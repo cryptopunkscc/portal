@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<script>
+    const api = new AppHostClient()
+
+    async function run() {
+        let id = await api.resolve("localnode")
+        let info = await api.nodeInfo(id)
+        document.getElementById("info").innerText = JSON.stringify(info)
+    }
+
+    run()
+</script>
+<p id="info"></p>
+</html>

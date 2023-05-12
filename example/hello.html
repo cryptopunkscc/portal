@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<script>
+    const api = new AppHostClient()
+
+    async function run() {
+        let conn = await api.dialName("localnode", "hello")
+        await conn.write("hello I am frontend")
+        let result = await conn.read()
+        alert(result)
+    }
+
+    run()
+</script>
+</html>
