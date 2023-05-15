@@ -3,7 +3,7 @@ module astral-js
 go 1.19
 
 require (
-	github.com/cryptopunkscc/astrald v0.0.0-20230515132512-b5158936c572
+	github.com/cryptopunkscc/astrald v0.0.0-20230515211425-60cd9617ffef
 	github.com/dop251/goja v0.0.0-20230427124612-428fc442ff5f
 	github.com/google/uuid v1.3.0
 	github.com/webview/webview v0.0.0-20230415172654-8387ff8945fc
