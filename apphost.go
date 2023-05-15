@@ -1,4 +1,4 @@
-package astral_js
+package astraljs
 
 import (
 	_ "embed"
@@ -12,6 +12,21 @@ import (
 	"time"
 )
 
+const (
+	Log             = "log"
+	Sleep           = "sleep"
+	ServiceRegister = "astral_service_register"
+	ServiceClose    = "astral_service_close"
+	ConnAccept      = "astral_conn_accept"
+	ConnClose       = "astral_conn_close"
+	ConnWrite       = "astral_conn_write"
+	ConnRead        = "astral_conn_read"
+	Query           = "astral_query"
+	QueryName       = "astral_query_name"
+	GetNodeInfo     = "astral_node_info"
+	Resolve         = "astral_resolve"
+)
+
 //go:embed apphost.js
 var appHostJsClient string
 
@@ -20,14 +35,14 @@ func AppHostJsClient() string {
 }
 
 type AppHostFlatAdapter struct {
-	ports map[string]*astral.Listener
-	conns map[string]io.ReadWriteCloser
+	listeners map[string]*astral.Listener
+	conns     map[string]io.ReadWriteCloser
 }
 
 func NewAppHostFlatAdapter() *AppHostFlatAdapter {
 	return &AppHostFlatAdapter{
-		ports: map[string]*astral.Listener{},
-		conns: map[string]io.ReadWriteCloser{},
+		listeners: map[string]*astral.Listener{},
+		conns:     map[string]io.ReadWriteCloser{},
 	}
 }
 
@@ -39,32 +54,32 @@ func (api *AppHostFlatAdapter) Sleep(duration int64) {
 	time.Sleep(time.Duration(duration) * time.Millisecond)
 }
 
-func (api *AppHostFlatAdapter) PortListen(service string) (err error) {
+func (api *AppHostFlatAdapter) ServiceRegister(service string) (err error) {
 	listener, err := astral.Register(service)
 	if err != nil {
 		return
 	}
-	api.ports[service] = listener
+	api.listeners[service] = listener
 	return
 }
 
-func (api *AppHostFlatAdapter) PortClose(port string) (err error) {
-	listener, ok := api.ports[port]
+func (api *AppHostFlatAdapter) ServiceClose(service string) (err error) {
+	listener, ok := api.listeners[service]
 	if !ok {
-		err = errors.New("[PortClose] not listening on port: " + port)
+		err = errors.New("[ServiceClose] not listening on port: " + service)
 		return
 	}
 	err = listener.Close()
 	if err != nil {
-		delete(api.ports, port)
+		delete(api.listeners, service)
 	}
 	return
 }
 
-func (api *AppHostFlatAdapter) ConnAccept(port string) (id string, err error) {
-	listener, ok := api.ports[port]
+func (api *AppHostFlatAdapter) ConnAccept(service string) (id string, err error) {
+	listener, ok := api.listeners[service]
 	if !ok {
-		err = fmt.Errorf("[ConnAccept] not listening on port: %v", port)
+		err = fmt.Errorf("[ConnAccept] not listening on port: %v", service)
 		return
 	}
 	conn, err := listener.Accept()
@@ -123,7 +138,7 @@ func (api *AppHostFlatAdapter) ConnRead(id string) (data string, err error) {
 	}
 }
 
-func (api *AppHostFlatAdapter) Dial(identity string, query string) (connId string, err error) {
+func (api *AppHostFlatAdapter) Query(identity string, query string) (connId string, err error) {
 	nid, err := id.ParsePublicKeyHex(identity)
 	if err != nil {
 		return
@@ -137,7 +152,7 @@ func (api *AppHostFlatAdapter) Dial(identity string, query string) (connId strin
 	return
 }
 
-func (api *AppHostFlatAdapter) DialName(name string, query string) (connId string, err error) {
+func (api *AppHostFlatAdapter) QueryName(name string, query string) (connId string, err error) {
 	conn, err := astral.QueryName(name, query)
 	if err != nil {
 		return

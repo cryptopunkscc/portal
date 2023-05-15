@@ -1,4 +1,4 @@
-module astral-js
+module astraljs
 
 go 1.19
 

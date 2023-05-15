@@ -1,25 +1,25 @@
 package main
 
 import (
-	astral_js "astral-js"
-	goja2 "astral-js/goja"
+	"astraljs"
+	goja2 "astraljs/goja"
 	"context"
 	"github.com/dop251/goja"
 	"log"
 )
 
 func main() {
-	app := astral_js.ResolveWebApp()
+	app := astraljs.ResolveWebApp()
 
 	vm := goja.New()
 
-	err := goja2.Bind(vm, astral_js.NewAppHostFlatAdapter())
+	err := goja2.Bind(vm, astraljs.NewAppHostFlatAdapter())
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// inject apphost client js lib
-	_, err = vm.RunString(astral_js.AppHostJsClient())
+	_, err = vm.RunString(astraljs.AppHostJsClient())
 	if err != nil {
 		log.Fatal(err)
 	}

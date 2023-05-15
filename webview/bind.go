@@ -1,42 +1,42 @@
 package webview
 
 import (
-	"astral-js"
+	"astraljs"
 	"github.com/webview/webview"
 )
 
-func Bind(view webview.WebView, astral *astral_js.AppHostFlatAdapter) {
-	if err := view.Bind("log", astral.Log); err != nil {
+func Bind(view webview.WebView, astral *astraljs.AppHostFlatAdapter) {
+	if err := view.Bind(astraljs.Log, astral.Log); err != nil {
 		return
 	}
-	if err := view.Bind("astral_port_listen", astral.PortListen); err != nil {
+	if err := view.Bind(astraljs.ServiceRegister, astral.ServiceRegister); err != nil {
 		return
 	}
-	if err := view.Bind("astral_port_close", astral.PortClose); err != nil {
+	if err := view.Bind(astraljs.ServiceClose, astral.ServiceClose); err != nil {
 		return
 	}
-	if err := view.Bind("astral_conn_accept", astral.ConnAccept); err != nil {
+	if err := view.Bind(astraljs.ConnAccept, astral.ConnAccept); err != nil {
 		return
 	}
-	if err := view.Bind("astral_conn_close", astral.ConnClose); err != nil {
+	if err := view.Bind(astraljs.ConnClose, astral.ConnClose); err != nil {
 		return
 	}
-	if err := view.Bind("astral_conn_write", astral.ConnWrite); err != nil {
+	if err := view.Bind(astraljs.ConnWrite, astral.ConnWrite); err != nil {
 		return
 	}
-	if err := view.Bind("astral_conn_read", astral.ConnRead); err != nil {
+	if err := view.Bind(astraljs.ConnRead, astral.ConnRead); err != nil {
 		return
 	}
-	if err := view.Bind("astral_dial", astral.Dial); err != nil {
+	if err := view.Bind(astraljs.Query, astral.Query); err != nil {
 		return
 	}
-	if err := view.Bind("astral_dial_name", astral.DialName); err != nil {
+	if err := view.Bind(astraljs.QueryName, astral.QueryName); err != nil {
 		return
 	}
-	if err := view.Bind("astral_node_info", astral.NodeInfo); err != nil {
+	if err := view.Bind(astraljs.GetNodeInfo, astral.NodeInfo); err != nil {
 		return
 	}
-	if err := view.Bind("astral_resolve", astral.Resolve); err != nil {
+	if err := view.Bind(astraljs.Resolve, astral.Resolve); err != nil {
 		return
 	}
 }

@@ -1,55 +1,55 @@
 package v8
 
 import (
-	"astral-js"
+	"astraljs"
 	"log"
 	v8 "rogchap.com/v8go"
 )
 
-func Bind(iso *v8.Isolate, astral *astral_js.AppHostFlatAdapter) (template *v8.ObjectTemplate, err error) {
+func Bind(iso *v8.Isolate, astral *astraljs.AppHostFlatAdapter) (template *v8.ObjectTemplate, err error) {
 	template = v8.NewObjectTemplate(iso)
 	a := adapter{astral}
-	if err = template.Set("log", v8.NewFunctionTemplate(iso, a.Log)); err != nil {
+	if err = template.Set(astraljs.Log, v8.NewFunctionTemplate(iso, a.Log)); err != nil {
 		return
 	}
-	if err = template.Set("sleep", v8.NewFunctionTemplate(iso, a.Sleep)); err != nil {
+	if err = template.Set(astraljs.Sleep, v8.NewFunctionTemplate(iso, a.Sleep)); err != nil {
 		return
 	}
-	if err = template.Set("astral_port_listen", v8.NewFunctionTemplate(iso, a.PortListen)); err != nil {
+	if err = template.Set(astraljs.ServiceRegister, v8.NewFunctionTemplate(iso, a.ServiceRegister)); err != nil {
 		return
 	}
-	if err = template.Set("astral_port_close", v8.NewFunctionTemplate(iso, a.PortClose)); err != nil {
+	if err = template.Set(astraljs.ServiceClose, v8.NewFunctionTemplate(iso, a.ServiceClose)); err != nil {
 		return
 	}
-	if err = template.Set("astral_conn_accept", v8.NewFunctionTemplate(iso, a.ConnAccept)); err != nil {
+	if err = template.Set(astraljs.ConnAccept, v8.NewFunctionTemplate(iso, a.ConnAccept)); err != nil {
 		return
 	}
-	if err = template.Set("astral_conn_close", v8.NewFunctionTemplate(iso, a.ConnClose)); err != nil {
+	if err = template.Set(astraljs.ConnClose, v8.NewFunctionTemplate(iso, a.ConnClose)); err != nil {
 		return
 	}
-	if err = template.Set("astral_conn_write", v8.NewFunctionTemplate(iso, a.ConnWrite)); err != nil {
+	if err = template.Set(astraljs.ConnWrite, v8.NewFunctionTemplate(iso, a.ConnWrite)); err != nil {
 		return
 	}
-	if err = template.Set("astral_conn_read", v8.NewFunctionTemplate(iso, a.ConnRead)); err != nil {
+	if err = template.Set(astraljs.ConnRead, v8.NewFunctionTemplate(iso, a.ConnRead)); err != nil {
 		return
 	}
-	if err = template.Set("astral_dial", v8.NewFunctionTemplate(iso, a.Dial)); err != nil {
+	if err = template.Set(astraljs.Query, v8.NewFunctionTemplate(iso, a.Query)); err != nil {
 		return
 	}
-	if err = template.Set("astral_dial_name", v8.NewFunctionTemplate(iso, a.DialName)); err != nil {
+	if err = template.Set(astraljs.QueryName, v8.NewFunctionTemplate(iso, a.QueryName)); err != nil {
 		return
 	}
-	if err = template.Set("astral_node_info", v8.NewFunctionTemplate(iso, a.NodeInfo)); err != nil {
+	if err = template.Set(astraljs.GetNodeInfo, v8.NewFunctionTemplate(iso, a.NodeInfo)); err != nil {
 		return
 	}
-	if err = template.Set("astral_resolve", v8.NewFunctionTemplate(iso, a.Resolve)); err != nil {
+	if err = template.Set(astraljs.Resolve, v8.NewFunctionTemplate(iso, a.Resolve)); err != nil {
 		return
 	}
 	return
 }
 
 type adapter struct {
-	astral *astral_js.AppHostFlatAdapter
+	astral *astraljs.AppHostFlatAdapter
 }
 
 func (a *adapter) Log(info *v8.FunctionCallbackInfo) *v8.Value {
@@ -68,12 +68,12 @@ func (a *adapter) Sleep(info *v8.FunctionCallbackInfo) *v8.Value {
 	return resolver.GetPromise().Value
 }
 
-func (a *adapter) PortListen(info *v8.FunctionCallbackInfo) *v8.Value {
+func (a *adapter) ServiceRegister(info *v8.FunctionCallbackInfo) *v8.Value {
 	iso := info.Context().Isolate()
 	port := info.Args()[0].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		err := a.astral.PortListen(port)
+		err := a.astral.ServiceRegister(port)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {
@@ -86,12 +86,12 @@ func (a *adapter) PortListen(info *v8.FunctionCallbackInfo) *v8.Value {
 	return resolver.GetPromise().Value
 }
 
-func (a *adapter) PortClose(info *v8.FunctionCallbackInfo) *v8.Value {
+func (a *adapter) ServiceClose(info *v8.FunctionCallbackInfo) *v8.Value {
 	iso := info.Context().Isolate()
 	port := info.Args()[0].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		err := a.astral.PortClose(port)
+		err := a.astral.ServiceClose(port)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {
@@ -187,13 +187,13 @@ func (a *adapter) ConnRead(info *v8.FunctionCallbackInfo) *v8.Value {
 	return resolver.GetPromise().Value
 }
 
-func (a *adapter) Dial(info *v8.FunctionCallbackInfo) *v8.Value {
+func (a *adapter) Query(info *v8.FunctionCallbackInfo) *v8.Value {
 	iso := info.Context().Isolate()
 	id := info.Args()[0].String()
 	query := info.Args()[1].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		connId, err := a.astral.Dial(id, query)
+		connId, err := a.astral.Query(id, query)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {
@@ -211,13 +211,13 @@ func (a *adapter) Dial(info *v8.FunctionCallbackInfo) *v8.Value {
 	return resolver.GetPromise().Value
 }
 
-func (a *adapter) DialName(info *v8.FunctionCallbackInfo) *v8.Value {
+func (a *adapter) QueryName(info *v8.FunctionCallbackInfo) *v8.Value {
 	iso := info.Context().Isolate()
 	name := info.Args()[0].String()
 	query := info.Args()[1].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		connId, err := a.astral.DialName(name, query)
+		connId, err := a.astral.QueryName(name, query)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {

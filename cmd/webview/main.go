@@ -1,13 +1,13 @@
 package main
 
 import (
-	"astral-js"
-	webview2 "astral-js/webview"
+	"astraljs"
+	webview2 "astraljs/webview"
 	"github.com/webview/webview"
 )
 
 func main() {
-	app := astral_js.ResolveWebApp()
+	app := astraljs.ResolveWebApp()
 
 	w := webview.New(true)
 	defer w.Destroy()
@@ -16,13 +16,13 @@ func main() {
 	w.SetTitle(app.Title)
 
 	// inject apphost js client lib
-	w.Init(astral_js.AppHostJsClient())
+	w.Init(astraljs.AppHostJsClient())
 
 	// set app source code
 	w.SetHtml(app.Source)
 
 	// bind apphost adapter to js env
-	webview2.Bind(w, astral_js.NewAppHostFlatAdapter())
+	webview2.Bind(w, astraljs.NewAppHostFlatAdapter())
 
 	// start js application frontend
 	w.Run()

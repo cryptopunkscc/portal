@@ -1,17 +1,17 @@
 class AppHostClient {
-    async listen(port) {
-        await astral_port_listen(port)
-        return new Port(port)
+    async register(service) {
+        await astral_service_register(service)
+        return new AppHostListener(service)
     }
 
-    async dial(node, query) {
-        const conn = await astral_dial(node, query)
-        return new Conn(conn)
+    async query(node, query) {
+        const conn = await astral_query(node, query)
+        return new AppHostConn(conn)
     }
 
-    async dialName(node, query) {
-        const conn = await astral_dial_name(node, query)
-        return new Conn(conn)
+    async queryName(node, query) {
+        const conn = await astral_query_name(node, query)
+        return new AppHostConn(conn)
     }
 
     async nodeInfo(id) {
@@ -23,22 +23,22 @@ class AppHostClient {
     }
 }
 
-class Port {
+class AppHostListener {
     constructor(port) {
         this.port = port
     }
 
     async accept() {
         const conn = await astral_conn_accept(this.port)
-        return new Conn(conn)
+        return new AppHostConn(conn)
     }
 
     async close() {
-        astral_port_close(this.port)
+        await astral_service_close(this.port)
     }
 }
 
-class Conn {
+class AppHostConn {
     constructor(conn) {
         this.conn = conn
     }
@@ -52,6 +52,6 @@ class Conn {
     }
 
     async close() {
-        astral_conn_close(this.conn)
+        await astral_conn_close(this.conn)
     }
 }

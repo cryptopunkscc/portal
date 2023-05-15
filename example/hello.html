@@ -4,9 +4,10 @@
     const api = new AppHostClient()
 
     async function run() {
-        let conn = await api.dialName("localnode", "hello")
+        let conn = await api.queryName("localnode", "hello")
         await conn.write("hello I am frontend")
         let result = await conn.read()
+        await conn.close()
         alert(result)
     }
 

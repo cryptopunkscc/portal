@@ -1,4 +1,4 @@
-package astral_js
+package astraljs
 
 import (
 	"errors"
@@ -35,13 +35,13 @@ func getWebAppPath() (path string, err error) {
 	return
 }
 
-func getWebApp(path string) (html WebApp, err error) {
+func getWebApp(path string) (app WebApp, err error) {
 	bytes, err := os.ReadFile(path)
 	if err != nil {
 		return
 	}
 
-	html = WebApp{
+	app = WebApp{
 		Title:  path,
 		Source: string(bytes),
 		Path:   path,

@@ -1,21 +1,21 @@
 package main
 
 import (
-	"astral-js"
-	"astral-js/v8"
+	"astraljs"
+	"astraljs/v8"
 	"context"
 	"log"
 	"rogchap.com/v8go"
 )
 
 func main() {
-	app := astral_js.ResolveWebApp()
+	app := astraljs.ResolveWebApp()
 
 	iso := v8go.NewIsolate()
 	defer iso.Dispose()
 
 	// bind apphost adapter to js env
-	global, err := v8.Bind(iso, astral_js.NewAppHostFlatAdapter())
+	global, err := v8.Bind(iso, astraljs.NewAppHostFlatAdapter())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -25,7 +25,7 @@ func main() {
 	defer v8Ctx.Close()
 
 	// inject apphost client js lib
-	_, err = v8Ctx.RunScript(astral_js.AppHostJsClient(), "apphost")
+	_, err = v8Ctx.RunScript(astraljs.AppHostJsClient(), "apphost")
 	if err != nil {
 		log.Fatal(err)
 	}
