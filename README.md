@@ -14,7 +14,7 @@ Supported platforms for specific implementation:
   * Linux
   * MacOS ?
   * ~~Windows~~
-* goja - ES5
+* goja - ES6 (partial?)
   * Linux 
   * MacOS ?
   * Windows ?
@@ -28,22 +28,17 @@ Make sure all required dependencies are installed.
 
 ## How to run
 
-* v8 backend + es6
+* v8 backend
 ```shell
 go run ./cmd/v8 ./example/hello.js 
 ```
 
-* v8 backend (es5)
+* goja backend
 ```shell
-go run ./cmd/v8 ./example/hello.es5.js 
+go run ./cmd/goja ./example/hello.js 
 ```
 
-* goja + es5
-```shell
-go run ./cmd/goja ./example/hello.es5.js 
-```
-
-Start frontend:
+* WebView frontend
 
 ```shell
 go run ./cmd/webview ./example/hello.html 

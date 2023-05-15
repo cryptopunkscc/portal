@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"io"
 	"log"
+	"time"
 )
 
 //go:embed apphost.js
@@ -34,6 +35,10 @@ func (api *AppHostFlatAdapter) Log(arg ...any) {
 	log.Println(arg...)
 }
 
+func (api *AppHostFlatAdapter) Sleep(duration int64) {
+	time.Sleep(time.Duration(duration) * time.Millisecond)
+}
+
 func (api *AppHostFlatAdapter) PortListen(port string) (err error) {
 	listener, err := astral.Listen(port)
 	if err != nil {
@@ -46,7 +51,7 @@ func (api *AppHostFlatAdapter) PortListen(port string) (err error) {
 func (api *AppHostFlatAdapter) PortClose(port string) (err error) {
 	listener, ok := api.ports[port]
 	if !ok {
-		err = errors.New("not listening on port: " + port)
+		err = errors.New("[PortClose] not listening on port: " + port)
 		return
 	}
 	err = listener.Close()
@@ -59,7 +64,7 @@ func (api *AppHostFlatAdapter) PortClose(port string) (err error) {
 func (api *AppHostFlatAdapter) ConnAccept(port string) (id string, err error) {
 	listener, ok := api.ports[port]
 	if !ok {
-		err = fmt.Errorf("not listening on port: %v", port)
+		err = fmt.Errorf("[ConnAccept] not listening on port: %v", port)
 		return
 	}
 	conn, err := listener.Accept()
@@ -74,7 +79,7 @@ func (api *AppHostFlatAdapter) ConnAccept(port string) (id string, err error) {
 func (api *AppHostFlatAdapter) ConnClose(id string) (err error) {
 	conn, ok := api.conns[id]
 	if !ok {
-		err = errors.New("not found connection with id: " + id)
+		err = errors.New("[ConnClose] not found connection with id: " + id)
 		return
 	}
 	err = conn.Close()
@@ -87,7 +92,7 @@ func (api *AppHostFlatAdapter) ConnClose(id string) (err error) {
 func (api *AppHostFlatAdapter) ConnWrite(id string, data string) (err error) {
 	conn, ok := api.conns[id]
 	if !ok {
-		err = errors.New("not found connection with id: " + id)
+		err = errors.New("[ConnWrite] not found connection with id: " + id)
 		return
 	}
 	_, err = conn.Write([]byte(data))
@@ -97,7 +102,7 @@ func (api *AppHostFlatAdapter) ConnWrite(id string, data string) (err error) {
 func (api *AppHostFlatAdapter) ConnRead(id string) (data string, err error) {
 	conn, ok := api.conns[id]
 	if !ok {
-		err = errors.New("not found connection with id: " + id)
+		err = errors.New("[ConnRead] not found connection with id: " + id)
 		return
 	}
 	buf := make([]byte, 4096)

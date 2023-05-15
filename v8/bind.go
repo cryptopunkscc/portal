@@ -12,6 +12,9 @@ func Bind(iso *v8.Isolate, astral *astral_js.AppHostFlatAdapter) (template *v8.O
 	if err = template.Set("log", v8.NewFunctionTemplate(iso, a.Log)); err != nil {
 		return
 	}
+	if err = template.Set("sleep", v8.NewFunctionTemplate(iso, a.Sleep)); err != nil {
+		return
+	}
 	if err = template.Set("astral_port_listen", v8.NewFunctionTemplate(iso, a.PortListen)); err != nil {
 		return
 	}
@@ -52,6 +55,17 @@ type adapter struct {
 func (a *adapter) Log(info *v8.FunctionCallbackInfo) *v8.Value {
 	log.Println(info.Args())
 	return nil
+}
+
+func (a *adapter) Sleep(info *v8.FunctionCallbackInfo) *v8.Value {
+	iso := info.Context().Isolate()
+	t := info.Args()[0].Integer()
+	resolver, _ := v8.NewPromiseResolver(info.Context())
+	go func() {
+		a.astral.Sleep(t)
+		resolver.Resolve(v8.Undefined(iso))
+	}()
+	return resolver.GetPromise().Value
 }
 
 func (a *adapter) PortListen(info *v8.FunctionCallbackInfo) *v8.Value {
