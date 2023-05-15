@@ -39,12 +39,12 @@ func (api *AppHostFlatAdapter) Sleep(duration int64) {
 	time.Sleep(time.Duration(duration) * time.Millisecond)
 }
 
-func (api *AppHostFlatAdapter) PortListen(port string) (err error) {
-	listener, err := astral.Listen(port)
+func (api *AppHostFlatAdapter) PortListen(service string) (err error) {
+	listener, err := astral.Register(service)
 	if err != nil {
 		return
 	}
-	api.ports[port] = listener
+	api.ports[service] = listener
 	return
 }
 
@@ -128,7 +128,7 @@ func (api *AppHostFlatAdapter) Dial(identity string, query string) (connId strin
 	if err != nil {
 		return
 	}
-	conn, err := astral.Dial(nid, query)
+	conn, err := astral.Query(nid, query)
 	if err != nil {
 		return
 	}
@@ -138,7 +138,7 @@ func (api *AppHostFlatAdapter) Dial(identity string, query string) (connId strin
 }
 
 func (api *AppHostFlatAdapter) DialName(name string, query string) (connId string, err error) {
-	conn, err := astral.DialName(name, query)
+	conn, err := astral.QueryName(name, query)
 	if err != nil {
 		return
 	}
@@ -161,7 +161,7 @@ func (api *AppHostFlatAdapter) NodeInfo(identity string) (info NodeInfo, err err
 	if err != nil {
 		return
 	}
-	i, err := astral.NodeInfo(nid)
+	i, err := astral.GetNodeInfo(nid)
 	if err != nil {
 		return
 	}

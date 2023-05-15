@@ -15,7 +15,7 @@ Supported platforms for specific implementation:
   * MacOS ?
   * ~~Windows~~
 * goja - ES6 (partial?)
-  * Linux 
+  * Linux
   * MacOS ?
   * Windows ?
   * Android ?
@@ -26,14 +26,52 @@ Make sure all required dependencies are installed.
 
 * [WebView](https://github.com/webview/webview#prerequisites)
 
+## Install
+
+### Linux
+
+Update binaries:
+
+```shell
+go build -o "$HOME/.local/bin/astral-runtime-webview" ./cmd/webview &&
+go build -o "$HOME/.local/bin/astral-runtime-v8" ./cmd/v8 &&
+go build -o "$HOME/.local/bin/astral-runtime-goja" ./cmd/goja
+```
+
+Update anc
+
+```shell
+go build -o "$HOME/.local/bin/anc" github.com/cryptopunkscc/astrald/cmd/anc
+```
+
+Update config:
+
+```shell
+cp ./mod_apphost.yaml "$HOME/.config/astrald/config/"
+```
+
 ## How to run
 
+### AppHost
+
+```shell
+anc query localnode admin
+```
+start js app in admin console:
+```
+apphost run goja path_to_script.js
+```
+
+### Legacy
+
 * v8 backend
+
 ```shell
 go run ./cmd/v8 ./example/hello.js 
 ```
 
 * goja backend
+
 ```shell
 go run ./cmd/goja ./example/hello.js 
 ```
