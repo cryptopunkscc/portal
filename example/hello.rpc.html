@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<script>
+    async function rpc() {
+        let srv = await appHost.queryName("localnode", "srv")
+        await srv.bindRpc()
+
+        let result = await srv.get("Hello from front")
+        alert(JSON.stringify(result))
+
+        result = await srv.sum(1, 2)
+        alert(result)
+
+        await srv.close()
+    }
+
+    rpc()
+</script>
+</html>
