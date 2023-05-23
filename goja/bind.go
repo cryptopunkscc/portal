@@ -52,7 +52,7 @@ type adapter struct {
 }
 
 func (a *adapter) Log(arg ...any) {
-	a.astral.Log(arg)
+	a.astral.LogArr(arg)
 }
 
 func (a *adapter) Sleep(millis int64) *goja.Promise {

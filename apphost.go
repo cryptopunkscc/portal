@@ -46,7 +46,11 @@ func NewAppHostFlatAdapter() *AppHostFlatAdapter {
 	}
 }
 
-func (api *AppHostFlatAdapter) Log(arg []any) {
+func (api *AppHostFlatAdapter) Log(arg ...any) {
+	log.Println(arg...)
+}
+
+func (api *AppHostFlatAdapter) LogArr(arg []any) {
 	log.Println(arg...)
 }
 

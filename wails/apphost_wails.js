@@ -39,7 +39,7 @@ function astral_service_register(arg1) {
 }
 
 function log(...arg1) {
-  return window['go']['main']['Adapter']['Log'](arg1);
+  return window['go']['main']['Adapter']['LogArr'](arg1);
 }
 
 function sleep(arg1) {
