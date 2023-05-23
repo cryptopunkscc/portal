@@ -1,16 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+<script src="apphost.js"></script>
 <script>
-    const api = new AppHostClient()
-
+    log("test log")
     async function run() {
-        let conn = await api.queryName("localnode", "hello")
+        let conn = await appHost.queryName("localnode", "hello")
         await conn.write("hello I am frontend")
         let result = await conn.read()
         await conn.close()
         alert(result)
     }
-
+    run()
+    run()
+    run()
+    run()
+    run()
+    run()
+    run()
+    run()
     run()
 </script>
 </html>

@@ -6,25 +6,32 @@ Astral JavaScript runtime environment written in golang for desktop.
 
 Supported platforms for specific implementation:
 
-* WebView - ES6
-  * Linux
-  * MacOS ?
-  * Windows ?
-* V8 - ES6
-  * Linux
-  * MacOS ?
-  * ~~Windows~~
-* goja - ES6 (partial?)
-  * Linux
-  * MacOS ?
-  * Windows ?
-  * Android ?
+* Frontend
+  * WebView - ES6
+    * Linux
+    * MacOS ?
+    * Windows ?
+  * wails - ES6
+    * Linux
+    * MacOS ?
+    * Windows ?
+* Backend
+  * V8 - ES6
+    * Linux
+    * MacOS ?
+    * ~~Windows~~
+  * goja - ES6 (partial?)
+    * Linux
+    * MacOS ?
+    * Windows ?
+    * Android ?
 
 ## Prerequisites
 
 Make sure all required dependencies are installed.
 
 * [WebView](https://github.com/webview/webview#prerequisites)
+* [wails](https://wails.io/docs/gettingstarted/installation)
 
 ## Install
 
@@ -36,6 +43,10 @@ Update binaries:
 go build -o "$HOME/.local/bin/astral-runtime-webview" ./cmd/webview &&
 go build -o "$HOME/.local/bin/astral-runtime-v8" ./cmd/v8 &&
 go build -o "$HOME/.local/bin/astral-runtime-goja" ./cmd/goja
+```
+
+```shell
+./cmd/wails/build.sh
 ```
 
 Update anc
@@ -80,4 +91,10 @@ go run ./cmd/goja ./example/hello.js
 
 ```shell
 go run ./cmd/webview ./example/hello.html 
+```
+
+* wails frontend
+
+```shell
+./cmd/wails/build/bin/wails ./example/hello.html 
 ```

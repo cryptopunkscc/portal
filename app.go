@@ -25,6 +25,21 @@ func ResolveWebApp() (webApp WebApp) {
 	return
 }
 
+func TryResolveWebApp() (webApp WebApp) {
+	path, err := getWebAppPath()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	webApp, err = getWebApp(path)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	return
+}
+
 func getWebAppPath() (path string, err error) {
 	args := os.Args[1:]
 	if len(args) < 1 {
@@ -36,15 +51,14 @@ func getWebAppPath() (path string, err error) {
 }
 
 func getWebApp(path string) (app WebApp, err error) {
+	app = WebApp{
+		Title: path,
+		Path:  path,
+	}
 	bytes, err := os.ReadFile(path)
 	if err != nil {
 		return
 	}
-
-	app = WebApp{
-		Title:  path,
-		Source: string(bytes),
-		Path:   path,
-	}
+	app.Source = string(bytes)
 	return
 }
