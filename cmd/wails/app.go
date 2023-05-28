@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/astrald/data"
+	"github.com/cryptopunkscc/astrald/lib/astral"
 	"io"
 	"net/http"
 	"os"
@@ -24,16 +25,25 @@ type Manifest struct {
 }
 
 type App struct {
-	Title string
 	FileStore
+	Title    string
+	tempFile string
 }
 
 func NewApp(appName string) (*App, error) {
-	if _, err := data.Parse(appName); err == nil {
-		panic("astral storage not implemented")
+	var app = &App{}
+
+	if blockID, err := data.Parse(appName); err == nil {
+		//TODO: don't download the block, read it remotely
+		file, err := downloadBlock(blockID)
+		if err != nil {
+			return nil, err
+		}
+
+		appName = file
+		app.tempFile = file
 	}
 
-	var app = &App{}
 	var path = appName
 
 	if path[0] != '/' {
@@ -89,6 +99,43 @@ func NewApp(appName string) (*App, error) {
 	return app, nil
 }
 
+func (app *App) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	var filename = strings.TrimPrefix(req.URL.Path, "/")
+
+	if filename == "" {
+		filename = "index.html"
+	}
+
+	if r, err := app.Open(filename); err != nil {
+		fmt.Fprintf(os.Stderr, "GET /%s 404\n", filename)
+		w.WriteHeader(http.StatusNotFound)
+	} else {
+		fmt.Fprintf(os.Stdout, "GET /%s 200\n", filename)
+		w.WriteHeader(http.StatusOK)
+		io.Copy(w, r)
+	}
+}
+
+func downloadBlock(blockID data.ID) (string, error) {
+	storage := astral.Client.LocalStorage()
+	r, err := storage.Read(blockID, 0, 0)
+	if err != nil {
+		return "", err
+	}
+
+	file, err := os.CreateTemp("", ".astral.app-*")
+	if err != nil {
+		return "", err
+	}
+
+	_, err = io.Copy(file, r)
+	if err != nil {
+		return "", err
+	}
+
+	return file.Name(), nil
+}
+
 func fileType(filePath string) (string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -107,19 +154,8 @@ func fileType(filePath string) (string, error) {
 	return contentType, nil
 }
 
-func (app *App) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	var filename = strings.TrimPrefix(req.URL.Path, "/")
-
-	if filename == "" {
-		filename = "index.html"
-	}
-
-	if r, err := app.Open(filename); err != nil {
-		fmt.Fprintf(os.Stderr, "GET /%s 404\n", filename)
-		w.WriteHeader(http.StatusNotFound)
-	} else {
-		fmt.Fprintf(os.Stdout, "GET /%s 200\n", filename)
-		w.WriteHeader(http.StatusOK)
-		io.Copy(w, r)
+func (app *App) Cleanup() {
+	if app.tempFile != "" {
+		os.Remove(app.tempFile)
 	}
 }

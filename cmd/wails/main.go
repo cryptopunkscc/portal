@@ -21,6 +21,8 @@ func main() {
 		panic(err)
 	}
 
+	defer app.Cleanup()
+
 	if err := wails.Run(&options.App{
 		Title:  app.Title,
 		Width:  1024,
