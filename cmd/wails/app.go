@@ -1,7 +1,6 @@
 package main
 
 import (
-	"astraljs"
 	_ "embed"
 	"encoding/json"
 	"errors"
@@ -60,7 +59,7 @@ func NewApp(appName string) (*App, error) {
 
 	switch {
 	case info.IsDir():
-		app.FileStore = NewDirStore(path)
+		app.FileStore = NewOverlayStore(NewDirStore(path), SDKStore)
 
 	case info.Mode().IsRegular():
 		filetype, err := fileType(path)
@@ -69,16 +68,16 @@ func NewApp(appName string) (*App, error) {
 		}
 		switch filetype {
 		case "text/html":
-			var mem = NewMemStore()
-			mem.Entries["index.html"], _ = os.ReadFile(path)
-			mem.Entries["apphost.js"] = []byte(apphostWails + astraljs.AppHostJsClient())
-			app.FileStore = mem
+			var store = NewMemStore()
+			store.Entries["index.html"], _ = os.ReadFile(path)
+			app.FileStore = NewOverlayStore(store, SDKStore)
 
 		case "application/zip":
-			app.FileStore, err = NewZipStore(path)
+			store, err := NewZipStore(path)
 			if err != nil {
 				return nil, err
 			}
+			app.FileStore = NewOverlayStore(store, SDKStore)
 
 		default:
 			return nil, errors.New("unsupported file type: " + filetype)
