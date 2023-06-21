@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"io"
 	"log"
+	"sync"
 	"time"
 )
 
@@ -35,14 +36,51 @@ func AppHostJsClient() string {
 }
 
 type AppHostFlatAdapter struct {
-	listeners map[string]*astral.Listener
-	conns     map[string]io.ReadWriteCloser
+	listeners      map[string]*astral.Listener
+	listenersMutex sync.RWMutex
+
+	connections      map[string]io.ReadWriteCloser
+	connectionsMutex sync.RWMutex
 }
 
 func NewAppHostFlatAdapter() *AppHostFlatAdapter {
 	return &AppHostFlatAdapter{
-		listeners: map[string]*astral.Listener{},
-		conns:     map[string]io.ReadWriteCloser{},
+		listeners:   map[string]*astral.Listener{},
+		connections: map[string]io.ReadWriteCloser{},
+	}
+}
+
+func (api *AppHostFlatAdapter) getListener(service string) (l *astral.Listener, ok bool) {
+	api.listenersMutex.RLock()
+	defer api.listenersMutex.RUnlock()
+	l, ok = api.listeners[service]
+	return
+}
+
+func (api *AppHostFlatAdapter) setListener(service string, listener *astral.Listener) {
+	api.listenersMutex.Lock()
+	defer api.listenersMutex.Unlock()
+	if listener != nil {
+		api.listeners[service] = listener
+	} else {
+		delete(api.listeners, service)
+	}
+}
+
+func (api *AppHostFlatAdapter) getConnection(connectionId string) (rw io.ReadWriteCloser, ok bool) {
+	api.connectionsMutex.RLock()
+	defer api.connectionsMutex.RUnlock()
+	rw, ok = api.connections[connectionId]
+	return
+}
+
+func (api *AppHostFlatAdapter) setConnection(connectionId string, connection io.ReadWriteCloser) {
+	api.connectionsMutex.Lock()
+	defer api.connectionsMutex.Unlock()
+	if connection != nil {
+		api.connections[connectionId] = connection
+	} else {
+		delete(api.connections, connectionId)
 	}
 }
 
@@ -63,25 +101,25 @@ func (api *AppHostFlatAdapter) ServiceRegister(service string) (err error) {
 	if err != nil {
 		return
 	}
-	api.listeners[service] = listener
+	api.setListener(service, listener)
 	return
 }
 
 func (api *AppHostFlatAdapter) ServiceClose(service string) (err error) {
-	listener, ok := api.listeners[service]
+	listener, ok := api.getListener(service)
 	if !ok {
 		err = errors.New("[ServiceClose] not listening on port: " + service)
 		return
 	}
 	err = listener.Close()
 	if err != nil {
-		delete(api.listeners, service)
+		api.setListener(service, nil)
 	}
 	return
 }
 
 func (api *AppHostFlatAdapter) ConnAccept(service string) (id string, err error) {
-	listener, ok := api.listeners[service]
+	listener, ok := api.getListener(service)
 	if !ok {
 		err = fmt.Errorf("[ConnAccept] not listening on port: %v", service)
 		return
@@ -91,25 +129,25 @@ func (api *AppHostFlatAdapter) ConnAccept(service string) (id string, err error)
 		return
 	}
 	id = uuid.New().String()
-	api.conns[id] = conn
+	api.setConnection(id, conn)
 	return
 }
 
 func (api *AppHostFlatAdapter) ConnClose(id string) (err error) {
-	conn, ok := api.conns[id]
+	conn, ok := api.getConnection(id)
 	if !ok {
 		err = errors.New("[ConnClose] not found connection with id: " + id)
 		return
 	}
 	err = conn.Close()
 	if err == nil {
-		delete(api.conns, id)
+		api.setConnection(id, nil)
 	}
 	return
 }
 
 func (api *AppHostFlatAdapter) ConnWrite(id string, data string) (err error) {
-	conn, ok := api.conns[id]
+	conn, ok := api.getConnection(id)
 	if !ok {
 		err = errors.New("[ConnWrite] not found connection with id: " + id)
 		return
@@ -119,7 +157,7 @@ func (api *AppHostFlatAdapter) ConnWrite(id string, data string) (err error) {
 }
 
 func (api *AppHostFlatAdapter) ConnRead(id string) (data string, err error) {
-	conn, ok := api.conns[id]
+	conn, ok := api.getConnection(id)
 	if !ok {
 		err = errors.New("[ConnRead] not found connection with id: " + id)
 		return
@@ -152,7 +190,7 @@ func (api *AppHostFlatAdapter) Query(identity string, query string) (connId stri
 		return
 	}
 	connId = uuid.New().String()
-	api.conns[connId] = conn
+	api.setConnection(connId, conn)
 	return
 }
 
@@ -162,7 +200,7 @@ func (api *AppHostFlatAdapter) QueryName(name string, query string) (connId stri
 		return
 	}
 	connId = uuid.New().String()
-	api.conns[connId] = conn
+	api.setConnection(connId, conn)
 	return
 }
 

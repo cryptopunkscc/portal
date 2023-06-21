@@ -6,7 +6,7 @@ import (
 )
 
 func Bind(vm *goja.Runtime, astral *astraljs.AppHostFlatAdapter) (err error) {
-	var a = adapter{astral: astral, vm: vm}
+	var a = adapter{astral: astral, vm: vm, queue: make(chan func(), 1024)}
 	if err = vm.Set(astraljs.Log, a.Log); err != nil {
 		return
 	}
@@ -43,12 +43,18 @@ func Bind(vm *goja.Runtime, astral *astraljs.AppHostFlatAdapter) (err error) {
 	if err = vm.Set(astraljs.Resolve, a.Resolve); err != nil {
 		return
 	}
+	go func() {
+		for f := range a.queue {
+			f()
+		}
+	}()
 	return
 }
 
 type adapter struct {
 	astral *astraljs.AppHostFlatAdapter
 	vm     *goja.Runtime
+	queue  chan func()
 }
 
 func (a *adapter) Log(arg ...any) {
@@ -59,7 +65,9 @@ func (a *adapter) Sleep(millis int64) *goja.Promise {
 	promise, resolve, _ := a.vm.NewPromise()
 	go func() {
 		a.astral.Sleep(millis)
-		resolve(goja.Undefined())
+		a.queue <- func() {
+			resolve(goja.Undefined())
+		}
 	}()
 	return promise
 }
@@ -68,10 +76,12 @@ func (a *adapter) ServiceRegister(port string) *goja.Promise {
 	promise, resolve, reject := a.vm.NewPromise()
 	go func() {
 		err := a.astral.ServiceRegister(port)
-		if err != nil {
-			reject(err)
-		} else {
-			resolve(goja.Undefined())
+		a.queue <- func() {
+			if err != nil {
+				reject(err)
+			} else {
+				resolve(goja.Undefined())
+			}
 		}
 	}()
 	return promise
@@ -81,10 +91,12 @@ func (a *adapter) ServiceClose(port string) *goja.Promise {
 	promise, resolve, reject := a.vm.NewPromise()
 	go func() {
 		err := a.astral.ServiceClose(port)
-		if err != nil {
-			reject(err)
-		} else {
-			resolve(goja.Undefined())
+		a.queue <- func() {
+			if err != nil {
+				reject(err)
+			} else {
+				resolve(goja.Undefined())
+			}
 		}
 	}()
 	return promise
@@ -94,10 +106,12 @@ func (a *adapter) ConnAccept(port string) *goja.Promise {
 	promise, resolve, reject := a.vm.NewPromise()
 	go func() {
 		conn, err := a.astral.ConnAccept(port)
-		if err != nil {
-			reject(err)
-		} else {
-			resolve(conn)
+		a.queue <- func() {
+			if err != nil {
+				reject(err)
+			} else {
+				resolve(conn)
+			}
 		}
 	}()
 	return promise
@@ -107,10 +121,12 @@ func (a *adapter) ConnClose(id string) *goja.Promise {
 	promise, resolve, reject := a.vm.NewPromise()
 	go func() {
 		err := a.astral.ConnClose(id)
-		if err != nil {
-			reject(err)
-		} else {
-			resolve(goja.Undefined())
+		a.queue <- func() {
+			if err != nil {
+				reject(err)
+			} else {
+				resolve(goja.Undefined())
+			}
 		}
 	}()
 	return promise
@@ -120,10 +136,12 @@ func (a *adapter) ConnWrite(id string, data string) *goja.Promise {
 	promise, resolve, reject := a.vm.NewPromise()
 	go func() {
 		err := a.astral.ConnWrite(id, data)
-		if err != nil {
-			reject(err)
-		} else {
-			resolve(goja.Undefined())
+		a.queue <- func() {
+			if err != nil {
+				reject(err)
+			} else {
+				resolve(goja.Undefined())
+			}
 		}
 	}()
 	return promise
@@ -133,10 +151,12 @@ func (a *adapter) ConnRead(id string) *goja.Promise {
 	promise, resolve, reject := a.vm.NewPromise()
 	go func() {
 		val, err := a.astral.ConnRead(id)
-		if err != nil {
-			reject(err)
-		} else {
-			resolve(val)
+		a.queue <- func() {
+			if err != nil {
+				reject(err)
+			} else {
+				resolve(val)
+			}
 		}
 	}()
 	return promise
@@ -146,10 +166,12 @@ func (a *adapter) Query(identity string, query string) *goja.Promise {
 	promise, resolve, reject := a.vm.NewPromise()
 	go func() {
 		val, err := a.astral.Query(identity, query)
-		if err != nil {
-			reject(err)
-		} else {
-			resolve(val)
+		a.queue <- func() {
+			if err != nil {
+				reject(err)
+			} else {
+				resolve(val)
+			}
 		}
 	}()
 	return promise
@@ -159,10 +181,12 @@ func (a *adapter) QueryName(name string, query string) *goja.Promise {
 	promise, resolve, reject := a.vm.NewPromise()
 	go func() {
 		val, err := a.astral.Query(name, query)
-		if err != nil {
-			reject(err)
-		} else {
-			resolve(val)
+		a.queue <- func() {
+			if err != nil {
+				reject(err)
+			} else {
+				resolve(val)
+			}
 		}
 	}()
 	return promise
@@ -172,10 +196,12 @@ func (a *adapter) Resolve(name string) *goja.Promise {
 	promise, resolve, reject := a.vm.NewPromise()
 	go func() {
 		val, err := a.astral.Resolve(name)
-		if err != nil {
-			reject(err)
-		} else {
-			resolve(val)
+		a.queue <- func() {
+			if err != nil {
+				reject(err)
+			} else {
+				resolve(val)
+			}
 		}
 	}()
 	return promise
@@ -185,10 +211,12 @@ func (a *adapter) NodeInfo(identity string) *goja.Promise {
 	promise, resolve, reject := a.vm.NewPromise()
 	go func() {
 		val, err := a.astral.NodeInfo(identity)
-		if err != nil {
-			reject(err)
-		} else {
-			resolve(val)
+		a.queue <- func() {
+			if err != nil {
+				reject(err)
+			} else {
+				resolve(val)
+			}
 		}
 	}()
 	return promise
