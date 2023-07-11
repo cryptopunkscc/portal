@@ -1,7 +1,7 @@
 package goja
 
 import (
-	"astraljs"
+	"github.com/cryptopunkscc/go-astral-js"
 	"github.com/dop251/goja"
 )
 

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"astraljs"
-	webview2 "astraljs/webview"
+	"github.com/cryptopunkscc/go-astral-js"
+	webview2 "github.com/cryptopunkscc/go-astral-js/webview"
 	"github.com/webview/webview"
 )
 

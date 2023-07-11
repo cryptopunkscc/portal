@@ -1,9 +1,9 @@
 package main
 
 import (
-	"astraljs"
-	"astraljs/v8"
 	"context"
+	"github.com/cryptopunkscc/go-astral-js"
+	"github.com/cryptopunkscc/go-astral-js/v8"
 	"log"
 	"rogchap.com/v8go"
 )

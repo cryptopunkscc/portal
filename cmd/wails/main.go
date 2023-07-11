@@ -1,8 +1,8 @@
 package main
 
 import (
-	"astraljs"
 	"fmt"
+	astraljs "github.com/cryptopunkscc/go-astral-js"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"

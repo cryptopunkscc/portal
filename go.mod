@@ -1,4 +1,4 @@
-module astraljs
+module github.com/cryptopunkscc/go-astral-js
 
 go 1.19
 

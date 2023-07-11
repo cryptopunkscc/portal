@@ -1,9 +1,9 @@
 package main
 
 import (
-	"astraljs"
 	"bytes"
 	"errors"
+	"github.com/cryptopunkscc/go-astral-js"
 	"io"
 )
 

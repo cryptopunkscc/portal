@@ -1,9 +1,9 @@
 package main
 
 import (
-	"astraljs"
-	goja2 "astraljs/goja"
 	"context"
+	"github.com/cryptopunkscc/go-astral-js"
+	goja2 "github.com/cryptopunkscc/go-astral-js/goja"
 	"github.com/dop251/goja"
 	"log"
 )
