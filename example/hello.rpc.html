@@ -3,7 +3,7 @@
 <script src="apphost.js"></script>
 <script>
     async function rpc() {
-        let srv = await appHost.queryName("localnode", "srv")
+        let srv = await appHost.query("", "srv")
         await srv.bindRpc()
 
         let result = await srv.get("Hello from front")

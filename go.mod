@@ -3,7 +3,7 @@ module github.com/cryptopunkscc/go-astral-js
 go 1.19
 
 require (
-	github.com/cryptopunkscc/astrald v0.0.0-20230613005844-93d1734d03e3
+	github.com/cryptopunkscc/astrald v0.0.0-20230712010746-5371cbcb887d
 	github.com/dop251/goja v0.0.0-20230427124612-428fc442ff5f
 	github.com/google/uuid v1.3.0
 	github.com/wailsapp/wails/v2 v2.5.1
@@ -40,3 +40,5 @@ require (
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 )
+
+//replace github.com/cryptopunkscc/astrald => ../astrald

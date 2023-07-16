@@ -181,9 +181,12 @@ func (api *AppHostFlatAdapter) ConnRead(id string) (data string, err error) {
 }
 
 func (api *AppHostFlatAdapter) Query(identity string, query string) (connId string, err error) {
-	nid, err := id.ParsePublicKeyHex(identity)
-	if err != nil {
-		return
+	nid := id.Identity{}
+	if len(identity) > 0 {
+		nid, err = id.ParsePublicKeyHex(identity)
+		if err != nil {
+			return
+		}
 	}
 	conn, err := astral.Query(nid, query)
 	if err != nil {
