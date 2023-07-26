@@ -36,6 +36,8 @@ func AppHostJsClient() string {
 }
 
 type AppHostFlatAdapter struct {
+	closed bool
+
 	listeners      map[string]*astral.Listener
 	listenersMutex sync.RWMutex
 
@@ -50,9 +52,29 @@ func NewAppHostFlatAdapter() *AppHostFlatAdapter {
 	}
 }
 
+func CloseAppHostFlatAdapter(api *AppHostFlatAdapter) {
+	api.listenersMutex.Lock()
+	api.connectionsMutex.Lock()
+	defer api.listenersMutex.Unlock()
+	defer api.connectionsMutex.Unlock()
+	for _, closer := range api.listeners {
+		_ = closer.Close()
+	}
+	for _, closer := range api.connections {
+		_ = closer.Close()
+	}
+	api.connections = nil
+	api.listeners = nil
+	api.closed = true
+	log.Println("[AppHostFlatAdapter] closed")
+}
+
 func (api *AppHostFlatAdapter) getListener(service string) (l *astral.Listener, ok bool) {
 	api.listenersMutex.RLock()
 	defer api.listenersMutex.RUnlock()
+	if api.closed {
+		return
+	}
 	l, ok = api.listeners[service]
 	return
 }
@@ -60,6 +82,9 @@ func (api *AppHostFlatAdapter) getListener(service string) (l *astral.Listener, 
 func (api *AppHostFlatAdapter) setListener(service string, listener *astral.Listener) {
 	api.listenersMutex.Lock()
 	defer api.listenersMutex.Unlock()
+	if api.closed {
+		return
+	}
 	if listener != nil {
 		api.listeners[service] = listener
 	} else {
@@ -70,6 +95,9 @@ func (api *AppHostFlatAdapter) setListener(service string, listener *astral.List
 func (api *AppHostFlatAdapter) getConnection(connectionId string) (rw io.ReadWriteCloser, ok bool) {
 	api.connectionsMutex.RLock()
 	defer api.connectionsMutex.RUnlock()
+	if api.closed {
+		return
+	}
 	rw, ok = api.connections[connectionId]
 	return
 }
@@ -77,6 +105,9 @@ func (api *AppHostFlatAdapter) getConnection(connectionId string) (rw io.ReadWri
 func (api *AppHostFlatAdapter) setConnection(connectionId string, connection io.ReadWriteCloser) {
 	api.connectionsMutex.Lock()
 	defer api.connectionsMutex.Unlock()
+	if api.closed {
+		return
+	}
 	if connection != nil {
 		api.connections[connectionId] = connection
 	} else {
