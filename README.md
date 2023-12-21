@@ -4,16 +4,16 @@ Astral JavaScript runtime environment written in golang for desktop.
 
 ## Platforms
 
-Supported platforms for specific implementation:
+Supported platforms for specific implementation, based on your OS you can run either Wails or Webview:
 
 * Frontend
   * WebView - ES6
-    * Linux
-    * MacOS ?
+    * Linux 
+    * MacOS ❌ 
     * Windows ?
   * wails - ES6
-    * Linux
-    * MacOS ?
+    * Linux 
+    * MacOS 
     * Windows ?
 * Backend
   * V8 - ES6
@@ -22,11 +22,13 @@ Supported platforms for specific implementation:
     * ~~Windows~~
   * goja - ES6 (partial?)
     * Linux
-    * MacOS ?
+    * MacOS 
     * Windows ?
     * Android ?
 
 ## Prerequisites
+
+To run the frontend, you must have the [Astral Daemon](https://github.com/cryptopunkscc/astrald/blob/master/docs/quickstart.md) installed, configured, and running.
 
 Make sure all required dependencies are installed.
 
@@ -35,7 +37,7 @@ Make sure all required dependencies are installed.
 
 ## Install
 
-### Linux
+### Linux & MacOS
 
 Update binaries:
 
