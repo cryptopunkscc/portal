@@ -98,3 +98,9 @@ go run ./cmd/webview ./example/hello.html
 ```shell
 ./cmd/wails/build/bin/wails ./example/hello.html 
 ```
+
+On MacOS:
+
+```shell
+./cmd/wails/build/bin/wails.app/Contents/MacOS/wails ./example/hello.html 
+```
