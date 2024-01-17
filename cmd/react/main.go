@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
-	astraljs "github.com/cryptopunkscc/go-astral-js"
+	// astraljs "github.com/cryptopunkscc/go-astral-js"
 	"io/fs"
 	"log"
 	"mime"
@@ -15,6 +15,12 @@ import (
 
 func main() {
 	mux := http.NewServeMux()
+	var err error
+	//todo: fix react embed
+	uiFS, err = fs.Sub(UI, "web/build")
+	if err != nil {
+		log.Fatal("failed to get ui fs", err)
+	}
 	mux.HandleFunc("/health", handleHealth)
 	mux.HandleFunc("/api", handleApi)
 	// ...
@@ -36,7 +42,7 @@ var uiFS fs.FS
 func init() {
 	var err error
 	//todo: fix react embed
-	uiFS, err = fs.Sub(app.UI, "web/build")
+	uiFS, err = fs.Sub(UI, "web/build")
 	if err != nil {
 		log.Fatal("failed to get ui fs", err)
 	}
