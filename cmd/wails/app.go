@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/cryptopunkscc/astrald/data"
-	"github.com/cryptopunkscc/astrald/lib/astral"
 	"io"
 	"net/http"
 	"os"
@@ -32,16 +30,16 @@ type App struct {
 func NewApp(appName string) (*App, error) {
 	var app = &App{}
 
-	if blockID, err := data.Parse(appName); err == nil {
-		//TODO: don't download the block, read it remotely
-		file, err := downloadBlock(blockID)
-		if err != nil {
-			return nil, err
-		}
-
-		appName = file
-		app.tempFile = file
-	}
+	//if blockID, err := data.Parse(appName); err == nil {
+	//	//TODO: don't download the block, read it remotely
+	//	file, err := downloadBlock(blockID)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//
+	//	appName = file
+	//	app.tempFile = file
+	//}
 
 	var path = appName
 
@@ -115,25 +113,25 @@ func (app *App) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func downloadBlock(blockID data.ID) (string, error) {
-	storage := astral.Client.LocalStorage()
-	r, err := storage.Read(blockID, 0, 0)
-	if err != nil {
-		return "", err
-	}
-
-	file, err := os.CreateTemp("", ".astral.app-*")
-	if err != nil {
-		return "", err
-	}
-
-	_, err = io.Copy(file, r)
-	if err != nil {
-		return "", err
-	}
-
-	return file.Name(), nil
-}
+//func downloadBlock(blockID data.ID) (string, error) {
+//	storage := astral.Client.LocalStorage()
+//	r, err := storage.Read(blockID, 0, 0)
+//	if err != nil {
+//		return "", err
+//	}
+//
+//	file, err := os.CreateTemp("", ".astral.app-*")
+//	if err != nil {
+//		return "", err
+//	}
+//
+//	_, err = io.Copy(file, r)
+//	if err != nil {
+//		return "", err
+//	}
+//
+//	return file.Name(), nil
+//}
 
 func fileType(filePath string) (string, error) {
 	file, err := os.Open(filePath)
