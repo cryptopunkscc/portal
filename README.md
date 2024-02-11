@@ -1,102 +1,108 @@
-# Astral JS - Golang
+# Portal
 
-Astral JavaScript runtime environment written in golang for desktop.
-
-## Platforms
-
-Supported platforms for specific implementation, based on your OS you can run either Wails or Webview:
-
-* Frontend
-  * WebView - ES6
-    * Linux 
-    * MacOS ❌ 
-    * Windows ?
-  * wails - ES6
-    * Linux 
-    * MacOS 
-    * Windows ?
-* Backend
-  * V8 - ES6
-    * Linux
-    * MacOS ?
-    * ~~Windows~~
-  * goja - ES6 (partial?)
-    * Linux
-    * MacOS 
-    * Windows ?
-    * Android ?
+Astral apps JavaScript runtime environment for desktop.
 
 ## Prerequisites
 
-To run the frontend, you must have the [Astral Daemon](https://github.com/cryptopunkscc/astrald/blob/master/docs/quickstart.md) installed, configured, and running.
-
-Make sure all required dependencies are installed.
-
-* [WebView](https://github.com/webview/webview#prerequisites)
-* [wails](https://wails.io/docs/gettingstarted/installation)
+To unlock connectivity features Portal requires [Astral](https://github.com/cryptopunkscc/astrald/blob/master/docs/quickstart.md) network installed, configured, and running.
 
 ## Install
 
+Install dependencies from Wails [installation](https://wails.io/docs/gettingstarted/installation)
+guide.
+
 ### Linux & MacOS
 
-Update binaries:
+* Install production runtime if you want to:
+    * Run frontend application.
+    * Run backend application.
 
 ```shell
-go build -o "$HOME/.local/bin/astral-runtime-webview" ./cmd/webview &&
-go build -o "$HOME/.local/bin/astral-runtime-v8" ./cmd/v8 &&
-go build -o "$HOME/.local/bin/astral-runtime-goja" ./cmd/goja
+go install -tags "desktop,wv2runtime.download,production" github.com/cryptopunkscc/go-astral-js/cmd/portal
 ```
+
+* Install developer runtime if you want to:
+    * Create new application.
+    * Run development server.
+    * Build application.
+    * Generate application bundle.
 
 ```shell
-./cmd/wails/build.sh
+go install -tags dev github.com/cryptopunkscc/go-astral-js/cmd/portal
 ```
 
-Update anc
+## How to use
+
+* Print help.
 
 ```shell
-go build -o "$HOME/.local/bin/anc" github.com/cryptopunkscc/astrald/cmd/anc
+portal -help
 ```
 
-Update config:
+* Run development server.
 
 ```shell
-cp ./mod_apphost.yaml "$HOME/.config/astrald/config/"
+portal dev ./example/wails
 ```
 
-## How to run
-
-### AppHost
+* Create base application project from template.
 
 ```shell
-anc query localnode admin
-```
-start js app in admin console:
-```
-apphost run goja path_to_script.js
+portal create -n my_react_app -t react
 ```
 
-### Legacy
+* Generate application bundle
+
+```shell
+portal bundle my_react_app
+```
+
+* Run application bundle
+
+```shell
+portal open my_react_app/build/my_react_app.zip
+```
+
+### Legacy commands
 
 * v8 backend
 
 ```shell
-go run ./cmd/v8 ./example/hello.js 
+go run ./cmd/legacy/v8 ./example/hello.js 
 ```
 
 * goja backend
 
 ```shell
-go run ./cmd/goja ./example/hello.js 
+go run ./cmd/legacy/goja ./example/hello.js 
 ```
 
 * WebView frontend
 
 ```shell
-go run ./cmd/webview ./example/hello.html 
+go run ./cmd/legacy/webview ./example/hello.html 
 ```
 
-* wails frontend
+## Compatibility
 
-```shell
-./cmd/wails/build/bin/wails ./example/hello.html 
-```
+Supported platforms for specific implementation.
+
+* Frontend
+    * wails - ES6
+        * Linux
+        * MacOS
+        * Windows ?
+    * WebView - ES6
+        * Linux
+        * MacOS ❌
+        * Windows ?
+* Backend
+    * goja - ES6 (partial?)
+        * Linux
+        * MacOS
+        * Windows ?
+        * Android ?
+    * V8 - ES6
+        * Linux
+        * MacOS ?
+        * ~~Windows~~

@@ -1,5 +1,0 @@
-allow_anonymous: true
-runtime:
-  webview: "astral-runtime-webview"
-  goja: "astral-runtime-goja"
-  v8: "astral-runtime-v8"
