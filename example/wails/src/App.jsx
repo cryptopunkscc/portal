@@ -17,15 +17,16 @@ function App() {
     async function connect() {
       try {
         log("rpc connecting...")
-        let conn = await appHost.query("", "rpc")
-        await conn.bindRpc()
+        const conn = await appHost.bindRpc("", "rpc")
+        // let conn = await appHost.query("", "rpc")
+        // await conn.bindRpc()
         setRpc(conn)
         log("rpc connected")
       } catch (e) {
         log(e)
       }
     }
-    connect()
+    connect().catch(log)
   }, [])
 
   async function info() {

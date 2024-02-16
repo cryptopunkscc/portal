@@ -1,6 +1,8 @@
 package apphost
 
-import "log"
+import (
+	"log"
+)
 
 var _jsBaseString string
 

@@ -4,10 +4,12 @@ import (
 	"embed"
 	"encoding/json"
 	"fmt"
+	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	"github.com/cryptopunkscc/go-astral-js/pkg/create/templates/fs"
 	gofs "io/fs"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -267,6 +269,13 @@ func Install(options *Options) (bool, *Template, error) {
 
 	// Extract the template
 	err = installer.Extract(options.TargetDir, templateData)
+	if err != nil {
+		return false, nil, err
+	}
+
+	// install apphost.js
+
+	err = os.WriteFile(path.Join(options.TargetDir, "src/apphost.js"), apphost.JsBytes(), 0644)
 	if err != nil {
 		return false, nil, err
 	}

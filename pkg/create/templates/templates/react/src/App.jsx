@@ -3,7 +3,6 @@ import logo from './assets/images/logo-universal.png';
 import './App.css';
 import appHost, {log, platform} from './apphost';
 
-
 function App() {
   log("render")
 
@@ -18,16 +17,16 @@ function App() {
     async function connect() {
       try {
         log("rpc connecting...")
-        let conn = await appHost.query("", "rpc")
-        await conn.bindRpc()
+        const conn = await appHost.bindRpc("", "rpc")
+        // let conn = await appHost.query("", "rpc")
+        // await conn.bindRpc()
         setRpc(conn)
         log("rpc connected")
       } catch (e) {
         log(e)
       }
     }
-
-    connect()
+    connect().catch(log)
   }, [])
 
   async function info() {
@@ -47,6 +46,7 @@ function App() {
     const num = await rpc.inc()
     setState({...state, counter: num})
   }
+
 
   return (
     <div id="App">

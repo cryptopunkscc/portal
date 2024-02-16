@@ -65,5 +65,6 @@ func Run(path string, opt *options.App) (err error) {
 
 	// run
 	log.Println("running wails")
+	opt.LogLevel = 6
 	return wails.Run(opt)
 }

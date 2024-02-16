@@ -12,13 +12,15 @@ class AppHostClient {
   }
 
   async query(node, query) {
-    const conn = await bindings.astral_query(node, query)
-    return new AppHostConn(conn, query)
+    const json = await bindings.astral_query(node, query)
+    const data = JSON.parse(json)
+    return new AppHostConn(data, query)
   }
 
   async queryName(node, query) {
-    const conn = await bindings.astral_query_name(node, query)
-    return new AppHostConn(conn, query)
+    const json = await bindings.astral_query_name(node, query)
+    const data = JSON.parse(json)
+    return new AppHostConn(data, query)
   }
 
   async nodeInfo(id) {
@@ -36,8 +38,9 @@ class AppHostListener {
   }
 
   async accept() {
-    const conn = await bindings.astral_conn_accept(this.port)
-    return new AppHostConn(conn, this.port)
+    const json = await bindings.astral_conn_accept(this.port)
+    const data = JSON.parse(json)
+    return new AppHostConn(data)
   }
 
   async close() {
@@ -46,21 +49,21 @@ class AppHostListener {
 }
 
 class AppHostConn {
-  constructor(conn, port) {
-    this.conn = conn
-    this.port = port
+  constructor(data) {
+    this.id = data.id
+    this.query = data.query
   }
 
   async read() {
-    return await bindings.astral_conn_read(this.conn)
+    return await bindings.astral_conn_read(this.id)
   }
 
   async write(data) {
-    return await bindings.astral_conn_write(this.conn, data)
+    return await bindings.astral_conn_write(this.id, data)
   }
 
   async close() {
-    await bindings.astral_conn_close(this.conn)
+    await bindings.astral_conn_close(this.id)
   }
 }
 

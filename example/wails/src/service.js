@@ -1,6 +1,7 @@
 class Service {
 
     constructor() {
+        this.name = "rpc"
         this.counter = 0
     }
 
@@ -20,4 +21,4 @@ class Service {
     }
 }
 
-appHost.bindRpc(Service, "rpc").catch(log)
+appHost.bindRpcService(Service).catch(log)

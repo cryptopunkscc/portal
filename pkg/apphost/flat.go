@@ -2,12 +2,12 @@ package apphost
 
 import (
 	_ "embed"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/astrald/lib/astral"
 	"github.com/google/uuid"
-	"io"
 	"log"
 	"sync"
 	"time"
@@ -32,14 +32,14 @@ type FlatAdapter struct {
 	listeners      map[string]*astral.Listener
 	listenersMutex sync.RWMutex
 
-	connections      map[string]io.ReadWriteCloser
+	connections      map[string]*astral.Conn
 	connectionsMutex sync.RWMutex
 }
 
 func NewFlatAdapter() *FlatAdapter {
 	return &FlatAdapter{
 		listeners:   map[string]*astral.Listener{},
-		connections: map[string]io.ReadWriteCloser{},
+		connections: map[string]*astral.Conn{},
 	}
 }
 
@@ -56,7 +56,7 @@ func (api *FlatAdapter) Interrupt() {
 		log.Print("[Interrupt] closing connection:", name)
 		_ = closer.Close()
 	}
-	api.connections = map[string]io.ReadWriteCloser{}
+	api.connections = map[string]*astral.Conn{}
 	api.listeners = map[string]*astral.Listener{}
 }
 
@@ -77,14 +77,14 @@ func (api *FlatAdapter) setListener(service string, listener *astral.Listener) {
 	}
 }
 
-func (api *FlatAdapter) getConnection(connectionId string) (rw io.ReadWriteCloser, ok bool) {
+func (api *FlatAdapter) getConnection(connectionId string) (rw *astral.Conn, ok bool) {
 	api.connectionsMutex.RLock()
 	defer api.connectionsMutex.RUnlock()
 	rw, ok = api.connections[connectionId]
 	return
 }
 
-func (api *FlatAdapter) setConnection(connectionId string, connection io.ReadWriteCloser) {
+func (api *FlatAdapter) setConnection(connectionId string, connection *astral.Conn) {
 	api.connectionsMutex.Lock()
 	defer api.connectionsMutex.Unlock()
 	if connection != nil {
@@ -128,19 +128,40 @@ func (api *FlatAdapter) ServiceClose(service string) (err error) {
 	return
 }
 
-func (api *FlatAdapter) ConnAccept(service string) (id string, err error) {
+func (api *FlatAdapter) ConnAccept(service string) (data string, err error) {
 	listener, ok := api.getListener(service)
 	if !ok {
 		err = fmt.Errorf("[ConnAccept] not listening on port: %v", service)
 		return
 	}
-	conn, err := listener.Accept()
+	log.Println("accept")
+	next, err := listener.Next()
 	if err != nil {
 		return
 	}
-	id = uuid.New().String()
-	api.setConnection(id, conn)
+
+	conn, err := next.Accept()
+	if err != nil {
+		return
+	}
+
+	connId := uuid.New().String()
+	api.setConnection(connId, conn)
+
+	bytes, err := json.Marshal(queryData{
+		Id:    connId,
+		Query: conn.Query(),
+	})
+	if err != nil {
+		return
+	}
+	data = string(bytes)
 	return
+}
+
+type queryData struct {
+	Id    string `json:"id"`
+	Query string `json:"query"`
 }
 
 func (api *FlatAdapter) ConnClose(id string) (err error) {
@@ -190,7 +211,7 @@ func (api *FlatAdapter) ConnRead(id string) (data string, err error) {
 	}
 }
 
-func (api *FlatAdapter) Query(identity string, query string) (connId string, err error) {
+func (api *FlatAdapter) Query(identity string, query string) (data string, err error) {
 	nid := id.Identity{}
 	if len(identity) > 0 {
 		nid, err = id.ParsePublicKeyHex(identity)
@@ -202,18 +223,36 @@ func (api *FlatAdapter) Query(identity string, query string) (connId string, err
 	if err != nil {
 		return
 	}
-	connId = uuid.New().String()
+	connId := uuid.New().String()
 	api.setConnection(connId, conn)
+
+	bytes, err := json.Marshal(queryData{
+		Id:    connId,
+		Query: conn.Query(),
+	})
+	if err != nil {
+		return
+	}
+	data = string(bytes)
 	return
 }
 
-func (api *FlatAdapter) QueryName(name string, query string) (connId string, err error) {
+func (api *FlatAdapter) QueryName(name string, query string) (data string, err error) {
 	conn, err := astral.QueryName(name, query)
 	if err != nil {
 		return
 	}
-	connId = uuid.New().String()
+	connId := uuid.New().String()
 	api.setConnection(connId, conn)
+
+	bytes, err := json.Marshal(queryData{
+		Id:    connId,
+		Query: conn.Query(),
+	})
+	if err != nil {
+		return
+	}
+	data = string(bytes)
 	return
 }
 
