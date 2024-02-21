@@ -10,7 +10,13 @@ func JsBaseString() string { return _jsBaseString }
 
 func init() {
 	var err error
-	_jsBaseString, err = GenerateAppHostJs("builder", "default", "api", "jrpc")
+	_jsBaseString, err = GenerateAppHostJs(
+		"builder",
+		"default",
+		"api",
+		"jrpc",
+		"static",
+	)
 	if err != nil {
 		log.Fatalln(err)
 	}

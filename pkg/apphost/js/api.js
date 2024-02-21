@@ -66,5 +66,3 @@ class AppHostConn {
     await bindings.astral_conn_close(this.id)
   }
 }
-
-const appHost = new AppHostClient()

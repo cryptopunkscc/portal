@@ -14,6 +14,7 @@ func main() {
 		"default",
 		"api",
 		"jrpc",
+		"static",
 		"module",
 	)
 	if err != nil {

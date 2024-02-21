@@ -134,7 +134,6 @@ func (api *FlatAdapter) ConnAccept(service string) (data string, err error) {
 		err = fmt.Errorf("[ConnAccept] not listening on port: %v", service)
 		return
 	}
-	log.Println("accept")
 	next, err := listener.Next()
 	if err != nil {
 		return

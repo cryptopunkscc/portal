@@ -1,0 +1,1 @@
+const appHost = new AppHostClient()

@@ -25,6 +25,7 @@ func init() {
 		"default",
 		"api",
 		"jrpc",
+		"static",
 		"module",
 	)
 	if err != nil {

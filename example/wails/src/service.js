@@ -1,24 +1,32 @@
 class Service {
 
-    constructor() {
-        this.name = "rpc"
-        this.counter = 0
-    }
+  constructor() {
+    this.name = "rpc"
+    this.counter = 0
+  }
 
-    async get(arg) {
-        return {
-            arg: arg,
-            val: "Hello RPC"
-        }
+  async get(arg) {
+    return {
+      arg: arg,
+      val: "Hello RPC"
     }
+  }
 
-    async sum(a, b) {
-        return a + b
-    }
+  async sum(a, b) {
+    return a + b
+  }
 
-    async inc() {
-        return ++this.counter
+  async inc() {
+    return ++this.counter
+  }
+
+  async ticker(send) {
+    let counter = 0
+    for (; ;) {
+      await send(counter++)
+      await sleep(1000)
     }
+  }
 }
 
 appHost.bindRpcService(Service).catch(log)
