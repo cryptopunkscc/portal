@@ -170,9 +170,7 @@ func (api *FlatAdapter) ConnClose(id string) (err error) {
 		return
 	}
 	err = conn.Close()
-	if err == nil {
-		api.setConnection(id, nil)
-	}
+	api.setConnection(id, nil)
 	return
 }
 
@@ -182,7 +180,10 @@ func (api *FlatAdapter) ConnWrite(id string, data string) (err error) {
 		err = errors.New("[ConnWrite] not found connection with id: " + id)
 		return
 	}
-	_, err = conn.Write([]byte(data))
+	if _, err = conn.Write([]byte(data)); err != nil {
+		_ = conn.Close()
+		api.setConnection(id, nil)
+	}
 	return
 }
 
@@ -201,6 +202,8 @@ func (api *FlatAdapter) ConnRead(id string) (data string, err error) {
 	for {
 		n, err = conn.Read(buf)
 		if err != nil {
+			_ = conn.Close()
+			api.setConnection(id, nil)
 			return
 		}
 		arr = append(arr, buf[0:n]...)

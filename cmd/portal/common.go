@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	astraljs "github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	"github.com/cryptopunkscc/go-astral-js/pkg/backend/goja"
 	"github.com/cryptopunkscc/go-astral-js/pkg/frontend/wails"
@@ -9,12 +10,14 @@ import (
 )
 
 func AppOptions() *options.App {
+	adapter := &Adapter{*astraljs.NewFlatAdapter()}
 	return &options.App{
 		Width:            1024,
 		Height:           768,
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
-		Bind: []interface{}{
-			&Adapter{*astraljs.NewFlatAdapter()},
+		Bind:             []interface{}{adapter},
+		OnDomReady: func(ctx context.Context) {
+			adapter.Interrupt()
 		},
 	}
 }
