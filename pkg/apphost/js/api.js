@@ -30,6 +30,10 @@ class AppHostClient {
   async resolve(name) {
     return await bindings.astral_resolve(name)
   }
+
+  async interrupt() {
+    await bindings.astral_interrupt()
+  }
 }
 
 class AppHostListener {

@@ -15,6 +15,7 @@ const _wails_bindings = () => ({
   astral_resolve: window['go']['main']['Adapter']['Resolve'],
   astral_service_close: window['go']['main']['Adapter']['ServiceClose'],
   astral_service_register: window['go']['main']['Adapter']['ServiceRegister'],
+  astral_interrupt: window['go']['main']['Adapter']['Interrupt'],
   sleep: window['go']['main']['Adapter']['Sleep'],
   log: window['go']['main']['Adapter']['LogArr'],
 })

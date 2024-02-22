@@ -39,6 +39,8 @@ function App() {
       }
     }
     connect().catch(log)
+
+    return appHost.interrupt
   }, [])
 
   async function info() {

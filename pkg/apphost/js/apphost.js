@@ -17,6 +17,7 @@ const _wails_bindings = () => ({
   astral_resolve: window['go']['main']['Adapter']['Resolve'],
   astral_service_close: window['go']['main']['Adapter']['ServiceClose'],
   astral_service_register: window['go']['main']['Adapter']['ServiceRegister'],
+  astral_interrupt: window['go']['main']['Adapter']['Interrupt'],
   sleep: window['go']['main']['Adapter']['Sleep'],
   log: window['go']['main']['Adapter']['LogArr'],
 })
@@ -61,6 +62,7 @@ const _android_bindings = () => {
     astral_resolve: (arg1) => _promise(() => _app_host.resolve(arg1)),
     astral_service_close: (arg1) => _promise(() => _app_host.serviceClose(arg1)),
     astral_service_register: (arg1) => _promise(() => _app_host.serviceRegister(arg1)),
+    astral_interrupt: () => _promise(() => _app_host.interrupt()),
     sleep: (arg1) => _promise(() => _app_host.sleep(arg1)),
     log: (arg1) => _app_host.logArr(JSON.stringify(arg1)),
   }
@@ -83,6 +85,7 @@ const _default_bindings = () => ({
   astral_resolve: _astral_resolve,
   astral_service_close: _astral_service_close,
   astral_service_register: _astral_service_register,
+  astral_interrupt: _astral_interrupt,
   sleep: _sleep,
   log: _log,
 })
@@ -139,6 +142,10 @@ class AppHostClient {
 
   async resolve(name) {
     return await bindings.astral_resolve(name)
+  }
+
+  async interrupt() {
+    await bindings.astral_interrupt()
   }
 }
 

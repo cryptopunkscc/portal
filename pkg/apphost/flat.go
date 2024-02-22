@@ -26,6 +26,7 @@ const (
 	QueryName       = "_astral_query_name"
 	GetNodeInfo     = "_astral_node_info"
 	Resolve         = "_astral_resolve"
+	Interrupt       = "_astral_interrupt"
 )
 
 type FlatAdapter struct {

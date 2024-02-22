@@ -33,6 +33,7 @@ const _android_bindings = () => {
     astral_resolve: (arg1) => _promise(() => _app_host.resolve(arg1)),
     astral_service_close: (arg1) => _promise(() => _app_host.serviceClose(arg1)),
     astral_service_register: (arg1) => _promise(() => _app_host.serviceRegister(arg1)),
+    astral_interrupt: () => _promise(() => _app_host.interrupt()),
     sleep: (arg1) => _promise(() => _app_host.sleep(arg1)),
     log: (arg1) => _app_host.logArr(JSON.stringify(arg1)),
   }

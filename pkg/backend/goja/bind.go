@@ -43,6 +43,9 @@ func Bind(vm *goja.Runtime, astral *apphost.FlatAdapter) (err error) {
 	if err = vm.Set(apphost.Resolve, a.Resolve); err != nil {
 		return
 	}
+	if err = vm.Set(apphost.Interrupt, a.Interrupt); err != nil {
+		return
+	}
 	go func() {
 		for f := range a.queue {
 			f()
@@ -217,6 +220,17 @@ func (a *adapter) NodeInfo(identity string) *goja.Promise {
 			} else {
 				resolve(val)
 			}
+		}
+	}()
+	return promise
+}
+
+func (a *adapter) Interrupt() *goja.Promise {
+	promise, resolve, _ := a.vm.NewPromise()
+	go func() {
+		a.astral.Interrupt()
+		a.queue <- func() {
+			resolve(nil)
 		}
 	}()
 	return promise

@@ -10,6 +10,7 @@ const _default_bindings = () => ({
   astral_resolve: _astral_resolve,
   astral_service_close: _astral_service_close,
   astral_service_register: _astral_service_register,
+  astral_interrupt: _astral_interrupt,
   sleep: _sleep,
   log: _log,
 })
