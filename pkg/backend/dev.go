@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func Dev(backend Backend, path string) (err error) {
+func Dev(backend Backend, path string, output chan<- Event) (err error) {
 	if err = backend.Run(path); err != nil {
 		return fmt.Errorf("failed to run %s %v", path, err)
 	}
@@ -22,10 +22,19 @@ func Dev(backend Backend, path string) (err error) {
 			if err = backend.Run(path); err != nil {
 				log.Printf("failed to rerun %s %v", path, err)
 			}
+			if output != nil {
+				output <- EventReload
+			}
 		}
 	}()
 	return
 }
+
+type Event uint
+
+const (
+	EventReload = Event(iota + 1)
+)
 
 func observeChanges(path string, file string) (out <-chan any, err error) {
 	watcher, err := fsnotify.NewWatcher()

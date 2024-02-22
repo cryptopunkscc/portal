@@ -3,6 +3,7 @@
 package main
 
 import (
+	"context"
 	"github.com/cryptopunkscc/go-astral-js/pkg/backend"
 	"github.com/cryptopunkscc/go-astral-js/pkg/backend/goja"
 	"github.com/cryptopunkscc/go-astral-js/pkg/build"
@@ -12,6 +13,8 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/frontend/wails/dev"
 	"github.com/leaanthony/clir"
 	"github.com/pterm/pterm"
+	"github.com/wailsapp/wails/v2/pkg/options"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"log"
 	"path"
 	"sync"
@@ -34,15 +37,31 @@ type FlagsDev struct{ FlagsApp }
 func cliDevelopment(f *FlagsDev) (err error) {
 	f.Setup()
 	wait := sync.WaitGroup{}
+
+	var frontend *options.App
+	var backendEvents chan backend.Event
+
+	if f.Front {
+		backendEvents = make(chan backend.Event)
+		frontend = AppOptions()
+		frontend.OnStartup = func(ctx context.Context) {
+			go func() {
+				for range backendEvents {
+					runtime.WindowReload(ctx)
+				}
+			}()
+		}
+	}
+
 	if f.Back {
 		wait.Add(1)
-		if err = backend.Dev(goja.NewBackend(), path.Join(f.Path, "src")); err != nil {
+		if err = backend.Dev(goja.NewBackend(), path.Join(f.Path, "src"), backendEvents); err != nil {
 			return
 		}
 	}
 	if f.Front {
 		wait.Add(1)
-		return dev.Run(f.Path, AppOptions())
+		return dev.Run(f.Path, frontend)
 	}
 	wait.Wait()
 	return
