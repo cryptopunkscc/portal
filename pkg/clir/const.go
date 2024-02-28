@@ -1,4 +1,4 @@
-package main
+package clir
 
 const (
 	PortalVersion         = "0.0.1"

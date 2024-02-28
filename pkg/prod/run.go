@@ -5,13 +5,12 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/backend/goja"
 	"github.com/cryptopunkscc/go-astral-js/pkg/frontend/wails"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
-	"io"
 	"sync"
 )
 
 func Run(
 	src string,
-	bindings func() io.Closer,
+	bindings runner.Bindings,
 ) (err error) {
 	d, err := runner.New(src, runner.ProdTargets)
 	if err != nil {

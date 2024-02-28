@@ -9,14 +9,13 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/frontend/wails/dev"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
-	"io"
 	"log"
 	"sync"
 )
 
 func Run(
 	dir string,
-	bindings func() io.Closer,
+	bindings runner.Bindings,
 ) (err error) {
 	d, err := runner.New(dir, runner.DevTargets)
 	if err != nil {

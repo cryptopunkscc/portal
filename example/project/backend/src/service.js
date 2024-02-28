@@ -21,7 +21,7 @@ export class Service {
   }
 
   async ticker(send) {
-    let counter = 100
+    let counter = 0
     for (; ;) {
       await send(counter++)
       await sleep(1000)

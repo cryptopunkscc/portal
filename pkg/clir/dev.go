@@ -1,6 +1,6 @@
 //go:build dev
 
-package main
+package clir
 
 import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/build"
@@ -8,16 +8,17 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/create"
 	"github.com/cryptopunkscc/go-astral-js/pkg/create/templates"
 	"github.com/cryptopunkscc/go-astral-js/pkg/dev"
+	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"github.com/leaanthony/clir"
 	"github.com/pterm/pterm"
 	"log"
 )
 
-func main() {
+func Run(bindings runner.Bindings) {
 	cli := clir.NewCli(PortalName, PortalDevDescription, PortalVersion)
 	cli.NewSubCommandFunction("create", "Create production bundle.", cliInit)
-	cli.NewSubCommandFunction("dev", "Run development server for given dir.", cliDevelopment)
-	cli.NewSubCommandFunction("open", "Execute app from bundle, dir, or file.", cliApplication)
+	cli.NewSubCommandFunction("dev", "Run development server for given dir.", cliDevelopment(bindings))
+	cli.NewSubCommandFunction("open", "Execute app from bundle, dir, or file.", cliApplication(bindings))
 	cli.NewSubCommandFunction("build", "Build application.", cliBuild)
 	cli.NewSubCommandFunction("bundle", "Create production bundle.", cliBundle)
 	if err := cli.Run(); err != nil {
@@ -25,7 +26,11 @@ func main() {
 	}
 }
 
-func cliDevelopment(f *FlagsPath) (err error) { return dev.Run(f.Path, newAdapter) }
+func cliDevelopment(bindings runner.Bindings) func(f *FlagsPath) (err error) {
+	return func(f *FlagsPath) (err error) {
+		return dev.Run(f.Path, bindings)
+	}
+}
 
 func cliBuild(f *FlagsPath) error {
 	return build.Run(f.Path)
