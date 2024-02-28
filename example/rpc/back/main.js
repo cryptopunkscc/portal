@@ -1,5 +1,9 @@
 class Service {
 
+    constructor() {
+        this.name = "srv"
+    }
+
     async get(arg) {
         return {
             arg: arg,
@@ -12,4 +16,4 @@ class Service {
     }
 }
 
-appHost.bindRpc(Service, "srv").catch(log)
+appHost.bindRpcService(Service).catch(log)

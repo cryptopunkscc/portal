@@ -5,27 +5,11 @@ import (
 	"bytes"
 	_ "embed"
 	"errors"
-	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
 )
-
-func BundleStore(bundleType string, path string) (s Store, err error) {
-	switch bundleType {
-	case TypeDir:
-		s = NewDirStore(path)
-	case TypeHtml:
-		s, err = SingleFileStore(path, "index.html")
-	case TypeZip:
-		s, err = NewZipStore(path)
-	}
-	if err == nil {
-		s = &OverlayStore{[]Store{s, &FsStore{apphost.JsFs()}}}
-	}
-	return
-}
 
 type Store interface {
 	Open(string) (io.ReadCloser, error)

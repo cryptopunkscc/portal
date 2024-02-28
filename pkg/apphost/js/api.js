@@ -1,3 +1,19 @@
+const platform = function () {
+  for (let next of builder) {
+    if (next.platform) {
+      return next.platform
+    }
+  }
+}()
+
+const bindings = function () {
+  for (let next of builder) {
+    if (next.platform) {
+      return next.bindings()
+    }
+  }
+}()
+
 // ================== Static functions adapter ==================
 
 const log = (...arg1) => bindings.log(arg1)

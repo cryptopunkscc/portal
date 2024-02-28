@@ -14,10 +14,6 @@ Before you can install & use Portal u need manually prepare the following depend
 
 Portal GUI runner uses Wails source code as a base, also it requires same dependencies for production and development purpose. For Installing them follow official Wails [installation](https://wails.io/docs/gettingstarted/installation) guideline.
 
-### Clir
-
-Command line interface for Portal is created using [clir](https://clir.leaanthony.com/) library.   
-
 ## Install
 
 Portal sources can produce production or development executable. Generally speaking, the development runtime is an extended version of the production runtime.
@@ -45,6 +41,10 @@ go install -tags dev github.com/cryptopunkscc/go-astral-js/cmd/portal
 
 ## How to use
 
+Portal provides command line interface created using [clir](https://clir.leaanthony.com/) library.
+
+### Example commands
+
 Print help.
 
 ```shell
@@ -54,7 +54,7 @@ portal -help
 Run development server.
 
 ```shell
-portal dev ./example/wails
+portal dev ./example/project
 ```
 
 Create base application project from template.
@@ -66,13 +66,13 @@ portal create -n my_react_app -t react
 Generate application bundle
 
 ```shell
-portal bundle my_react_app
+portal bundle ./example/project
 ```
 
 Run application bundle
 
 ```shell
-portal open my_react_app/build/my_react_app.zip
+portal open ./example/project
 ```
 
 ### Legacy runners
@@ -80,19 +80,19 @@ portal open my_react_app/build/my_react_app.zip
 v8 backend
 
 ```shell
-go run ./cmd/legacy/v8 ./example/hello.js 
+go run ./cmd/legacy/v8 ./example/basic/main.js 
 ```
 
 goja backend
 
 ```shell
-go run ./cmd/legacy/goja ./example/hello.js 
+go run ./cmd/legacy/goja ./example/basic/main.js 
 ```
 
 WebView frontend
 
 ```shell
-go run ./cmd/legacy/webview ./example/hello.html 
+go run ./cmd/legacy/webview ./example/basic/index.html 
 ```
 
 ## Compatibility

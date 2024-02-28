@@ -4,23 +4,42 @@ import (
 	"fmt"
 	"github.com/fsnotify/fsnotify"
 	"log"
+	"os"
+	"os/exec"
+	"path"
 	"strings"
 	"time"
 )
 
-func Dev(backend Backend, path string, output chan<- Event) (err error) {
-	if err = backend.Run(path); err != nil {
-		return fmt.Errorf("failed to run %s %v", path, err)
+func Watcher(src string) {
+	if _, err := os.Stat(path.Join(src, "package.json")); err != nil {
+		return
 	}
-	changes, err := observeChanges(path, "service.js")
+	cmd := exec.Command("npm", "run", "watch")
+	cmd.Env = os.Environ()
+	cmd.Dir = src
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
+	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("failed to observe changes %s %v", path, err)
+		log.Println("npm run watch:", err)
+	}
+}
+
+func Dev(backend Backend, file string, output chan<- Event) (err error) {
+	if err = backend.Run(file); err != nil {
+		return fmt.Errorf("failed to run %s %v", file, err)
+	}
+	changes, err := observeChanges(file, path.Base(file))
+	if err != nil {
+		return fmt.Errorf("failed to observe changes %s %v", file, err)
 	}
 	go func() {
 		changes = debounce[any](changes, 200*time.Millisecond)
 		for range changes {
-			if err = backend.Run(path); err != nil {
-				log.Printf("failed to rerun %s %v", path, err)
+			if err = backend.Run(file); err != nil {
+				log.Printf("failed to rerun %s %v", file, err)
 			}
 			if output != nil {
 				output <- EventReload

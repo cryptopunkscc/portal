@@ -1,94 +1,84 @@
 package bundle
 
 import (
-	"archive/zip"
 	"encoding/json"
+	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/build"
-	"io"
+	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"io/fs"
-	"log"
 	"os"
 	"path"
-	"path/filepath"
-	"strings"
 )
 
-func Run(dir string) (err error) {
+func RunAll(dir string) (err error) {
+	r, err := runner.New(dir, runner.DevTargets)
+	if err != nil {
+		return
+	}
+
+	targets := append(r.Backends, r.Frontends...)
+
+	for _, target := range targets {
+		if err = Run(target.Path); err != nil {
+			return fmt.Errorf("bundle target %v: %v", target.Path, err)
+		}
+	}
+
+	return
+}
+
+func Run(src string) (err error) {
+	srcFs := os.DirFS(src)
+
 	// build dist if needed
-	if _, err = fs.Stat(os.DirFS(dir), "dist"); os.IsNotExist(err) {
-		if err = build.Run(dir); err != nil {
+	if _, err = fs.Stat(srcFs, "dist"); os.IsNotExist(err) {
+		if err = build.Run(src); err != nil {
 			return
 		}
 	}
 
-	// prepare dist path
-	dist := path.Join(dir, "dist")
+	dist := path.Join(src, "dist")
 
-	// read package.json
-	pkg := path.Join(dir, "package.json")
-	pkgBytes, err := os.ReadFile(pkg)
+	// prepare portal.json
+	portalJson := &PackageJson{
+		Name:    path.Base(src),
+		Version: "0.0.0",
+	}
+	_ = portalJson.Load(path.Join(src, "portal.json"))
+	_ = portalJson.Load(path.Join(src, "package.json"))
+	bytes, err := json.Marshal(portalJson)
+	if err != nil {
+		return err
+	}
+	if err = os.WriteFile(path.Join(dist, "portal.json"), bytes, 0644); err != nil {
+		return fmt.Errorf("os.WriteFile: %v", err)
+	}
+
+	// create build dir
+	buildDir := path.Join(src, "/", "build")
+	if err = os.MkdirAll(buildDir, 0775); err != nil && !os.IsExist(err) {
+		return fmt.Errorf("os.MkdirAll: %v", err)
+	}
+
+	// pack dist dir
+	bundleName := fmt.Sprintf("%s_%s.portal", portalJson.Name, portalJson.Version)
+	if err = Pack(dist, path.Join(buildDir, bundleName)); err != nil {
+		return fmt.Errorf("Pack: %v", err)
+	}
+
+	return
+}
+
+type PackageJson struct {
+	Name        string `json:"name"`
+	Version     string `json:"version"`
+	Description string `json:"description"`
+}
+
+func (pkg *PackageJson) Load(src string) (err error) {
+	bytes, err := os.ReadFile(src)
 	if err != nil {
 		return
 	}
-	p := struct{ Name string }{}
-	if err = json.Unmarshal(pkgBytes, &p); err != nil {
-		return
-	}
-
-	// copy service file
-	service := "service.js"
-	src := path.Join(dir, "src")
-	bytes, err := os.ReadFile(path.Join(src, service))
-	if err != nil {
-		return
-	}
-	if err = os.WriteFile(path.Join(dist, service), bytes, 0644); err != nil {
-		return
-	}
-
-	// create empty bundle
-	if err = os.Mkdir(path.Join(dir, "build"), 0775); err != nil && !os.IsExist(err) {
-		return
-	}
-	bundle := path.Join(dir, "build", p.Name+".zip")
-	file, err := os.Create(bundle)
-	if err != nil {
-		return
-	}
-	defer file.Close()
-	w := zip.NewWriter(file)
-	defer w.Close()
-
-	// copy files to bundle
-	return filepath.Walk(dist, func(p string, d os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if d.IsDir() {
-			return nil
-		}
-		file, err := os.Open(p)
-		if err != nil {
-			return err
-		}
-
-		trim, found := strings.CutPrefix(p, dist)
-		if !found {
-			return nil
-		}
-		f, err := w.Create(trim)
-		if err != nil {
-			return err
-		}
-
-		if _, err = io.Copy(f, file); err != nil {
-			return err
-		}
-		if err = w.Flush(); err != nil {
-			return err
-		}
-		_ = file.Close()
-		log.Println(trim)
-		return nil
-	})
+	return json.Unmarshal(bytes, pkg)
 }

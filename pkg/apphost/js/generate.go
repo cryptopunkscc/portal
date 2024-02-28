@@ -7,6 +7,11 @@ import (
 )
 
 func main() {
+	generateApphostFullModule()
+	generateApphostWails()
+}
+
+func generateApphostFullModule() {
 	js, err := apphost.GenerateAppHostJs(
 		"builder",
 		"wails",
@@ -21,6 +26,23 @@ func main() {
 		log.Fatalln(err)
 	}
 	err = os.WriteFile("pkg/apphost/js/apphost.js", []byte(js), 0644)
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
+
+func generateApphostWails() {
+	js, err := apphost.GenerateAppHostJs(
+		"builder",
+		"wails",
+		"api",
+		"jrpc",
+		"static",
+	)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = os.WriteFile("pkg/apphost/js/wails/apphost.js", []byte(js), 0644)
 	if err != nil {
 		log.Fatalln(err)
 	}

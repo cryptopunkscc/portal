@@ -3,21 +3,14 @@
 package main
 
 import (
-	"context"
-	"github.com/cryptopunkscc/go-astral-js/pkg/backend"
-	"github.com/cryptopunkscc/go-astral-js/pkg/backend/goja"
 	"github.com/cryptopunkscc/go-astral-js/pkg/build"
 	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	"github.com/cryptopunkscc/go-astral-js/pkg/create"
 	"github.com/cryptopunkscc/go-astral-js/pkg/create/templates"
-	"github.com/cryptopunkscc/go-astral-js/pkg/frontend/wails/dev"
+	"github.com/cryptopunkscc/go-astral-js/pkg/dev"
 	"github.com/leaanthony/clir"
 	"github.com/pterm/pterm"
-	"github.com/wailsapp/wails/v2/pkg/options"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"log"
-	"path"
-	"sync"
 )
 
 func main() {
@@ -32,51 +25,14 @@ func main() {
 	}
 }
 
-type FlagsDev struct{ FlagsApp }
+func cliDevelopment(f *FlagsPath) (err error) { return dev.Run(f.Path, newAdapter) }
 
-func cliDevelopment(f *FlagsDev) (err error) {
-	f.Setup()
-	wait := sync.WaitGroup{}
-
-	var frontend *options.App
-	var backendEvents chan backend.Event
-
-	if f.Front {
-		backendEvents = make(chan backend.Event)
-		frontend = AppOptions()
-		frontend.OnStartup = func(ctx context.Context) {
-			go func() {
-				for range backendEvents {
-					runtime.WindowReload(ctx)
-				}
-			}()
-		}
-	}
-
-	if f.Back {
-		wait.Add(1)
-		if err = backend.Dev(goja.NewBackend(), path.Join(f.Path, "src"), backendEvents); err != nil {
-			return
-		}
-	}
-	if f.Front {
-		wait.Add(1)
-		return dev.Run(f.Path, frontend)
-	}
-	wait.Wait()
-	return
-}
-
-type FlagsBuild struct{ FlagsPath }
-
-func cliBuild(f *FlagsBuild) error {
+func cliBuild(f *FlagsPath) error {
 	return build.Run(f.Path)
 }
 
-type FlagsBundle struct{ FlagsBuild }
-
-func cliBundle(f *FlagsBundle) error {
-	return bundle.Run(f.Path)
+func cliBundle(f *FlagsPath) error {
+	return bundle.RunAll(f.Path)
 }
 
 type FlagsInit struct {

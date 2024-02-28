@@ -1,14 +1,15 @@
 package dev
 
 import (
+	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	"github.com/cryptopunkscc/go-astral-js/pkg/assets"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"io/fs"
 	"log"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"syscall"
 )
 
@@ -17,32 +18,24 @@ func Run(path string, opt *options.App) (err error) {
 	front := path
 	path = path + "/dist"
 
-	// identify app bundle type
-	bundleType, err := assets.BundleType(path)
-	if err != nil {
-		return
-	}
-
 	// Setup defaults
-	if opt.Title != "" {
-		opt.Title = filepath.Base(path)
-	}
+	//if opt.Title != "" {
+	//	opt.Title = filepath.Base(front)
+	//}
 	if opt.AssetServer == nil {
 		opt.AssetServer = &assetserver.Options{}
 	}
 
 	// Setup fs assets
-	opt.AssetServer.Assets, err = assets.BundleFS(bundleType, path)
-	if err != nil {
-		return
-	}
+	opt.AssetServer.Assets = assets.ArrayFs{Array: []fs.FS{os.DirFS(path), apphost.JsWailsFs()}}
 
 	// Setup http assets
-	store, err := assets.BundleStore(bundleType, path)
-	if err != nil {
-		return
+	opt.AssetServer.Handler = assets.StoreHandler{
+		Store: &assets.OverlayStore{Stores: []assets.Store{
+			&assets.FsStore{FS: os.DirFS(path)},
+			&assets.FsStore{FS: apphost.JsWailsFs()}},
+		},
 	}
-	opt.AssetServer.Handler = assets.StoreHandler{Store: store}
 
 	// Start frontend dev watcher
 	runDevWatcherCommand := "npm run dev"

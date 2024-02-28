@@ -44,6 +44,11 @@ func NewFlatAdapter() *FlatAdapter {
 	}
 }
 
+func (api *FlatAdapter) Close() error {
+	api.Interrupt()
+	return nil
+}
+
 func (api *FlatAdapter) Interrupt() {
 	api.listenersMutex.Lock()
 	api.connectionsMutex.Lock()

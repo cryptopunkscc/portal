@@ -19,19 +19,3 @@ builder.push({
   platform: "default",
   bindings: _default_bindings,
 })
-
-const platform = function () {
-  for (let next of builder) {
-    if (next.platform) {
-      return next.platform
-    }
-  }
-}()
-
-const bindings = function () {
-  for (let next of builder) {
-    if (next.platform) {
-      return next.bindings()
-    }
-  }
-}()

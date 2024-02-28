@@ -2,13 +2,20 @@ package apphost
 
 import (
 	"embed"
+	"io/fs"
 	"log"
 )
 
 //go:embed js/apphost.js
 var _jsFs embed.FS
 
-func JsFs() embed.FS { return _jsFs }
+func JsFs() fs.FS {
+	sub, err := fs.Sub(_jsFs, "js")
+	if err != nil {
+		panic(err)
+	}
+	return sub
+}
 
 var _jsString string
 

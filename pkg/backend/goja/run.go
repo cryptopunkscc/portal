@@ -2,10 +2,10 @@ package goja
 
 import (
 	astraljs "github.com/cryptopunkscc/go-astral-js/pkg/apphost"
-	"github.com/cryptopunkscc/go-astral-js/pkg/assets"
 	"github.com/dop251/goja"
 	"io/fs"
-	"log"
+	"os"
+	"path"
 )
 
 type Backend struct {
@@ -19,48 +19,55 @@ func NewBackend() *Backend {
 	}
 }
 
-func (b *Backend) Run(path string) (err error) {
-	// identify app bundle type
-	bundleType, err := assets.BundleType(path)
-	if err != nil {
-		return
+func (b *Backend) Run(app string) (err error) {
+	if fs.ValidPath(app) {
+		return b.RunPath(app)
+	} else {
+		return b.RunSource(app)
 	}
+}
 
-	bundleFs, err := assets.BundleFS(bundleType, path)
-	if err != nil {
-		return
-	}
-
-	bytes, err := fs.ReadFile(bundleFs, "service.js")
+func (b *Backend) RunPath(app string) (err error) {
+	stat, err := os.Stat(app)
 	if err != nil {
 		return err
 	}
+	var src []byte
+	if stat.IsDir() {
+		app = path.Join(app, "main.js")
+	}
+	src, err = os.ReadFile(app)
 
-	b.RunSource(string(bytes))
-	return
+	return b.RunSource(string(src))
 }
 
-func (b *Backend) RunSource(app string) {
+func (b *Backend) RunFs(appFs fs.FS) (err error) {
+	var src []byte
+	if src, err = fs.ReadFile(appFs, "main.js"); err != nil {
+		return err
+	}
+	return b.RunSource(string(src))
+}
+
+func (b *Backend) RunSource(app string) (err error) {
 	if b.vm != nil {
 		b.vm.ClearInterrupt()
 		b.appHost.Interrupt()
 	}
 	b.vm = goja.New()
 
-	err := Bind(b.vm, b.appHost)
-	if err != nil {
-		log.Fatal(err)
+	if err = Bind(b.vm, b.appHost); err != nil {
+		return
 	}
 
 	// inject apphost client js lib
-	_, err = b.vm.RunString(astraljs.JsBaseString())
-	if err != nil {
-		log.Fatal(err)
+	if _, err = b.vm.RunString(astraljs.JsBaseString()); err != nil {
+		return
 	}
 
 	// start js application backend
-	_, err = b.vm.RunString(app)
-	if err != nil {
-		log.Fatal(err)
+	if _, err = b.vm.RunString(app); err != nil {
+		return
 	}
+	return
 }

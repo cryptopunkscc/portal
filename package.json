@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "wails-example": "file:example/complete/react"
+  }
+}
