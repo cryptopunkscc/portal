@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
-	webview2 "github.com/cryptopunkscc/go-astral-js/pkg/frontend/webview"
+	webview2 "github.com/cryptopunkscc/go-astral-js/pkg/runner/frontend/webview"
 	"github.com/webview/webview"
 	"log"
 	"os"

@@ -3,11 +3,12 @@
 package clir
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/build"
-	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
-	"github.com/cryptopunkscc/go-astral-js/pkg/create"
-	"github.com/cryptopunkscc/go-astral-js/pkg/create/template"
-	"github.com/cryptopunkscc/go-astral-js/pkg/dev"
+	"github.com/cryptopunkscc/go-astral-js"
+	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/build"
+	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/bundle"
+	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/create"
+	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/create/template"
+	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/dev"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"github.com/leaanthony/clir"
 	"github.com/pterm/pterm"
@@ -16,7 +17,7 @@ import (
 )
 
 func Run(bindings runner.Bindings) {
-	cli := clir.NewCli(PortalName, PortalDevDescription, PortalVersion)
+	cli := clir.NewCli(portal.Name, portal.DevDescription, portal.Version)
 	cli.NewSubCommandFunction("create", "Create production bundle.", cliCreate)
 	cli.NewSubCommandFunction("dev", "Run development server for given dir.", cliDevelopment(bindings))
 	cli.NewSubCommandFunction("open", "Execute app from bundle, dir, or file.", cliApplication(bindings))

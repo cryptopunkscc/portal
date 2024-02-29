@@ -1,7 +1,7 @@
 package clir
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/prod"
+	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/prod"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 )
 

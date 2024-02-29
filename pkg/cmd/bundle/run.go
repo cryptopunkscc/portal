@@ -3,8 +3,9 @@ package bundle
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/build"
+	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/build"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
+	"github.com/cryptopunkscc/go-astral-js/pkg/zip"
 	"io/fs"
 	"os"
 	"path"
@@ -62,7 +63,7 @@ func Run(src string) (err error) {
 
 	// pack dist dir
 	bundleName := fmt.Sprintf("%s_%s.portal", portalJson.Name, portalJson.Version)
-	if err = Pack(dist, path.Join(buildDir, bundleName)); err != nil {
+	if err = zip.Pack(dist, path.Join(buildDir, bundleName)); err != nil {
 		return fmt.Errorf("Pack: %v", err)
 	}
 

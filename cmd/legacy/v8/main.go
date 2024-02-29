@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
-	"github.com/cryptopunkscc/go-astral-js/pkg/backend/v8"
+	"github.com/cryptopunkscc/go-astral-js/pkg/runner/backend/v8"
 	"log"
 	"os"
 	"rogchap.com/v8go"

@@ -1,4 +1,4 @@
-package bundle
+package zip
 
 import (
 	"archive/zip"

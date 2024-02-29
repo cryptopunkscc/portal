@@ -2,9 +2,9 @@ package prod
 
 import (
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/backend/goja"
-	"github.com/cryptopunkscc/go-astral-js/pkg/frontend/wails"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
+	"github.com/cryptopunkscc/go-astral-js/pkg/runner/backend/goja"
+	"github.com/cryptopunkscc/go-astral-js/pkg/runner/frontend/wails"
 	"sync"
 )
 
