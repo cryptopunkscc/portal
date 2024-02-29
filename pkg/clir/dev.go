@@ -6,17 +6,18 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/build"
 	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	"github.com/cryptopunkscc/go-astral-js/pkg/create"
-	"github.com/cryptopunkscc/go-astral-js/pkg/create/templates"
+	"github.com/cryptopunkscc/go-astral-js/pkg/create/template"
 	"github.com/cryptopunkscc/go-astral-js/pkg/dev"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"github.com/leaanthony/clir"
 	"github.com/pterm/pterm"
 	"log"
+	"strings"
 )
 
 func Run(bindings runner.Bindings) {
 	cli := clir.NewCli(PortalName, PortalDevDescription, PortalVersion)
-	cli.NewSubCommandFunction("create", "Create production bundle.", cliInit)
+	cli.NewSubCommandFunction("create", "Create production bundle.", cliCreate)
 	cli.NewSubCommandFunction("dev", "Run development server for given dir.", cliDevelopment(bindings))
 	cli.NewSubCommandFunction("open", "Execute app from bundle, dir, or file.", cliApplication(bindings))
 	cli.NewSubCommandFunction("build", "Build application.", cliBuild)
@@ -43,21 +44,27 @@ func cliBundle(f *FlagsPath) error {
 type FlagsInit struct {
 	Template string `name:"t" description:"Name of built-in template to use, path to template or template url"`
 	Name     string `name:"n" description:"Name of project"`
-	Dir      string `name:"d" description:"Project directory"`
 	Force    bool   `name:"f" description:"Force recreate project"`
 	List     bool   `name:"l" description:"List available templates"`
+	Dir      string `pos:"1" description:"Project directory"`
 }
 
-func cliInit(f *FlagsInit) error {
-	if f.List {
+var emptyFlagsInit = FlagsInit{}
+
+func cliCreate(f *FlagsInit) error {
+	switch {
+	case *f == emptyFlagsInit:
 		return cliList()
-	} else {
-		return create.Run(f.Name, f.Dir, f.Template, f.Force)
+	case f.List:
+		return cliList()
+	default:
+		temps := strings.Split(f.Template, " ")
+		return create.Run(f.Name, f.Dir, temps, f.Force)
 	}
 }
 
 func cliList() error {
-	templateList, err := templates.List()
+	templateList, err := template.List()
 	if err != nil {
 		return err
 	}

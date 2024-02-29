@@ -1,32 +1,48 @@
 import {useEffect, useState} from 'react';
 import logo from './assets/images/logo-universal.png';
 import './App.css';
-import appHost, {log, platform} from './apphost';
+import appHost, {log, platform} from '../../lib/apphost/apphost';
 
 function App() {
   log("render")
 
   const [rpc, setRpc] = useState({})
+  const [tick, setTick] = useState(-1)
   const [state, setState] = useState({
     info: "undefined",
     sum: 0,
     counter: 0,
+    tick: 0,
   })
 
   useEffect(() => {
+    async function subscribeTicker(rpc) {
+      const read = await rpc.subscribe("ticker")
+      for (let i = 0; i < 100; i++) {
+        const num = await read()
+        setTick(num)
+      }
+      await read.cancel()
+    }
+
     async function connect() {
       try {
         log("rpc connecting...")
+        // const appHost = new AppHostClient()
         const conn = await appHost.bindRpc("", "rpc")
+        // const conn = await (new AppHostClient()).bindRpc("", "rpc")
         // let conn = await appHost.query("", "rpc")
         // await conn.bindRpc()
         setRpc(conn)
         log("rpc connected")
+        await subscribeTicker(conn)
       } catch (e) {
         log(e)
       }
     }
     connect().catch(log)
+
+    return appHost.interrupt
   }, [])
 
   async function info() {
@@ -53,6 +69,7 @@ function App() {
       <img src={logo} id="logo" alt="logo"/>
       <p>Running on {platform}</p>
       <p>{JSON.stringify(rpc)}</p>
+      <p>ticker {tick}</p>
 
       <button onClick={info}>get node info</button>
       <p>{state.info}</p>

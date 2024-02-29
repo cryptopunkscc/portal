@@ -1,4 +1,4 @@
-class Service {
+export class Service {
 
   constructor() {
     this.name = "rpc"
@@ -28,5 +28,3 @@ class Service {
     }
   }
 }
-
-appHost.bindRpcService(Service).catch(log)

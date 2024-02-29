@@ -17,6 +17,7 @@ const _wails_bindings = () => ({
   astral_resolve: window['go']['main']['Adapter']['Resolve'],
   astral_service_close: window['go']['main']['Adapter']['ServiceClose'],
   astral_service_register: window['go']['main']['Adapter']['ServiceRegister'],
+  astral_interrupt: window['go']['main']['Adapter']['Interrupt'],
   sleep: window['go']['main']['Adapter']['Sleep'],
   log: window['go']['main']['Adapter']['LogArr'],
 })
@@ -61,6 +62,7 @@ const _android_bindings = () => {
     astral_resolve: (arg1) => _promise(() => _app_host.resolve(arg1)),
     astral_service_close: (arg1) => _promise(() => _app_host.serviceClose(arg1)),
     astral_service_register: (arg1) => _promise(() => _app_host.serviceRegister(arg1)),
+    astral_interrupt: () => _promise(() => _app_host.interrupt()),
     sleep: (arg1) => _promise(() => _app_host.sleep(arg1)),
     log: (arg1) => _app_host.logArr(JSON.stringify(arg1)),
   }
@@ -83,6 +85,7 @@ const _default_bindings = () => ({
   astral_resolve: _astral_resolve,
   astral_service_close: _astral_service_close,
   astral_service_register: _astral_service_register,
+  astral_interrupt: _astral_interrupt,
   sleep: _sleep,
   log: _log,
 })
@@ -122,13 +125,15 @@ class AppHostClient {
   }
 
   async query(node, query) {
-    const conn = await bindings.astral_query(node, query)
-    return new AppHostConn(conn, query)
+    const json = await bindings.astral_query(node, query)
+    const data = JSON.parse(json)
+    return new AppHostConn(data, query)
   }
 
   async queryName(node, query) {
-    const conn = await bindings.astral_query_name(node, query)
-    return new AppHostConn(conn, query)
+    const json = await bindings.astral_query_name(node, query)
+    const data = JSON.parse(json)
+    return new AppHostConn(data, query)
   }
 
   async nodeInfo(id) {
@@ -138,6 +143,10 @@ class AppHostClient {
   async resolve(name) {
     return await bindings.astral_resolve(name)
   }
+
+  async interrupt() {
+    await bindings.astral_interrupt()
+  }
 }
 
 class AppHostListener {
@@ -146,8 +155,9 @@ class AppHostListener {
   }
 
   async accept() {
-    const conn = await bindings.astral_conn_accept(this.port)
-    return new AppHostConn(conn, this.port)
+    const json = await bindings.astral_conn_accept(this.port)
+    const data = JSON.parse(json)
+    return new AppHostConn(data)
   }
 
   async close() {
@@ -156,57 +166,117 @@ class AppHostListener {
 }
 
 class AppHostConn {
-  constructor(conn, port) {
-    this.conn = conn
-    this.port = port
+  constructor(data) {
+    this.id = data.id
+    this.query = data.query
   }
 
   async read() {
-    return await bindings.astral_conn_read(this.conn)
+    return await bindings.astral_conn_read(this.id)
   }
 
   async write(data) {
-    return await bindings.astral_conn_write(this.conn, data)
+    return await bindings.astral_conn_write(this.id, data)
   }
 
   async close() {
-    await bindings.astral_conn_close(this.conn)
+    await bindings.astral_conn_close(this.id)
   }
 }
 
-const appHost = new AppHostClient()
-
 // ================== RPC extensions ==================
+
+AppHostConn.prototype.jrpcCall = async function (method, ...data) {
+  const cmd = JSON.stringify([method, ...data])
+  log(this.query + " " + this.id + ": => " + cmd)
+  await this.write(cmd)
+}
+
+AppHostConn.prototype.readJson = async function (method) {
+  const resp = await this.read()
+  const json = JSON.parse(resp)
+  if (method !== undefined) {
+    log(this.query + " " + this.id + ": <= " + JSON.stringify([method, json]))
+  }
+  return json
+}
+
+AppHostConn.prototype.jsonReader = async function (method) {
+  const read = async () => await this.readJson(method)
+  read.cancel = async () => await this.close()
+  return read
+}
 
 // Bind RPC api of service associated to this connection
 AppHostConn.prototype.bindRpc = async function () {
-  await astral_rpc_bind_api(this)
+  await astral_rpc_conn_bind_api(this)
 }
 
-async function astral_rpc_bind_api(conn) {
-  await conn.write(JSON.stringify(["api"]))
-  const api = await conn.read()
-  log(conn.port + " " + conn.conn + ": == " + api)
-  const methods = JSON.parse(api)
+async function astral_rpc_conn_bind_api(conn) {
+  // request api methods
+  await conn.jrpcCall("api")
+
+  // read api methods
+  const methods = await conn.readJson("api")
+
+  // bind methods
   for (let method of methods) {
     conn[method] = async (...data) => {
-      const cmd = JSON.stringify([method, ...data])
-      log(conn.port + " " + conn.conn + ": => " + cmd)
-      await conn.write(cmd)
-      const resp = await conn.read()
-      const json = JSON.parse(resp)
-      log(conn.port + " " + conn.conn + ": <= " + JSON.stringify([method, json]))
+      await conn.jrpcCall(method, ...data)
+      return await conn.readJson(method)
+    }
+  }
+
+  // bind subscribe
+  conn.subscribe = async (method, ...data) => {
+    await conn.jrpcCall(method, ...data)
+    return conn.jsonReader(method)
+  }
+}
+
+AppHostClient.prototype.jrpcCall = async function (node, service, method, ...data) {
+  const cmd = JSON.stringify([method, ...data])
+  const conn = await this.query(node, service + cmd)
+  log(service + " " + conn.id + ": => " + cmd)
+  return conn
+}
+
+AppHostClient.prototype.bindRpc = async function (node, service) {
+  await astral_rpc_client_bind_api(this, node, service)
+  return this
+}
+
+async function astral_rpc_client_bind_api(client, node, service) {
+  // request api methods
+  const conn = await client.jrpcCall(node, service, "api")
+
+  // read api methods
+  const methods = await conn.readJson("api")
+  conn.close().catch(log)
+
+  // bind methods
+  for (let method of methods) {
+    client[method] = async (...data) => {
+      const conn = await client.jrpcCall(node, service, method, ...data)
+      const json = await conn.readJson(method)
+      conn.close().catch(log)
       return json
     }
+  }
+
+  // bind subscribe
+  client.subscribe = async (method, ...data) => {
+    const conn = await client.jrpcCall(node, service, method, ...data)
+    return await conn.jsonReader(method)
   }
 }
 
 // Bind RPC service to given name
-AppHostClient.prototype.bindRpc = async function (service, name) {
-  await astral_rpc_bind_srv.call(this, service, name)
+AppHostClient.prototype.bindRpcService = async function (service) {
+  return await astral_rpc_bind_srv.call(this, service)
 }
 
-async function astral_rpc_bind_srv(Service, name) {
+async function astral_rpc_bind_srv(Service) {
   const props = Object.getOwnPropertyNames(Service.prototype)
   if (props[0] !== "constructor") throw new Error("Service must have a constructor")
   const methods = props.slice(1, props.length)
@@ -214,34 +284,51 @@ async function astral_rpc_bind_srv(Service, name) {
   Service.prototype.api = async () => {
     return methods
   }
-  const listener = await this.register(name)
-  log("listen " + name)
-  astral_rpc_listen.call(new Service(), listener).then(log)
+  const srv = new Service()
+  const listener = await this.register(srv.name + "*")
+  log("listen " + srv.name)
+  astral_rpc_listen.call(srv, listener).catch(log)
+  return listener
 }
 
 async function astral_rpc_listen(listener) {
   for (; ;) {
     const conn = await listener.accept()
-    log(conn.port + " " + conn.conn + ": accepted")
-    astral_rpc_handle.call(this, conn)
+    log(conn.query + " " + conn.id + ": accepted")
+    astral_rpc_handle.call(this, conn).catch(log)
   }
 }
 
 async function astral_rpc_handle(conn) {
   try {
+    const send = async (result) =>
+      await conn.write(JSON.stringify(result))
+
+    let str = conn.query.slice(this.name.length)
+    const single = str.length > 0
     for (; ;) {
-      const str = await conn.read()
-      log(conn.port + " " + conn.conn + ": " + str)
+      if (!single) {
+        str = await conn.read()
+      }
+      log(this.name + " " + conn.id + ": " + str)
       const query = JSON.parse(str)
       const method = query[0]
       const args = query.slice(1)
-      const result = await this[method](...args)
-      await conn.write(JSON.stringify(result))
+      const result = await this[method](...args, send)
+      if (result !== undefined) {
+        await conn.write(JSON.stringify(result))
+      }
+      if (single) {
+        conn.close().catch(log)
+        break
+      }
     }
   } catch (e) {
-    log(conn.port + " " + conn.conn + ": " + e)
+    log(conn.query + " " + conn.id + ": " + e)
   }
 }
+
+const appHost = new AppHostClient()
 
 // ================== Exports ==================
 
