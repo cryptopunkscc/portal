@@ -1,7 +1,7 @@
 {
-  "name": "Backend + Webpack",
+  "name": "Backend + Rollup",
   "shortname": "backend",
   "author": "yang",
-  "description": "Backend + Webpack development server",
+  "description": "Backend + Rollup development server",
   "helpurl": "https://github.com/cryptopunkscc/go-astral-js"
 }

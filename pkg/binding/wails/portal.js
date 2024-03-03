@@ -197,7 +197,6 @@ var portal = (function (exports) {
 
   // Bind RPC service to given name
   AppHostClient.prototype.bindRpcService = async function (service) {
-
     return await astral_rpc_bind_srv.call(this, service)
   };
 
