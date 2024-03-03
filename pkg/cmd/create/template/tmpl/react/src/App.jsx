@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import logo from './assets/images/logo-universal.png';
 import './App.css';
-import appHost, {log, platform} from '../../lib/apphost/apphost';
+import {appHost, log, platform} from '../../lib/portal';
 
 function App() {
   log("render")

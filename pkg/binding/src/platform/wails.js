@@ -1,10 +1,13 @@
+import {inject} from "../bindings";
+
 // ================== Wails bindings adapter ==================
 
 /* eslint-disable */
-const _wails_platform = () => typeof window['go'] === "undefined" ? undefined : "wails"
+const platform = typeof window['go'] === "undefined" ? undefined : "wails"
 
 /* eslint-disable */
-const _wails_bindings = () => ({
+const adapter = () => ({
+  // apphost
   astral_conn_accept: window['go']['main']['Adapter']['ConnAccept'],
   astral_conn_close: window['go']['main']['Adapter']['ConnClose'],
   astral_conn_read: window['go']['main']['Adapter']['ConnRead'],
@@ -16,11 +19,9 @@ const _wails_bindings = () => ({
   astral_service_close: window['go']['main']['Adapter']['ServiceClose'],
   astral_service_register: window['go']['main']['Adapter']['ServiceRegister'],
   astral_interrupt: window['go']['main']['Adapter']['Interrupt'],
+  // runtime
   sleep: window['go']['main']['Adapter']['Sleep'],
-  log: window['go']['main']['Adapter']['LogArr'],
+  log: (...arg) => window['go']['main']['Adapter']['LogArr'](arg),
 })
 
-builder.push({
-  platform: _wails_platform(),
-  bindings: _wails_bindings,
-})
+inject(platform, adapter)

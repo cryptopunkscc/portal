@@ -1,23 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
-<script src="apphost.js"></script>
+<script src="portal.js"></script>
 <script>
-    log("test log")
-    async function run() {
-        let conn = await appHost.query(null, "hello")
-        await conn.write("hello I am frontend")
-        let result = await conn.read()
-        await conn.close()
-        alert(result)
-    }
-    run()
-    run()
-    run()
-    run()
-    run()
-    run()
-    run()
-    run()
-    run()
+  portal.log("test log")
+
+  async function run() {
+    let conn = await portal.apphost.query("", "hello")
+    await conn.write("hello I am frontend")
+    let result = await conn.read()
+    await conn.close()
+    alert(result)
+  }
+
+  run()
+  run()
+  run()
+  run()
+  run()
+  run()
+  run()
+  run()
+  run()
 </script>
 </html>

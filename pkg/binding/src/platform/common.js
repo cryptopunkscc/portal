@@ -1,5 +1,10 @@
+import {inject} from "../bindings";
+
+const platform = typeof _log === 'undefined' ? undefined : "common"
+
 /* eslint-disable */
-const _default_bindings = () => ({
+const adapter = () => ({
+  // apphost
   astral_conn_accept: _astral_conn_accept,
   astral_conn_close: _astral_conn_close,
   astral_conn_read: _astral_conn_read,
@@ -11,11 +16,9 @@ const _default_bindings = () => ({
   astral_service_close: _astral_service_close,
   astral_service_register: _astral_service_register,
   astral_interrupt: _astral_interrupt,
+  // apphost
   sleep: _sleep,
   log: _log,
 })
 
-builder.push({
-  platform: "default",
-  bindings: _default_bindings,
-})
+inject(platform, adapter)

@@ -1,27 +1,8 @@
-const platform = function () {
-  for (let next of builder) {
-    if (next.platform) {
-      return next.platform
-    }
-  }
-}()
-
-const bindings = function () {
-  for (let next of builder) {
-    if (next.platform) {
-      return next.bindings()
-    }
-  }
-}()
-
-// ================== Static functions adapter ==================
-
-const log = (...arg1) => bindings.log(arg1)
-const sleep = (arg1) => bindings.sleep(arg1)
+import {bindings} from "../bindings";
 
 // ================== Object oriented adapter ==================
 
-class AppHostClient {
+export class AppHostClient {
   async register(service) {
     await bindings.astral_service_register(service)
     return new AppHostListener(service)
@@ -52,7 +33,7 @@ class AppHostClient {
   }
 }
 
-class AppHostListener {
+export class AppHostListener {
   constructor(port) {
     this.port = port
   }
@@ -68,7 +49,7 @@ class AppHostListener {
   }
 }
 
-class AppHostConn {
+export class AppHostConn {
   constructor(data) {
     this.id = data.id
     this.query = data.query

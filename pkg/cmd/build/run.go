@@ -1,10 +1,9 @@
 package build
 
 import (
+	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"log"
-	"os"
-	"os/exec"
 	"sync"
 )
 
@@ -37,19 +36,9 @@ func RunRunner(r *runner.Runner) (err error) {
 }
 
 func npmInstall(dir string) error {
-	return runCmd(dir, "npm", "install")
+	return exec.Run(dir, "npm", "install")
 }
 
 func npmRunBuild(dir string) error {
-	return runCmd(dir, "npm", "run", "build")
-}
-
-func runCmd(dir, name string, args ...string) error {
-	cmd := exec.Command(name, args...)
-	cmd.Env = os.Environ()
-	cmd.Dir = dir
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Stdin = os.Stdin
-	return cmd.Run()
+	return exec.Run(dir, "npm", "run", "build")
 }

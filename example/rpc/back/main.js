@@ -1,3 +1,5 @@
+const {apphost, log} = portal
+
 class Service {
 
     constructor() {
@@ -16,4 +18,4 @@ class Service {
     }
 }
 
-appHost.bindRpcService(Service).catch(log)
+apphost.bindRpcService(Service).catch(log)

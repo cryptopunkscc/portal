@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path"
 	"strings"
+	"time"
 )
 
 func Run(
@@ -74,21 +75,26 @@ func runSingle(opt template.Options) (err error) {
 	if err = template.Install(&opt); err != nil {
 		return errors.Wrap(err, "template.Install")
 	}
+	time.Sleep(500 * time.Millisecond)
 
 	// npm install
 	if err = npmInstall(opt.TargetDir); err != nil {
 		return
 	}
+	time.Sleep(1000 * time.Millisecond)
 
 	// build project
 	if err = build.Run(opt.TargetDir); err != nil {
 		return
 	}
+	time.Sleep(500 * time.Millisecond)
 
 	// bundle project
 	if err = bundle.Run(opt.TargetDir); err != nil {
 		return
 	}
+	time.Sleep(250 * time.Millisecond)
+
 	return
 }
 

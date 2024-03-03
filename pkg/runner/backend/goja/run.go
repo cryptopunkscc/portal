@@ -2,6 +2,7 @@ package goja
 
 import (
 	astraljs "github.com/cryptopunkscc/go-astral-js/pkg/apphost"
+	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/common"
 	"github.com/dop251/goja"
 	"io/fs"
 	"os"
@@ -9,13 +10,15 @@ import (
 )
 
 type Backend struct {
-	vm      *goja.Runtime
-	appHost *astraljs.FlatAdapter
+	vm        *goja.Runtime
+	appHost   *astraljs.FlatAdapter
+	appHostJs string
 }
 
 func NewBackend() *Backend {
 	return &Backend{
-		appHost: astraljs.NewFlatAdapter(),
+		appHost:   astraljs.NewFlatAdapter(),
+		appHostJs: binding.CommonJsString,
 	}
 }
 
@@ -61,7 +64,7 @@ func (b *Backend) RunSource(app string) (err error) {
 	}
 
 	// inject apphost client js lib
-	if _, err = b.vm.RunString(astraljs.JsBaseString()); err != nil {
+	if _, err = b.vm.RunString(b.appHostJs); err != nil {
 		return
 	}
 

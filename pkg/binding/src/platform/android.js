@@ -1,10 +1,11 @@
+import {inject} from "../bindings";
 // ================== Android bindings adapter ==================
 
 /* eslint-disable */
-const _android_platform = () => typeof _app_host === "undefined" ? undefined : "android"
+const platform = typeof _app_host === "undefined" ? undefined : "android"
 
 /* eslint-disable */
-const _android_bindings = () => {
+const adapter = () => {
 
   const _awaiting = new Map()
 
@@ -23,6 +24,7 @@ const _android_bindings = () => {
       _awaiting.set(block(), [resolve, reject]))
 
   return {
+    // apphost
     astral_node_info: (arg1) => _promise(() => _app_host.nodeInfo(arg1)).then(v => JSON.parse(v)),
     astral_conn_accept: (arg1) => _promise(() => _app_host.connAccept(arg1)),
     astral_conn_close: (arg1) => _promise(() => _app_host.connClose(arg1)),
@@ -34,12 +36,10 @@ const _android_bindings = () => {
     astral_service_close: (arg1) => _promise(() => _app_host.serviceClose(arg1)),
     astral_service_register: (arg1) => _promise(() => _app_host.serviceRegister(arg1)),
     astral_interrupt: () => _promise(() => _app_host.interrupt()),
+    // runtime
     sleep: (arg1) => _promise(() => _app_host.sleep(arg1)),
     log: (arg1) => _app_host.logArr(JSON.stringify(arg1)),
   }
 }
 
-builder.push({
-  platform: _android_platform(),
-  bindings: _android_bindings,
-})
+inject(platform, adapter)

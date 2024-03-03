@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import logo from './assets/images/logo-universal.png';
 import './App.css';
-import appHost, {log, platform} from '../../lib/apphost/apphost';
+import {apphost, log, platform} from '../../lib/portal';
 
 function App() {
   log("render")
@@ -28,10 +28,10 @@ function App() {
     async function connect() {
       try {
         log("rpc connecting...")
-        // const appHost = new AppHostClient()
-        const conn = await appHost.bindRpc("", "rpc")
+        // const apphost = new AppHostClient()
+        const conn = await apphost.bindRpc("", "rpc")
         // const conn = await (new AppHostClient()).bindRpc("", "rpc")
-        // let conn = await appHost.query("", "rpc")
+        // let conn = await apphost.query("", "rpc")
         // await conn.bindRpc()
         setRpc(conn)
         log("rpc connected")
@@ -42,12 +42,12 @@ function App() {
     }
     connect().catch(log)
 
-    return appHost.interrupt
+    return apphost.interrupt
   }, [])
 
   async function info() {
-    const id = await appHost.resolve("localnode")
-    const info = await appHost.nodeInfo(id)
+    const id = await apphost.resolve("localnode")
+    const info = await apphost.nodeInfo(id)
     const string = JSON.stringify(info, null, 2)
     log(string)
     setState({...state, info: string})

@@ -2,8 +2,8 @@ package wails
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	"github.com/cryptopunkscc/go-astral-js/pkg/assets"
+	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/wails"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
@@ -21,14 +21,16 @@ func RunFS(src fs.FS, opt *options.App) (err error) {
 		opt.AssetServer = &assetserver.Options{}
 	}
 
+	apphostJsFs := binding.WailsJsFs
+
 	// Setup fs assets
-	opt.AssetServer.Assets = assets.ArrayFs{Array: []fs.FS{src, apphost.JsWailsFs()}}
+	opt.AssetServer.Assets = assets.ArrayFs{Array: []fs.FS{src, apphostJsFs}}
 
 	// Setup http assets
 	opt.AssetServer.Handler = assets.StoreHandler{
 		Store: &assets.OverlayStore{Stores: []assets.Store{
 			&assets.FsStore{FS: src},
-			&assets.FsStore{FS: apphost.JsWailsFs()}},
+			&assets.FsStore{FS: apphostJsFs}},
 		},
 	}
 

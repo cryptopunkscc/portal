@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
+	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/common"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner/backend/v8"
 	"log"
 	"os"
@@ -32,7 +33,7 @@ func main() {
 	defer v8Ctx.Close()
 
 	// inject apphost client js lib
-	_, err = v8Ctx.RunScript(apphost.JsBaseString(), "apphost")
+	_, err = v8Ctx.RunScript(binding.CommonJsString, "apphost")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,0 +1,17 @@
+{
+  "name": "portal-bindings",
+  "version": "0.0.1",
+  "description": "Portal bindings for js",
+  "type": "module",
+  "scripts": {
+    "build": "npm run all && npm run backend && npm run wails",
+    "all": "rollup all.js -o all/portal.js --f es",
+    "backend": "rollup common.js -o common/portal.js --f iife -n portal",
+    "wails": "rollup wails.js -o wails/portal.js --f iife -n portal"
+  },
+  "author": "yang@cryptopunks.cc",
+  "license": "MIT",
+  "devDependencies": {
+    "rollup": "^4.12.0"
+  }
+}

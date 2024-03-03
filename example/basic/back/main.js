@@ -1,28 +1,28 @@
-const api = new AppHostClient()
+const {apphost, log, sleep} = portal
 
 log("backend start")
 
 listenHello().catch(err => {
-    log("port hello err " + err)
+  log("port hello err " + err)
 })
 
 async function listenHello() {
-    this.port = await api.register("hello")
-    log("new port " + this.port.port)
-    for (;;) {
-        let conn = await this.port.accept()
-        log("new conn " + conn.conn)
-        handle(conn).catch(err => {
-            log("conn err " + err)
-        })
-    }
+  this.port = await apphost.register("hello")
+  log("new port " + this.port.port)
+  for (; ;) {
+    let conn = await this.port.accept()
+    log("new conn " + conn.id)
+    handle(conn).catch(err => {
+      log("conn err " + err)
+    })
+  }
 }
 
 async function handle(conn) {
-    let data = await conn.read()
-    log("blocking " + conn.conn)
-    await sleep(3000)
-    log(data)
-    await conn.write("Hello I am backend")
-    await conn.close()
+  let data = await conn.read()
+  log("blocking " + conn.id)
+  await sleep(3000)
+  log(data)
+  await conn.write("Hello I am backend")
+  await conn.close()
 }

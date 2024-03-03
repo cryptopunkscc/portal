@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
+	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/common"
 	webview2 "github.com/cryptopunkscc/go-astral-js/pkg/runner/frontend/webview"
 	"github.com/webview/webview"
 	"log"
@@ -26,7 +27,7 @@ func main() {
 	w.SetTitle(title)
 
 	// inject apphost js client lib
-	w.Init(apphost.JsBaseString())
+	w.Init(binding.CommonJsString)
 
 	// set app source code
 	w.SetHtml(src)

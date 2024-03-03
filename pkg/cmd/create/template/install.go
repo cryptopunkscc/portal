@@ -1,6 +1,7 @@
 package template
 
 import (
+	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/all"
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
 	"github.com/leaanthony/debme"
 	"github.com/leaanthony/gosod"
@@ -8,6 +9,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/clilogger"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 )
@@ -115,6 +117,10 @@ func InstallBase(src string) (err error) {
 
 	if err = installer.Extract(src, struct{}{}); err != nil {
 		return errors.Wrap(err, "installer.Extract")
+	}
+
+	if err = os.WriteFile(path.Join(src, "lib", "portal.js"), []byte(binding.AllJsString), 0644); err != nil {
+		return err
 	}
 	return
 }

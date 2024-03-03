@@ -1,3 +1,5 @@
+const {sleep} = portal
+
 export class Service {
 
   constructor() {
