@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/pkg/backend/goja"
+	"github.com/cryptopunkscc/go-astral-js/pkg/runner/backend/goja"
 	"log"
 	"os"
 )
@@ -16,7 +16,9 @@ func main() {
 	}
 	src := string(srcBytes)
 
-	goja.RunSource(src)
+	if err = goja.NewBackend().RunSource(src); err != nil {
+		panic(err)
+	}
 
 	ctx := context.Background()
 	<-ctx.Done()
