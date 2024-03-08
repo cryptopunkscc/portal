@@ -21,7 +21,7 @@ func DevTargets(src string) (targets []Target, err error) {
 }
 
 func ProdTargets(src string) (targets []Target, err error) {
-	if targets, err = findTargetBundles(src); len(targets) > 0 {
+	if targets, err = BundleTargets(src); len(targets) > 0 {
 		return
 	}
 	if stat, err := os.Stat(src); err == nil && stat.IsDir() {
@@ -32,7 +32,7 @@ func ProdTargets(src string) (targets []Target, err error) {
 	return
 }
 
-func findTargetBundles(src string) (targets []Target, err error) {
+func BundleTargets(src string) (targets []Target, err error) {
 	if targets = appendZipTarget(targets, src); len(targets) > 0 {
 		return
 	}

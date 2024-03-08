@@ -9,6 +9,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/create"
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/create/template"
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/dev"
+	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/publish"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"github.com/leaanthony/clir"
 	"github.com/pterm/pterm"
@@ -23,6 +24,7 @@ func Run(bindings runner.Bindings) {
 	cli.NewSubCommandFunction("open", "Execute app from bundle, dir, or file.", cliApplication(bindings))
 	cli.NewSubCommandFunction("build", "Build application.", cliBuild)
 	cli.NewSubCommandFunction("bundle", "Create production bundle.", cliBundle)
+	cli.NewSubCommandFunction("publish", "Publish bundles from given path to storage", cliPublish)
 	if err := cli.Run(); err != nil {
 		log.Fatalln(err)
 	}
@@ -79,4 +81,8 @@ func cliList() error {
 	err = pterm.DefaultTable.WithHasHeader(true).WithBoxed(true).WithData(table).Render()
 	pterm.Println()
 	return err
+}
+
+func cliPublish(f *FlagsPath) error {
+	return publish.Run(f.Path)
 }

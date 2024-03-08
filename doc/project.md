@@ -13,7 +13,7 @@
 6. **[pre alpha]** (Apphost RPC) *As a developer I can use convenient rpc adapter to apphost for the ipc communication.*
 7. **[pre alpha]** (Bundle create) *As a developer I can generate application bundle from the project.*
 8. **[pre alpha]** (Bundle run) *As a user I can execute application bundles from given path.*
-9. **[to do]** (Storage install) *As a user I can install application in my astral storage.*
+9. **[pre alpha]** (Storage install) *As a user I can install application in my astral storage.*
 10. **[to do]** (Storage run) *As a user I can run application from the astral storage.*
 
 # Stages
