@@ -62,6 +62,10 @@ func appendZipTarget(targets []Target, src string) []Target {
 }
 
 func findTargetDirs(dir string, target fsTarget) (targets []Target, err error) {
+	_, err = os.Stat(dir)
+	if err != nil {
+		return
+	}
 	files := os.DirFS(dir)
 	if err = fs.WalkDir(files, ".", func(p string, d fs.DirEntry, err error) error {
 		if strings.Contains(p, "node_modules") {

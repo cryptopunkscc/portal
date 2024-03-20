@@ -9,6 +9,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/create"
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/create/template"
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/dev"
+	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/jrpc"
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/publish"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"github.com/leaanthony/clir"
@@ -25,6 +26,7 @@ func Run(bindings runner.Bindings) {
 	cli.NewSubCommandFunction("build", "Build application.", cliBuild)
 	cli.NewSubCommandFunction("bundle", "Create production bundle.", cliBundle)
 	cli.NewSubCommandFunction("publish", "Publish bundles from given path to storage", cliPublish)
+	cli.NewSubCommandFunction("serve", "Serve api through jrpc adapter", cliSrv(bindings))
 	if err := cli.Run(); err != nil {
 		log.Fatalln(err)
 	}
@@ -85,4 +87,10 @@ func cliList() error {
 
 func cliPublish(f *FlagsPath) error {
 	return publish.Run(f.Path)
+}
+
+func cliSrv(bindings runner.Bindings) func(*struct{}) error {
+	return func(_ *struct{}) error {
+		return jrpc.Run(bindings)
+	}
 }

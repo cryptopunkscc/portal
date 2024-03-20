@@ -62,5 +62,6 @@ func Run(
 		return
 	}
 	wait.Wait()
+	log.Println("dev closed")
 	return
 }

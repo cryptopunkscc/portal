@@ -2,8 +2,8 @@ package publish
 
 import (
 	"github.com/cryptopunkscc/astrald/auth/id"
+	client "github.com/cryptopunkscc/astrald/lib/storage"
 	"github.com/cryptopunkscc/astrald/mod/storage"
-	cslq "github.com/cryptopunkscc/astrald/mod/storage/cslq/client"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"io"
 	"log"
@@ -16,19 +16,19 @@ func Run(dir string) (err error) {
 		return
 	}
 
-	client := cslq.NewClient(id.Anyone)
+	c := client.NewClient(id.Anyone)
 	targets := append(r.Backends, r.Frontends...)
 
 	for _, t := range targets {
 		log.Printf("publish %v", t.Path)
-		if err = publish(client, t); err != nil {
+		if err = publish(c, t); err != nil {
 			log.Printf("cannot publish %v: %v", t.Path, err)
 		}
 	}
 	return
 }
 
-func publish(client *cslq.Client, target runner.Target) (err error) {
+func publish(client *client.Client, target runner.Target) (err error) {
 	dst, err := client.Create(&storage.CreateOpts{})
 	if err != nil {
 		return
