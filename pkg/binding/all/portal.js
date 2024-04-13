@@ -111,14 +111,14 @@ class AppHostClient {
     return new AppHostListener(service)
   }
 
-  async query(node, query) {
-    const json = await bindings.astral_query(node, query);
+  async query(identity, query) {
+    const json = await bindings.astral_query(identity, query);
     const data = JSON.parse(json);
     return new AppHostConn(data, query)
   }
 
-  async queryName(node, query) {
-    const json = await bindings.astral_query_name(node, query);
+  async queryName(name, query) {
+    const json = await bindings.astral_query_name(name, query);
     const data = JSON.parse(json);
     return new AppHostConn(data, query)
   }
@@ -176,7 +176,10 @@ const {log: log$1} = bindings;
 // ================== RPC extensions ==================
 
 AppHostConn.prototype.jrpcCall = async function (method, ...data) {
-  const cmd = JSON.stringify([method, ...data]);
+  let cmd = method;
+  if (data.length > 0) {
+    cmd += "?" + JSON.stringify(data);
+  }
   log$1(this.query + " " + this.id + ": => " + cmd);
   await this.write(cmd);
 };
@@ -185,7 +188,7 @@ AppHostConn.prototype.readJson = async function (method) {
   const resp = await this.read();
   const json = JSON.parse(resp);
   if (method !== undefined) {
-    log$1(this.query + " " + this.id + ": <= " + JSON.stringify([method, json]));
+    log$1(this.query + " " + this.id + ": <= " + method  + ":" + resp);
   }
   return json
 };
@@ -223,21 +226,27 @@ async function astral_rpc_conn_bind_api(conn) {
   };
 }
 
-AppHostClient.prototype.jrpcCall = async function (node, service, method, ...data) {
-  const cmd = JSON.stringify([method, ...data]);
-  const conn = await this.query(node, service + cmd);
+AppHostClient.prototype.jrpcCall = async function (identity, service, method, ...data) {
+  let cmd = service;
+  if (method) {
+    cmd += "." + method;
+  }
+  if (data.length > 0) {
+    cmd += "?" + JSON.stringify(data);
+  }
+  const conn = await this.query(identity, cmd);
   log$1(service + " " + conn.id + ": => " + cmd);
   return conn
 };
 
-AppHostClient.prototype.bindRpc = async function (node, service) {
-  await astral_rpc_client_bind_api(this, node, service);
+AppHostClient.prototype.bindRpc = async function (identity, service) {
+  await astral_rpc_client_bind_api(this, identity, service);
   return this
 };
 
-async function astral_rpc_client_bind_api(client, node, service) {
+async function astral_rpc_client_bind_api(client, identity, service) {
   // request api methods
-  const conn = await client.jrpcCall(node, service, "api");
+  const conn = await client.jrpcCall(identity, service, "api");
 
   // read api methods
   const methods = await conn.readJson("api");
@@ -246,7 +255,7 @@ async function astral_rpc_client_bind_api(client, node, service) {
   // bind methods
   for (let method of methods) {
     client[method] = async (...data) => {
-      const conn = await client.jrpcCall(node, service, method, ...data);
+      const conn = await client.jrpcCall(identity, service, method, ...data);
       const json = await conn.readJson(method);
       conn.close().catch(log$1);
       return json
@@ -255,14 +264,13 @@ async function astral_rpc_client_bind_api(client, node, service) {
 
   // bind subscribe
   client.subscribe = async (method, ...data) => {
-    const conn = await client.jrpcCall(node, service, method, ...data);
+    const conn = await client.jrpcCall(identity, service, method, ...data);
     return await conn.jsonReader(method)
   };
 }
 
 // Bind RPC service to given name
 AppHostClient.prototype.bindRpcService = async function (service) {
-
   return await astral_rpc_bind_srv.call(this, service)
 };
 
@@ -291,22 +299,23 @@ async function astral_rpc_listen(listener) {
 
 async function astral_rpc_handle(conn) {
   try {
-    const send = async (result) =>
-      await conn.write(JSON.stringify(result));
+    const send = async (result) => await conn.write(JSON.stringify(result));
 
-    let str = conn.query.slice(this.name.length);
-    const single = str.length > 0;
+    let query = conn.query.slice(this.name.length);
+    let method = query, args = [];
+    const single = query !== '';
+
     for (; ;) {
       if (!single) {
-        str = await conn.read();
+        query = await conn.read();
       }
-      log$1(this.name + " " + conn.id + ": " + str);
-      const query = JSON.parse(str);
-      const method = query[0];
-      const args = query.slice(1);
-      const result = await this[method](...args, send);
+      [method, args] = parseQuery(query);
+
+      log$1(this.name + " " + conn.id + ": " + query);
+      let result = await this[method](...args, send);
       if (result !== undefined) {
-        await conn.write(JSON.stringify(result));
+        result = JSON.stringify(result);
+        await conn.write(result);
       }
       if (single) {
         conn.close().catch(log$1);
@@ -316,6 +325,18 @@ async function astral_rpc_handle(conn) {
   } catch (e) {
     log$1(conn.query + " " + conn.id + ": " + e);
   }
+}
+
+function parseQuery(query) {
+  if (query[0] === '.') {
+    query = query.slice(1);
+  }
+  let [method, payload] = query.split('?', 2);
+  let args = [];
+  if (payload) {
+    args = JSON.parse(payload);
+  }
+  return [method, args]
 }
 
 const {log, sleep, platform} = bindings;
