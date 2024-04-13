@@ -9,8 +9,8 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/create"
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/create/template"
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/dev"
-	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/jrpc"
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/publish"
+	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/rpc"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"github.com/leaanthony/clir"
 	"github.com/pterm/pterm"
@@ -96,6 +96,6 @@ func cliPublish(f *FlagsPath) error {
 
 func cliSrv(bindings runner.Bindings) func(*struct{}) error {
 	return func(_ *struct{}) error {
-		return jrpc.Run(bindings)
+		return rpc.Run(bindings)
 	}
 }

@@ -20,7 +20,7 @@ AppHostConn.prototype.readJson = async function (method) {
   const resp = await this.read()
   const json = JSON.parse(resp)
   if (method !== undefined) {
-    log(this.query + " " + this.id + ": <= " + method  + ":" + resp)
+    log(this.query + " " + this.id + ": <= " + method  + ":" + resp.trimEnd())
   }
   return json
 }
