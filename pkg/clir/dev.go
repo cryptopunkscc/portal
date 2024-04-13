@@ -20,6 +20,11 @@ import (
 
 func Run(bindings runner.Bindings) {
 	cli := clir.NewCli(portal.Name, portal.DevDescription, portal.Version)
+
+	flags := &FlagsPath{}
+	cli.AddFlags(flags)
+	cli.Action(func() error { return cliApplication(bindings)(flags) })
+
 	cli.NewSubCommandFunction("create", "Create production bundle.", cliCreate)
 	cli.NewSubCommandFunction("dev", "Run development server for given dir.", cliDevelopment(bindings))
 	cli.NewSubCommandFunction("open", "Execute app from bundle, dir, or file.", cliApplication(bindings))
