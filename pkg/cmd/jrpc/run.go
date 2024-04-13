@@ -14,51 +14,24 @@ import (
 )
 
 func Run(bindings runner.Bindings) (err error) {
-	return jrpc.NewServer(
-		func(context.Context, jrpc.Conn) *service {
-			return newService(bindings)
-		}).
-		Logger(log.New(log.Writer(), "service ", 0)).
-		Run(context.Background())
-}
 
-type service struct {
-	bindings runner.Bindings
-}
+	s := jrpc.NewApp("portal")
+	s.Logger(log.New(log.Writer(), "service ", 0))
 
-func (s service) String() string {
-	return "portal"
-}
+	s.With(bindings)
+	s.Routes("*")
+	s.RouteFunc("open", prod.Run)
+	s.RouteFunc("create", create.Run)
+	s.RouteFunc("dev", dev.Run)
+	s.RouteFunc("build", build.Run)
+	s.RouteFunc("bundle", bundle.Run)
+	s.RouteFunc("publish", publish.Run)
 
-func newService(bindings runner.Bindings) *service {
-	return &service{bindings: bindings}
-}
-
-func (s *service) Create(
-	projectName string,
-	targetDir string,
-	templates []string,
-	force bool,
-) (err error) {
-	return create.Run(projectName, targetDir, templates, force)
-}
-
-func (s *service) Dev(src string) (err error) {
-	return dev.Run(src, s.bindings)
-}
-
-func (s *service) Open(src string) (err error) {
-	return prod.Run(src, s.bindings)
-}
-
-func (s *service) Build(src string) (err error) {
-	return build.Run(src)
-}
-
-func (s *service) Bundle(src string) (err error) {
-	return bundle.Run(src)
-}
-
-func (s *service) Publish(src string) (err error) {
-	return publish.Run(src)
+	ctx := context.Background()
+	err = s.Run(ctx)
+	if err != nil {
+		return
+	}
+	<-ctx.Done()
+	return
 }

@@ -4,6 +4,8 @@ import (
 	"github.com/cryptopunkscc/astrald/auth/id"
 	client "github.com/cryptopunkscc/astrald/lib/storage"
 	"github.com/cryptopunkscc/astrald/mod/storage"
+	proto "github.com/cryptopunkscc/astrald/mod/storage/srv"
+	jrpc "github.com/cryptopunkscc/go-apphost-jrpc"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"io"
 	"log"
@@ -16,7 +18,7 @@ func Run(dir string) (err error) {
 		return
 	}
 
-	c := client.NewClient(id.Anyone)
+	c := client.NewClient(jrpc.NewRequest(id.Anyone, proto.Port))
 	targets := append(r.Backends, r.Frontends...)
 
 	for _, t := range targets {

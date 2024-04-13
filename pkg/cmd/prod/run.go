@@ -9,8 +9,8 @@ import (
 )
 
 func Run(
-	src string,
 	bindings runner.Bindings,
+	src string,
 ) (err error) {
 	d, err := runner.New(src, runner.ProdTargets)
 	if err != nil {

@@ -14,8 +14,8 @@ import (
 )
 
 func Run(
-	dir string,
 	bindings runner.Bindings,
+	dir string,
 ) (err error) {
 	d, err := runner.New(dir, runner.DevTargets)
 	if err != nil {

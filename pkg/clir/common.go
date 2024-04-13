@@ -11,6 +11,6 @@ type FlagsPath struct {
 
 func cliApplication(bindings runner.Bindings) func(f *FlagsPath) (err error) {
 	return func(f *FlagsPath) (err error) {
-		return prod.Run(f.Path, bindings)
+		return prod.Run(bindings, f.Path)
 	}
 }

@@ -34,7 +34,7 @@ func Run(bindings runner.Bindings) {
 
 func cliDevelopment(bindings runner.Bindings) func(f *FlagsPath) (err error) {
 	return func(f *FlagsPath) (err error) {
-		return dev.Run(f.Path, bindings)
+		return dev.Run(bindings, f.Path)
 	}
 }
 
