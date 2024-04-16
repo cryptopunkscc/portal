@@ -29,6 +29,9 @@ func Run(
 		if projectName, err = os.Getwd(); err != nil {
 			return
 		}
+		if targetDir == "" {
+			targetDir = projectName
+		}
 		projectName = path.Base(projectName)
 	}
 
@@ -53,6 +56,9 @@ func Run(
 
 	// install each template
 	for _, t := range templates {
+		if len(t) == 0 {
+			continue
+		}
 		c := strings.Split(t, ":")
 		o := opt
 		o.TemplateName = c[0]

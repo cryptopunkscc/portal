@@ -109,6 +109,7 @@ func Install(opt *Options) (err error) {
 }
 
 func InstallBase(src string) (err error) {
+	log.Println("install lib in:", src)
 	commonFs, err := debme.FS(templatesFs, "tmpl/base")
 	if err != nil {
 		return err

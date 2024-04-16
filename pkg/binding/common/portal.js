@@ -112,7 +112,7 @@ var portal = (function (exports) {
     if (data.length > 0) {
       cmd += "?" + JSON.stringify(data);
     }
-    log$1(this.query + " " + this.id + ": => " + cmd);
+    log$1(this.id + " conn => " + this.query + "." + cmd);
     await this.write(cmd);
   };
 
@@ -120,7 +120,7 @@ var portal = (function (exports) {
     const resp = await this.read();
     const json = JSON.parse(resp);
     if (method !== undefined) {
-      log$1(this.query + " " + this.id + ": <= " + method  + ":" + resp.trimEnd());
+      log$1(this.id + " conn <= " + this.query  + ":" + resp.trimEnd());
     }
     return json
   };
@@ -167,13 +167,23 @@ var portal = (function (exports) {
       cmd += "?" + JSON.stringify(data);
     }
     const conn = await this.query(identity, cmd);
-    log$1(service + " " + conn.id + ": => " + cmd);
+    log$1(conn.id + " client => " + cmd);
     return conn
   };
 
   AppHostClient.prototype.bindRpc = async function (identity, service) {
     await astral_rpc_client_bind_api(this, identity, service);
     return this
+  };
+
+  AppHostClient.prototype.rpcQuery = function (identity, port) {
+    const client = this;
+    return async function (...data) {
+      const conn = await client.jrpcCall(identity, port, "", ...data);
+      const json = await conn.readJson(port);
+      conn.close().catch(log$1);
+      return json
+    }
   };
 
   async function astral_rpc_client_bind_api(client, identity, service) {
@@ -224,7 +234,7 @@ var portal = (function (exports) {
   async function astral_rpc_listen(listener) {
     for (; ;) {
       const conn = await listener.accept();
-      log$1(conn.query + " " + conn.id + ": accepted");
+      log$1(conn.id + " service <= " + conn.query);
       astral_rpc_handle.call(this, conn).catch(log$1);
     }
   }
@@ -240,10 +250,10 @@ var portal = (function (exports) {
       for (; ;) {
         if (!single) {
           query = await conn.read();
+          log$1(conn.id + " service <= " + query);
         }
         [method, args] = parseQuery(query);
 
-        log$1(this.name + " " + conn.id + ": " + query);
         let result = await this[method](...args, send);
         if (result !== undefined) {
           result = JSON.stringify(result);
@@ -255,7 +265,7 @@ var portal = (function (exports) {
         }
       }
     } catch (e) {
-      log$1(conn.query + " " + conn.id + ": " + e);
+      log$1(conn.id + "service != " + conn.query + ":" + e);
     }
   }
 

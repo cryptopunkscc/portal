@@ -12,7 +12,7 @@ AppHostConn.prototype.jrpcCall = async function (method, ...data) {
   if (data.length > 0) {
     cmd += "?" + JSON.stringify(data)
   }
-  log(this.query + " " + this.id + ": => " + cmd)
+  log(this.id + " conn => " + this.query + "." + cmd)
   await this.write(cmd)
 }
 
@@ -20,7 +20,7 @@ AppHostConn.prototype.readJson = async function (method) {
   const resp = await this.read()
   const json = JSON.parse(resp)
   if (method !== undefined) {
-    log(this.query + " " + this.id + ": <= " + method  + ":" + resp.trimEnd())
+    log(this.id + " conn <= " + this.query  + ":" + resp.trimEnd())
   }
   return json
 }
@@ -67,13 +67,23 @@ AppHostClient.prototype.jrpcCall = async function (identity, service, method, ..
     cmd += "?" + JSON.stringify(data)
   }
   const conn = await this.query(identity, cmd)
-  log(service + " " + conn.id + ": => " + cmd)
+  log(conn.id + " client => " + cmd)
   return conn
 }
 
 AppHostClient.prototype.bindRpc = async function (identity, service) {
   await astral_rpc_client_bind_api(this, identity, service)
   return this
+}
+
+AppHostClient.prototype.rpcQuery = function (identity, port) {
+  const client = this
+  return async function (...data) {
+    const conn = await client.jrpcCall(identity, port, "", ...data)
+    const json = await conn.readJson(port)
+    conn.close().catch(log)
+    return json
+  }
 }
 
 async function astral_rpc_client_bind_api(client, identity, service) {
@@ -124,7 +134,7 @@ async function astral_rpc_bind_srv(Service) {
 async function astral_rpc_listen(listener) {
   for (; ;) {
     const conn = await listener.accept()
-    log(conn.query + " " + conn.id + ": accepted")
+    log(conn.id + " service <= " + conn.query)
     astral_rpc_handle.call(this, conn).catch(log)
   }
 }
@@ -140,10 +150,10 @@ async function astral_rpc_handle(conn) {
     for (; ;) {
       if (!single) {
         query = await conn.read();
+        log(conn.id + " service <= " + query)
       }
       [method, args] = parseQuery(query)
 
-      log(this.name + " " + conn.id + ": " + query)
       let result = await this[method](...args, send)
       if (result !== undefined) {
         result = JSON.stringify(result)
@@ -155,7 +165,7 @@ async function astral_rpc_handle(conn) {
       }
     }
   } catch (e) {
-    log(conn.query + " " + conn.id + ": " + e)
+    log(conn.id + "service != " + conn.query + ":" + e)
   }
 }
 
