@@ -1,0 +1,53 @@
+classDiagram
+    class Launcher {
+        <<component>>
+    }
+    class AppItemList {
+        <<component>>
+    }
+    class AppItem {
+        <<component>>
+        install()
+        uninstall()
+    }
+    class AppsRepository {
+        items <-chan appData
+        loadMore(num int)
+    }
+
+    class appData {
+        <<struct>>
+        id data.ID
+        name string
+        description string
+        icon Uri
+        tags []string
+        installed bool
+    }
+    class AppRepository {
+        launch(id data.ID)
+        install(id data.ID)
+        uninstall(id data.ID)
+    }
+    class Apps {
+        <<conn>>
+    }
+    class Portal {
+        <<service>>
+        observe(opts) Apps
+        open(id data.ID)
+        install(id data.ID)
+        uninstall(id data.ID)
+    }
+
+    Launcher "1" *-- "1" AppItemList
+    AppItemList "1" *-- "*" AppItem
+    AppItemList "1" *-- "1" AppsRepository
+    AppItem "*" *-- "1" AppRepository
+    AppItem "1" *-- "1" appData
+%%    appData "*" <.. "1"  AppsRepository
+    AppsRepository "1" ..> "*" appData
+    AppsRepository "1" o..> "1" Apps
+    AppRepository "calls" ..> Portal
+    Apps <..o "serve" Portal
+    %%    AppsRepository "calls" ..> AppsRepository
