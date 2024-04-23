@@ -3,6 +3,7 @@ package bundle
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/build"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"github.com/cryptopunkscc/go-astral-js/pkg/zip"
@@ -38,21 +39,10 @@ func Run(src string) (err error) {
 		}
 	}
 
-	dist := path.Join(src, "dist")
-
-	// prepare portal.json
-	portalJson := &PackageJson{
-		Name:    path.Base(src),
-		Version: "0.0.0",
-	}
-	_ = portalJson.Load(path.Join(src, "portal.json"))
-	_ = portalJson.Load(path.Join(src, "package.json"))
-	bytes, err := json.Marshal(portalJson)
-	if err != nil {
-		return err
-	}
-	if err = os.WriteFile(path.Join(dist, "portal.json"), bytes, 0644); err != nil {
-		return fmt.Errorf("os.WriteFile: %v", err)
+	// load manifest
+	portalJson := bundle.Base(src)
+	if err = portalJson.LoadPath(src, "portal.json"); err != nil {
+		return fmt.Errorf("portalJson.LoadPath: %v", err)
 	}
 
 	// create build dir
@@ -62,6 +52,7 @@ func Run(src string) (err error) {
 	}
 
 	// pack dist dir
+	dist := path.Join(src, "dist")
 	bundleName := fmt.Sprintf("%s_%s.portal", portalJson.Name, portalJson.Version)
 	if err = zip.Pack(dist, path.Join(buildDir, bundleName)); err != nil {
 		return fmt.Errorf("Pack: %v", err)

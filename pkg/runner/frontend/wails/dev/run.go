@@ -1,12 +1,10 @@
 package dev
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/assets"
-	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/wails"
+	"fmt"
+	common "github.com/cryptopunkscc/go-astral-js/pkg/runner/frontend/wails"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
-	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
-	"io/fs"
 	"log"
 	"os"
 	"os/signal"
@@ -17,27 +15,16 @@ func Run(path string, opt *options.App) (err error) {
 
 	front := path
 	path = path + "/dist"
-
-	// Setup defaults
-	//if opt.Title != "" {
-	//	opt.Title = filepath.Base(front)
-	//}
-	if opt.AssetServer == nil {
-		opt.AssetServer = &assetserver.Options{}
+	src := os.DirFS(path)
+	common.SetupOptions(src, opt)
+	if opt.Title == "" {
+		opt.Title = "development"
 	}
-
-	apphostJsFs := binding.WailsJsFs
-
-	// Setup fs assets
-	opt.AssetServer.Assets = assets.ArrayFs{Array: []fs.FS{os.DirFS(path), apphostJsFs}}
-
-	// Setup http assets
-	opt.AssetServer.Handler = assets.StoreHandler{
-		Store: &assets.OverlayStore{Stores: []assets.Store{
-			&assets.FsStore{FS: os.DirFS(path)},
-			&assets.FsStore{FS: apphostJsFs}},
-		},
+	titleSuffix := front
+	if exec, err := os.Getwd(); err == nil {
+		titleSuffix = exec
 	}
+	opt.Title = fmt.Sprintf("%s - %s", opt.Title, titleSuffix)
 
 	// Start frontend dev watcher
 	runDevWatcherCommand := "npm run dev"

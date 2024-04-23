@@ -130,6 +130,7 @@ var portal = (function (exports) {
 
   AppHostConn.prototype.writeJson = async function (data) {
     const json = JSON.stringify(data) + '\n';
+    log$1(this.id + " conn => " + this.query + ":" + json.trimEnd());
     await this.write(json);
   };
 

@@ -1,4 +1,6 @@
 {
-  "name": "portal-launcher",
-  "package": "svelte"
+  "title": "Portal Launcher",
+  "description": "Portal applications launcher.",
+  "package": "svelte",
+  "icon": "./src/assets/images/logo.svg"
 }

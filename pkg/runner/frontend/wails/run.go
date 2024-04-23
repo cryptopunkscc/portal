@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/cryptopunkscc/go-astral-js/pkg/assets"
 	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/wails"
+	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
@@ -13,15 +14,30 @@ import (
 )
 
 func RunFS(src fs.FS, opt *options.App) (err error) {
+	SetupOptions(src, opt)
+	log.Println("running wails")
+	return wails.Run(opt)
+}
+
+func SetupOptions(src fs.FS, opt *options.App) {
 	// Setup defaults
-	//if opt.Title != "" {
-	//	opt.Title = filepath.Base(path)
-	//}
 	if opt.AssetServer == nil {
 		opt.AssetServer = &assetserver.Options{}
 	}
 
 	apphostJsFs := binding.WailsJsFs
+
+	// Setup manifest
+	log.Println("Reading manifest")
+	if manifest, err := bundle.ReadManifestFs(src); err == nil {
+		log.Printf("Reading manifest success: %s\n", manifest)
+		opt.Title = manifest.Title
+		if opt.Title == "" {
+			opt.Title = manifest.Name
+		}
+	} else {
+		log.Println("Reading manifest err: ", err)
+	}
 
 	// Setup fs assets
 	opt.AssetServer.Assets = assets.ArrayFs{Array: []fs.FS{src, apphostJsFs}}
@@ -33,9 +49,6 @@ func RunFS(src fs.FS, opt *options.App) (err error) {
 			&assets.FsStore{FS: apphostJsFs}},
 		},
 	}
-
-	log.Println("running wails")
-	return wails.Run(opt)
 }
 
 func AppOptions(app io.Closer) *options.App {
