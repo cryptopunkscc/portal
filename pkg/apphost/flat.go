@@ -1,6 +1,7 @@
 package apphost
 
 import (
+	"bufio"
 	_ "embed"
 	"encoding/json"
 	"errors"
@@ -8,6 +9,7 @@ import (
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/astrald/lib/astral"
 	"github.com/google/uuid"
+	"io"
 	"log"
 	"sync"
 	"time"
@@ -33,14 +35,14 @@ type FlatAdapter struct {
 	listeners      map[string]*astral.Listener
 	listenersMutex sync.RWMutex
 
-	connections      map[string]*astral.Conn
+	connections      map[string]*Conn
 	connectionsMutex sync.RWMutex
 }
 
 func NewFlatAdapter() *FlatAdapter {
 	return &FlatAdapter{
 		listeners:   map[string]*astral.Listener{},
-		connections: map[string]*astral.Conn{},
+		connections: map[string]*Conn{},
 	}
 }
 
@@ -62,7 +64,7 @@ func (api *FlatAdapter) Interrupt() {
 		log.Print("[Interrupt] closing connection:", name)
 		_ = closer.Close()
 	}
-	api.connections = map[string]*astral.Conn{}
+	api.connections = map[string]*Conn{}
 	api.listeners = map[string]*astral.Listener{}
 }
 
@@ -83,7 +85,7 @@ func (api *FlatAdapter) setListener(service string, listener *astral.Listener) {
 	}
 }
 
-func (api *FlatAdapter) getConnection(connectionId string) (rw *astral.Conn, ok bool) {
+func (api *FlatAdapter) getConnection(connectionId string) (rw *Conn, ok bool) {
 	api.connectionsMutex.RLock()
 	defer api.connectionsMutex.RUnlock()
 	rw, ok = api.connections[connectionId]
@@ -94,7 +96,7 @@ func (api *FlatAdapter) setConnection(connectionId string, connection *astral.Co
 	api.connectionsMutex.Lock()
 	defer api.connectionsMutex.Unlock()
 	if connection != nil {
-		api.connections[connectionId] = connection
+		api.connections[connectionId] = newConn(connection)
 	} else {
 		delete(api.connections, connectionId)
 	}
@@ -199,24 +201,7 @@ func (api *FlatAdapter) ConnRead(id string) (data string, err error) {
 		err = errors.New("[ConnRead] not found connection with id: " + id)
 		return
 	}
-	buf := make([]byte, 4096)
-	arr := make([]byte, 0)
-	n := 0
-	defer func() {
-		data = string(arr)
-	}()
-	for {
-		n, err = conn.Read(buf)
-		if err != nil {
-			_ = conn.Close()
-			api.setConnection(id, nil)
-			return
-		}
-		arr = append(arr, buf[0:n]...)
-		if n < len(buf) {
-			return
-		}
-	}
+	return conn.ReadString('\n')
 }
 
 func (api *FlatAdapter) Query(identity string, query string) (data string, err error) {
@@ -287,6 +272,20 @@ func (api *FlatAdapter) NodeInfo(identity string) (info NodeInfo, err error) {
 		Name:     i.Name,
 	}
 	return
+}
+
+type Conn struct {
+	conn *astral.Conn
+	*bufio.Reader
+	io.WriteCloser
+}
+
+func newConn(conn *astral.Conn) *Conn {
+	return &Conn{
+		conn:        conn,
+		Reader:      bufio.NewReader(conn),
+		WriteCloser: conn,
+	}
 }
 
 type NodeInfo struct {

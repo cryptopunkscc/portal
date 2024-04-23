@@ -7,6 +7,11 @@ export class Service {
     this.counter = 0
   }
 
+  async open(id) {
+    log("open " + id)
+    return id
+  }
+
   async launch(id) {
     log("launch " + id)
   }
@@ -34,7 +39,6 @@ export class Service {
         let next = {id: i, name: "app" + i}
         await write(next)
         log("next: ", next)
-        await sleep(100)
       }
     }
   }

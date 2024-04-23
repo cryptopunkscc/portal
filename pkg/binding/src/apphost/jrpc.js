@@ -10,7 +10,7 @@ export * from "./client";
 AppHostConn.prototype.jrpcCall = async function (method, ...data) {
   let cmd = method
   if (data.length > 0) {
-    cmd += "?" + JSON.stringify(data)
+    cmd += "?" + JSON.stringify(data) + '\n'
   }
   log(this.id + " conn => " + this.query + "." + cmd)
   await this.write(cmd)
@@ -26,7 +26,7 @@ AppHostConn.prototype.readJson = async function (method) {
 }
 
 AppHostConn.prototype.writeJson = async function (data) {
-  const json = JSON.stringify(data)
+  const json = JSON.stringify(data) + '\n'
   await this.write(json)
 }
 
@@ -169,7 +169,7 @@ async function astral_rpc_handle(conn) {
       }
     }
   } catch (e) {
-    log(conn.id + "service != " + conn.query + ":" + e)
+    log(conn.id + " service != " + conn.query + ":" + e)
   }
 }
 

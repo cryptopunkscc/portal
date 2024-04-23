@@ -26,3 +26,7 @@
 6. **[beta]** Open testing.
 7. **[rc]** Release candidate for product.
 8. **[prod]** Product ready for users.
+
+# Improvements
+
+* [ ] Spawn multiple applications as separate portal processes.

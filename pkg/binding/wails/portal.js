@@ -113,7 +113,7 @@ var portal = (function (exports) {
   AppHostConn.prototype.jrpcCall = async function (method, ...data) {
     let cmd = method;
     if (data.length > 0) {
-      cmd += "?" + JSON.stringify(data);
+      cmd += "?" + JSON.stringify(data) + '\n';
     }
     log$1(this.id + " conn => " + this.query + "." + cmd);
     await this.write(cmd);
@@ -129,7 +129,7 @@ var portal = (function (exports) {
   };
 
   AppHostConn.prototype.writeJson = async function (data) {
-    const json = JSON.stringify(data);
+    const json = JSON.stringify(data) + '\n';
     await this.write(json);
   };
 
