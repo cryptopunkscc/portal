@@ -1,4 +1,4 @@
-package template
+package project
 
 import (
 	"embed"
@@ -12,8 +12,8 @@ var templatesFs embed.FS
 // We use this because we need different views of the same data
 var templateCache []Template
 
-// List returns the list of available templates
-func List() ([]Template, error) {
+// Templates returns the list of available templates
+func Templates() ([]Template, error) {
 	return templateCache, nil
 }
 

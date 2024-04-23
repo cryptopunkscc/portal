@@ -269,7 +269,7 @@ var portal = (function (exports) {
         }
       }
     } catch (e) {
-      log$1(conn.id + "service != " + conn.query + ":" + e);
+      log$1(conn.id + " service != " + conn.query + ":" + e);
     }
   }
 

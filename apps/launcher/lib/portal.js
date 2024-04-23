@@ -337,7 +337,7 @@ async function astral_rpc_handle(conn) {
       }
     }
   } catch (e) {
-    log$1(conn.id + "service != " + conn.query + ":" + e);
+    log$1(conn.id + " service != " + conn.query + ":" + e);
   }
 }
 

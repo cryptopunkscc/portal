@@ -3,7 +3,7 @@ package create
 import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/build"
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/bundle"
-	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/create/template"
+	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/pkg/errors"
 	"log"
 	"os"
@@ -42,13 +42,13 @@ func Run(
 	}
 
 	// install base
-	if err = template.InstallBase(targetDir); err != nil {
+	if err = project.InstallBase(targetDir); err != nil {
 		return err
 	}
 
 	// prepare template options
-	opt := template.Options{
-		Data: template.Data{
+	opt := project.Options{
+		Data: project.Data{
 			ProjectName: projectName,
 		},
 		TargetDir: targetDir,
@@ -76,9 +76,9 @@ func Run(
 	return nil
 }
 
-func runSingle(opt template.Options) (err error) {
+func runSingle(opt project.Options) (err error) {
 	// generate project from template
-	if err = template.Install(&opt); err != nil {
+	if err = project.Install(&opt); err != nil {
 		return errors.Wrap(err, "template.Install")
 	}
 	time.Sleep(500 * time.Millisecond)

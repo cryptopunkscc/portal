@@ -7,10 +7,10 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/build"
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/bundle"
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/create"
-	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/create/template"
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/dev"
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/publish"
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/rpc"
+	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"github.com/leaanthony/clir"
 	"github.com/pterm/pterm"
@@ -74,7 +74,7 @@ func cliCreate(f *FlagsInit) error {
 }
 
 func cliList() error {
-	templateList, err := template.List()
+	templates, err := project.Templates()
 	if err != nil {
 		return err
 	}
@@ -82,7 +82,7 @@ func cliList() error {
 	pterm.DefaultSection.Println("Available templates")
 
 	table := pterm.TableData{{"Template", "Short Name", "Description"}}
-	for _, template := range templateList {
+	for _, template := range templates {
 		table = append(table, []string{template.Name, template.ShortName, template.Description})
 	}
 	err = pterm.DefaultTable.WithHasHeader(true).WithBoxed(true).WithData(table).Render()
