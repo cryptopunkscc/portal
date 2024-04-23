@@ -193,6 +193,11 @@ AppHostConn.prototype.readJson = async function (method) {
   return json
 };
 
+AppHostConn.prototype.writeJson = async function (data) {
+  const json = JSON.stringify(data);
+  await this.write(json);
+};
+
 AppHostConn.prototype.jsonReader = async function (method) {
   const read = async () => await this.readJson(method);
   read.cancel = async () => await this.close();
@@ -309,11 +314,11 @@ async function astral_rpc_listen(listener) {
 
 async function astral_rpc_handle(conn) {
   try {
-    const send = async (result) => await conn.write(JSON.stringify(result));
-
     let query = conn.query.slice(this.name.length);
     let method = query, args = [];
     const single = query !== '';
+    const write = async (data) => await conn.writeJson(data);
+    const read = async (method) => await conn.readJson(method);
 
     for (; ;) {
       if (!single) {
@@ -322,10 +327,9 @@ async function astral_rpc_handle(conn) {
       }
       [method, args] = parseQuery(query);
 
-      let result = await this[method](...args, send);
+      let result = await this[method](...args, write, read);
       if (result !== undefined) {
-        result = JSON.stringify(result);
-        await conn.write(result);
+        await conn.writeJson(result);
       }
       if (single) {
         conn.close().catch(log$1);
