@@ -21,10 +21,10 @@ func New(dir string, resolve GetTargets) (out *Runner, err error) {
 	out = &Runner{}
 	for _, d := range targets {
 		switch {
-		case isBackend(d.Files):
+		case IsBackend(d.Files):
 			log.Println("found backend:", d.Path)
 			out.Backends = append(out.Backends, d)
-		case isFrontend(d.Files):
+		case IsFrontend(d.Files):
 			log.Println("found frontend:", d.Path)
 			out.Frontends = append(out.Frontends, d)
 		}
@@ -32,7 +32,7 @@ func New(dir string, resolve GetTargets) (out *Runner, err error) {
 	return
 }
 
-func isFrontend(dir fs.FS) bool {
+func IsFrontend(dir fs.FS) bool {
 	stat, err := fs.Stat(dir, "index.html")
 	if err != nil {
 		return false
@@ -40,7 +40,7 @@ func isFrontend(dir fs.FS) bool {
 	return stat.Mode().IsRegular()
 }
 
-func isBackend(dir fs.FS) bool {
+func IsBackend(dir fs.FS) bool {
 	_, err := fs.Stat(dir, "index.html")
 	return err != nil
 }

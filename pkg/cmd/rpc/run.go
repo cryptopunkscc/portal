@@ -3,9 +3,9 @@ package rpc
 import (
 	"context"
 	jrpc "github.com/cryptopunkscc/go-apphost-jrpc"
+	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"log"
-	"os"
 	"os/exec"
 )
 
@@ -25,8 +25,7 @@ func Run(bindings runner.Bindings) (err error) {
 }
 
 func open(path string, background bool) (pid int, err error) {
-	portal := portalExecutable()
-	c := exec.Command(portal, path)
+	c := exec.Command(portal.Executable(), path)
 	if !background {
 		err = c.Run()
 		return
@@ -36,12 +35,4 @@ func open(path string, background bool) (pid int, err error) {
 	}
 	pid = c.Process.Pid
 	return
-}
-
-func portalExecutable() string {
-	executable, err := os.Executable()
-	if err != nil {
-		executable = "portal"
-	}
-	return executable
 }
