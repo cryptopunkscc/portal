@@ -4,16 +4,17 @@
 
   const repo = new AppRepository()
   export let app = {
-    id: '',
+    title: '',
+    package: '',
     name: '',
     description: '',
     icon: '',
     url: '',
     installed: false,
   };
-  const launch = () => repo.launch(app.id).catch(log)
-  const install = () => repo.install(app.id).catch(log)
-  const uninstall = () => repo.uninstall(app.id).catch(log)
+  const launch = () => repo.launch(app.package).catch(log)
+  const install = () => repo.install(app.package).catch(log)
+  const uninstall = () => repo.uninstall(app.package).catch(log)
 
 </script>
 
@@ -24,17 +25,17 @@
 
     <div class="app-info">
         <div class="app-name">
-            <h2>{app.name}</h2>
+            <h2>{app.title}</h2>
             <span class="installed-status">{app.installed ? '(Zainstalowano)' : ''}</span>
         </div>
         <p class="app-description">{app.description}</p>
     </div>
 
-    <div class="app-actions">
-        <button on:click={() => {}}>
-            {app.installed ? 'Uruchom' : 'Zainstaluj'}
-        </button>
-    </div>
+<!--    <div class="app-actions">-->
+<!--        <button on:click={() => {}}>-->
+<!--            {app.installed ? 'Uruchom' : 'Zainstaluj'}-->
+<!--        </button>-->
+<!--    </div>-->
 </div>
 
 <style>

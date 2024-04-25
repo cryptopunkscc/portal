@@ -3,7 +3,7 @@
 * [ ] Spawn multiple applications as separate portal processes.
   * [x] prod
   * [ ] dev
-* [ ] Local apps service for testing needed until module isn't available.
+* [x] Local apps service for testing needed until module isn't available.
   * Features
     * Install app
     * Uninstall app
@@ -11,3 +11,9 @@
 * [ ] Invoke queried service on demand if hosing application is not running spawn it proceeding query.   
   * Extend flat apphost adapter query function for an option to spawn requested app.
 * [ ] Implement a cmd for building portal app along with js scripts.
+* [ ] Upgrade JavaScript RPC:
+  * [ ] Register methods automatically under the service name specified in manifest.
+* [ ] Design runtime API for JavaScript apps:
+  * [ ] backend
+  * [ ] wails
+  * [ ] android

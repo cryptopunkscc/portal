@@ -93,6 +93,17 @@ func FileExists(path string) bool {
 	return fi.Mode().IsRegular()
 }
 
+// Exists returns a boolean value indicating whether
+// the given file exists
+func Exists(path string) bool {
+	fi, err := os.Lstat(path)
+	if err != nil {
+		return false
+	}
+	mode := fi.Mode()
+	return mode.IsRegular() || mode.IsDir()
+}
+
 // RelativePath returns a qualified path created by joining the
 // directory of the calling file and the given relative path.
 //

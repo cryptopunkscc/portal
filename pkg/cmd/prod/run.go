@@ -3,6 +3,8 @@ package prod
 import (
 	"context"
 	"fmt"
+	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
+	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
 	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner/backend/goja"
@@ -47,6 +49,13 @@ func Run(
 	bindings runner.Bindings,
 	src string,
 ) (err error) {
+
+	if !fs.Exists(src) {
+		log.Println("resolving path from id: ", src)
+		if src, err = appstore.Path(src); err != nil {
+			return
+		}
+	}
 
 	targets, err := runner.ProdTargets(src)
 	if err != nil {

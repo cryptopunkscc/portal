@@ -1,6 +1,7 @@
 {
   "title": "Portal Launcher",
   "description": "Portal applications launcher.",
-  "package": "svelte",
+  "name": "launcher",
+  "package": "cc.cryptopunks.portal.launcher",
   "icon": "./src/assets/images/logo.svg"
 }
