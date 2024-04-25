@@ -25,6 +25,7 @@ func Run(bindings runner.Bindings) {
 	cli.AddFlags(flags)
 	cli.Action(func() error { return cliApplication(bindings)(flags) })
 
+	cli.NewSubCommand("launcher", "Start portal launcher GUI.").Action(cliLauncher(bindings))
 	cli.NewSubCommandFunction("create", "Create production bundle.", cliCreate)
 	cli.NewSubCommandFunction("dev", "Run development server for given dir.", cliDevelopment(bindings))
 	cli.NewSubCommandFunction("open", "Execute app from bundle, dir, or file.", cliApplication(bindings))

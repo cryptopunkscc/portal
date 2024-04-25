@@ -1,6 +1,7 @@
 package clir
 
 import (
+	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/launcher"
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/prod"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 )
@@ -13,4 +14,8 @@ func cliApplication(bindings runner.Bindings) func(f *FlagsPath) (err error) {
 	return func(f *FlagsPath) (err error) {
 		return prod.Run(bindings, f.Path)
 	}
+}
+
+func cliLauncher(bindings runner.Bindings) func() error {
+	return func() error { return launcher.Run(bindings) }
 }

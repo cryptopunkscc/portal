@@ -14,6 +14,7 @@ func Run(bindings runner.Bindings) {
 	flags := &FlagsPath{}
 	cli.AddFlags(flags)
 	cli.Action(func() error { return cliApplication(bindings)(flags) })
+	cli.NewSubCommand("launcher", "Start portal launcher GUI.").Action(cliLauncher(bindings))
 	if err := cli.Run(); err != nil {
 		log.Fatalln(err)
 	}
