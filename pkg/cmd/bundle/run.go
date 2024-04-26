@@ -2,25 +2,39 @@ package bundle
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/build"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"github.com/cryptopunkscc/go-astral-js/pkg/zip"
 	"io/fs"
+	"log"
 	"os"
 	"path"
 )
 
 func RunAll(dir string) (err error) {
-	r, err := runner.New(dir, runner.DevTargets)
-	if err != nil {
+	targets, err := runner.DevTargets(dir)
+
+	// fallback for a pass written without a build system
+	rawTargets, err2 := runner.RawTargets(dir)
+	if err2 == nil {
+		targets = append(targets, rawTargets...)
+	}
+
+	if len(targets) == 0 {
+		if err == nil {
+			err = err2
+		}
+		if err == nil {
+			err = errors.New("no targets found")
+		}
 		return
 	}
 
-	targets := append(r.Backends, r.Frontends...)
-
 	for _, target := range targets {
+		log.Println(target.Path)
 		if err = Run(target.Path); err != nil {
 			return fmt.Errorf("bundle target %v: %v", target.Path, err)
 		}
@@ -33,9 +47,11 @@ func Run(src string) (err error) {
 	srcFs := os.DirFS(src)
 
 	// build dist if needed
-	if _, err = fs.Stat(srcFs, "dist"); os.IsNotExist(err) {
-		if err = build.Run(src); err != nil {
-			return
+	if stat, err := fs.Stat(srcFs, "package.json"); err == nil && stat.Mode().IsRegular() {
+		if _, err = fs.Stat(srcFs, "dist"); os.IsNotExist(err) {
+			if err = build.Run(src); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -51,8 +67,13 @@ func Run(src string) (err error) {
 		return fmt.Errorf("os.MkdirAll: %v", err)
 	}
 
+	// resolve dist dir
+	dist := src
+	if stat, err := fs.Stat(srcFs, "dist"); err == nil && stat.IsDir() {
+		dist = path.Join(src, "dist")
+	}
+
 	// pack dist dir
-	dist := path.Join(src, "dist")
 	bundleName := fmt.Sprintf("%s_%s.portal", portalJson.Name, portalJson.Version)
 	if err = zip.Pack(dist, path.Join(buildDir, bundleName)); err != nil {
 		return fmt.Errorf("Pack: %v", err)

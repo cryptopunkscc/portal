@@ -16,6 +16,10 @@ type Target struct {
 
 type GetTargets func(string) ([]Target, error)
 
+func RawTargets(src string) (targets []Target, err error) {
+	return findTargetDirs(src, targetProd)
+}
+
 func DevTargets(src string) (targets []Target, err error) {
 	return findTargetDirs(src, targetDev)
 }
@@ -25,7 +29,7 @@ func ProdTargets(src string) (targets []Target, err error) {
 		return
 	}
 	if stat, err := os.Stat(src); err == nil && stat.IsDir() {
-		if targets2, err := findTargetDirs(src, targetProd); err == nil {
+		if targets2, err := RawTargets(src); err == nil {
 			targets = append(targets, targets2...)
 		}
 	}
