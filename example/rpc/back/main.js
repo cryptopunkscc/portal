@@ -3,7 +3,7 @@ const {apphost, log} = portal
 class Service {
 
     constructor() {
-        this.name = "srv"
+        this.name = "portal.example.rpc"
     }
 
     async get(arg) {
