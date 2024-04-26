@@ -5,7 +5,7 @@ import (
 	"github.com/webview/webview"
 )
 
-func Bind(view webview.WebView, astral *apphost.FlatAdapter) {
+func Bind(view webview.WebView, astral apphost.Flat) {
 	if err := view.Bind(apphost.Log, astral.Log); err != nil {
 		return
 	}

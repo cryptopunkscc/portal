@@ -8,8 +8,8 @@ import (
 
 func main() {
 	clir.Run(func() io.Closer {
-		return &Adapter{FlatAdapter: *astraljs.NewFlatAdapter()}
+		return &Adapter{Flat: astraljs.NewFlatAdapter()}
 	})
 }
 
-type Adapter struct{ astraljs.FlatAdapter }
+type Adapter struct{ astraljs.Flat }

@@ -11,7 +11,7 @@ import (
 
 type Backend struct {
 	vm        *goja.Runtime
-	appHost   *astraljs.FlatAdapter
+	appHost   astraljs.Flat
 	appHostJs string
 }
 

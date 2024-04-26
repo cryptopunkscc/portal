@@ -6,7 +6,7 @@ import (
 	v8 "rogchap.com/v8go"
 )
 
-func Bind(iso *v8.Isolate, astral *apphost.FlatAdapter) (template *v8.ObjectTemplate, err error) {
+func Bind(iso *v8.Isolate, astral apphost.Flat) (template *v8.ObjectTemplate, err error) {
 	template = v8.NewObjectTemplate(iso)
 	a := adapter{astral}
 	if err = template.Set(apphost.Log, v8.NewFunctionTemplate(iso, a.Log)); err != nil {
@@ -49,7 +49,7 @@ func Bind(iso *v8.Isolate, astral *apphost.FlatAdapter) (template *v8.ObjectTemp
 }
 
 type adapter struct {
-	astral *apphost.FlatAdapter
+	astral apphost.Flat
 }
 
 func (a *adapter) Log(info *v8.FunctionCallbackInfo) *v8.Value {
