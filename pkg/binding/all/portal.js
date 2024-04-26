@@ -178,10 +178,10 @@ const {log: log$1} = bindings;
 AppHostConn.prototype.jrpcCall = async function (method, ...data) {
   let cmd = method;
   if (data.length > 0) {
-    cmd += "?" + JSON.stringify(data) + '\n';
+    cmd += "?" + JSON.stringify(data);
   }
   log$1(this.id + " conn => " + this.query + "." + cmd);
-  await this.write(cmd);
+  await this.write(cmd + '\n');
 };
 
 AppHostConn.prototype.readJson = async function (method) {
@@ -194,9 +194,9 @@ AppHostConn.prototype.readJson = async function (method) {
 };
 
 AppHostConn.prototype.writeJson = async function (data) {
-  const json = JSON.stringify(data) + '\n';
+  const json = JSON.stringify(data);
   log$1(this.id + " conn => " + this.query + ":" + json.trimEnd());
-  await this.write(json);
+  await this.write(json + '\n');
 };
 
 AppHostConn.prototype.jsonReader = async function (method) {
@@ -338,7 +338,8 @@ async function astral_rpc_handle(conn) {
       }
     }
   } catch (e) {
-    log$1(conn.id + " service != " + conn.query + ":" + e);
+    log$1(conn.id + " service !! " + conn.query + ":" + e);
+    conn.close().catch(log$1);
   }
 }
 
