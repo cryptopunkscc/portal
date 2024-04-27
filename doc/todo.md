@@ -11,7 +11,9 @@
 * Invoke queried service on demand. If hosing application is not running spawn it and proceed the query.
   * [x] prod
   * dev
-* Close backend with given timeout when idling detected.
+* [x] Close backend with given timeout when idling detected.
+* [ ] Portal launcher tray icon.
+  * [ ] Bind portal rpc on launch.
 * Implement a cmd for building portal app along with js scripts.
 * Upgrade JavaScript RPC:
   * Register methods automatically under the service name specified in manifest.
@@ -22,3 +24,4 @@
   * backend
   * wails
   * android
+* Install JavaScript runtime dependencies in local node modules.

@@ -2,7 +2,7 @@ package dev
 
 import (
 	"fmt"
-	common "github.com/cryptopunkscc/go-astral-js/pkg/runner/frontend/wails"
+	common "github.com/cryptopunkscc/go-astral-js/pkg/wails"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"log"

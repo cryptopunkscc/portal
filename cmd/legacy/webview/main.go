@@ -5,7 +5,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/common"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
-	frontend "github.com/cryptopunkscc/go-astral-js/pkg/runner/frontend/webview"
+	frontend "github.com/cryptopunkscc/go-astral-js/pkg/webview"
 	"github.com/webview/webview"
 	"log"
 	"os"

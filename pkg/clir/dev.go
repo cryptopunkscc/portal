@@ -25,12 +25,12 @@ func Run(ctx context.Context, bindings runtime.New) {
 
 	flags := &FlagsPath{}
 	cli.AddFlags(flags)
-	cli.Action(func() error { return cliApplication(ctx, bindings)(flags) })
+	cli.Action(func() error { return cliOpen(ctx, bindings)(flags) })
 
 	cli.NewSubCommand("launcher", "Start portal launcher GUI.").Action(cliLauncher(ctx, bindings))
 	cli.NewSubCommandFunction("create", "Create production bundle.", cliCreate)
 	cli.NewSubCommandFunction("dev", "Run development server for given dir.", cliDevelopment(bindings))
-	cli.NewSubCommandFunction("open", "Execute app from bundle, dir, or file.", cliApplication(ctx, bindings))
+	cli.NewSubCommandFunction("open", "Execute app from bundle, dir, or file.", cliOpen(ctx, bindings))
 	cli.NewSubCommandFunction("build", "Build application.", cliBuild)
 	cli.NewSubCommandFunction("bundle", "Create production bundle.", cliBundle)
 	cli.NewSubCommandFunction("publish", "Publish bundles from given path to storage", cliPublish)

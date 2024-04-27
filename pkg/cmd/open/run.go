@@ -1,15 +1,15 @@
-package prod
+package open
 
 import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
+	"github.com/cryptopunkscc/go-astral-js/pkg/goja"
 	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runner/backend/goja"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runner/frontend/wails"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
+	"github.com/cryptopunkscc/go-astral-js/pkg/wails"
 	"log"
 	"os"
 	"os/exec"
