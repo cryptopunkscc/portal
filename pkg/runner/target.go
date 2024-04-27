@@ -21,6 +21,10 @@ func RawTargets(src string) (targets []Target, err error) {
 	return findTargetDirs(src, targetProd)
 }
 
+func RawTargetsFS(files fs.FS) (targets []Target, err error) {
+	return findTargetFS("", files, targetProd)
+}
+
 func DevTargets(src string) (targets []Target, err error) {
 	return findTargetDirs(src, targetDev)
 }
@@ -72,11 +76,15 @@ func findTargetDirs(dir string, target fsTarget) (targets []Target, err error) {
 		return
 	}
 	files := os.DirFS(dir)
+	return findTargetFS(dir, files, target)
+}
+
+func findTargetFS(dir string, files fs.FS, target fsTarget) (targets []Target, err error) {
 	if err = fs.WalkDir(files, ".", func(p string, d fs.DirEntry, err error) error {
 		if strings.Contains(p, "node_modules") {
 			return fs.SkipDir
 		}
-		if sub := getTargetDir(files, p, d, target); sub != nil {
+		if sub := getTargetFS(files, p, d, target); sub != nil {
 			t := Target{
 				Files: sub,
 				Path:  path.Join(dir, p),
@@ -91,7 +99,7 @@ func findTargetDirs(dir string, target fsTarget) (targets []Target, err error) {
 	return
 }
 
-func getTargetDir(files fs.FS, path string, d fs.DirEntry, target fsTarget) (project fs.FS) {
+func getTargetFS(files fs.FS, path string, d fs.DirEntry, target fsTarget) (project fs.FS) {
 	if !d.IsDir() {
 		return
 	}
