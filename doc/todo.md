@@ -13,7 +13,7 @@
   * dev
 * [x] Close backend with given timeout when idling detected.
 * [x] Portal launcher tray icon.
-  * Bind portal rpc on launch.
+  * [x] Bind portal serve on launch.
 * Implement a cmd for building portal app along with js scripts.
 * Upgrade JavaScript RPC:
   * Register methods automatically under the service name specified in manifest.
@@ -26,3 +26,4 @@
   * android
 * Install JavaScript runtime dependencies in local node modules.
 * Use injected prefixed logger. Review & unify existing logs.
+* Close nested apps gracefully.

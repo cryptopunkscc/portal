@@ -17,8 +17,13 @@ func Executable() string {
 	return executable
 }
 
-func OpenContext(ctx context.Context, args ...string) *exec.Cmd {
-	c := exec.CommandContext(ctx, Executable(), args...)
+func Open(ctx context.Context, args ...string) *exec.Cmd {
+	var c *exec.Cmd
+	if ctx != nil {
+		c = exec.CommandContext(ctx, Executable(), args...)
+	} else {
+		c = exec.Command(Executable(), args...)
+	}
 	c.Stdout = os.Stdout
 	c.Stderr = os.Stderr
 	return c
@@ -26,7 +31,7 @@ func OpenContext(ctx context.Context, args ...string) *exec.Cmd {
 
 func OpenWithContext(ctx context.Context) func(src string, background bool) (pid int, err error) {
 	return func(src string, background bool) (pid int, err error) {
-		c := OpenContext(ctx, src)
+		c := Open(ctx, src)
 		if !background {
 			err = c.Run()
 			return

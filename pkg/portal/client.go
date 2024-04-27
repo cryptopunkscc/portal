@@ -7,6 +7,8 @@ import (
 	"io"
 )
 
+var Request = rpc.NewRequest(id.Anyone, "portal")
+
 func Bind(src string) (run func() error, closer io.ReadCloser, err error) {
 	open, err := rpc.QueryFlow(id.Anyone, "portal.open")
 	if err != nil {
