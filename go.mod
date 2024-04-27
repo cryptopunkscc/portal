@@ -5,7 +5,6 @@ go 1.21
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/cryptopunkscc/astrald v0.0.0-20240318185312-d89c09eb899f
-	github.com/cryptopunkscc/go-apphost-jrpc v0.0.0-20240411182101-cb3652e71ef6
 	github.com/dop251/goja v0.0.0-20240220182346-e401ed450204
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/go-git/go-git/v5 v5.11.0
@@ -18,6 +17,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/pterm/pterm v0.12.79
 	github.com/samber/lo v1.39.0
+	github.com/stretchr/testify v1.9.0
 	github.com/wailsapp/wails/v2 v2.6.0
 	github.com/webview/webview v0.0.0-20230415172654-8387ff8945fc
 	golang.org/x/mod v0.16.0
@@ -37,7 +37,9 @@ require (
 	github.com/btcsuite/btcd/btcec/v2 v2.3.2 // indirect
 	github.com/cloudflare/circl v1.3.3 // indirect
 	github.com/containerd/console v1.0.3 // indirect
+	github.com/cryptopunkscc/go-apphost-jrpc v0.0.0-20240411182101-cb3652e71ef6 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.3.0 // indirect
 	github.com/dlclark/regexp2 v1.7.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -67,6 +69,7 @@ require (
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
@@ -88,6 +91,7 @@ require (
 	golang.org/x/tools v0.19.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/sqlite v1.5.5 // indirect
 	gorm.io/gorm v1.25.9 // indirect
 	modernc.org/libc v1.49.0 // indirect
@@ -97,5 +101,3 @@ require (
 )
 
 replace github.com/cryptopunkscc/astrald => ../astrald
-
-replace github.com/cryptopunkscc/go-apphost-jrpc => ../go-apphost-jrpc

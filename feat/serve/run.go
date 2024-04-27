@@ -2,15 +2,15 @@ package serve
 
 import (
 	"context"
-	jrpc "github.com/cryptopunkscc/go-apphost-jrpc"
 	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
 	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
+	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"log"
 )
 
 func Run(ctx context.Context, bindings runtime.New) (err error) {
-	s := jrpc.NewApp("portal")
+	s := rpc.NewApp("portal")
 	s.Logger(log.New(log.Writer(), "service ", 0))
 	s.With(bindings)
 	s.RouteFunc("open", portal.OpenWithContext(ctx))

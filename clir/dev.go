@@ -35,7 +35,7 @@ func Run(ctx context.Context, bindings runtime.New) {
 	cli.NewSubCommandFunction("bundle", "Create production bundle.", cliBundle)
 	cli.NewSubCommandFunction("publish", "Publish bundles from given path to storage", cliPublish)
 	cli.NewSubCommandFunction("install", "Install bundles from given path", cliInstall)
-	cli.NewSubCommandFunction("serve", "Serve api through jrpc adapter", cliSrv(ctx, bindings))
+	cli.NewSubCommandFunction("serve", "Serve api through rpc adapter", cliSrv(ctx, bindings))
 	if err := cli.Run(); err != nil {
 		log.Fatalln(err)
 	}

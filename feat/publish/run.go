@@ -1,54 +1,46 @@
 package publish
 
 import (
-	"github.com/cryptopunkscc/astrald/auth/id"
-	client "github.com/cryptopunkscc/astrald/lib/storage"
-	"github.com/cryptopunkscc/astrald/mod/storage"
-	proto "github.com/cryptopunkscc/astrald/mod/storage/srv"
-	jrpc "github.com/cryptopunkscc/go-apphost-jrpc"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
-	"io"
-	"log"
-	"os"
+	"errors"
 )
 
 func Run(dir string) (err error) {
-	r, err := runner.New(dir, runner.BundleTargets)
-	if err != nil {
-		return
-	}
-
-	c := client.NewClient(jrpc.NewRequest(id.Anyone, proto.Port))
-	targets := append(r.Backends, r.Frontends...)
-
-	for _, t := range targets {
-		log.Printf("publish %v", t.Path)
-		if err = publish(c, t); err != nil {
-			log.Printf("cannot publish %v: %v", t.Path, err)
-		}
-	}
-	return
+	//r, err := runner.New(dir, runner.BundleTargets)
+	//if err != nil {
+	//	return
+	//}
+	//
+	//c := client.NewClient(rpc.NewRequest(id.Anyone, proto.Port))
+	//targets := append(r.Backends, r.Frontends...)
+	//
+	//for _, t := range targets {
+	//	log.Printf("publish %v", t.Path)
+	//	if err = publish(c, t); err != nil {
+	//		log.Printf("cannot publish %v: %v", t.Path, err)
+	//	}
+	//}
+	return errors.ErrUnsupported
 }
 
-func publish(client *client.Client, target runner.Target) (err error) {
-	dst, err := client.Create(&storage.CreateOpts{})
-	if err != nil {
-		return
-	}
-	src, err := os.Open(target.Path)
-	if err != nil {
-		return err
-	}
-	defer src.Close()
-	l, err := io.Copy(dst, src)
-	if err != nil {
-		return err
-	}
-	log.Println("Commit", l, target.Path)
-	dataID, err := dst.Commit()
-	if err != nil {
-		return
-	}
-	log.Printf("%v <- %v", dataID, target.Path)
-	return
-}
+//func publish(client *client.Client, target runner.Target) (err error) {
+//	dst, err := client.Create(&storage.CreateOpts{})
+//	if err != nil {
+//		return
+//	}
+//	src, err := os.Open(target.Path)
+//	if err != nil {
+//		return err
+//	}
+//	defer src.Close()
+//	l, err := io.Copy(dst, src)
+//	if err != nil {
+//		return err
+//	}
+//	log.Println("Commit", l, target.Path)
+//	dataID, err := dst.Commit()
+//	if err != nil {
+//		return
+//	}
+//	log.Printf("%v <- %v", dataID, target.Path)
+//	return
+//}

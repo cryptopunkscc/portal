@@ -3,15 +3,15 @@ package appstore
 import (
 	"context"
 	"errors"
-	jrpc "github.com/cryptopunkscc/go-apphost-jrpc"
 	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
+	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"io"
 	"log"
 )
 
-func Observe(ctx context.Context, conn jrpc.Conn) (err error) {
+func Observe(ctx context.Context, conn rpc.Conn) (err error) {
 	log.Println("Observing...")
 
 	err = send(portalAppsDir, conn)
@@ -37,7 +37,7 @@ func Observe(ctx context.Context, conn jrpc.Conn) (err error) {
 
 func send(
 	src string,
-	conn jrpc.Conn,
+	conn rpc.Conn,
 ) (err error) {
 	targets, err := runner.BundleTargets(src)
 	if err != nil {
