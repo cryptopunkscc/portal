@@ -3,7 +3,7 @@ package launcher
 import (
 	"context"
 	"github.com/cryptopunkscc/go-astral-js/apps"
-	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/open"
+	"github.com/cryptopunkscc/go-astral-js/feat/open"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 )

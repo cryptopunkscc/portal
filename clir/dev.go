@@ -5,13 +5,13 @@ package clir
 import (
 	"context"
 	"github.com/cryptopunkscc/go-astral-js"
+	"github.com/cryptopunkscc/go-astral-js/feat/build"
+	"github.com/cryptopunkscc/go-astral-js/feat/bundle"
+	"github.com/cryptopunkscc/go-astral-js/feat/create"
+	"github.com/cryptopunkscc/go-astral-js/feat/dev"
+	"github.com/cryptopunkscc/go-astral-js/feat/publish"
+	"github.com/cryptopunkscc/go-astral-js/feat/serve"
 	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
-	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/build"
-	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/bundle"
-	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/create"
-	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/dev"
-	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/publish"
-	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/rpc"
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/leaanthony/clir"
@@ -104,6 +104,6 @@ func cliInstall(f *FlagsPath) error {
 
 func cliSrv(ctx context.Context, bindings runtime.New) func(*struct{}) error {
 	return func(_ *struct{}) error {
-		return rpc.Run(ctx, bindings)
+		return serve.Run(ctx, bindings)
 	}
 }

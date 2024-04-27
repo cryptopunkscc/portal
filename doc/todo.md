@@ -25,3 +25,4 @@
   * wails
   * android
 * Install JavaScript runtime dependencies in local node modules.
+* Use injected prefixed logger. Review & unify existing logs.

@@ -1,8 +1,8 @@
 package create
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/build"
-	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/bundle"
+	"github.com/cryptopunkscc/go-astral-js/feat/build"
+	"github.com/cryptopunkscc/go-astral-js/feat/bundle"
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/pkg/errors"
 	"log"

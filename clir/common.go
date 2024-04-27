@@ -2,8 +2,8 @@ package clir
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/launcher"
-	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/open"
+	"github.com/cryptopunkscc/go-astral-js/feat/launcher"
+	"github.com/cryptopunkscc/go-astral-js/feat/open"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 )
 
