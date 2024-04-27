@@ -1,4 +1,4 @@
-const {apphost, log} = portal
+const {apphost, log, sleep} = portal
 
 class Service {
 
@@ -18,4 +18,8 @@ class Service {
     }
 }
 
-apphost.bindRpcService(Service).catch(log)
+async function bind() {
+    apphost.bindRpcService(Service).catch(log)
+}
+
+bind().catch(log)

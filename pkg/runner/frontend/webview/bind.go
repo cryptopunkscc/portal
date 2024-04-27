@@ -5,7 +5,15 @@ import (
 	"github.com/webview/webview"
 )
 
-func Bind(view webview.WebView, astral apphost.Flat) {
+type WebView struct {
+	webview.WebView
+}
+
+func New(debug bool) *WebView {
+	return &WebView{WebView: webview.New(debug)}
+}
+
+func (view *WebView) BindApphost(astral apphost.Flat) {
 	if err := view.Bind(apphost.Log, astral.Log); err != nil {
 		return
 	}

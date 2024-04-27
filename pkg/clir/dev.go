@@ -3,6 +3,7 @@
 package clir
 
 import (
+	"context"
 	"github.com/cryptopunkscc/go-astral-js"
 	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/build"
@@ -12,35 +13,35 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/publish"
 	"github.com/cryptopunkscc/go-astral-js/pkg/cmd/rpc"
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
+	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/leaanthony/clir"
 	"github.com/pterm/pterm"
 	"log"
 	"strings"
 )
 
-func Run(bindings runner.Bindings) {
+func Run(ctx context.Context, bindings runtime.New) {
 	cli := clir.NewCli(portal.Name, portal.DevDescription, portal.Version)
 
 	flags := &FlagsPath{}
 	cli.AddFlags(flags)
-	cli.Action(func() error { return cliApplication(bindings)(flags) })
+	cli.Action(func() error { return cliApplication(ctx, bindings)(flags) })
 
-	cli.NewSubCommand("launcher", "Start portal launcher GUI.").Action(cliLauncher(bindings))
+	cli.NewSubCommand("launcher", "Start portal launcher GUI.").Action(cliLauncher(ctx, bindings))
 	cli.NewSubCommandFunction("create", "Create production bundle.", cliCreate)
 	cli.NewSubCommandFunction("dev", "Run development server for given dir.", cliDevelopment(bindings))
-	cli.NewSubCommandFunction("open", "Execute app from bundle, dir, or file.", cliApplication(bindings))
+	cli.NewSubCommandFunction("open", "Execute app from bundle, dir, or file.", cliApplication(ctx, bindings))
 	cli.NewSubCommandFunction("build", "Build application.", cliBuild)
 	cli.NewSubCommandFunction("bundle", "Create production bundle.", cliBundle)
 	cli.NewSubCommandFunction("publish", "Publish bundles from given path to storage", cliPublish)
 	cli.NewSubCommandFunction("install", "Install bundles from given path", cliInstall)
-	cli.NewSubCommandFunction("serve", "Serve api through jrpc adapter", cliSrv(bindings))
+	cli.NewSubCommandFunction("serve", "Serve api through jrpc adapter", cliSrv(ctx, bindings))
 	if err := cli.Run(); err != nil {
 		log.Fatalln(err)
 	}
 }
 
-func cliDevelopment(bindings runner.Bindings) func(f *FlagsPath) (err error) {
+func cliDevelopment(bindings runtime.New) func(f *FlagsPath) (err error) {
 	return func(f *FlagsPath) (err error) {
 		return dev.Run(bindings, f.Path)
 	}
@@ -101,8 +102,8 @@ func cliInstall(f *FlagsPath) error {
 	return appstore.Install(f.Path)
 }
 
-func cliSrv(bindings runner.Bindings) func(*struct{}) error {
+func cliSrv(ctx context.Context, bindings runtime.New) func(*struct{}) error {
 	return func(_ *struct{}) error {
-		return rpc.Run(bindings)
+		return rpc.Run(ctx, bindings)
 	}
 }

@@ -1,15 +1,24 @@
 package main
 
 import (
-	astraljs "github.com/cryptopunkscc/go-astral-js/pkg/apphost"
+	"context"
+	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	"github.com/cryptopunkscc/go-astral-js/pkg/clir"
-	"io"
+	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
+	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
+	"time"
 )
 
 func main() {
-	clir.Run(func() io.Closer {
-		return &Adapter{Flat: astraljs.NewFlatAdapter()}
+	ctx, cancel := context.WithCancel(context.Background())
+	go exec.OnShutdown(cancel)
+	clir.Run(ctx, func() runtime.Api {
+		return &Adapter{Flat: apphost.NewAdapter(ctx)}
 	})
+	if ctx.Err() == nil {
+		cancel()
+		time.Sleep(200 * time.Millisecond)
+	}
 }
 
-type Adapter struct{ astraljs.Flat }
+type Adapter struct{ apphost.Flat }

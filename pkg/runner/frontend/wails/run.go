@@ -5,18 +5,26 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/assets"
 	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/wails"
 	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
-	"github.com/wailsapp/wails/v2"
+	bindings "github.com/cryptopunkscc/go-astral-js/pkg/runtime"
+	"github.com/wailsapp/wails/v2/pkg/application"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
-	"io"
 	"io/fs"
 	"log"
+	"os"
 )
 
 func RunFS(src fs.FS, opt *options.App) (err error) {
+	m, _ := bundle.ReadManifestFs(src)
+	log.Printf("portal open: (%d) %s\n", os.Getpid(), m)
 	SetupOptions(src, opt)
-	log.Println("running wails")
-	return wails.Run(opt)
+	app := application.NewWithOptions(opt)
+	err = app.Run()
+	log.Printf("portal close: (%d) %s\n", os.Getpid(), m)
+	if err != nil {
+		return
+	}
+	return
 }
 
 func SetupOptions(src fs.FS, opt *options.App) {
@@ -28,9 +36,8 @@ func SetupOptions(src fs.FS, opt *options.App) {
 	apphostJsFs := binding.WailsJsFs
 
 	// Setup manifest
-	log.Println("Reading manifest")
-	if manifest, err := bundle.ReadManifestFs(src); err == nil {
-		log.Printf("Reading manifest success: %s\n", manifest)
+	manifest, err := bundle.ReadManifestFs(src)
+	if err == nil {
 		opt.Title = manifest.Title
 		if opt.Title == "" {
 			opt.Title = manifest.Name
@@ -51,14 +58,14 @@ func SetupOptions(src fs.FS, opt *options.App) {
 	}
 }
 
-func AppOptions(app io.Closer) *options.App {
+func AppOptions(app bindings.Api) *options.App {
 	return &options.App{
 		Width:            1024,
 		Height:           768,
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
 		Bind:             []interface{}{app},
 		OnDomReady: func(ctx context.Context) {
-			_ = app.Close()
+			_ = app.Interrupt
 		},
 	}
 }

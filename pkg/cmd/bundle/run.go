@@ -57,7 +57,7 @@ func Run(src string) (err error) {
 
 	// load manifest
 	portalJson := bundle.Base(src)
-	if err = portalJson.LoadPath(src, "portal.json"); err != nil {
+	if err = portalJson.LoadPath(src, bundle.PortalJson); err != nil {
 		return fmt.Errorf("portalJson.LoadPath: %v", err)
 	}
 

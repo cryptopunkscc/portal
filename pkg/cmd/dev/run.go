@@ -8,13 +8,14 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner/backend/goja"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner/frontend/wails"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner/frontend/wails/dev"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
+	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 	"log"
 	"sync"
 )
 
 func Run(
-	bindings runner.Bindings,
+	bindings runtime.New,
 	dir string,
 ) (err error) {
 	d, err := runner.New(dir, runner.DevTargets)
@@ -29,7 +30,7 @@ func Run(
 	go func() {
 		for range backendEvents {
 			for _, ctx := range frontCtxs {
-				runtime.WindowReload(ctx)
+				wailsruntime.WindowReload(ctx)
 			}
 		}
 	}()
@@ -46,7 +47,7 @@ func Run(
 
 		go backend.Watcher(target.Path)
 
-		if err = backend.Dev(goja.NewBackend(), src, backendEvents); err != nil {
+		if err = backend.Dev(goja.NewBackend(context.TODO()), src, backendEvents); err != nil {
 			return fmt.Errorf("backend.Dev: %v", err)
 		}
 	}

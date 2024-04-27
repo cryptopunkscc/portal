@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/common"
-	webview2 "github.com/cryptopunkscc/go-astral-js/pkg/runner/frontend/webview"
+	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
+	frontend "github.com/cryptopunkscc/go-astral-js/pkg/runner/frontend/webview"
 	"github.com/webview/webview"
 	"log"
 	"os"
@@ -20,7 +22,10 @@ func main() {
 	title := path.Base(file)
 	src := string(srcBytes)
 
-	w := webview.New(true)
+	ctx, cancel := context.WithCancel(context.Background())
+	go exec.OnShutdown(cancel)
+
+	w := frontend.New(true)
 	defer w.Destroy()
 
 	w.SetSize(800, 600, webview.HintNone)
@@ -33,7 +38,7 @@ func main() {
 	w.SetHtml(src)
 
 	// bind apphost adapter to js env
-	webview2.Bind(w, apphost.NewFlatAdapter())
+	w.BindApphost(apphost.NewAdapter(ctx))
 
 	// start js application frontend
 	w.Run()

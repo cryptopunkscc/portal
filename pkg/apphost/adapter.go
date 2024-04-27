@@ -38,6 +38,8 @@ type FlatAdapter struct {
 
 	connections      map[string]*Conn
 	connectionsMutex sync.RWMutex
+
+	onIdle func(bool)
 }
 
 func (api *FlatAdapter) Close() error {
@@ -93,6 +95,9 @@ func (api *FlatAdapter) setConnection(connectionId string, connection *astral.Co
 		api.connections[connectionId] = newConn(connection)
 	} else {
 		delete(api.connections, connectionId)
+	}
+	if api.onIdle != nil {
+		api.onIdle(len(api.connections) == 0)
 	}
 }
 

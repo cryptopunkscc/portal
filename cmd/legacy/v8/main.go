@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/common"
+	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner/backend/v8"
 	"log"
 	"os"
@@ -22,8 +23,12 @@ func main() {
 	iso := v8go.NewIsolate()
 	defer iso.Dispose()
 
+	// prepare context
+	ctx, cancel := context.WithCancel(context.Background())
+	exec.OnShutdown(cancel)
+
 	// bind apphost adapter to js env
-	global, err := v8.Bind(iso, apphost.NewFlatAdapter())
+	global, err := v8.Bind(iso, apphost.NewAdapter(ctx))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,6 +49,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ctx := context.Background()
 	<-ctx.Done()
 }

@@ -3,6 +3,7 @@ package runner
 import (
 	"archive/zip"
 	"errors"
+	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	"io/fs"
 	"os"
 	"path"
@@ -108,7 +109,7 @@ func getTargetDir(files fs.FS, path string, d fs.DirEntry, target fsTarget) (pro
 type fsTarget func(fs.FS) bool
 
 func targetDev(dir fs.FS) (b bool) {
-	if stat, err := fs.Stat(dir, "portal.json"); err != nil || !stat.Mode().IsRegular() {
+	if stat, err := fs.Stat(dir, bundle.PortalJson); err != nil || !stat.Mode().IsRegular() {
 		return
 	}
 	if stat, err := fs.Stat(dir, "package.json"); err != nil || !stat.Mode().IsRegular() {
@@ -118,7 +119,7 @@ func targetDev(dir fs.FS) (b bool) {
 }
 
 func targetProd(dir fs.FS) (b bool) {
-	if stat, err := fs.Stat(dir, "portal.json"); err != nil || !stat.Mode().IsRegular() {
+	if stat, err := fs.Stat(dir, bundle.PortalJson); err != nil || !stat.Mode().IsRegular() {
 		return
 	}
 	if stat, err := fs.Stat(dir, "package.json"); err == nil && stat.Mode().IsRegular() {

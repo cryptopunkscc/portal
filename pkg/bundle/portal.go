@@ -3,10 +3,11 @@ package bundle
 import (
 	"encoding/json"
 	"io/fs"
-	"log"
 	"os"
 	"path"
 )
+
+const PortalJson = "portal.json"
 
 type Manifest struct {
 	Name        string `json:"name,omitempty"`
@@ -24,22 +25,17 @@ func Base(src string) Manifest {
 	}
 }
 
-func ReadManifestFs(src fs.FS) (p *Manifest, err error) {
-	pp := Manifest{}
-	if err = pp.LoadFs(src, "portal.json"); err == nil {
-		p = &pp
-	}
+func ReadManifestFs(src fs.FS) (p Manifest, err error) {
+	err = p.LoadFs(src, PortalJson)
 	return
 }
 
 func (m *Manifest) LoadFs(src fs.FS, name string) (err error) {
 	file, err := fs.ReadFile(src, name)
-	log.Println("ReadManifest: ", string(file))
 	if err != nil {
 		return
 	}
 	err = json.Unmarshal(file, &m)
-	log.Printf("ReadManifest.struct: %v", m)
 	return
 }
 

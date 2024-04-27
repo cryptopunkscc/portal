@@ -1,6 +1,11 @@
 package apphost
 
-import "github.com/cryptopunkscc/astrald/lib/astral"
+import (
+	"context"
+	"github.com/cryptopunkscc/astrald/lib/astral"
+	"syscall"
+	"time"
+)
 
 type Flat interface {
 	Close() error
@@ -20,9 +25,26 @@ type Flat interface {
 	NodeInfo(identity string) (info NodeInfo, err error)
 }
 
-func NewFlatAdapter() Flat {
-	return &FlatAdapter{
-		listeners:   map[string]*astral.Listener{},
-		connections: map[string]*Conn{},
+func NewAdapter(ctx context.Context) Flat {
+	return &Invoker{
+		ctx: ctx,
+		Flat: &FlatAdapter{
+			listeners:   map[string]*astral.Listener{},
+			connections: map[string]*Conn{},
+		},
+	}
+}
+
+func WithTimeout(ctx context.Context) Flat {
+	timeout := NewTimout(3*time.Second, func() {
+		_ = syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+	})
+	return &Invoker{
+		ctx: ctx,
+		Flat: &FlatAdapter{
+			listeners:   map[string]*astral.Listener{},
+			connections: map[string]*Conn{},
+			onIdle:      timeout.Enable,
+		},
 	}
 }

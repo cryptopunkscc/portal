@@ -55,7 +55,7 @@ func npmRunBuild(dir string) error {
 func copyManifest(src string) (err error) {
 	manifest := bundle.Base(src)
 	_ = manifest.LoadPath(src, "package.json")
-	_ = manifest.LoadPath(src, "portal.json")
+	_ = manifest.LoadPath(src, bundle.PortalJson)
 	if manifest.Icon != "" {
 		iconSrc := path.Join(src, manifest.Icon)
 		iconName := "icon" + path.Ext(manifest.Icon)
@@ -70,7 +70,7 @@ func copyManifest(src string) (err error) {
 	if err != nil {
 		return err
 	}
-	if err = os.WriteFile(path.Join(src, "dist", "portal.json"), bytes, 0644); err != nil {
+	if err = os.WriteFile(path.Join(src, "dist", bundle.PortalJson), bytes, 0644); err != nil {
 		return fmt.Errorf("os.WriteFile: %v", err)
 	}
 	return

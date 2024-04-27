@@ -9,44 +9,15 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner/backend/goja"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner/frontend/wails"
+	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"log"
 	"os"
 	"os/exec"
-	"sync"
 )
 
-func RunLegacy(
-	bindings runner.Bindings,
-	src string,
-) (err error) {
-	d, err := runner.New(src, runner.ProdTargets)
-	if err != nil {
-		return fmt.Errorf("newRunner: %v", err)
-	}
-	wait := sync.WaitGroup{}
-
-	for _, target := range d.Backends {
-		wait.Add(1)
-		if err = goja.NewBackend().RunFs(target.Files); err != nil {
-			return fmt.Errorf("goja.NewBackend().RunSource: %v", err)
-		}
-	}
-
-	// TODO handle more than one frontend
-	for _, target := range d.Frontends {
-		wait.Add(1)
-		opt := wails.AppOptions(bindings())
-		if err = wails.RunFS(target.Files, opt); err != nil {
-			return fmt.Errorf("dev.Run: %v", err)
-		}
-		return
-	}
-	wait.Wait()
-	return
-}
-
 func Run(
-	bindings runner.Bindings,
+	ctx context.Context,
+	bindings runtime.New,
 	src string,
 ) (err error) {
 
@@ -62,17 +33,18 @@ func Run(
 		return fmt.Errorf("prod.Run: %v", err)
 	}
 
-	return RunTargets(bindings, targets)
+	return RunTargets(ctx, bindings, targets)
 }
 
 func RunTargets(
-	bindings runner.Bindings,
+	ctx context.Context,
+	bindings runtime.New,
 	targets []runner.Target,
 ) (err error) {
 
 	// execute single target in current process
 	if len(targets) == 1 {
-		return RunTarget(bindings, targets[0])
+		return RunTarget(ctx, bindings, targets[0])
 	}
 
 	// execute multiple targets as separate processes
@@ -89,17 +61,17 @@ func RunTargets(
 }
 
 func RunTarget(
-	bindings runner.Bindings,
+	ctx context.Context,
+	bindings runtime.New,
 	target runner.Target,
 ) (err error) {
 	switch {
 
 	case runner.IsBackend(target.Files):
-		log.Println("Running in backend mode")
-		if err = goja.NewBackend().RunFs(target.Files); err != nil {
+		if err = goja.NewBackend(ctx).RunFs(target.Files); err != nil {
 			return fmt.Errorf("goja.NewBackend().RunSource: %v", err)
 		}
-		<-context.Background().Done()
+		<-ctx.Done()
 
 	case runner.IsFrontend(target.Files):
 		opt := wails.AppOptions(bindings())

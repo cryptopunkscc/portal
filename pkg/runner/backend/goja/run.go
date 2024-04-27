@@ -1,7 +1,8 @@
 package goja
 
 import (
-	astraljs "github.com/cryptopunkscc/go-astral-js/pkg/apphost"
+	"context"
+	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/common"
 	"github.com/dop251/goja"
 	"io/fs"
@@ -11,13 +12,13 @@ import (
 
 type Backend struct {
 	vm        *goja.Runtime
-	appHost   astraljs.Flat
+	appHost   apphost.Flat
 	appHostJs string
 }
 
-func NewBackend() *Backend {
+func NewBackend(ctx context.Context) *Backend {
 	return &Backend{
-		appHost:   astraljs.NewFlatAdapter(),
+		appHost:   apphost.WithTimeout(ctx),
 		appHostJs: binding.CommonJsString,
 	}
 }
