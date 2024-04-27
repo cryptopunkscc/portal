@@ -12,7 +12,7 @@
   * [x] prod
   * dev
 * [x] Close backend with given timeout when idling detected.
-* Portal launcher tray icon.
+* [x] Portal launcher tray icon.
   * Bind portal rpc on launch.
 * Implement a cmd for building portal app along with js scripts.
 * Upgrade JavaScript RPC:

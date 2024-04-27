@@ -2,9 +2,12 @@ package portal
 
 import (
 	"context"
+	"github.com/cryptopunkscc/go-astral-js"
 	"os"
 	"os/exec"
 )
+
+const Name = portal.Name
 
 func Executable() string {
 	executable, err := os.Executable()
@@ -14,8 +17,8 @@ func Executable() string {
 	return executable
 }
 
-func OpenContext(ctx context.Context, src string) *exec.Cmd {
-	c := exec.CommandContext(ctx, Executable(), src)
+func OpenContext(ctx context.Context, args ...string) *exec.Cmd {
+	c := exec.CommandContext(ctx, Executable(), args...)
 	c.Stdout = os.Stdout
 	c.Stderr = os.Stderr
 	return c

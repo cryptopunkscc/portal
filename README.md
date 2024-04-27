@@ -27,6 +27,13 @@ Portal sources can produce production or development executable. Generally speak
   * Build application.
   * Generate application bundle.
 
+### Linux
+
+Systray:
+```shell
+sudo apt-get install gcc libgtk-3-dev libayatana-appindicator3-dev
+```
+
 ### Linux & MacOS (Windows?)
 
 Install production runtime: 

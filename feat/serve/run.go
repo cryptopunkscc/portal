@@ -2,6 +2,7 @@ package serve
 
 import (
 	"context"
+	"github.com/cryptopunkscc/go-astral-js/feat/tray"
 	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
 	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
@@ -9,7 +10,7 @@ import (
 	"log"
 )
 
-func Run(ctx context.Context, bindings runtime.New) (err error) {
+func Run(ctx context.Context, bindings runtime.New, indicator bool) (err error) {
 	s := rpc.NewApp("portal")
 	s.Logger(log.New(log.Writer(), "service ", 0))
 	s.With(bindings)
@@ -22,6 +23,10 @@ func Run(ctx context.Context, bindings runtime.New) (err error) {
 		return
 	}
 	log.Println("portal service started")
+
+	if indicator {
+		tray.Run(ctx)
+	}
 	<-ctx.Done()
 	return
 }

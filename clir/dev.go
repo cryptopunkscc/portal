@@ -102,8 +102,12 @@ func cliInstall(f *FlagsPath) error {
 	return appstore.Install(f.Path)
 }
 
-func cliSrv(ctx context.Context, bindings runtime.New) func(*struct{}) error {
-	return func(_ *struct{}) error {
-		return serve.Run(ctx, bindings)
+type FlagsSrv struct {
+	Tray bool `name:"t" description:"Display system tray indicator."`
+}
+
+func cliSrv(ctx context.Context, bindings runtime.New) func(f *FlagsSrv) error {
+	return func(f *FlagsSrv) error {
+		return serve.Run(ctx, bindings, f.Tray)
 	}
 }
