@@ -36,7 +36,7 @@ func FindAll(files fs.FS, dir string, filter ...Project) (in <-chan Project) {
 			if err != nil {
 				return err
 			}
-			directory := Directory{dir: src, files: sub}
+			directory := Module{dir: src, files: sub}
 			if nodeModule, err := directory.NodeModule(); err == nil {
 				if portalModule, err := nodeModule.PortalNodeModule(); err == nil {
 					current := *portalModule

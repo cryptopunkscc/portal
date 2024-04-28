@@ -9,16 +9,16 @@ import (
 )
 
 type NodeModule struct {
-	Directory
+	Module
 	pkgJson PackageJson
 }
 
-func (p *Directory) NodeModule() (module *NodeModule, err error) {
+func (p *Module) NodeModule() (module *NodeModule, err error) {
 	pkgJson, err := LoadPackageJson(p.files)
 	if err != nil {
 		return
 	}
-	module = &NodeModule{Directory: *p, pkgJson: pkgJson}
+	module = &NodeModule{Module: *p, pkgJson: pkgJson}
 	return
 }
 
