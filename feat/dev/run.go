@@ -40,12 +40,12 @@ func Run(
 	for _, target := range d.Backends {
 		wait.Add(1)
 		src := ""
-		src, err = runner.ResolveSrc(target.Path, "main.js")
+		src, err = runner.ResolveSrc(target.Path(), "main.js")
 		if err != nil {
 			return fmt.Errorf("resolveSrc %v: %v", "main.js", err)
 		}
 
-		go backend.Watcher(target.Path)
+		go backend.Watcher(target.Path())
 
 		if err = backend.Dev(goja.NewBackend(context.TODO()), src, backendEvents); err != nil {
 			return fmt.Errorf("backend.Dev: %v", err)
@@ -57,7 +57,7 @@ func Run(
 		wait.Add(1)
 		opt := wails.AppOptions(bindings())
 		opt.OnStartup = appendFrontCtx
-		if err = dev.Run(target.Path, opt); err != nil {
+		if err = dev.Run(target.Path(), opt); err != nil {
 			log.Fatal(fmt.Errorf("dev.Run: %v", err))
 		}
 		return

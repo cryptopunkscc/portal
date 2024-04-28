@@ -32,7 +32,7 @@ func Run(dir string) (err error) {
 			if err := CopyManifest(src); err != nil {
 				log.Println(err)
 			}
-		}(target.Path)
+		}(target.Path())
 	}
 	wait.Wait()
 	return

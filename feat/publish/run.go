@@ -27,7 +27,7 @@ func Run(dir string) (err error) {
 //	if err != nil {
 //		return
 //	}
-//	src, err := os.Open(target.Path)
+//	src, err := os.Open(target.Path())
 //	if err != nil {
 //		return err
 //	}
@@ -36,11 +36,11 @@ func Run(dir string) (err error) {
 //	if err != nil {
 //		return err
 //	}
-//	log.Println("Commit", l, target.Path)
+//	log.Println("Commit", l, target.Path())
 //	dataID, err := dst.Commit()
 //	if err != nil {
 //		return
 //	}
-//	log.Printf("%v <- %v", dataID, target.Path)
+//	log.Printf("%v <- %v", dataID, target.Path())
 //	return
 //}

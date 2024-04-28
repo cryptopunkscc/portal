@@ -20,8 +20,8 @@ func Install(src string) (err error) {
 		if err != nil {
 			return
 		}
-		src = path.Join(wd, target.Path)
-		dst := path.Join(portalAppsDir, path.Base(target.Path))
+		src = path.Join(wd, target.Path())
+		dst := path.Join(portalAppsDir, path.Base(target.Path()))
 
 		err = fs.CopyFile(src, dst)
 		log.Printf("Installing %s to %s", src, dst)

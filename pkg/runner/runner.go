@@ -21,11 +21,11 @@ func New(dir string, resolve GetTargets) (out *Runner, err error) {
 	out = &Runner{}
 	for _, d := range targets {
 		switch {
-		case IsBackend(d.Files):
-			log.Println("found backend:", d.Path)
+		case IsBackend(d.Files()):
+			log.Println("found backend:", d.Path())
 			out.Backends = append(out.Backends, d)
-		case IsFrontend(d.Files):
-			log.Println("found frontend:", d.Path)
+		case IsFrontend(d.Files()):
+			log.Println("found frontend:", d.Path())
 			out.Frontends = append(out.Frontends, d)
 		}
 	}

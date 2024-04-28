@@ -45,7 +45,7 @@ func send(
 	}
 	for _, target := range targets {
 		m := bundle.Manifest{}
-		if err := m.LoadFs(target.Files, bundle.PortalJson); err != nil {
+		if err := m.LoadFs(target.Files(), bundle.PortalJson); err != nil {
 			continue
 		}
 		if err = conn.Encode(m); err != nil {

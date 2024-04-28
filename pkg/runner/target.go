@@ -4,15 +4,16 @@ import (
 	"archive/zip"
 	"errors"
 	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
+	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"io/fs"
 	"os"
 	"path"
 	"strings"
 )
 
-type Target struct {
-	Files fs.FS
-	Path  string
+type Target interface {
+	Path() string
+	Files() fs.FS
 }
 
 type GetTargets func(string) ([]Target, error)
@@ -61,10 +62,7 @@ func BundleTargets(src string) (targets []Target, err error) {
 func appendZipTarget(targets []Target, src string) []Target {
 	if path.Ext(src) == ".portal" {
 		if reader, err := zip.OpenReader(src); err == nil {
-			targets = append(targets, Target{
-				Files: reader,
-				Path:  src,
-			})
+			targets = append(targets, project.NewDirectory(src, reader))
 		}
 	}
 	return targets
@@ -85,10 +83,7 @@ func findTargetFS(dir string, files fs.FS, target fsTarget) (targets []Target, e
 			return fs.SkipDir
 		}
 		if sub := getTargetFS(files, p, d, target); sub != nil {
-			t := Target{
-				Files: sub,
-				Path:  path.Join(dir, p),
-			}
+			t := project.NewDirectory(path.Join(dir, p), sub)
 			targets = append(targets, t)
 			return fs.SkipDir
 		}

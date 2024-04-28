@@ -34,9 +34,9 @@ func RunAll(dir string) (err error) {
 	}
 
 	for _, target := range targets {
-		log.Println(target.Path)
-		if err = Run(target.Path); err != nil {
-			return fmt.Errorf("bundle target %v: %v", target.Path, err)
+		log.Println(target.Path())
+		if err = Run(target.Path()); err != nil {
+			return fmt.Errorf("bundle target %v: %v", target.Path(), err)
 		}
 	}
 

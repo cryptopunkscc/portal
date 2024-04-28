@@ -67,27 +67,27 @@ func RunTarget(
 ) (err error) {
 	switch {
 
-	case runner.IsBackend(target.Files):
-		if err = goja.NewBackend(ctx).RunFs(target.Files); err != nil {
+	case runner.IsBackend(target.Files()):
+		if err = goja.NewBackend(ctx).RunFs(target.Files()); err != nil {
 			return fmt.Errorf("goja.NewBackend().RunSource: %v", err)
 		}
 		<-ctx.Done()
 
-	case runner.IsFrontend(target.Files):
+	case runner.IsFrontend(target.Files()):
 		opt := wails.AppOptions(bindings())
-		if err = wails.RunFS(target.Files, opt); err != nil {
+		if err = wails.RunFS(target.Files(), opt); err != nil {
 			return fmt.Errorf("dev.Run: %v", err)
 		}
 
 	default:
-		return fmt.Errorf("invalid target: %v", target.Path)
+		return fmt.Errorf("invalid target: %v", target.Path())
 	}
 	return
 }
 
 func RunTargetProcess(ctx context.Context, target runner.Target) (err error) {
-	log.Println("RunTargetProcess: ", target.Path)
-	cmd := exec.CommandContext(ctx, portal.Executable(), target.Path)
+	log.Println("RunTargetProcess: ", target.Path())
+	cmd := exec.CommandContext(ctx, portal.Executable(), target.Path())
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin

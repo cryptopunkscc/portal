@@ -7,7 +7,15 @@ type Directory struct {
 	files fs.FS
 }
 
+func NewDirectory(dir string, files fs.FS) *Directory {
+	return &Directory{dir: dir, files: files}
+}
+
 func (p *Directory) Dir() string {
+	return p.dir
+}
+
+func (p *Directory) Path() string {
 	return p.dir
 }
 

@@ -13,11 +13,11 @@ func Path(appPackage string) (src string, err error) {
 	}
 	for _, target := range targets {
 		m := bundle.Manifest{}
-		if err = m.LoadFs(target.Files, bundle.PortalJson); err != nil {
+		if err = m.LoadFs(target.Files(), bundle.PortalJson); err != nil {
 			return
 		}
 		if m.Package == appPackage {
-			src = target.Path
+			src = target.Path()
 			return
 		}
 	}

@@ -15,9 +15,9 @@ func Uninstall(id string) (err error) {
 
 	for _, target := range targets {
 		manifest := bundle.Manifest{}
-		_ = manifest.LoadFs(target.Files, bundle.PortalJson)
+		_ = manifest.LoadFs(target.Files(), bundle.PortalJson)
 		if manifest.Package == id {
-			err = fs.DeleteFile(target.Path)
+			err = fs.DeleteFile(target.Path())
 			return
 		}
 	}
