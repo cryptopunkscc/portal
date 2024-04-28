@@ -1,5 +1,6 @@
 node_modules
 build
 !feat/build
+!cmd/build
 dist
 .idea/

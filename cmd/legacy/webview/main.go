@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
-	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/common"
+	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/out/common"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	frontend "github.com/cryptopunkscc/go-astral-js/pkg/webview"
 	"github.com/webview/webview"

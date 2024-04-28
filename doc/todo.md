@@ -14,7 +14,7 @@
 * [x] Close backend with given timeout when idling detected.
 * [x] Portal launcher tray icon.
   * [x] Bind portal serve on launch.
-* Implement a cmd for building portal app along with js scripts.
+* [x] Implement portal installer.
 * Upgrade JavaScript RPC:
   * Register methods automatically under the service name specified in manifest.
   * Ensure or redesign. 

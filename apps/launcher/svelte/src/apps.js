@@ -1,4 +1,4 @@
-import {log} from "../../lib/portal";
+import {log} from "portal/portal.js";
 import portal from "./portal.js";
 import {writable} from "svelte/store";
 

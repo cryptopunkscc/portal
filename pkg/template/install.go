@@ -1,7 +1,6 @@
 package template
 
 import (
-	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/all"
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
 	"github.com/leaanthony/debme"
 	"github.com/leaanthony/gosod"
@@ -9,7 +8,6 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/clilogger"
 	"log"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 )
@@ -105,23 +103,5 @@ func Install(opt *Options) (err error) {
 		return errors.Wrap(err, "installer.Extract")
 	}
 
-	return
-}
-
-func InstallBase(src string) (err error) {
-	log.Println("install lib in:", src)
-	commonFs, err := debme.FS(templatesFs, "tmpl/base")
-	if err != nil {
-		return err
-	}
-	installer := gosod.New(commonFs)
-
-	if err = installer.Extract(src, struct{}{}); err != nil {
-		return errors.Wrap(err, "installer.Extract")
-	}
-
-	if err = os.WriteFile(path.Join(src, "lib", "portal.js"), []byte(binding.AllJsString), 0644); err != nil {
-		return err
-	}
 	return
 }

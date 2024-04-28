@@ -41,11 +41,6 @@ func Run(
 		}
 	}
 
-	// install base
-	if err = template.InstallBase(targetDir); err != nil {
-		return err
-	}
-
 	// prepare template options
 	opt := template.Options{
 		Data: template.Data{

@@ -1,4 +1,4 @@
-package binding
+package wails
 
 import (
 	"embed"

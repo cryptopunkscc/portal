@@ -3,7 +3,7 @@ package wails
 import (
 	"context"
 	"github.com/cryptopunkscc/go-astral-js/pkg/assets"
-	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/wails"
+	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/out/wails"
 	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	bindings "github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/wailsapp/wails/v2/pkg/application"

@@ -14,16 +14,10 @@ import (
 )
 
 func Run(dir string) (err error) {
-	r, err := runner.New(dir, runner.DevTargets)
+	targets, err := runner.DevTargets(dir)
 	if err != nil {
-		return
+		return err
 	}
-	return RunRunner(r)
-}
-
-func RunRunner(r *runner.Runner) (err error) {
-	targets := append(r.Backends, r.Frontends...)
-
 	wait := sync.WaitGroup{}
 	wait.Add(len(targets))
 	for _, target := range targets {
@@ -35,7 +29,7 @@ func RunRunner(r *runner.Runner) (err error) {
 			if err := npmRunBuild(src); err != nil {
 				log.Println(err)
 			}
-			if err := copyManifest(src); err != nil {
+			if err := CopyManifest(src); err != nil {
 				log.Println(err)
 			}
 		}(target.Path)
@@ -52,21 +46,21 @@ func npmRunBuild(dir string) error {
 	return exec.Run(dir, "npm", "run", "build")
 }
 
-func copyManifest(src string) (err error) {
-	manifest := bundle.Base(src)
-	_ = manifest.LoadPath(src, "package.json")
-	_ = manifest.LoadPath(src, bundle.PortalJson)
-	if manifest.Icon != "" {
-		iconSrc := path.Join(src, manifest.Icon)
-		iconName := "icon" + path.Ext(manifest.Icon)
+func CopyManifest(src string) (err error) {
+	m := bundle.Base(src)
+	_ = m.LoadPath(src, "package.json")
+	_ = m.LoadPath(src, bundle.PortalJson)
+	if m.Icon != "" {
+		iconSrc := path.Join(src, m.Icon)
+		iconName := "icon" + path.Ext(m.Icon)
 		iconDst := path.Join(src, "dist", iconName)
 		if err = fs.CopyFile(iconSrc, iconDst); err != nil {
 			return
 		}
-		manifest.Icon = iconName
+		m.Icon = iconName
 	}
 
-	bytes, err := json.Marshal(manifest)
+	bytes, err := json.Marshal(m)
 	if err != nil {
 		return err
 	}

@@ -1,4 +1,4 @@
-import {apphost} from "../../lib/portal.js";
+import {apphost} from "portal/portal.js";
 
 export default {
   launch: apphost.rpcQuery("", "portal.open"),

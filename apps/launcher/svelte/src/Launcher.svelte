@@ -1,7 +1,7 @@
 <script>
   import Apps from "./Apps.svelte";
   import {onDestroy} from "svelte";
-  import {apphost} from "../../lib/portal.js";
+  import {apphost} from "portal/portal.js";
   onDestroy(apphost.interrupt)
 </script>
 

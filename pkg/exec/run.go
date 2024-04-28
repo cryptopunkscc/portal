@@ -8,14 +8,14 @@ import (
 	"syscall"
 )
 
-func Run(dir, name string, args ...string) error {
-	cmd := exec.Command(name, args...)
-	cmd.Env = os.Environ()
-	cmd.Dir = dir
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Stdin = os.Stdin
-	return cmd.Run()
+func Run(dir string, cmd ...string) error {
+	c := exec.Command(cmd[0], cmd[1:]...)
+	c.Env = os.Environ()
+	c.Dir = dir
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	c.Stdin = os.Stdin
+	return c.Run()
 }
 
 func OnShutdown(cancel func()) {

@@ -3,7 +3,7 @@ package goja
 import (
 	"context"
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
-	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/common"
+	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/out/common"
 	"github.com/dop251/goja"
 	"io/fs"
 	"os"

@@ -44,12 +44,10 @@ func send(
 		return
 	}
 	for _, target := range targets {
-		log.Println("Sending manifest for target", target.Path)
 		m := bundle.Manifest{}
 		if err := m.LoadFs(target.Files, bundle.PortalJson); err != nil {
 			continue
 		}
-		log.Println("Sending manifest", m)
 		if err = conn.Encode(m); err != nil {
 			return
 		}
