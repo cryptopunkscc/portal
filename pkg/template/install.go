@@ -1,4 +1,4 @@
-package project
+package template
 
 import (
 	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/all"

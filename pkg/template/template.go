@@ -1,4 +1,4 @@
-package project
+package template
 
 import (
 	gofs "io/fs"
