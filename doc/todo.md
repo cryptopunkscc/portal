@@ -26,4 +26,4 @@
   * android
 * Install JavaScript runtime dependencies in local node modules.
 * Use injected prefixed logger. Review & unify existing logs.
-* Close nested apps gracefully.
+* [x] Close nested apps gracefully.

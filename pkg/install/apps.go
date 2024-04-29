@@ -1,7 +1,6 @@
 package install
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/feat/build"
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"log"
 	"os"
@@ -24,7 +23,7 @@ func (d *PortalDev) buildJsApps() {
 		if err := p.NpmRunBuild(); err != nil {
 			log.Fatalln(err)
 		}
-		if err := build.CopyManifest(p.Path()); err != nil {
+		if err := p.CopyManifest(); err != nil {
 			log.Fatalln(err)
 		}
 	}

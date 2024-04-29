@@ -5,7 +5,6 @@
   import {onDestroy} from "svelte";
 
   const apps = new AppsRepository()
-
   onScrollBottomReached(() => apps.loadMore())
   onDestroy(() => apps.cancel())
 </script>

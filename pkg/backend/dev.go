@@ -78,7 +78,6 @@ func observeChanges(path string, file string) (out <-chan any, err error) {
 				if !ok {
 					return
 				}
-				//c <- err
 				log.Println("error:", err)
 			}
 		}

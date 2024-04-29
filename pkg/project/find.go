@@ -30,9 +30,10 @@ func FindAll(files fs.FS, dir string, filter ...runner.Target) (in <-chan runner
 		filter = append(filter, matchAll)
 	}
 	go func() {
+		defer close(out)
 		_ = fs.WalkDir(files, dir, func(src string, d fs.DirEntry, err error) error {
 			if err != nil {
-				panic(err)
+				return fs.SkipAll
 			}
 			if d.Name() == "node_modules" {
 				return fs.SkipDir
@@ -89,7 +90,6 @@ func FindAll(files fs.FS, dir string, filter ...runner.Target) (in <-chan runner
 			}
 			return nil
 		})
-		close(out)
 	}()
 	return
 }

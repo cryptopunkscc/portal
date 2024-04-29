@@ -16,7 +16,6 @@ export class AppsRepository {
 
   async run() {
     for (; this.channel;) {
-      log("next")
       let app;
       try {
         app = await this.channel.next()
@@ -24,7 +23,6 @@ export class AppsRepository {
         log("error: ", JSON.stringify(e))
         throw e
       }
-      log("got next", app)
       this.apps.push(app)
       this.store.set(this.apps)
     }
