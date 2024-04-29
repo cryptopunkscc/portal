@@ -5,12 +5,15 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/backend"
 	"github.com/cryptopunkscc/go-astral-js/pkg/goja"
+	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/cryptopunkscc/go-astral-js/pkg/wails"
 	"github.com/cryptopunkscc/go-astral-js/pkg/wails/dev"
 	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 	"log"
+	"os"
+	"path"
 	"sync"
 )
 
@@ -18,9 +21,16 @@ func Run(
 	bindings runtime.New,
 	dir string,
 ) (err error) {
-	d, err := runner.New(dir, runner.DevTargets)
-	if err != nil {
-		return fmt.Errorf("newRunner: %v", err)
+	var backends []project.PortalNodeModule
+	var frontends []project.PortalNodeModule
+	for module := range project.DevTargets(os.DirFS(dir)) {
+		switch module.Type() {
+		case runner.Frontend:
+			frontends = append(frontends, module)
+		case runner.Backend:
+			backends = append(backends, module)
+		case runner.Invalid:
+		}
 	}
 
 	var frontCtxs []context.Context
@@ -37,10 +47,10 @@ func Run(
 
 	wait := sync.WaitGroup{}
 
-	for _, target := range d.Backends {
+	for _, target := range backends {
 		wait.Add(1)
 		src := ""
-		src, err = runner.ResolveSrc(target.Path(), "main.js")
+		src, err = ResolveSrc(target.Path(), "main.js")
 		if err != nil {
 			return fmt.Errorf("resolveSrc %v: %v", "main.js", err)
 		}
@@ -53,7 +63,7 @@ func Run(
 	}
 
 	// TODO handle more than one frontend
-	for _, target := range d.Frontends {
+	for _, target := range frontends {
 		wait.Add(1)
 		opt := wails.AppOptions(bindings())
 		opt.OnStartup = appendFrontCtx
@@ -64,5 +74,17 @@ func Run(
 	}
 	wait.Wait()
 	log.Println("dev closed")
+	return
+}
+
+func ResolveSrc(dir string, name string) (f string, err error) {
+	f = path.Join(dir, "dist", name)
+	if _, err = os.Stat(f); err == nil {
+		return
+	}
+	f = path.Join(dir, name)
+	if _, err = os.Stat(f); err == nil {
+		return
+	}
 	return
 }

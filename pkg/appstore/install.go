@@ -2,19 +2,14 @@ package appstore
 
 import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
+	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"log"
 	"os"
 	"path"
 )
 
 func Install(src string) (err error) {
-	targets, err := runner.BundleTargets(src)
-	if err != nil {
-		return
-	}
-
-	for _, target := range targets {
+	for target := range project.BundleTargets(os.DirFS(src), ".") {
 		wd := ""
 		wd, err = os.Getwd()
 		if err != nil {
@@ -30,6 +25,5 @@ func Install(src string) (err error) {
 			return
 		}
 	}
-
 	return
 }

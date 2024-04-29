@@ -6,7 +6,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
+	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"log"
 	"os"
 	"path"
@@ -14,25 +14,25 @@ import (
 )
 
 func Run(dir string) (err error) {
-	targets, err := runner.DevTargets(dir)
-	if err != nil {
-		return err
-	}
+	targets := project.DevTargets(os.DirFS(dir))
 	wait := sync.WaitGroup{}
-	wait.Add(len(targets))
-	for _, target := range targets {
-		go func(src string) {
+	for target := range targets {
+		wait.Add(1)
+		go func(target project.PortalNodeModule) {
 			defer wait.Done()
-			if err := npmInstall(src); err != nil {
+			if err := target.NpmInstall(); err != nil {
 				log.Println(err)
+				return
 			}
-			if err := npmRunBuild(src); err != nil {
+			if err := target.NpmRunBuild(); err != nil {
 				log.Println(err)
+				return
 			}
-			if err := CopyManifest(src); err != nil {
+			if err := target.CopyManifest(); err != nil {
 				log.Println(err)
+				return
 			}
-		}(target.Path())
+		}(target)
 	}
 	wait.Wait()
 	return

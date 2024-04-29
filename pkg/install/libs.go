@@ -9,7 +9,7 @@ import (
 func (d *PortalDev) appendPortalModules() {
 	for p := range project.Find[project.NodeModule](os.DirFS(d.root), "pkg") {
 		if p.IsPortalModule() {
-			d.modules = append(d.modules, p.Dir())
+			d.modules = append(d.modules, p.Path())
 		}
 	}
 }
@@ -17,7 +17,7 @@ func (d *PortalDev) appendPortalModules() {
 func (d *PortalDev) installJsLibs() {
 	for p := range project.Find[project.NodeModule](os.DirFS(d.root), "pkg") {
 		if p.IsPortalModule() {
-			d.modules = append(d.modules, p.Dir())
+			d.modules = append(d.modules, p.Path())
 		}
 		if !p.HasNpmRunBuild() {
 			continue

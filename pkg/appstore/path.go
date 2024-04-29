@@ -2,22 +2,20 @@ package appstore
 
 import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
+	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"io/fs"
+	"os"
+	"path"
 )
 
 func Path(appPackage string) (src string, err error) {
-	targets, err := runner.BundleTargets(portalAppsDir)
-	if err != nil {
-		return
-	}
-	for _, target := range targets {
+	for target := range project.BundleTargets(os.DirFS(portalAppsDir), ".") {
 		m := bundle.Manifest{}
 		if err = m.LoadFs(target.Files(), bundle.PortalJson); err != nil {
 			return
 		}
 		if m.Package == appPackage {
-			src = target.Path()
+			src = path.Join(portalAppsDir, target.Path())
 			return
 		}
 	}

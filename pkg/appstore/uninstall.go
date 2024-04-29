@@ -4,16 +4,12 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
+	"github.com/cryptopunkscc/go-astral-js/pkg/project"
+	"os"
 )
 
 func Uninstall(id string) (err error) {
-	targets, err := runner.BundleTargets(portalAppsDir)
-	if err != nil {
-		return err
-	}
-
-	for _, target := range targets {
+	for target := range project.BundleTargets(os.DirFS(portalAppsDir), ".") {
 		manifest := bundle.Manifest{}
 		_ = manifest.LoadFs(target.Files(), bundle.PortalJson)
 		if manifest.Package == id {

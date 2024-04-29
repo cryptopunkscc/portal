@@ -1,24 +1,54 @@
 package project
 
-import "io/fs"
+import (
+	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
+	"io/fs"
+	"os"
+	"path"
+)
 
 type Module struct {
-	dir   string
+	src   string
 	files fs.FS
 }
 
-func NewDirectory(dir string, files fs.FS) *Module {
-	return &Module{dir: dir, files: files}
+func NewModule(src string) *Module {
+	dir, file := path.Split(src)
+	return NewModuleFS(file, os.DirFS(dir))
 }
 
-func (p *Module) Dir() string {
-	return p.dir
+func NewModuleFS(src string, files fs.FS) *Module {
+	return &Module{src: src, files: files}
 }
 
-func (p *Module) Path() string {
-	return p.dir
+func (m *Module) Path() string {
+	return m.src
 }
 
-func (p *Module) Files() fs.FS {
-	return p.files
+func (m *Module) Files() fs.FS {
+	return m.files
+}
+
+func (m *Module) Type() runner.Type {
+	switch {
+	case m.IsFrontend():
+		return runner.Frontend
+	case m.IsBackend():
+		return runner.Backend
+	default:
+		return runner.Invalid
+	}
+}
+
+func (m *Module) IsFrontend() bool {
+	stat, err := fs.Stat(m.files, "index.html")
+	if err != nil {
+		return false
+	}
+	return stat.Mode().IsRegular()
+}
+
+func (m *Module) IsBackend() bool {
+	_, err := fs.Stat(m.files, "index.html")
+	return err != nil
 }

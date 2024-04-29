@@ -1,69 +1,88 @@
 package project
 
 import (
+	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"io/fs"
 	"log"
+	"path"
 	"reflect"
 )
 
 type Project any
 
-func Find[P Project](files fs.FS, dir string) (in <-chan P) {
-	var p P
-	out := make(chan P)
+func Find[T runner.Target](files fs.FS, dir string) (in <-chan T) {
+	var filter T
+	out := make(chan T)
 	in = out
 	go func() {
 		defer close(out)
-		for project := range FindAll(files, dir, p) {
-			out <- project.(P)
+		for project := range FindAll(files, dir, filter) {
+			out <- project.(T)
 		}
 	}()
 	return
 }
 
-func FindAll(files fs.FS, dir string, filter ...Project) (in <-chan Project) {
-	out := make(chan Project)
+func FindAll(files fs.FS, dir string, filter ...runner.Target) (in <-chan runner.Target) {
+	out := make(chan runner.Target)
 	in = out
 	if len(filter) == 0 {
 		filter = append(filter, matchAll)
 	}
 	go func() {
 		_ = fs.WalkDir(files, dir, func(src string, d fs.DirEntry, err error) error {
+			if err != nil {
+				panic(err)
+			}
 			if d.Name() == "node_modules" {
 				return fs.SkipDir
 			}
+
+			if path.Ext(d.Name()) == ".portal" && d.Type().IsRegular() {
+				log.Println("portal bundle detected: ", dir, files, src)
+
+				module := NewModuleFS(src, files)
+				bundle, err := module.Bundle()
+				if err != nil {
+					log.Println("bundle error:", err)
+				}
+				out <- *bundle
+				return nil
+			}
+
 			sub, err := fs.Sub(files, src)
 			if err != nil {
 				return err
 			}
-			directory := Module{dir: src, files: sub}
-			if nodeModule, err := directory.NodeModule(); err == nil {
+			module := NewModuleFS(src, sub)
+			if nodeModule, err := module.NodeModule(); err == nil {
+
 				if portalModule, err := nodeModule.PortalNodeModule(); err == nil {
-					current := *portalModule
+					current := portalModule
 					for _, target := range filter {
-						if isSameType(target, current) {
+						if isSameType(target, *current) {
 							log.Println("portal module detected: ", src)
-							out <- current
+							out <- *current
 							return fs.SkipDir
 						}
 					}
 				}
-				current := *nodeModule
+				current := nodeModule
 				for _, target := range filter {
-					if isSameType(target, current) {
+					if isSameType(target, *current) {
 						log.Println("node module detected: ", src)
-						out <- current
+						out <- *current
 						return nil
 					}
 				}
 				return fs.SkipDir
 			}
-			if rawModule, err := directory.PortalRawModule(); err == nil {
-				current := *rawModule
+			if rawModule, err := module.PortalRawModule(); err == nil {
+				current := rawModule
 				for _, target := range filter {
-					if isSameType(target, current) {
+					if isSameType(target, *current) {
 						log.Println("raw module detected: ", src)
-						out <- current
+						out <- *current
 						return fs.SkipDir
 					}
 				}
@@ -75,9 +94,9 @@ func FindAll(files fs.FS, dir string, filter ...Project) (in <-chan Project) {
 	return
 }
 
-var matchAll = struct{}{}
+var matchAll = NewModuleFS("%all-matcher%", nil)
 
-func isSameType(target any, current any) bool {
+func isSameType(target runner.Target, current runner.Target) bool {
 	if target == matchAll {
 		return true
 	}

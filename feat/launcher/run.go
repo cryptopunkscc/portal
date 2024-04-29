@@ -6,8 +6,8 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/apps"
 	"github.com/cryptopunkscc/go-astral-js/feat/open"
 	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
+	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 )
 
@@ -17,12 +17,9 @@ func Run(ctx context.Context, bindings runtime.New) (err error) {
 			return
 		}
 	}
-	target, err := runner.RawTargetsFS(apps.LauncherSvelteFS)
-	if err != nil {
-		return
-	}
-	if len(target) == 0 {
+	target, ok := <-project.RawTargets(apps.LauncherSvelteFS)
+	if !ok {
 		return errors.New("embed launcher not found")
 	}
-	return open.RunTarget(ctx, bindings, target[0])
+	return open.RunTarget(ctx, bindings, target)
 }

@@ -5,10 +5,11 @@ import (
 	"errors"
 	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
+	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"io"
 	"log"
+	"os"
 )
 
 func Observe(ctx context.Context, conn rpc.Conn) (err error) {
@@ -39,11 +40,7 @@ func send(
 	src string,
 	conn rpc.Conn,
 ) (err error) {
-	targets, err := runner.BundleTargets(src)
-	if err != nil {
-		return
-	}
-	for _, target := range targets {
+	for target := range project.BundleTargets(os.DirFS(src), ".") {
 		m := bundle.Manifest{}
 		if err := m.LoadFs(target.Files(), bundle.PortalJson); err != nil {
 			continue

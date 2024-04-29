@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/feat/build"
 	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
+	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/zip"
 	"io/fs"
 	"log"
@@ -15,31 +15,17 @@ import (
 )
 
 func RunAll(dir string) (err error) {
-	targets, err := runner.DevTargets(dir)
-
-	// fallback for a pass written without a build system
-	rawTargets, err2 := runner.RawTargets(dir)
-	if err2 == nil {
-		targets = append(targets, rawTargets...)
-	}
-
-	if len(targets) == 0 {
-		if err == nil {
-			err = err2
-		}
-		if err == nil {
-			err = errors.New("no targets found")
-		}
-		return
-	}
-
-	for _, target := range targets {
+	found := false
+	for target := range project.ProdTargets(os.DirFS(dir)) {
 		log.Println(target.Path())
 		if err = Run(target.Path()); err != nil {
 			return fmt.Errorf("bundle target %v: %v", target.Path(), err)
 		}
+		found = true
 	}
-
+	if !found {
+		err = errors.New("no targets found")
+	}
 	return
 }
 

@@ -3,7 +3,7 @@ package project
 import "github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 
 type PortalNodeModule struct {
-	NodeModule
+	*NodeModule
 	manifest bundle.Manifest
 }
 
@@ -12,6 +12,6 @@ func (m *NodeModule) PortalNodeModule() (module *PortalNodeModule, err error) {
 	if err != nil {
 		return
 	}
-	module = &PortalNodeModule{NodeModule: *m, manifest: manifest}
+	module = &PortalNodeModule{NodeModule: m, manifest: manifest}
 	return
 }

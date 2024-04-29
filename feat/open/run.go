@@ -7,6 +7,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
 	"github.com/cryptopunkscc/go-astral-js/pkg/goja"
 	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
+	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/cryptopunkscc/go-astral-js/pkg/wails"
@@ -20,27 +21,21 @@ func Run(
 	bindings runtime.New,
 	src string,
 ) (err error) {
-
-	if !fs.Exists(src) {
-		log.Println("resolving path from id: ", src)
+	var targets []runner.Target
+	if fs.Exists(src) {
+		for target := range project.ProdTargets(os.DirFS(src)) {
+			targets = append(targets, target)
+		}
+	} else {
 		if src, err = appstore.Path(src); err != nil {
 			return
 		}
+		var bundle *project.Bundle
+		if bundle, err = project.NewModule(src).Bundle(); err != nil {
+			return
+		}
+		targets = append(targets, bundle)
 	}
-
-	targets, err := runner.ProdTargets(src)
-	if err != nil {
-		return fmt.Errorf("prod.Run: %v", err)
-	}
-
-	return RunTargets(ctx, bindings, targets)
-}
-
-func RunTargets(
-	ctx context.Context,
-	bindings runtime.New,
-	targets []runner.Target,
-) (err error) {
 
 	// execute single target in current process
 	if len(targets) == 1 {
@@ -65,15 +60,15 @@ func RunTarget(
 	bindings runtime.New,
 	target runner.Target,
 ) (err error) {
-	switch {
+	switch target.Type() {
 
-	case runner.IsBackend(target.Files()):
+	case runner.Backend:
 		if err = goja.NewBackend(ctx).RunFs(target.Files()); err != nil {
 			return fmt.Errorf("goja.NewBackend().RunSource: %v", err)
 		}
 		<-ctx.Done()
 
-	case runner.IsFrontend(target.Files()):
+	case runner.Frontend:
 		opt := wails.AppOptions(bindings())
 		if err = wails.RunFS(target.Files(), opt); err != nil {
 			return fmt.Errorf("dev.Run: %v", err)

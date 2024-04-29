@@ -24,7 +24,7 @@ func (d *PortalDev) buildJsApps() {
 		if err := p.NpmRunBuild(); err != nil {
 			log.Fatalln(err)
 		}
-		if err := build.CopyManifest(p.Dir()); err != nil {
+		if err := build.CopyManifest(p.Path()); err != nil {
 			log.Fatalln(err)
 		}
 	}
