@@ -11,7 +11,6 @@ import "github.com/getlantern/systray"
 func Run(ctx context.Context) {
 	t := tray{}
 	systray.SetTitle(portal.Name)
-
 	launcherItem := systray.AddMenuItem("Launcher", "Launcher")
 	go onMenuItemClick(launcherItem, func() {
 		go func() {
@@ -20,7 +19,6 @@ func Run(ctx context.Context) {
 			}
 		}()
 	})
-
 	quit := systray.AddMenuItem("Quit ", "Quit")
 	go onMenuItemClick(quit, func() {
 		systray.Quit()
@@ -28,18 +26,21 @@ func Run(ctx context.Context) {
 			log.Println("quit:", err)
 		}
 	})
+	go func() {
+		<-ctx.Done()
+		systray.Quit()
+	}()
 	systray.Run(t.onReady, t.onExit)
-	<-ctx.Done()
 }
 
 type tray struct{}
 
 func (t *tray) onReady() {
-	log.Println("ready")
+	log.Println("portal tray start")
 }
 
 func (t *tray) onExit() {
-	log.Println("exit")
+	log.Println("portal tray exit")
 }
 
 func onMenuItemClick(item *systray.MenuItem, onClick func()) {
