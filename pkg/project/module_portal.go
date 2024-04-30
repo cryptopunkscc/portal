@@ -16,8 +16,11 @@ type PortalNodeModule struct {
 }
 
 func (m *NodeModule) PortalNodeModule() (module *PortalNodeModule, err error) {
-	manifest, err := bundle.ReadManifestFs(m.files)
-	if err != nil {
+	manifest := bundle.Manifest{}
+	if err = manifest.LoadFs(m.files, "package.json"); err != nil {
+		return
+	}
+	if err = manifest.LoadFs(m.files, bundle.PortalJson); err != nil {
 		return
 	}
 	module = &PortalNodeModule{NodeModule: m, manifest: manifest}
@@ -63,32 +66,35 @@ func (m *PortalNodeModule) Build() (err error) {
 	if err = m.NpmRunBuild(); err != nil {
 		return
 	}
+	if err = m.CopyIcon(); err != nil {
+		return
+	}
 	if err = m.CopyManifest(); err != nil {
 		return
 	}
 	return
 }
 
-func (m *PortalNodeModule) CopyManifest() (err error) {
-	src := m.src
-	b := bundle.Base(src)
-	_ = b.LoadPath(src, "package.json")
-	_ = b.LoadPath(src, bundle.PortalJson)
-	if b.Icon != "" {
-		iconSrc := path.Join(src, b.Icon)
-		iconName := "icon" + path.Ext(b.Icon)
-		iconDst := path.Join(src, "dist", iconName)
-		if err = fs.CopyFile(iconSrc, iconDst); err != nil {
-			return
-		}
-		b.Icon = iconName
+func (m *PortalNodeModule) CopyIcon() (err error) {
+	if m.manifest.Icon == "" {
+		return
 	}
+	iconSrc := path.Join(m.src, m.manifest.Icon)
+	iconName := "icon" + path.Ext(m.manifest.Icon)
+	iconDst := path.Join(m.src, "dist", iconName)
+	if err = fs.CopyFile(iconSrc, iconDst); err != nil {
+		return
+	}
+	m.manifest.Icon = iconName
+	return
+}
 
-	bytes, err := json.Marshal(m)
+func (m *PortalNodeModule) CopyManifest() (err error) {
+	bytes, err := json.Marshal(m.manifest)
 	if err != nil {
 		return err
 	}
-	if err = os.WriteFile(path.Join(src, "dist", bundle.PortalJson), bytes, 0644); err != nil {
+	if err = os.WriteFile(path.Join(m.src, "dist", bundle.PortalJson), bytes, 0644); err != nil {
 		return fmt.Errorf("os.WriteFile: %v", err)
 	}
 	return
