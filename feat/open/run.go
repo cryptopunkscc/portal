@@ -8,8 +8,8 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/goja"
 	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/pkg/wails"
 	"log"
 	"os"
@@ -21,10 +21,10 @@ func Run(
 	bindings runtime.New,
 	src string,
 ) (err error) {
-	var targets []runner.Target
+	var apps []target.Source
 	if fs.Exists(src) {
-		for target := range project.ProdTargets(os.DirFS(src)) {
-			targets = append(targets, target)
+		for app := range project.ProdTargets(os.DirFS(src)) {
+			apps = append(apps, app)
 		}
 	} else {
 		if src, err = appstore.Path(src); err != nil {
@@ -34,21 +34,21 @@ func Run(
 		if bundle, err = project.NewModule(src).Bundle(); err != nil {
 			return
 		}
-		targets = append(targets, bundle)
+		apps = append(apps, bundle)
 	}
 
 	// execute single target in current process
-	if len(targets) == 1 {
-		return RunTarget(ctx, bindings, targets[0])
+	if len(apps) == 1 {
+		return RunTarget(ctx, bindings, apps[0])
 	}
 
 	// execute multiple targets as separate processes
 	ctx, cancel := context.WithCancel(context.Background())
-	for _, target := range targets {
-		go func(target runner.Target) {
-			err = RunTargetProcess(ctx, target)
+	for _, t := range apps {
+		go func(t target.Source) {
+			err = RunTargetProcess(ctx, t)
 			cancel()
-		}(target)
+		}(t)
 	}
 	<-ctx.Done()
 	cancel()
@@ -58,29 +58,29 @@ func Run(
 func RunTarget(
 	ctx context.Context,
 	bindings runtime.New,
-	target runner.Target,
+	app target.Source,
 ) (err error) {
-	switch target.Type() {
+	switch app.Type() {
 
-	case runner.Backend:
-		if err = goja.NewBackend(ctx).RunFs(target.Files()); err != nil {
+	case target.Backend:
+		if err = goja.NewBackend(ctx).RunFs(app.Files()); err != nil {
 			return fmt.Errorf("goja.NewBackend().RunSource: %v", err)
 		}
 		<-ctx.Done()
 
-	case runner.Frontend:
+	case target.Frontend:
 		opt := wails.AppOptions(bindings())
-		if err = wails.RunFS(target.Files(), opt); err != nil {
+		if err = wails.RunFS(app.Files(), opt); err != nil {
 			return fmt.Errorf("dev.Run: %v", err)
 		}
 
 	default:
-		return fmt.Errorf("invalid target: %v", target.Path())
+		return fmt.Errorf("invalid target: %v", app.Path())
 	}
 	return
 }
 
-func RunTargetProcess(ctx context.Context, target runner.Target) (err error) {
+func RunTargetProcess(ctx context.Context, target target.Source) (err error) {
 	log.Println("RunTargetProcess: ", target.Path())
 	cmd := exec.CommandContext(ctx, portal.Executable(), target.Path())
 	cmd.Stderr = os.Stderr

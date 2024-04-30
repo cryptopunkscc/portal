@@ -1,7 +1,7 @@
 package project
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"io/fs"
 	"os"
 	"path"
@@ -32,14 +32,14 @@ func (m *Module) Files() fs.FS {
 	return m.files
 }
 
-func (m *Module) Type() runner.Type {
+func (m *Module) Type() target.Type {
 	switch {
 	case m.IsFrontend():
-		return runner.Frontend
+		return target.Frontend
 	case m.IsBackend():
-		return runner.Backend
+		return target.Backend
 	default:
-		return runner.Invalid
+		return target.Invalid
 	}
 }
 

@@ -1,7 +1,7 @@
 package project
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"io/fs"
 	"log"
 	"path"
@@ -10,7 +10,7 @@ import (
 
 type Project any
 
-func Find[T runner.Target](files fs.FS, dir string) (in <-chan T) {
+func Find[T target.Source](files fs.FS, dir string) (in <-chan T) {
 	var filter T
 	out := make(chan T)
 	in = out
@@ -23,8 +23,8 @@ func Find[T runner.Target](files fs.FS, dir string) (in <-chan T) {
 	return
 }
 
-func FindAll(files fs.FS, dir string, filter ...runner.Target) (in <-chan runner.Target) {
-	out := make(chan runner.Target)
+func FindAll(files fs.FS, dir string, filter ...target.Source) (in <-chan target.Source) {
+	out := make(chan target.Source)
 	in = out
 	if len(filter) == 0 {
 		filter = append(filter, matchAll)
@@ -96,7 +96,7 @@ func FindAll(files fs.FS, dir string, filter ...runner.Target) (in <-chan runner
 
 var matchAll = NewModuleFS("%all-matcher%", nil)
 
-func isSameType(target runner.Target, current runner.Target) bool {
+func isSameType(target target.Source, current target.Source) bool {
 	if target == matchAll {
 		return true
 	}

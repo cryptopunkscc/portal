@@ -6,8 +6,8 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/backend"
 	"github.com/cryptopunkscc/go-astral-js/pkg/goja"
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runner"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/pkg/wails"
 	"github.com/cryptopunkscc/go-astral-js/pkg/wails/dev"
 	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
@@ -25,11 +25,11 @@ func Run(
 	var frontends []project.PortalNodeModule
 	for module := range project.DevTargets(os.DirFS(dir)) {
 		switch module.Type() {
-		case runner.Frontend:
+		case target.Frontend:
 			frontends = append(frontends, module)
-		case runner.Backend:
+		case target.Backend:
 			backends = append(backends, module)
-		case runner.Invalid:
+		case target.Invalid:
 		}
 	}
 

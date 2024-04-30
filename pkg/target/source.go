@@ -1,10 +1,10 @@
-package runner
+package target
 
 import (
 	"io/fs"
 )
 
-type Target interface {
+type Source interface {
 	Path() string
 	Files() fs.FS
 	Type() Type
