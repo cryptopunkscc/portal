@@ -8,23 +8,14 @@ import (
 
 func (d *PortalDev) buildJsApps() {
 	if len(d.modules) == 0 {
-		d.appendPortalModules()
+		d.collectPortalLibs()
 	}
-	for p := range project.Find[project.PortalNodeModule](os.DirFS(d.root), "apps") {
-		if !p.HasNpmRunBuild() {
+	for m := range project.Find[project.PortalNodeModule](os.DirFS(d.root), "apps") {
+		if !m.CanNpmRunBuild() {
 			continue
 		}
-		if err := p.NpmInstall(); err != nil {
+		if err := m.PrepareBuild(d.modules...); err != nil {
 			log.Fatal(err)
-		}
-		if err := p.CopyModules(d.modules); err != nil {
-			log.Fatalln(err)
-		}
-		if err := p.NpmRunBuild(); err != nil {
-			log.Fatalln(err)
-		}
-		if err := p.CopyManifest(); err != nil {
-			log.Fatalln(err)
 		}
 	}
 	return

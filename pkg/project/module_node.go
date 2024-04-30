@@ -1,11 +1,10 @@
 package project
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
-	fs2 "github.com/cryptopunkscc/go-astral-js/pkg/fs"
+	"io"
+	"io/fs"
 	"log"
 	"os"
 	"path"
@@ -25,11 +24,11 @@ func (m *Module) NodeModule() (module *NodeModule, err error) {
 	return
 }
 
-func (m *NodeModule) IsPortalModule() bool {
-	return m.pkgJson.IsPortalModule()
+func (m *NodeModule) IsPortalLib() bool {
+	return m.pkgJson.IsPortalLib()
 }
 
-func (m *NodeModule) HasNpmRunBuild() bool {
+func (m *NodeModule) CanNpmRunBuild() bool {
 	return m.pkgJson.Scripts.Build != ""
 }
 
@@ -44,39 +43,43 @@ func (m *NodeModule) NpmInstall() (err error) {
 	return
 }
 
-func (m *NodeModule) CopyManifest() (err error) {
-	src := m.src
-	b := bundle.Base(src)
-	_ = b.LoadPath(src, "package.json")
-	_ = b.LoadPath(src, bundle.PortalJson)
-	if b.Icon != "" {
-		iconSrc := path.Join(src, b.Icon)
-		iconName := "icon" + path.Ext(b.Icon)
-		iconDst := path.Join(src, "dist", iconName)
-		if err = fs2.CopyFile(iconSrc, iconDst); err != nil {
+func (m *NodeModule) InjectDependencies(modules []NodeModule) (err error) {
+	for _, module := range modules {
+		if err = m.InjectDependency(module); err != nil {
 			return
 		}
-		b.Icon = iconName
-	}
-
-	bytes, err := json.Marshal(m)
-	if err != nil {
-		return err
-	}
-	if err = os.WriteFile(path.Join(src, "dist", bundle.PortalJson), bytes, 0644); err != nil {
-		return fmt.Errorf("os.WriteFile: %v", err)
 	}
 	return
 }
 
-func (m *NodeModule) CopyModules(modules []string) (err error) {
-	nodeModules := path.Join(m.src, "node_modules")
-	log.Printf("copying modules %v into: %s", modules, nodeModules)
-	for _, module := range modules {
-		dst := path.Join(nodeModules, path.Base(module))
-		if err = fs2.CopyDir(module, dst); err != nil {
-			return
+func (m *NodeModule) InjectDependency(module NodeModule) (err error) {
+	log.Println(module, module.Files(), module.Path())
+	nm := path.Join(m.src, "node_modules", path.Base(module.Path()))
+	log.Printf("copying module %v %v into: %s", module.Module, module.pkgJson, nm)
+	return fs.WalkDir(module.Files(), ".", func(s string, d fs.DirEntry, err error) error {
+		log.Println("WalkDir", s, d, err)
+		path.Join(s, d.Name())
+		if d.IsDir() {
+			dst := path.Join(nm, s)
+			if err = os.MkdirAll(dst, 0755); err != nil {
+				return fmt.Errorf("os.MkdirAll: %v", err)
+			}
+			return nil
 		}
-	}
-	return
+		src, err := module.Files().Open(s)
+		if err != nil {
+			return fmt.Errorf("cannot open %s: %s", s, err)
+		}
+		defer src.Close()
+		dst, err := os.Create(path.Join(nm, s))
+		if err != nil {
+			return fmt.Errorf("os.Create: %v", err)
+		}
+		defer dst.Close()
+		_, err = io.Copy(dst, src)
+		if err != nil {
+			return fmt.Errorf("io.Copy: %v", err)
+		}
+		return nil
+	})
 }

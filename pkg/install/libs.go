@@ -6,20 +6,12 @@ import (
 	"os"
 )
 
-func (d *PortalDev) appendPortalModules() {
+func (d *PortalDev) buildJsLibs() {
 	for p := range project.Find[project.NodeModule](os.DirFS(d.root), "pkg") {
-		if p.IsPortalModule() {
-			d.modules = append(d.modules, p.Path())
+		if p.IsPortalLib() {
+			d.modules = append(d.modules, p)
 		}
-	}
-}
-
-func (d *PortalDev) installJsLibs() {
-	for p := range project.Find[project.NodeModule](os.DirFS(d.root), "pkg") {
-		if p.IsPortalModule() {
-			d.modules = append(d.modules, p.Path())
-		}
-		if !p.HasNpmRunBuild() {
+		if !p.CanNpmRunBuild() {
 			continue
 		}
 		if err := p.NpmInstall(); err != nil {
@@ -27,6 +19,14 @@ func (d *PortalDev) installJsLibs() {
 		}
 		if err := p.NpmRunBuild(); err != nil {
 			log.Fatalln(err)
+		}
+	}
+}
+
+func (d *PortalDev) collectPortalLibs() {
+	for p := range project.Find[project.NodeModule](os.DirFS(d.root), "pkg") {
+		if p.IsPortalLib() {
+			d.modules = append(d.modules, p)
 		}
 	}
 }

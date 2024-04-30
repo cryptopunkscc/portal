@@ -9,7 +9,7 @@ type PackageJson struct {
 	Module  string `json:"module,omitempty"`
 	Scripts struct {
 		Build string `json:"build"`
-	} `json:"scripts"`
+	} `json:"scripts,omitempty"`
 }
 
 func LoadPackageJson(files fs.FS) (pkgJson PackageJson, err error) {
@@ -25,6 +25,6 @@ func (p PackageJson) HasBuildScript() bool {
 	return p.Scripts.Build != ""
 }
 
-func (p PackageJson) IsPortalModule() bool {
+func (p PackageJson) IsPortalLib() bool {
 	return p.Module == "portal"
 }

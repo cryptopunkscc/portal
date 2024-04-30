@@ -1,10 +1,13 @@
 package install
 
-import "log"
+import (
+	"github.com/cryptopunkscc/go-astral-js/pkg/project"
+	"log"
+)
 
 type PortalDev struct {
 	root    string
-	modules []string
+	modules []project.NodeModule
 }
 
 func NewPortalDev(root string) *PortalDev {
@@ -40,7 +43,7 @@ func (d *PortalDev) Install(deps ...Dependency) {
 	}
 	if dep&Libs == Libs {
 		log.Println(" * js libs")
-		d.installJsLibs()
+		d.buildJsLibs()
 	}
 	if dep&Apps == Apps {
 		log.Println(" * js apps")

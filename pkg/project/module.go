@@ -13,8 +13,11 @@ type Module struct {
 }
 
 func NewModule(src string) *Module {
-	dir, file := path.Split(src)
-	return NewModuleFS(file, os.DirFS(dir))
+	if path.Ext(src) == ".portal" {
+		dir, file := path.Split(src)
+		return NewModuleFS(file, os.DirFS(dir))
+	}
+	return NewModuleFS(src, os.DirFS(src))
 }
 
 func NewModuleFS(src string, files fs.FS) *Module {
