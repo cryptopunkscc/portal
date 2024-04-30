@@ -21,5 +21,5 @@ func Run(ctx context.Context, bindings runtime.New) (err error) {
 	if !ok {
 		return errors.New("embed launcher not found")
 	}
-	return open.RunTarget(ctx, bindings, target)
+	return open.RunTarget(ctx, bindings, &target)
 }

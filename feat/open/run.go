@@ -14,6 +14,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path"
 )
 
 func Run(
@@ -21,7 +22,7 @@ func Run(
 	bindings runtime.New,
 	src string,
 ) (err error) {
-	var apps []target.Source
+	var apps []target.App
 	if fs.Exists(src) {
 		for app := range project.ProdTargets(os.DirFS(src)) {
 			apps = append(apps, app)
@@ -46,7 +47,7 @@ func Run(
 	ctx, cancel := context.WithCancel(context.Background())
 	for _, t := range apps {
 		go func(t target.Source) {
-			err = RunTargetProcess(ctx, t)
+			err = RunTargetProcess(ctx, path.Join(src, t.Path()))
 			cancel()
 		}(t)
 	}
@@ -58,7 +59,7 @@ func Run(
 func RunTarget(
 	ctx context.Context,
 	bindings runtime.New,
-	app target.Source,
+	app target.App,
 ) (err error) {
 	switch app.Type() {
 
@@ -70,7 +71,7 @@ func RunTarget(
 
 	case target.Frontend:
 		opt := wails.AppOptions(bindings())
-		if err = wails.RunFS(app.Files(), opt); err != nil {
+		if err = wails.Run(app, opt); err != nil {
 			return fmt.Errorf("dev.Run: %v", err)
 		}
 
@@ -80,9 +81,9 @@ func RunTarget(
 	return
 }
 
-func RunTargetProcess(ctx context.Context, target target.Source) (err error) {
-	log.Println("RunTargetProcess: ", target.Path())
-	cmd := exec.CommandContext(ctx, portal.Executable(), target.Path())
+func RunTargetProcess(ctx context.Context, src string) (err error) {
+	log.Println("RunTargetProcess: ", src)
+	cmd := exec.CommandContext(ctx, portal.Executable(), src)
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin

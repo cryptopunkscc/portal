@@ -2,6 +2,7 @@ package dev
 
 import (
 	"fmt"
+	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	common "github.com/cryptopunkscc/go-astral-js/pkg/wails"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -15,7 +16,10 @@ func Run(path string, opt *options.App) (err error) {
 
 	front := path
 	path = path + "/dist"
-	src := os.DirFS(path)
+	src, err := project.NewModule(path).PortalNodeModule()
+	if err != nil {
+		return err
+	}
 	common.SetupOptions(src, opt)
 	if opt.Title == "" {
 		opt.Title = "development"

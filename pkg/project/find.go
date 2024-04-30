@@ -10,14 +10,30 @@ import (
 
 type Project any
 
-func Find[T target.Source](files fs.FS, dir string) (in <-chan T) {
-	var filter T
+func Find[T target.Source](files fs.FS, dir string, filter ...T) (in <-chan T) {
+	var filters []target.Source
+	for _, f := range filter {
+		v := reflect.ValueOf(f)
+		if reflect.TypeOf(f).Kind() != reflect.Pointer {
+			filters = append(filters, f)
+		} else {
+			filters = append(filters, v.Elem().Interface().(target.Source))
+		}
+	}
+	var f T
+	if len(filters) == 0 {
+		filters = append(filters, f)
+	}
 	out := make(chan T)
 	in = out
 	go func() {
 		defer close(out)
-		for project := range FindAll(files, dir, filter) {
-			out <- project.(T)
+		for project := range FindAll(files, dir, filters...) {
+			p, ok := project.(T)
+			if !ok {
+				p = reflect.ValueOf(project).Elem().Interface().(T)
+			}
+			out <- p
 		}
 	}()
 	return
@@ -47,7 +63,7 @@ func FindAll(files fs.FS, dir string, filter ...target.Source) (in <-chan target
 				if err != nil {
 					log.Println("bundle error:", err)
 				}
-				out <- *bundle
+				out <- bundle
 				return nil
 			}
 
@@ -59,31 +75,31 @@ func FindAll(files fs.FS, dir string, filter ...target.Source) (in <-chan target
 			if nodeModule, err := module.NodeModule(); err == nil {
 
 				if portalModule, err := nodeModule.PortalNodeModule(); err == nil {
-					current := portalModule
-					for _, target := range filter {
-						if isSameType(target, *current) {
+					current := *portalModule
+					for _, t := range filter {
+						if isSameType(t, current) {
 							log.Println("portal module detected: ", src)
-							out <- *current
+							out <- &current
 							return fs.SkipDir
 						}
 					}
 				}
-				current := nodeModule
-				for _, target := range filter {
-					if isSameType(target, *current) {
+				current := *nodeModule
+				for _, t := range filter {
+					if isSameType(t, current) {
 						log.Println("node module detected: ", src)
-						out <- *current
+						out <- &current
 						return nil
 					}
 				}
 				return fs.SkipDir
 			}
 			if rawModule, err := module.PortalRawModule(); err == nil {
-				current := rawModule
-				for _, target := range filter {
-					if isSameType(target, *current) {
+				current := *rawModule
+				for _, t := range filter {
+					if isSameType(t, current) {
 						log.Println("raw module detected: ", src)
-						out <- *current
+						out <- &current
 						return fs.SkipDir
 					}
 				}
@@ -100,5 +116,5 @@ func isSameType(target target.Source, current target.Source) bool {
 	if target == matchAll {
 		return true
 	}
-	return reflect.TypeOf(current) == reflect.TypeOf(target)
+	return reflect.TypeOf(current).AssignableTo(reflect.TypeOf(target))
 }

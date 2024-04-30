@@ -17,6 +17,6 @@ func BundleTargets(files fs.FS, dir string) <-chan Bundle {
 	return Find[Bundle](files, dir)
 }
 
-func ProdTargets(files fs.FS) <-chan target.Source {
-	return FindAll(files, ".", PortalRawModule{}, Bundle{})
+func ProdTargets(files fs.FS) <-chan target.App {
+	return Find[target.App](files, ".", &PortalRawModule{}, &Bundle{})
 }

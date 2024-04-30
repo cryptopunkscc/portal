@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/cryptopunkscc/go-astral-js/pkg/assets"
 	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/out/wails"
-	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	bindings "github.com/cryptopunkscc/go-astral-js/pkg/runtime"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/wailsapp/wails/v2/pkg/application"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
@@ -14,45 +14,40 @@ import (
 	"os"
 )
 
-func RunFS(src fs.FS, opt *options.App) (err error) {
-	m, _ := bundle.ReadManifestFs(src)
-	log.Printf("portal open: (%d) %s\n", os.Getpid(), m)
+func Run(src target.App, opt *options.App) (err error) {
+	log.Printf("portal open: (%d) %s\n", os.Getpid(), src.Manifest())
 	SetupOptions(src, opt)
 	app := application.NewWithOptions(opt)
 	err = app.Run()
-	log.Printf("portal close: (%d) %s\n", os.Getpid(), m)
+	log.Printf("portal close: (%d) %s\n", os.Getpid(), src.Manifest())
 	if err != nil {
 		return
 	}
 	return
 }
 
-func SetupOptions(src fs.FS, opt *options.App) {
+func SetupOptions(src target.App, opt *options.App) {
 	// Setup defaults
 	if opt.AssetServer == nil {
 		opt.AssetServer = &assetserver.Options{}
 	}
 
-	apphostJsFs := binding.WailsJsFs
-
 	// Setup manifest
-	manifest, err := bundle.ReadManifestFs(src)
-	if err == nil {
-		opt.Title = manifest.Title
-		if opt.Title == "" {
-			opt.Title = manifest.Name
-		}
-	} else {
-		log.Println("Reading manifest err: ", err)
+	m := src.Manifest()
+	opt.Title = m.Title
+	if opt.Title == "" {
+		opt.Title = m.Name
 	}
 
+	apphostJsFs := binding.WailsJsFs
+
 	// Setup fs assets
-	opt.AssetServer.Assets = assets.ArrayFs{Array: []fs.FS{src, apphostJsFs}}
+	opt.AssetServer.Assets = assets.ArrayFs{Array: []fs.FS{src.Files(), apphostJsFs}}
 
 	// Setup http assets
 	opt.AssetServer.Handler = assets.StoreHandler{
 		Store: &assets.OverlayStore{Stores: []assets.Store{
-			&assets.FsStore{FS: src},
+			&assets.FsStore{FS: src.Files()},
 			&assets.FsStore{FS: apphostJsFs}},
 		},
 	}

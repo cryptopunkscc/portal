@@ -2,6 +2,7 @@ package project
 
 import (
 	"fmt"
+	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"io"
 	"io/fs"
@@ -12,16 +13,20 @@ import (
 
 type NodeModule struct {
 	*Module
-	pkgJson PackageJson
+	pkgJson bundle.PackageJson
 }
 
 func (m *Module) NodeModule() (module *NodeModule, err error) {
-	pkgJson, err := LoadPackageJson(m.files)
+	pkgJson, err := bundle.LoadPackageJson(m.files)
 	if err != nil {
 		return
 	}
 	module = &NodeModule{Module: m, pkgJson: pkgJson}
 	return
+}
+
+func (m *NodeModule) PkgJson() bundle.PackageJson {
+	return m.pkgJson
 }
 
 func (m *NodeModule) IsPortalLib() bool {
@@ -53,11 +58,9 @@ func (m *NodeModule) InjectDependencies(modules []NodeModule) (err error) {
 }
 
 func (m *NodeModule) InjectDependency(module NodeModule) (err error) {
-	log.Println(module, module.Files(), module.Path())
 	nm := path.Join(m.src, "node_modules", path.Base(module.Path()))
-	log.Printf("copying module %v %v into: %s", module.Module, module.pkgJson, nm)
+	log.Printf("copying module %v %v into: %s", module.Path(), module.pkgJson, nm)
 	return fs.WalkDir(module.Files(), ".", func(s string, d fs.DirEntry, err error) error {
-		log.Println("WalkDir", s, d, err)
 		path.Join(s, d.Name())
 		if d.IsDir() {
 			dst := path.Join(nm, s)

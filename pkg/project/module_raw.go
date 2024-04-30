@@ -15,3 +15,7 @@ func (m *Module) PortalRawModule() (module *PortalRawModule, err error) {
 	module = &PortalRawModule{Module: m, manifest: manifest}
 	return
 }
+
+func (p *PortalRawModule) Manifest() bundle.Manifest {
+	return p.manifest
+}

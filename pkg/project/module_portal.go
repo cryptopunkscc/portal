@@ -24,6 +24,18 @@ func (m *NodeModule) PortalNodeModule() (module *PortalNodeModule, err error) {
 	return
 }
 
+func (m *Module) PortalNodeModule() (module *PortalNodeModule, err error) {
+	nm, err := m.NodeModule()
+	if err != nil {
+		return
+	}
+	return nm.PortalNodeModule()
+}
+
+func (m *PortalNodeModule) Manifest() bundle.Manifest {
+	return m.manifest
+}
+
 func (m *PortalNodeModule) PrepareBuild(dependencies ...NodeModule) (err error) {
 	if err = m.Prepare(dependencies...); err != nil {
 		return

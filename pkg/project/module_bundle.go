@@ -36,3 +36,7 @@ func (m *Module) Bundle() (b *Bundle, err error) {
 	}
 	return
 }
+
+func (b *Bundle) Manifest() bundle.Manifest {
+	return b.manifest
+}
