@@ -24,7 +24,7 @@ func Run(
 ) (err error) {
 	var apps []target.App
 	if fs.Exists(src) {
-		for app := range project.ProdTargets(os.DirFS(src)) {
+		for app := range project.Apps(os.DirFS(src)) {
 			apps = append(apps, app)
 		}
 	} else {

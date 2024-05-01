@@ -9,7 +9,7 @@ import (
 )
 
 func Uninstall(id string) (err error) {
-	for target := range project.BundleTargets(os.DirFS(portalAppsDir), ".") {
+	for target := range project.Bundles(os.DirFS(portalAppsDir), ".") {
 		manifest := bundle.Manifest{}
 		_ = manifest.LoadFs(target.Files(), bundle.PortalJson)
 		if manifest.Package == id {

@@ -3,7 +3,6 @@ package appstore
 import (
 	"context"
 	"errors"
-	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
@@ -14,7 +13,6 @@ import (
 
 func Observe(ctx context.Context, conn rpc.Conn) (err error) {
 	log.Println("Observing...")
-
 	err = send(portalAppsDir, conn)
 	if err != nil {
 		return
@@ -40,12 +38,8 @@ func send(
 	src string,
 	conn rpc.Conn,
 ) (err error) {
-	for target := range project.BundleTargets(os.DirFS(src), ".") {
-		m := bundle.Manifest{}
-		if err := m.LoadFs(target.Files(), bundle.PortalJson); err != nil {
-			continue
-		}
-		if err = conn.Encode(m); err != nil {
+	for target := range project.Bundles(os.DirFS(src), ".") {
+		if err = conn.Encode(target.Manifest()); err != nil {
 			return
 		}
 	}

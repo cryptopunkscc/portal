@@ -16,7 +16,7 @@ import (
 
 func RunAll(dir string) (err error) {
 	found := false
-	for target := range project.ProdTargets(os.DirFS(dir)) {
+	for target := range project.Apps(os.DirFS(dir)) {
 		log.Println(target.Path())
 		if err = Run(target.Path()); err != nil {
 			return fmt.Errorf("bundle target %v: %v", target.Path(), err)

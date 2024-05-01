@@ -6,10 +6,13 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
+	"log"
+	"os"
 	"time"
 )
 
 func main() {
+	log.Println("starting portal", os.Args)
 	ctx, cancel := context.WithCancel(context.Background())
 	go exec.OnShutdown(cancel)
 	clir.Run(ctx, func() runtime.Api {

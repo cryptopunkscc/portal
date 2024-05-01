@@ -31,7 +31,7 @@ func (m *Module) Bundle() (b *Bundle, err error) {
 		return
 	}
 	b = &Bundle{
-		Module:   NewModuleFS(m.Path(), reader),
+		Module:   newModuleFS(m.Path(), reader),
 		manifest: manifest,
 	}
 	return

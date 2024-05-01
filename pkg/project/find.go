@@ -1,6 +1,7 @@
 package project
 
 import (
+	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"io/fs"
 	"log"
@@ -8,113 +9,91 @@ import (
 	"reflect"
 )
 
-type Project any
-
-func Find[T target.Source](files fs.FS, dir string, filter ...T) (in <-chan T) {
-	var filters []target.Source
-	for _, f := range filter {
-		v := reflect.ValueOf(f)
-		if reflect.TypeOf(f).Kind() != reflect.Pointer {
-			filters = append(filters, f)
-		} else {
-			filters = append(filters, v.Elem().Interface().(target.Source))
-		}
-	}
-	var f T
-	if len(filters) == 0 {
-		filters = append(filters, f)
-	}
-	out := make(chan T)
-	in = out
-	go func() {
-		defer close(out)
-		for project := range FindAll(files, dir, filters...) {
-			p, ok := project.(T)
-			if !ok {
-				p = reflect.ValueOf(project).Elem().Interface().(T)
-			}
-			out <- p
-		}
-	}()
-	return
+func RawTargets(files fs.FS) <-chan PortalRawModule {
+	return Find[PortalRawModule](files, ".")
 }
 
-func FindAll(files fs.FS, dir string, filter ...target.Source) (in <-chan target.Source) {
-	out := make(chan target.Source)
+func DevTargets(files fs.FS) <-chan PortalNodeModule {
+	return Find[PortalNodeModule](files, ".")
+}
+
+func Bundles(files fs.FS, dir string) <-chan Bundle {
+	return Find[Bundle](files, dir)
+}
+
+func Apps(files fs.FS) <-chan target.App {
+	return Find[target.App](files, ".")
+}
+
+func Find[T target.Source](files fs.FS, dir string) (in <-chan T) {
+	out := make(chan T)
 	in = out
-	if len(filter) == 0 {
-		filter = append(filter, matchAll)
-	}
 	go func() {
 		defer close(out)
 		_ = fs.WalkDir(files, dir, func(src string, d fs.DirEntry, err error) error {
 			if err != nil {
 				return fs.SkipAll
 			}
-			if d.Name() == "node_modules" {
-				return fs.SkipDir
-			}
-
-			if path.Ext(d.Name()) == ".portal" && d.Type().IsRegular() {
-				log.Println("portal bundle detected: ", dir, files, src)
-
-				module := NewModuleFS(src, files)
-				bundle, err := module.Bundle()
-				if err != nil {
-					log.Println("bundle error:", err)
-				}
-				out <- bundle
-				return nil
-			}
-
-			sub, err := fs.Sub(files, src)
-			if err != nil {
-				return err
-			}
-			module := NewModuleFS(src, sub)
-			if nodeModule, err := module.NodeModule(); err == nil {
-
-				if portalModule, err := nodeModule.PortalNodeModule(); err == nil {
-					current := *portalModule
-					for _, t := range filter {
-						if isSameType(t, current) {
-							log.Println("portal module detected: ", src)
-							out <- &current
-							return fs.SkipDir
-						}
-					}
-				}
-				current := *nodeModule
-				for _, t := range filter {
-					if isSameType(t, current) {
-						log.Println("node module detected: ", src)
-						out <- &current
-						return nil
-					}
-				}
-				return fs.SkipDir
-			}
-			if rawModule, err := module.PortalRawModule(); err == nil {
-				current := *rawModule
-				for _, t := range filter {
-					if isSameType(t, current) {
-						log.Println("raw module detected: ", src)
-						out <- &current
-						return fs.SkipDir
-					}
+			sources, err := resolveSources(files, src, d)
+			if sources != nil {
+				t, ok := sources.(T)
+				if ok {
+					log.Println("load: ", reflect.TypeOf(t), src)
+					out <- t
 				}
 			}
-			return nil
+			return err
 		})
 	}()
 	return
 }
 
-var matchAll = NewModuleFS("%all-matcher%", nil)
-
-func isSameType(target target.Source, current target.Source) bool {
-	if target == matchAll {
-		return true
+func resolveSources(files fs.FS, src string, d fs.DirEntry) (result any, err error) {
+	if d.Name() == "node_modules" {
+		return nil, fs.SkipDir
 	}
-	return reflect.TypeOf(current).AssignableTo(reflect.TypeOf(target))
+	if path.Ext(src) == ".portal" && d.Type().IsRegular() {
+		var sub fs.FS
+		if sub, err = fs.Sub(files, path.Dir(src)); err != nil {
+			err = fmt.Errorf("fs.Sub: %v", err)
+			return
+		}
+		var bundle *Bundle
+		bundle, err = newModuleFS(src, sub).Bundle()
+		if err != nil {
+			err = fmt.Errorf("newModuleFS: %v", err)
+			return
+		}
+		result = *bundle
+		err = nil
+		return
+	}
+
+	sub, err := fs.Sub(files, src)
+	if err != nil {
+		return
+	}
+	module := newModuleFS(src, sub)
+	nodeModule, err := module.NodeModule()
+	if err == nil {
+		var portalModule *PortalNodeModule
+		portalModule, err = nodeModule.PortalNodeModule()
+		if err == nil {
+			result = *portalModule
+			err = fs.SkipDir
+			return
+		}
+		result = *nodeModule
+		err = nil
+		return
+	}
+
+	rawModule, err := module.PortalRawModule()
+	if err == nil {
+		result = *rawModule
+		err = fs.SkipDir
+		return
+	}
+	err = nil
+	return
 }

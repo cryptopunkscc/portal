@@ -9,7 +9,7 @@ import (
 )
 
 func Path(appPackage string) (src string, err error) {
-	for target := range project.BundleTargets(os.DirFS(portalAppsDir), ".") {
+	for target := range project.Bundles(os.DirFS(portalAppsDir), ".") {
 		m := bundle.Manifest{}
 		if err = m.LoadFs(target.Files(), bundle.PortalJson); err != nil {
 			return
