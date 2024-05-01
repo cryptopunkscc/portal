@@ -43,7 +43,7 @@ func (m *NodeModule) NpmRunBuild() (err error) {
 
 func (m *NodeModule) NpmInstall() (err error) {
 	if err = exec.Run(m.src, "npm", "install"); err != nil {
-		return fmt.Errorf("cannot install node_modules: %s", err)
+		return fmt.Errorf("cannot install node_modules in %s: %s", m.src, err)
 	}
 	return
 }
