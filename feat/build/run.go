@@ -4,23 +4,16 @@ import (
 	js "github.com/cryptopunkscc/go-astral-js/pkg/binding/out"
 	"github.com/cryptopunkscc/go-astral-js/pkg/list"
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
-	"os"
-	"path"
 )
 
 func Run(dir string) (err error) {
-	root := path.Clean(dir)
-	dir = "."
-	if !path.IsAbs(dir) {
-		dir = root
-		root, err = os.Getwd()
-		if err != nil {
-			return err
-		}
+	base, sub, err := project.Path(dir)
+	if err != nil {
+		return
 	}
 
 	libs := list.Chan(project.Find[project.NodeModule](js.PortalLibFS, "."))
-	if err = project.BuildPortalApps(root, dir, libs...); err != nil {
+	if err = project.BuildPortalApps(base, sub, libs...); err != nil {
 		return
 	}
 	return

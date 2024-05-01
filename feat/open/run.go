@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
+	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
 	"github.com/cryptopunkscc/go-astral-js/pkg/goja"
 	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
@@ -13,8 +14,6 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/wails"
 	"log"
 	"os"
-	"os/exec"
-	"path"
 )
 
 func Run(
@@ -22,39 +21,71 @@ func Run(
 	bindings runtime.New,
 	src string,
 ) (err error) {
-	var apps []target.App
-	log.Println("opening apps...", src)
-	if fs.Exists(src) {
-		for app := range project.Apps(os.DirFS(src)) {
-			apps = append(apps, app)
-		}
-	} else {
-		if src, err = appstore.Path(src); err != nil {
-			return
-		}
-		var bundle *project.Bundle
-		if bundle, err = project.NewModule(src).Bundle(); err != nil {
-			return
-		}
-		apps = append(apps, bundle)
-	}
+
+	apps, err := ResolveApps(src)
 
 	// execute single target in current process
 	if len(apps) == 1 {
-		return RunTarget(ctx, bindings, apps[0])
+		for _, app := range apps {
+			return RunTarget(ctx, bindings, app)
+		}
 	}
 
 	// execute multiple targets as separate processes
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	log.Println("apps", apps)
+
 	for _, t := range apps {
 		go func(t target.Source) {
-			err = RunTargetProcess(ctx, path.Join(src, t.Path()))
+			log.Println("running", t.Path())
+			err = portal.Open(ctx, t.Path()).Run()
+			_ = exec.Shutdown()
 			cancel()
 		}(t)
 	}
+
 	<-ctx.Done()
-	cancel()
+	return
+}
+
+type Apps map[string]target.App
+
+func ResolveApps(src string) (apps Apps, err error) {
+	apps = map[string]target.App{}
+
+	if fs.Exists(src) {
+		// scan src as path for portal apps
+		apps, err = ResolveAppsByPath(src)
+	} else {
+		// resolve app path from appstore using given src as package name
+		apps[src], err = ResolveAppByPackageName(src)
+	}
+	return
+}
+
+func ResolveAppsByPath(src string) (apps Apps, err error) {
+	apps = map[string]target.App{}
+	var base, sub string
+	base, sub, err = project.Path(src)
+	if err != nil {
+		return nil, fmt.Errorf("cannot portal apps path: %v", err)
+	}
+	for app := range project.Find[target.App](os.DirFS(base), sub) {
+		apps[app.Manifest().Package] = app
+	}
+	return
+}
+
+func ResolveAppByPackageName(src string) (app target.App, err error) {
+	if src, err = appstore.Path(src); err != nil {
+		return
+	}
+	var bundle *project.Bundle
+	if bundle, err = project.NewModule(src).Bundle(); err != nil {
+		return
+	}
+	app = bundle
 	return
 }
 
@@ -81,13 +112,4 @@ func RunTarget(
 		return fmt.Errorf("invalid target: %v", app.Path())
 	}
 	return
-}
-
-func RunTargetProcess(ctx context.Context, src string) (err error) {
-	log.Println("RunTargetProcess: ", src)
-	cmd := exec.CommandContext(ctx, portal.Executable(), src)
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-	cmd.Stdin = os.Stdin
-	return cmd.Run()
 }

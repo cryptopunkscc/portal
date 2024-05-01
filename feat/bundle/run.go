@@ -11,18 +11,13 @@ import (
 )
 
 func RunAll(dir string) (err error) {
-	root := path.Clean(dir)
-	dir = "."
-	if !path.IsAbs(dir) {
-		dir = root
-		root, err = os.Getwd()
-		if err != nil {
-			return err
-		}
+	base, sub, err := project.Path(dir)
+	if err != nil {
+		return
 	}
 
 	found := false
-	for app := range project.Find[project.PortalRawModule](os.DirFS(root), dir) {
+	for app := range project.Find[project.PortalRawModule](os.DirFS(base), sub) {
 		if err = Run(app); err != nil {
 			return fmt.Errorf("bundle target %v: %v", app.Path(), err)
 		}

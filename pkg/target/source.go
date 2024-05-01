@@ -5,12 +5,6 @@ import (
 	"io/fs"
 )
 
-type Source interface {
-	Path() string
-	Files() fs.FS
-	Type() Type
-}
-
 type Type int
 
 func (t Type) Has(p Type) bool {
@@ -23,9 +17,15 @@ const (
 	Frontend
 )
 
-type Project interface {
-	NodeModule
-	App
+type Source interface {
+	Path() string
+	Files() fs.FS
+	Type() Type
+}
+
+type Portal interface {
+	Source
+	Manifest() bundle.Manifest
 }
 
 type NodeModule interface {
@@ -33,7 +33,13 @@ type NodeModule interface {
 	PkgJson() bundle.PackageJson
 }
 
+type Project interface {
+	NodeModule
+	Portal
+}
+
 type App interface {
 	Source
-	Manifest() bundle.Manifest
+	Portal
+	App() // required to disable Project to App type casting
 }

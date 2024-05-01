@@ -35,7 +35,9 @@ func (s *App) registerRoute(ctx context.Context, route string) (err error) {
 }
 
 func (s *App) routeQuery(ctx context.Context, query *astral.QueryData) (err error) {
-	s.logger.Println("<", query.Query())
+	if s.logger != nil {
+		s.logger.Println("<", query.Query())
+	}
 
 	// setup
 	r := s.Query(query.Query())

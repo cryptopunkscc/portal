@@ -26,7 +26,7 @@ func Run(src target.App, opt *options.App) (err error) {
 	return
 }
 
-func SetupOptions(src target.App, opt *options.App) {
+func SetupOptions(src target.Portal, opt *options.App) {
 	// Setup defaults
 	if opt.AssetServer == nil {
 		opt.AssetServer = &assetserver.Options{}

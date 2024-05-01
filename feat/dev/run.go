@@ -47,15 +47,15 @@ func Run(
 
 	wait := sync.WaitGroup{}
 
-	for _, target := range backends {
+	for _, t := range backends {
 		wait.Add(1)
 		src := ""
-		src, err = ResolveSrc(target.Path(), "main.js")
+		src, err = ResolveSrc(t.Path(), "main.js")
 		if err != nil {
 			return fmt.Errorf("resolveSrc %v: %v", "main.js", err)
 		}
 
-		go backend.Watcher(target.Path())
+		go backend.Watcher(t.Path())
 
 		if err = backend.Dev(goja.NewBackend(context.TODO()), src, backendEvents); err != nil {
 			return fmt.Errorf("backend.Dev: %v", err)

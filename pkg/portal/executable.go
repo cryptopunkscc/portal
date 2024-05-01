@@ -29,7 +29,7 @@ func Open(ctx context.Context, args ...string) *exec.Cmd {
 	return c
 }
 
-func OpenWithContext(ctx context.Context) func(src string, background bool) (pid int, err error) {
+func Opener(ctx context.Context) func(src string, background bool) (pid int, err error) {
 	return func(src string, background bool) (pid int, err error) {
 		c := Open(ctx, src)
 		if !background {

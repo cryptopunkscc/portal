@@ -1,4 +1,5 @@
 {
+  "name": "example-back-rpc",
   "package": "portal.example.rpc",
   "title": "RPC example backend",
   "version": "1.0.0"
