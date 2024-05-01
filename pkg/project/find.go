@@ -80,7 +80,7 @@ func resolveSources(files fs.FS, src string, d fs.DirEntry) (result any, err err
 		portalModule, err = nodeModule.PortalNodeModule()
 		if err == nil {
 			result = *portalModule
-			err = fs.SkipDir
+			err = nil
 			return
 		}
 		result = *nodeModule

@@ -23,6 +23,7 @@ func Run(
 	src string,
 ) (err error) {
 	var apps []target.App
+	log.Println("opening apps...", src)
 	if fs.Exists(src) {
 		for app := range project.Apps(os.DirFS(src)) {
 			apps = append(apps, app)
@@ -45,6 +46,7 @@ func Run(
 
 	// execute multiple targets as separate processes
 	ctx, cancel := context.WithCancel(context.Background())
+	log.Println("apps", apps)
 	for _, t := range apps {
 		go func(t target.Source) {
 			err = RunTargetProcess(ctx, path.Join(src, t.Path()))

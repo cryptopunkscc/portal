@@ -4,22 +4,27 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/feat/build"
-	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/zip"
-	"io/fs"
-	"log"
 	"os"
 	"path"
 )
 
 func RunAll(dir string) (err error) {
+	root := path.Clean(dir)
+	dir = "."
+	if !path.IsAbs(dir) {
+		dir = root
+		root, err = os.Getwd()
+		if err != nil {
+			return err
+		}
+	}
+
 	found := false
-	for target := range project.Apps(os.DirFS(dir)) {
-		log.Println(target.Path())
-		if err = Run(target.Path()); err != nil {
-			return fmt.Errorf("bundle target %v: %v", target.Path(), err)
+	for app := range project.Find[project.PortalRawModule](os.DirFS(root), dir) {
+		if err = Run(app); err != nil {
+			return fmt.Errorf("bundle target %v: %v", app.Path(), err)
 		}
 		found = true
 	}
@@ -29,39 +34,17 @@ func RunAll(dir string) (err error) {
 	return
 }
 
-func Run(src string) (err error) {
-	srcFs := os.DirFS(src)
-
-	// build dist if needed
-	if stat, err := fs.Stat(srcFs, "package.json"); err == nil && stat.Mode().IsRegular() {
-		if _, err = fs.Stat(srcFs, "dist"); os.IsNotExist(err) {
-			if err = build.Run(src); err != nil {
-				return err
-			}
-		}
-	}
-
-	// load manifest
-	portalJson := bundle.Base(src)
-	if err = portalJson.LoadPath(src, bundle.PortalJson); err != nil {
-		return fmt.Errorf("portalJson.LoadPath: %v", err)
-	}
+func Run(app project.PortalRawModule) (err error) {
 
 	// create build dir
-	buildDir := path.Join(src, "/", "build")
+	buildDir := path.Join(app.Parent().Path(), "build")
 	if err = os.MkdirAll(buildDir, 0775); err != nil && !os.IsExist(err) {
 		return fmt.Errorf("os.MkdirAll: %v", err)
 	}
 
-	// resolve dist dir
-	dist := src
-	if stat, err := fs.Stat(srcFs, "dist"); err == nil && stat.IsDir() {
-		dist = path.Join(src, "dist")
-	}
-
 	// pack dist dir
-	bundleName := fmt.Sprintf("%s_%s.portal", portalJson.Name, portalJson.Version)
-	if err = zip.Pack(dist, path.Join(buildDir, bundleName)); err != nil {
+	bundleName := fmt.Sprintf("%s_%s.portal", app.Manifest().Name, app.Manifest().Version)
+	if err = zip.Pack(app.Path(), path.Join(buildDir, bundleName)); err != nil {
 		return fmt.Errorf("Pack: %v", err)
 	}
 

@@ -12,6 +12,10 @@ type Module struct {
 	files fs.FS
 }
 
+func (m *Module) Parent() *Module {
+	return NewModule(path.Dir(m.src))
+}
+
 func NewModule(src string) *Module {
 	if path.Ext(src) == ".portal" {
 		dir, file := path.Split(src)
