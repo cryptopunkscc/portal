@@ -3,10 +3,10 @@ package apphost
 import (
 	"context"
 	"github.com/cryptopunkscc/astrald/sig"
+	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
 	"io"
 	"log"
-	"math"
 	"strings"
 	"time"
 )
@@ -33,19 +33,16 @@ func (inv *Invoker) Query(identity string, query string) (data string, err error
 		}
 		log.Println("invoked app for:", query)
 
-		initial := 2
-		retries := 10
-		for i := initial; i < retries+initial; i++ {
-			t := 1 * time.Millisecond * time.Duration(math.Pow(2, float64(i)))
-			log.Printf("%d attempt %v retry after %v\n", i-initial, err, t)
-			time.Sleep(t)
-			data, err = inv.Flat.Query(identity, query)
-			if err == nil {
-				log.Println("query succeed")
-				return
+		data, err = exec.Retry[string](8188*time.Millisecond, func(i, n int, d time.Duration) (string, error) {
+			if i == 0 {
+				return data, err
 			}
+			return inv.Flat.Query(identity, query)
+		})
+		if err == nil {
+			log.Println("query succeed")
+			return
 		}
-		log.Println(err)
 	}
 	return
 }

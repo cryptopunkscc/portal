@@ -20,9 +20,12 @@ func Run(ctx context.Context, bindings runtime.New, indicator bool) (err error) 
 	s.RouteFunc("install", appstore.Install)
 	s.RouteFunc("uninstall", appstore.Uninstall)
 
-	if err = s.Run(ctx); err != nil {
-		return
-	}
+	go func() {
+		if err = s.Run(ctx); err != nil {
+			return
+		}
+	}()
+
 	log.Println("portal service started")
 
 	if indicator {

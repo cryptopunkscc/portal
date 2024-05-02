@@ -10,6 +10,7 @@ import (
 	"log"
 	"reflect"
 	"strings"
+	"sync"
 	"unicode"
 )
 
@@ -22,7 +23,7 @@ type Router struct {
 	query         string
 	args          string
 	rpc           *Flow
-	registerRoute func(ctx context.Context, route string) error
+	registerRoute func(route string) (func(ctx context.Context), error)
 }
 
 var ErrMalformedRequest = errors.New("malformed request")
@@ -86,12 +87,14 @@ func (r *Router) Interface(srv any) *Router {
 func (r *Router) Run(ctx context.Context) (err error) {
 	r.registerApi()
 	if len(r.routes) == 0 {
-		go func(r Router, route string) {
-			if err = r.registerRoute(ctx, route); err != nil {
-				panic(err)
-			}
-		}(*r, r.port)
+		var await func(ctx context.Context)
+		if await, err = r.registerRoute(r.port); err == nil {
+			await(ctx)
+		}
+		return
 	}
+	wg := sync.WaitGroup{}
+	wg.Add(len(r.routes))
 	for _, cmd := range r.routes {
 		rr := *r
 		f := "%s.%s"
@@ -99,11 +102,14 @@ func (r *Router) Run(ctx context.Context) (err error) {
 			f = "%s%s"
 		}
 		go func(r Router, route string) {
-			if err = r.registerRoute(ctx, route); err != nil {
-				panic(err)
+			defer wg.Done()
+			var await func(ctx context.Context)
+			if await, err = r.registerRoute(route); err == nil {
+				await(ctx)
 			}
 		}(rr, fmt.Sprintf(f, r.port, cmd))
 	}
+	wg.Wait()
 	return
 }
 

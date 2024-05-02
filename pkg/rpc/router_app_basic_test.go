@@ -123,7 +123,7 @@ func TestApp_Run_basic(t *testing.T) {
 		{query: "func7", arg: structI{1}, expected: structI{1}},
 		//{name: "func7 -i 1", expected: &structI{1}}, //TODO minor consider to fix
 		{query: `func8[{"i":1},{"b":true}]`, expected: struct1{structI{1}, structB{true}}},
-		{query: `func8 -i 1 -b true`, expected: struct1{structI{1}, structB{true}}},
+		{query: `func8 -i 1 -b`, expected: struct1{structI{1}, structB{true}}},
 		{query: `func8`, args: []any{structI{1}, structB{true}}, expected: struct1{structI{1}, structB{true}}},
 		{query: `func9[{"i":1},{"b":true}]`, expected: struct1{structI{1}, structB{true}}},
 		{query: `func9[{"i":1}]`, expected: struct1{structI{1}, structB{false}}},
@@ -157,49 +157,56 @@ func TestApp_Run_basic(t *testing.T) {
 			app := NewApp(port)
 			app.Routes(r...)
 			setHandlers(app)
+
 			ctx, cancel := context.WithCancel(context.Background())
-			if err := app.Run(ctx); err != nil {
-				skip(t, i1, 0, 0, err)
-				t.Fatal(err)
-			}
+			t.Run("backend", func(t *testing.T) {
+				t.Parallel()
+				if err := app.Run(ctx); err != nil {
+					skip(t, i1, 0, 0, err)
+					t.Fatal(err)
+				}
+			})
 			time.Sleep(1 * time.Millisecond)
-			t.Cleanup(cancel)
 
-			for i2, c := range clients {
-				t.Run(fmt.Sprintf("client:%d", i2+1), func(t *testing.T) {
-					for i3, tt := range cases {
-						if tt.client > 0 && tt.client-1 != i2 {
-							continue
+			t.Run("frontend", func(t *testing.T) {
+				t.Parallel()
+				t.Cleanup(cancel)
+				for i2, c := range clients {
+					t.Run(fmt.Sprintf("client:%d", i2+1), func(t *testing.T) {
+						for i3, tt := range cases {
+							if tt.client > 0 && tt.client-1 != i2 {
+								continue
+							}
+							t.Run(fmt.Sprintf("%d.%s", i3+1, tt.query), func(t *testing.T) {
+								client, err := c(t)
+								if err != nil {
+									skip(t, i1, i2, 0, err)
+									t.Fatal(err)
+								}
+								t.Cleanup(client.Flush)
+								args := tt.args
+								if tt.arg != nil {
+									args = append([]any{tt.arg}, args...)
+								}
+								if err := Call(client, tt.query, args...); err != nil {
+									skip(t, i1, i2, i3, err)
+									assert.Equal(t, tt.expected, err)
+									return
+								}
+
+								v := reflect.New(reflect.TypeOf(tt.expected))
+								if err := client.Decode(v.Interface()); err != nil {
+									assert.Equal(t, tt.expected, err)
+									skip(t, i1, i2, i3, err)
+								} else {
+									assert.Equal(t, tt.expected, v.Elem().Interface())
+									skip(t, i1, i2, i3, err)
+								}
+							})
 						}
-						t.Run(fmt.Sprintf("%d.%s", i3+1, tt.query), func(t *testing.T) {
-							client, err := c(t)
-							if err != nil {
-								skip(t, i1, i2, 0, err)
-								t.Fatal(err)
-							}
-							t.Cleanup(client.Flush)
-							args := tt.args
-							if tt.arg != nil {
-								args = append([]any{tt.arg}, args...)
-							}
-							if err := Call(client, tt.query, args...); err != nil {
-								skip(t, i1, i2, i3, err)
-								assert.Equal(t, tt.expected, err)
-								return
-							}
-
-							v := reflect.New(reflect.TypeOf(tt.expected))
-							if err := client.Decode(v.Interface()); err != nil {
-								assert.Equal(t, tt.expected, err)
-								skip(t, i1, i2, i3, err)
-							} else {
-								assert.Equal(t, tt.expected, v.Elem().Interface())
-								skip(t, i1, i2, i3, err)
-							}
-						})
-					}
-				})
-			}
+					})
+				}
+			})
 		})
 	}
 }

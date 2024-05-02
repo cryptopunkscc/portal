@@ -18,14 +18,14 @@ func NewModule(node node.Node, port string) (r *Module) {
 	return
 }
 
-func (m Module) registerRoute(ctx context.Context, route string) (err error) {
+func (m Module) registerRoute(route string) (await func(ctx context.Context), err error) {
 	if err = m.node.LocalRouter().AddRoute(route, m); err != nil {
 		return
 	}
-	go func() {
+	await = func(ctx context.Context) {
 		<-ctx.Done()
 		_ = m.node.LocalRouter().RemoveRoute(route)
-	}()
+	}
 	return
 }
 

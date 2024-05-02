@@ -15,23 +15,26 @@ func NewApp(port string) (s *App) {
 	return
 }
 
-func (s *App) registerRoute(ctx context.Context, route string) (err error) {
+func (s *App) registerRoute(route string) (await func(ctx context.Context), err error) {
 	listener, err := astral.Register(route)
 	if err != nil {
-		panic(err)
+		return
 	}
-	defer listener.Close()
-	done := ctx.Done()
-	queries := listener.QueryCh()
-	for {
-		select {
-		case <-done:
-			return
-		case q := <-queries:
-			ss := *s
-			go ss.routeQuery(ctx, q)
+	await = func(ctx context.Context) {
+		defer listener.Close()
+		done := ctx.Done()
+		queries := listener.QueryCh()
+		for {
+			select {
+			case <-done:
+				return
+			case q := <-queries:
+				ss := *s
+				go ss.routeQuery(ctx, q)
+			}
 		}
 	}
+	return
 }
 
 func (s *App) routeQuery(ctx context.Context, query *astral.QueryData) (err error) {
