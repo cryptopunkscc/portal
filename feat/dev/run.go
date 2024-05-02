@@ -23,7 +23,7 @@ func Run(
 ) (err error) {
 	var backends []project.PortalNodeModule
 	var frontends []project.PortalNodeModule
-	for module := range project.DevTargets(os.DirFS(dir)) {
+	for module := range project.Find[project.PortalNodeModule](os.DirFS(dir), ".") {
 		switch module.Type() {
 		case target.Frontend:
 			frontends = append(frontends, module)

@@ -17,7 +17,7 @@ func Run(ctx context.Context, bindings runtime.New) (err error) {
 			return
 		}
 	}
-	target, ok := <-project.RawTargets(apps.LauncherSvelteFS)
+	target, ok := <-project.Find[project.PortalRawModule](apps.LauncherSvelteFS, ".")
 	if !ok {
 		return errors.New("embed launcher not found")
 	}

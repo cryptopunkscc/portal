@@ -38,7 +38,7 @@ func send(
 	src string,
 	conn rpc.Conn,
 ) (err error) {
-	for target := range project.Bundles(os.DirFS(src), ".") {
+	for target := range project.Find[project.Bundle](os.DirFS(src), ".") {
 		if err = conn.Encode(target.Manifest()); err != nil {
 			return
 		}

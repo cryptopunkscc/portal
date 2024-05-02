@@ -2,6 +2,7 @@ package open
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
@@ -23,6 +24,10 @@ func Run(
 ) (err error) {
 
 	apps, err := ResolveApps(src)
+	if len(apps) == 0 {
+		err = errors.Join(fmt.Errorf("no apps found in %s", src), err)
+		return
+	}
 
 	// execute single target in current process
 	if len(apps) == 1 {

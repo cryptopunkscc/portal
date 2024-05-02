@@ -7,22 +7,8 @@ import (
 	"path"
 )
 
-func RawTargets(files fs.FS) <-chan PortalRawModule {
-	return Find[PortalRawModule](files, ".")
-}
-
-func DevTargets(files fs.FS) <-chan PortalNodeModule {
-	return Find[PortalNodeModule](files, ".")
-}
-
-func Bundles(files fs.FS, dir string) <-chan Bundle {
-	return Find[Bundle](files, dir)
-}
-
-func Apps(files fs.FS) <-chan target.App {
-	return Find[target.App](files, ".")
-}
-
+// Find all portal targets in a given dir and stream through the returned channel.
+// Possible types are: NodeModule, PortalNodeModule, PortalRawModule, Bundle,
 func Find[T target.Source](files fs.FS, dir string) (in <-chan T) {
 	out := make(chan T)
 	in = out
