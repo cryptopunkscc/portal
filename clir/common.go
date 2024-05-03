@@ -11,9 +11,14 @@ type FlagsPath struct {
 	Path string `pos:"1" default:"."`
 }
 
-func cliOpen(ctx context.Context, bindings runtime.New) func(f *FlagsPath) (err error) {
-	return func(f *FlagsPath) (err error) {
-		return open.Run(ctx, bindings, f.Path)
+type FlagsOpen struct {
+	FlagsPath
+	Attach bool `name:"attach" description:"Attach execution to the current process instead of dispatching to portal service."`
+}
+
+func cliOpen(ctx context.Context, bindings runtime.New) func(f *FlagsOpen) (err error) {
+	return func(f *FlagsOpen) (err error) {
+		return open.Run(ctx, bindings, f.Path, f.Attach)
 	}
 }
 

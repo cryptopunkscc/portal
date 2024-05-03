@@ -4,117 +4,71 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
-	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
-	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
-	"github.com/cryptopunkscc/go-astral-js/pkg/goja"
+	"github.com/cryptopunkscc/go-astral-js/feat/serve"
 	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
-	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
-	"github.com/cryptopunkscc/go-astral-js/pkg/target"
-	"github.com/cryptopunkscc/go-astral-js/pkg/wails"
 	"log"
-	"os"
+	"time"
 )
 
 func Run(
 	ctx context.Context,
 	bindings runtime.New,
 	src string,
+	attach bool,
 ) (err error) {
-
-	apps, err := ResolveApps(src)
-	if len(apps) == 0 {
-		err = errors.Join(fmt.Errorf("no apps found in %s", src), err)
-		return
+	log.Println("open.Run", src, attach)
+	// dispatch execution to service
+	if !attach {
+		return Serve(ctx, bindings, src)
 	}
 
-	// execute single target in current process
-	if len(apps) == 1 {
-		for _, app := range apps {
-			return RunTarget(ctx, bindings, app)
-		}
+	// resolve apps from given source
+	apps, err := portal.ResolveApps(src)
+	if len(apps) == 0 {
+		return errors.Join(fmt.Errorf("no apps found in %s", src), err)
 	}
 
 	// execute multiple targets as separate processes
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-	log.Println("apps", apps)
-
-	for _, t := range apps {
-		go func(t target.Source) {
-			log.Println("running", t.Path())
-			err = portal.Open(ctx, t.Path()).Run()
-			_ = exec.Shutdown()
-			cancel()
-		}(t)
+	if len(apps) > 1 {
+		return portal.Spawn(ctx, apps)
 	}
 
-	<-ctx.Done()
+	// execute single target in current process
+	for _, app := range apps {
+		_ = portal.Attach(ctx, bindings, app)
+	}
+
 	return
 }
 
-type Apps map[string]target.App
-
-func ResolveApps(src string) (apps Apps, err error) {
-	apps = map[string]target.App{}
-
-	if fs.Exists(src) {
-		// scan src as path for portal apps
-		apps, err = ResolveAppsByPath(src)
-	} else {
-		// resolve app path from appstore using given src as package name
-		apps[src], err = ResolveAppByPackageName(src)
-	}
-	return
-}
-
-func ResolveAppsByPath(src string) (apps Apps, err error) {
-	apps = map[string]target.App{}
-	var base, sub string
-	base, sub, err = project.Path(src)
-	if err != nil {
-		return nil, fmt.Errorf("cannot portal apps path: %v", err)
-	}
-	for app := range project.Find[target.App](os.DirFS(base), sub) {
-		apps[app.Manifest().Package] = app
-	}
-	return
-}
-
-func ResolveAppByPackageName(src string) (app target.App, err error) {
-	if src, err = appstore.Path(src); err != nil {
-		return
-	}
-	var bundle *project.Bundle
-	if bundle, err = project.NewModule(src).Bundle(); err != nil {
-		return
-	}
-	app = bundle
-	return
-}
-
-func RunTarget(
+func Serve(
 	ctx context.Context,
 	bindings runtime.New,
-	app target.App,
+	src string,
 ) (err error) {
-	switch app.Type() {
+	// dispatch query to service
+	if err = portal.SrvOpenCtx(ctx, src); err == nil {
+		return fmt.Errorf("portal.SrvOpen %v: %v", src, err)
+	}
 
-	case target.Backend:
-		if err = goja.NewBackend(ctx).RunFs(app.Files()); err != nil {
-			return fmt.Errorf("goja.NewBackend().RunSource: %v", err)
+	// wait up to 2 seconds for service start and execute as child process
+	go func() {
+		if err = portal.Await(2 * time.Second); err != nil {
+			log.Println("serve await timout:", err)
 		}
-		<-ctx.Done()
-
-	case target.Frontend:
-		opt := wails.AppOptions(bindings())
-		if err = wails.Run(app, opt); err != nil {
-			return fmt.Errorf("dev.Run: %v", err)
+		go func() {
+			<-ctx.Done()
+			log.Println("serve ctx done")
+		}()
+		if err = portal.SrvOpenCtx(ctx, src); err != nil {
+			log.Printf("serve portal.open %s: %v", src, err)
 		}
+	}()
 
-	default:
-		return fmt.Errorf("invalid target: %v", app.Path())
+	// start portal service
+	if err = serve.Run(ctx, bindings, true); err == nil {
+		err = fmt.Errorf("cannot serve portal: %w", err)
 	}
 	return
 }

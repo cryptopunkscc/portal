@@ -25,26 +25,22 @@ type Flat interface {
 	NodeInfo(identity string) (info NodeInfo, err error)
 }
 
-func NewAdapter(ctx context.Context) Flat {
-	return &Invoker{
-		ctx: ctx,
-		Flat: &FlatAdapter{
-			listeners:   map[string]*astral.Listener{},
-			connections: map[string]*Conn{},
-		},
+func NewAdapter(ctx context.Context, serve Invoke) Flat {
+	flat := &FlatAdapter{
+		listeners:   map[string]*astral.Listener{},
+		connections: map[string]*Conn{},
 	}
+	return NewInvoker(ctx, flat, serve)
 }
 
-func WithTimeout(ctx context.Context) Flat {
+func WithTimeout(ctx context.Context, serve Invoke) Flat {
 	timeout := NewTimout(3*time.Second, func() {
 		_ = syscall.Kill(syscall.Getpid(), syscall.SIGINT)
 	})
-	return &Invoker{
-		ctx: ctx,
-		Flat: &FlatAdapter{
-			listeners:   map[string]*astral.Listener{},
-			connections: map[string]*Conn{},
-			onIdle:      timeout.Enable,
-		},
+	flat := &FlatAdapter{
+		listeners:   map[string]*astral.Listener{},
+		connections: map[string]*Conn{},
+		onIdle:      timeout.Enable,
 	}
+	return NewInvoker(ctx, flat, serve)
 }

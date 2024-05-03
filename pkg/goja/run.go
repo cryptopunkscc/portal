@@ -1,7 +1,6 @@
 package goja
 
 import (
-	"context"
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/out/common"
 	"github.com/dop251/goja"
@@ -16,9 +15,9 @@ type Backend struct {
 	appHostJs string
 }
 
-func NewBackend(ctx context.Context) *Backend {
+func NewBackend(flat apphost.Flat) *Backend {
 	return &Backend{
-		appHost:   apphost.WithTimeout(ctx),
+		appHost:   flat,
 		appHostJs: binding.CommonJsString,
 	}
 }

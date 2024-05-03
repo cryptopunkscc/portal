@@ -1,24 +1,51 @@
 package portal
 
 import (
+	"context"
 	"fmt"
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
-	"io"
+	"log"
 	"time"
 )
 
-var Request = rpc.NewRequest(id.Anyone, "portal")
+var name = "portal"
 
-func Bind(src string) (run func() error, closer io.ReadCloser, err error) {
-	open, err := rpc.QueryFlow(id.Anyone, "portal.open")
+var Request = rpc.NewRequest(id.Anyone, name)
+
+func init() {
+	Request.Logger(log.New(log.Writer(), name+" ", 0))
+}
+
+func SrvOpen(src string) (pid int, err error) {
+	pid, err = rpc.Query[int](Request, "open", src, true)
+	return
+}
+
+func SrvOpenCtx(ctx context.Context, src string) (err error) {
+	open, err := SrvOpenerCtx(ctx)
 	if err != nil {
-		err = fmt.Errorf("portal.Bind failed: %v", err)
+		err = fmt.Errorf("portal.open: %v", err)
 		return
 	}
-	run = func() error { return rpc.Command(open, "", src) }
-	closer = open
+	open(src)
+	return
+}
+
+func SrvOpenerCtx(ctx context.Context) (open func(src string), err error) {
+	var conn rpc.Conn
+	if conn, err = rpc.QueryFlow(id.Anyone, "portal.open"); err != nil {
+		err = fmt.Errorf("portal.opener: %v", err)
+		return
+	}
+	go func() {
+		<-ctx.Done()
+		_ = conn.Close()
+	}()
+	open = func(src string) {
+		_ = rpc.Command(conn, "", src)
+	}
 	return
 }
 
@@ -28,7 +55,7 @@ func Ping() (err error) {
 
 func Await(duration time.Duration) (err error) {
 	err = Ping()
-	_, err = exec.Retry[any](duration, func(i int, n int, duration time.Duration) (_ any, err error) {
+	_, err = exec.RetryT[any](duration, func(i int, n int, duration time.Duration) (_ any, err error) {
 		err = Ping()
 		return
 	})

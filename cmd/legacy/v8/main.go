@@ -28,7 +28,7 @@ func main() {
 	exec.OnShutdown(cancel)
 
 	// bind apphost adapter to js env
-	global, err := v8.Bind(iso, apphost.NewAdapter(ctx))
+	global, err := v8.Bind(iso, apphost.NewAdapter(ctx, nil))
 	if err != nil {
 		log.Fatal(err)
 	}

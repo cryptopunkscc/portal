@@ -57,17 +57,17 @@ func Run(
 
 		go backend.Watcher(t.Path())
 
-		if err = backend.Dev(goja.NewBackend(context.TODO()), src, backendEvents); err != nil {
+		if err = backend.Dev(goja.NewBackend(bindings(target.Backend)), src, backendEvents); err != nil {
 			return fmt.Errorf("backend.Dev: %v", err)
 		}
 	}
 
 	// TODO handle more than one frontend
-	for _, target := range frontends {
+	for _, t := range frontends {
 		wait.Add(1)
-		opt := wails.AppOptions(bindings())
+		opt := wails.AppOptions(bindings(target.Frontend))
 		opt.OnStartup = appendFrontCtx
-		if err = dev.Run(target.Path(), opt); err != nil {
+		if err = dev.Run(t.Path(), opt); err != nil {
 			log.Fatal(fmt.Errorf("dev.Run: %v", err))
 		}
 		return

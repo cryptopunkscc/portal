@@ -15,7 +15,7 @@ func Run(ctx context.Context, bindings runtime.New, indicator bool) (err error) 
 	s.Logger(log.New(log.Writer(), "service ", 0))
 	s.With(bindings)
 	s.RouteFunc("ping", func() {})
-	s.RouteFunc("open", portal.Opener(ctx))
+	s.RouteFunc("open", portal.CmdOpenerCtx(ctx))
 	s.RouteFunc("observe", appstore.Observe)
 	s.RouteFunc("install", appstore.Install)
 	s.RouteFunc("uninstall", appstore.Uninstall)
@@ -26,7 +26,7 @@ func Run(ctx context.Context, bindings runtime.New, indicator bool) (err error) 
 		}
 	}()
 
-	log.Println("portal service started")
+	log.Printf("portal service started tray:%v", indicator)
 
 	if indicator {
 		tray.Run(ctx)

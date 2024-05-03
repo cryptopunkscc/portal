@@ -3,6 +3,7 @@ package project
 import (
 	"os"
 	"path"
+	"strings"
 )
 
 func BuildPortalApps(root, dir string, dependencies ...NodeModule) (err error) {
@@ -27,6 +28,8 @@ func Path(src string) (base, sub string, err error) {
 		if err != nil {
 			return
 		}
+	} else if strings.HasSuffix(src, ".portal") {
+		base, sub = path.Split(src)
 	}
 	return
 }

@@ -5,9 +5,16 @@ import (
 	"time"
 )
 
-func Retry[T any](duration time.Duration, fn func(int, int, time.Duration) (T, error)) (t T, err error) {
-	t, err = fn(0, 0, 0)
-	if err == nil {
+func Retry(duration time.Duration, fn func(int, int, time.Duration) error) (err error) {
+	_, err = RetryT[any](duration, func(i int, i2 int, duration time.Duration) (_ any, err error) {
+		err = fn(i2, i, duration)
+		return
+	})
+	return
+}
+
+func RetryT[T any](duration time.Duration, fn func(int, int, time.Duration) (T, error)) (t T, err error) {
+	if t, err = fn(0, 0, 0); err == nil {
 		return
 	}
 	retries := AwaitExp(duration)

@@ -2,10 +2,9 @@ package apphost
 
 import (
 	"context"
+	"errors"
 	"github.com/cryptopunkscc/astrald/sig"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
-	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
-	"io"
 	"log"
 	"strings"
 	"time"
@@ -14,26 +13,39 @@ import (
 type Invoker struct {
 	Flat
 	ctx       context.Context
-	processes sig.Map[io.Closer, interface{}]
+	cancel    context.CancelFunc
+	processes sig.Map[string, any]
+	invoke    Invoke
+}
+
+func NewInvoker(
+	ctx context.Context,
+	flat Flat,
+	serve Invoke,
+) (i *Invoker) {
+	i = &Invoker{Flat: flat, invoke: serve}
+	i.ctx, i.cancel = context.WithCancel(ctx)
+	return
 }
 
 func (inv *Invoker) Close() error {
-	for _, closer := range inv.processes.Keys() {
-		_ = closer.Close()
-	}
+	inv.cancel()
 	return nil
 }
 
 func (inv *Invoker) Query(identity string, query string) (data string, err error) {
 	data, err = inv.Flat.Query(identity, query)
 	if err != nil && identity == "" {
-		if err := inv.invoke(query); err != nil {
-			log.Println("service not available:", err)
-			return data, err
+		if inv.invoke != nil {
+			if err := inv.invokeApp(query); err != nil && !errors.Is(err, ErrServiceAlreadyRunning) {
+				log.Println("service not available:", err)
+				return data, err
+			} else if err == nil {
+				log.Println("invoked app for:", query)
+			}
 		}
-		log.Println("invoked app for:", query)
 
-		data, err = exec.Retry[string](8188*time.Millisecond, func(i, n int, d time.Duration) (string, error) {
+		data, err = exec.RetryT[string](8188*time.Millisecond, func(i, n int, d time.Duration) (string, error) {
 			if i == 0 {
 				return data, err
 			}
@@ -47,16 +59,24 @@ func (inv *Invoker) Query(identity string, query string) (data string, err error
 	return
 }
 
-func (inv *Invoker) invoke(query string) (err error) {
+func (inv *Invoker) invokeApp(query string) (err error) {
 	src := strings.Split(query, "?")[0]
-	run, closer, err := portal.Bind(src)
+	if _, ok := inv.processes.Set(src, 0); !ok {
+		return ErrServiceAlreadyRunning
+	}
+
+	run, err := inv.invoke(inv.ctx)
 	if err != nil {
 		return
 	}
+
 	go func() {
-		inv.processes.Set(closer, 0)
-		defer inv.processes.Delete(closer)
-		_ = run()
+		run(src)
+		inv.processes.Delete(src)
 	}()
 	return
 }
+
+type Invoke func(ctx context.Context) (func(string), error)
+
+var ErrServiceAlreadyRunning = errors.New("service already running")

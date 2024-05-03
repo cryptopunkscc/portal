@@ -14,7 +14,7 @@ func Run(ctx context.Context) {
 	launcherItem := systray.AddMenuItem("Launcher", "Launcher")
 	go onMenuItemClick(launcherItem, func() {
 		go func() {
-			if err := portal.Open(ctx, "launcher").Run(); err != nil {
+			if err := portal.CmdCtx(ctx, "launcher").Run(); err != nil {
 				log.Println("launcher:", err)
 			}
 		}()

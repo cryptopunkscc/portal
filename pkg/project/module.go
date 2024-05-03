@@ -18,8 +18,8 @@ func (m *Module) Parent() *Module {
 
 func NewModule(src string) *Module {
 	if path.Ext(src) == ".portal" {
-		dir, file := path.Split(src)
-		return newModuleFS(file, os.DirFS(dir))
+		dir, _ := path.Split(src)
+		return newModuleFS(src, os.DirFS(dir))
 	}
 	return newModuleFS(src, os.DirFS(src))
 }

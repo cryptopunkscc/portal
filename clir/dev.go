@@ -23,7 +23,7 @@ import (
 func Run(ctx context.Context, bindings runtime.New) {
 	cli := clir.NewCli(portal.Name, portal.DevDescription, portal.Version)
 
-	flags := &FlagsPath{}
+	flags := &FlagsOpen{}
 	cli.AddFlags(flags)
 	cli.Action(func() error { return cliOpen(ctx, bindings)(flags) })
 

@@ -38,7 +38,7 @@ func main() {
 	w.SetHtml(src)
 
 	// bind apphost adapter to js env
-	w.BindApphost(apphost.NewAdapter(ctx))
+	w.BindApphost(apphost.NewAdapter(ctx, nil))
 
 	// start js application frontend
 	w.Run()

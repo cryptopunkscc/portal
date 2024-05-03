@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"github.com/cryptopunkscc/go-astral-js/apps"
-	"github.com/cryptopunkscc/go-astral-js/feat/open"
 	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
@@ -13,7 +12,7 @@ import (
 
 func Run(ctx context.Context, bindings runtime.New) (err error) {
 	if noService := rpc.Command(portal.Request, "ping") != nil; noService {
-		if err = portal.Open(nil, "serve", "-t").Start(); err != nil {
+		if err = portal.CmdCtx(nil, "serve", "-t").Start(); err != nil {
 			return
 		}
 	}
@@ -21,5 +20,5 @@ func Run(ctx context.Context, bindings runtime.New) (err error) {
 	if !ok {
 		return errors.New("embed launcher not found")
 	}
-	return open.RunTarget(ctx, bindings, &target)
+	return portal.Attach(ctx, bindings, &target)
 }
