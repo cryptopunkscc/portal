@@ -5,7 +5,7 @@ import (
 )
 
 //go:embed portal.js
-var WailsJsString string
+var JsString string
 
 //go:embed portal.js
-var WailsJsFs embed.FS
+var JsFs embed.FS

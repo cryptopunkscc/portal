@@ -16,7 +16,7 @@ func Run(path string, opt *options.App) (err error) {
 
 	front := path
 	path = path + "/dist"
-	src, err := project.NewModule(path).PortalNodeModule()
+	src, err := project.NewModule(front).PortalNodeModule()
 	if err != nil {
 		return err
 	}

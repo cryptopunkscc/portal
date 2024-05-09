@@ -9,8 +9,10 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/feat/bundle"
 	"github.com/cryptopunkscc/go-astral-js/feat/create"
 	"github.com/cryptopunkscc/go-astral-js/feat/dev"
+	"github.com/cryptopunkscc/go-astral-js/feat/open"
 	"github.com/cryptopunkscc/go-astral-js/feat/publish"
 	"github.com/cryptopunkscc/go-astral-js/feat/serve"
+	"github.com/cryptopunkscc/go-astral-js/feat/tray"
 	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/cryptopunkscc/go-astral-js/pkg/template"
@@ -108,6 +110,10 @@ type FlagsSrv struct {
 
 func cliSrv(ctx context.Context, bindings runtime.New) func(f *FlagsSrv) error {
 	return func(f *FlagsSrv) error {
-		return serve.Run(ctx, bindings, f.Tray)
+		var t runtime.Tray
+		if f.Tray {
+			t = tray.Run
+		}
+		return serve.Run(ctx, bindings, open.Handlers, t)
 	}
 }

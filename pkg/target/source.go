@@ -23,6 +23,8 @@ type Source interface {
 	Type() Type
 }
 
+type Portals[T Portal] map[string]T
+
 type Portal interface {
 	Source
 	Manifest() bundle.Manifest

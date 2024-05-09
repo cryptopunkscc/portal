@@ -1,8 +1,8 @@
 package build
 
 import (
+	"github.com/cryptopunkscc/go-astral-js/pkg/arr"
 	js "github.com/cryptopunkscc/go-astral-js/pkg/binding/out"
-	"github.com/cryptopunkscc/go-astral-js/pkg/list"
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 )
 
@@ -12,7 +12,7 @@ func Run(dir string) (err error) {
 		return
 	}
 
-	libs := list.Chan(project.Find[project.NodeModule](js.PortalLibFS, "."))
+	libs := arr.FromChan(project.Find[project.NodeModule](js.PortalLibFS, "."))
 	if err = project.BuildPortalApps(base, sub, libs...); err != nil {
 		return
 	}

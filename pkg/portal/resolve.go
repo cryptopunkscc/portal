@@ -9,10 +9,12 @@ import (
 	"os"
 )
 
-type Apps map[string]target.App
+type Resolve[T target.Portal] func(src string) (apps target.Portals[T], err error)
 
-func ResolveApps(src string) (apps Apps, err error) {
-	apps = map[string]target.App{}
+type Apps target.Portals[target.App]
+
+func ResolveApps(src string) (apps target.Portals[target.App], err error) {
+	apps = make(target.Portals[target.App])
 
 	if fs.Exists(src) {
 		// scan src as path for portal apps
@@ -24,7 +26,7 @@ func ResolveApps(src string) (apps Apps, err error) {
 	return
 }
 
-func ResolveAppsByPath(src string) (apps Apps, err error) {
+func ResolveAppsByPath(src string) (apps target.Portals[target.App], err error) {
 	apps = map[string]target.App{}
 	var base, sub string
 	base, sub, err = project.Path(src)

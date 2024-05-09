@@ -3,8 +3,8 @@ package wails
 import (
 	"context"
 	"github.com/cryptopunkscc/go-astral-js/pkg/assets"
-	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/out/wails"
-	bindings "github.com/cryptopunkscc/go-astral-js/pkg/runtime"
+	"github.com/cryptopunkscc/go-astral-js/pkg/binding/out/wails"
+	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/wailsapp/wails/v2/pkg/application"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -39,7 +39,7 @@ func SetupOptions(src target.Portal, opt *options.App) {
 		opt.Title = m.Name
 	}
 
-	apphostJsFs := binding.WailsJsFs
+	apphostJsFs := wails.JsFs
 
 	// Setup fs assets
 	opt.AssetServer.Assets = assets.ArrayFs{Array: []fs.FS{src.Files(), apphostJsFs}}
@@ -53,7 +53,7 @@ func SetupOptions(src target.Portal, opt *options.App) {
 	}
 }
 
-func AppOptions(app bindings.Api) *options.App {
+func AppOptions(app runtime.Api) *options.App {
 	return &options.App{
 		Width:            1024,
 		Height:           768,

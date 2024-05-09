@@ -5,11 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js"
-	"github.com/cryptopunkscc/go-astral-js/pkg/goja"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
-	"github.com/cryptopunkscc/go-astral-js/pkg/wails"
-	"log"
 	"os"
 	"os/exec"
 	"sync"
@@ -26,30 +22,25 @@ func Executable() string {
 	return executable
 }
 
-func CmdCtx(ctx context.Context, args ...string) *exec.Cmd {
-	e := Executable()
-	log.Println("executable.CmdCtx", e, args)
-	var c *exec.Cmd
-	if ctx != nil {
-		c = exec.CommandContext(ctx, Executable(), args...)
-	} else {
-		c = exec.Command(Executable(), args...)
-	}
-	c.Stdout = os.Stdout
-	c.Stderr = os.Stderr
-	return c
+type CmdOpener[T target.Portal] struct {
+	Resolve[T]
+	action string
 }
 
-func CmdOpenerCtx(ctx context.Context) func(src string, background bool) error {
+func NewCmdOpener[T target.Portal](resolve Resolve[T], action string) *CmdOpener[T] {
+	return &CmdOpener[T]{Resolve: resolve, action: action}
+}
+
+func (o CmdOpener[T]) Open(ctx context.Context) func(src string, background bool) error {
 	run := func(src string) error {
 		// resolve apps from given source
-		apps, err := ResolveApps(src)
+		apps, err := o.Resolve(src)
 		if len(apps) == 0 {
 			return errors.Join(fmt.Errorf("CmdOpenerCtx no apps found in %s", src), err)
 		}
 
 		// execute multiple targets as separate processes
-		return Spawn(ctx, apps)
+		return Spawn[T](nil, ctx, apps, o.action)
 	}
 
 	return func(src string, background bool) error {
@@ -59,23 +50,26 @@ func CmdOpenerCtx(ctx context.Context) func(src string, background bool) error {
 		}
 		return run(src)
 	}
-
 }
 
-func Spawn(
+func Spawn[T target.Portal](
+	wg *sync.WaitGroup,
 	ctx context.Context,
-	apps Apps,
+	apps target.Portals[T],
+	action string,
 ) (err error) {
-	wg := sync.WaitGroup{}
+	if wg == nil {
+		wg = new(sync.WaitGroup)
+	}
 	wg.Add(len(apps))
 	for _, t := range apps {
-		go func(app target.App) {
+		go func(p target.Portal) {
 			defer wg.Done()
-			if app.Type() == target.Frontend {
+			if p.Type() == target.Frontend {
 				// TODO implement a better way to spawn backends before frontends
 				time.Sleep(200 * time.Millisecond)
 			}
-			if err := CmdCtx(ctx, app.Path(), "--attach").Run(); err != nil {
+			if err := CmdCtx(ctx, action, p.Path(), "--attach").Run(); err != nil {
 				return
 			}
 		}(t)
@@ -84,27 +78,14 @@ func Spawn(
 	return
 }
 
-func Attach(
-	ctx context.Context,
-	bindings runtime.New,
-	app target.App,
-) (err error) {
-	switch app.Type() {
-
-	case target.Backend:
-		if err = goja.NewBackend(bindings(app.Type())).RunFs(app.Files()); err != nil {
-			return fmt.Errorf("goja.NewBackend().RunSource: %v", err)
-		}
-		<-ctx.Done()
-
-	case target.Frontend:
-		opt := wails.AppOptions(bindings(app.Type()))
-		if err = wails.Run(app, opt); err != nil {
-			return fmt.Errorf("dev.Run: %v", err)
-		}
-
-	default:
-		return fmt.Errorf("invalid target: %v", app.Path())
+func CmdCtx(ctx context.Context, args ...string) *exec.Cmd {
+	var c *exec.Cmd
+	if ctx != nil {
+		c = exec.CommandContext(ctx, Executable(), args...)
+	} else {
+		c = exec.Command(Executable(), args...)
 	}
-	return
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	return c
 }

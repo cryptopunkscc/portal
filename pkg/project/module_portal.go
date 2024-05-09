@@ -6,9 +6,12 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"os"
 	"path"
 )
+
+var _ target.Project = &PortalNodeModule{}
 
 type PortalNodeModule struct {
 	*NodeModule
