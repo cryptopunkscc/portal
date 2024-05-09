@@ -49,10 +49,10 @@ func Serve(
 ) (err error) {
 	// dispatch query to service
 	if err = portal.SrvOpenCtx(ctx, src); err == nil {
-		return fmt.Errorf("portal.SrvOpen %v: %v", src, err)
+		return
 	}
 
-	// wait up to 2 seconds for service start and execute as child process
+	// wait up to 2 seconds for service start and execute given source as child process
 	go func() {
 		if err = portal.Await(2 * time.Second); err != nil {
 			log.Println("serve await timout:", err)
