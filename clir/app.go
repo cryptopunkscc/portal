@@ -3,6 +3,7 @@
 package clir
 
 import (
+	"context"
 	"github.com/cryptopunkscc/go-astral-js"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/leaanthony/clir"
@@ -10,11 +11,16 @@ import (
 )
 
 func Run(ctx context.Context, bindings runtime.New) {
-	cli := clir.NewCli(portal.Name, portal.ProdDescription, portal.Version)
-	flags := &FlagsPath{}
+	cli := Cli{
+		Cli:      clir.NewCli(portal.Name, portal.ProdDescription, portal.Version),
+		ctx:      ctx,
+		bindings: bindings,
+	}
+
+	flags := &FlagsOpen{}
 	cli.AddFlags(flags)
-	cli.Action(func() error { return cliOpen(cts, bindings)(flags) })
-	cli.NewSubCommand("launcher", "Start portal launcher GUI.").Action(cliLauncher(ctx, bindings))
+	cli.Action(func() error { return cli.Open(flags) })
+	cli.NewSubCommand("launcher", "Start portal launcher GUI.").Action(cli.Launcher)
 	if err := cli.Run(); err != nil {
 		log.Fatalln(err)
 	}

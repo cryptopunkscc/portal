@@ -5,6 +5,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/feat/launcher"
 	"github.com/cryptopunkscc/go-astral-js/feat/open"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
+	"github.com/leaanthony/clir"
 )
 
 type FlagsPath struct {
@@ -16,12 +17,16 @@ type FlagsOpen struct {
 	Attach bool `name:"attach" description:"Attach execution to the current process instead of dispatching to portal service."`
 }
 
-func cliOpen(ctx context.Context, bindings runtime.New) func(f *FlagsOpen) (err error) {
-	return func(f *FlagsOpen) (err error) {
-		return open.Run(ctx, bindings, f.Path, f.Attach)
-	}
+type Cli struct {
+	*clir.Cli
+	ctx      context.Context
+	bindings runtime.New
 }
 
-func cliLauncher(ctx context.Context, bindings runtime.New) func() error {
-	return func() error { return launcher.Run(ctx, bindings) }
+func (c Cli) Open(f *FlagsOpen) (err error) {
+	return open.Run(c.ctx, c.bindings, f.Path, f.Attach)
+}
+
+func (c Cli) Launcher() error {
+	return launcher.Run(c.ctx, c.bindings)
 }

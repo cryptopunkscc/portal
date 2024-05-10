@@ -23,38 +23,28 @@ import (
 )
 
 func Run(ctx context.Context, bindings runtime.New) {
-	cli := clir.NewCli(portal.Name, portal.DevDescription, portal.Version)
+	cli := Cli{
+		Cli:      clir.NewCli(portal.Name, portal.DevDescription, portal.Version),
+		ctx:      ctx,
+		bindings: bindings,
+	}
 
 	flags := &FlagsOpen{}
 	cli.AddFlags(flags)
-	cli.Action(func() error { return cliOpen(ctx, bindings)(flags) })
+	cli.Action(func() error { return cli.Open(flags) })
 
-	cli.NewSubCommand("launcher", "Start portal launcher GUI.").Action(cliLauncher(ctx, bindings))
-	cli.NewSubCommandFunction("create", "Create production bundle.", cliCreate)
-	cli.NewSubCommandFunction("dev", "Run development server for given dir.", cliDevelopment(bindings))
-	cli.NewSubCommandFunction("open", "Execute app from bundle, dir, or file.", cliOpen(ctx, bindings))
-	cli.NewSubCommandFunction("build", "Build application.", cliBuild)
-	cli.NewSubCommandFunction("bundle", "Create production bundle.", cliBundle)
-	cli.NewSubCommandFunction("publish", "Publish bundles from given path to storage", cliPublish)
-	cli.NewSubCommandFunction("install", "Install bundles from given path", cliInstall)
-	cli.NewSubCommandFunction("serve", "Serve api through rpc adapter", cliSrv(ctx, bindings))
+	cli.NewSubCommand("launcher", "Start portal launcher GUI.").Action(cli.Launcher)
+	cli.NewSubCommandFunction("create", "Create production bundle.", cli.Create)
+	cli.NewSubCommandFunction("dev", "Run development server for given dir.", cli.Development)
+	cli.NewSubCommandFunction("open", "Execute app from bundle, dir, or file.", cli.Open)
+	cli.NewSubCommandFunction("build", "Build application.", cli.Build)
+	cli.NewSubCommandFunction("bundle", "Create production bundle.", cli.Bundle)
+	cli.NewSubCommandFunction("publish", "Publish bundles from given path to storage", cli.Publish)
+	cli.NewSubCommandFunction("install", "Install bundles from given path", cli.Install)
+	cli.NewSubCommandFunction("serve", "Serve api through rpc adapter", cli.Srv)
 	if err := cli.Run(); err != nil {
 		log.Fatalln(err)
 	}
-}
-
-func cliDevelopment(bindings runtime.New) func(f *FlagsPath) (err error) {
-	return func(f *FlagsPath) (err error) {
-		return dev.Run(bindings, f.Path)
-	}
-}
-
-func cliBuild(f *FlagsPath) error {
-	return build.Run(f.Path)
-}
-
-func cliBundle(f *FlagsPath) error {
-	return bundle.RunAll(f.Path)
 }
 
 type FlagsInit struct {
@@ -67,19 +57,35 @@ type FlagsInit struct {
 
 var emptyFlagsInit = FlagsInit{}
 
-func cliCreate(f *FlagsInit) error {
+type FlagsSrv struct {
+	Tray bool `name:"t" description:"Display system tray indicator."`
+}
+
+func (c Cli) Development(f *FlagsOpen) (err error) {
+	return dev.Run(c.bindings, f.Path)
+}
+
+func (c Cli) Build(f *FlagsPath) error {
+	return build.Run(f.Path)
+}
+
+func (c Cli) Bundle(f *FlagsPath) error {
+	return bundle.RunAll(f.Path)
+}
+
+func (c Cli) Create(f *FlagsInit) error {
 	switch {
 	case *f == emptyFlagsInit:
-		return cliList()
+		return c.List()
 	case f.List:
-		return cliList()
+		return c.List()
 	default:
 		temps := strings.Split(f.Template, " ")
 		return create.Run(f.Name, f.Dir, temps, f.Force)
 	}
 }
 
-func cliList() error {
+func (c Cli) List() error {
 	templates, err := template.Templates()
 	if err != nil {
 		return err
@@ -96,24 +102,18 @@ func cliList() error {
 	return err
 }
 
-func cliPublish(f *FlagsPath) error {
+func (c Cli) Publish(f *FlagsPath) error {
 	return publish.Run(f.Path)
 }
 
-func cliInstall(f *FlagsPath) error {
+func (c Cli) Install(f *FlagsPath) error {
 	return appstore.Install(f.Path)
 }
 
-type FlagsSrv struct {
-	Tray bool `name:"t" description:"Display system tray indicator."`
-}
-
-func cliSrv(ctx context.Context, bindings runtime.New) func(f *FlagsSrv) error {
-	return func(f *FlagsSrv) error {
-		var t runtime.Tray
-		if f.Tray {
-			t = tray.Run
-		}
-		return serve.Run(ctx, bindings, open.Handlers, t)
+func (c Cli) Srv(f *FlagsSrv) error {
+	var t runtime.Tray
+	if f.Tray {
+		t = tray.Run
 	}
+	return serve.Run(c.ctx, c.bindings, open.Handlers, t)
 }
