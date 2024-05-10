@@ -27,13 +27,13 @@ func main() {
 
 type Adapter struct{ apphost.Flat }
 
-func newRuntimeFactory(ctx context.Context) func(t target.Type) runtime.Api {
-	return func(t target.Type) runtime.Api {
-		switch t {
-		case target.Frontend:
-			return &Adapter{Flat: apphost.NewAdapter(ctx, portal.SrvOpenerCtx)}
+func newRuntimeFactory(ctx context.Context) func(t target.Type, prefix ...string) runtime.Api {
+	return func(t target.Type, prefix ...string) runtime.Api {
+		switch {
+		case t.Is(target.Frontend):
+			return &Adapter{Flat: apphost.NewAdapter(ctx, portal.SrvOpenerCtx, prefix...)}
 		default:
-			return apphost.WithTimeout(ctx, portal.SrvOpenerCtx)
+			return apphost.WithTimeout(ctx, portal.SrvOpenerCtx, prefix...)
 		}
 	}
 }

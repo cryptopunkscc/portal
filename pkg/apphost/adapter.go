@@ -33,6 +33,8 @@ const (
 )
 
 type FlatAdapter struct {
+	prefix []string
+
 	listeners      map[string]*astral.Listener
 	listenersMutex sync.RWMutex
 
@@ -40,6 +42,14 @@ type FlatAdapter struct {
 	connectionsMutex sync.RWMutex
 
 	onIdle func(bool)
+}
+
+func (api *FlatAdapter) port(service string) (port string) {
+	return strings.Join(append(api.Prefix(), service), ".")
+}
+
+func (api *FlatAdapter) Prefix() []string {
+	return api.prefix
 }
 
 func (api *FlatAdapter) Close() error {
@@ -114,7 +124,8 @@ func (api *FlatAdapter) Sleep(duration int64) {
 }
 
 func (api *FlatAdapter) ServiceRegister(service string) (err error) {
-	listener, err := astral.Register(service)
+	port := api.port(service)
+	listener, err := astral.Register(port)
 	if err != nil {
 		return
 	}
@@ -154,9 +165,11 @@ func (api *FlatAdapter) ConnAccept(service string) (data string, err error) {
 	connId := uuid.New().String()
 	api.setConnection(connId, conn)
 
+	query := strings.TrimPrefix(conn.Query(), strings.Join(api.Prefix(), "."))
+	query = strings.TrimPrefix(query, ".")
 	bytes, err := json.Marshal(queryData{
 		Id:    connId,
-		Query: conn.Query(),
+		Query: query,
 	})
 	if err != nil {
 		return
@@ -216,7 +229,7 @@ func (api *FlatAdapter) Query(identity string, query string) (data string, err e
 			return
 		}
 	}
-	conn, err := astral.Query(nid, query)
+	conn, err := astral.Query(nid, api.port(query))
 	if err != nil {
 		return
 	}
@@ -235,7 +248,7 @@ func (api *FlatAdapter) Query(identity string, query string) (data string, err e
 }
 
 func (api *FlatAdapter) QueryName(name string, query string) (data string, err error) {
-	conn, err := astral.QueryName(name, query)
+	conn, err := astral.QueryName(name, api.port(query))
 	if err != nil {
 		return
 	}

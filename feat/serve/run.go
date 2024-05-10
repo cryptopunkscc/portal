@@ -7,10 +7,9 @@ import (
 	"log"
 )
 
-func Run(ctx context.Context, bindings runtime.New, handlers rpc.Handlers, tray runtime.Tray) (err error) {
-	s := rpc.NewApp("portal")
+func Run(ctx context.Context, port string, handlers rpc.Handlers, tray runtime.Tray) (err error) {
+	s := rpc.NewApp(port)
 	s.Logger(log.New(log.Writer(), "service ", 0))
-	s.With(bindings)
 	for name, h := range handlers {
 		s.RouteFunc(name, h)
 	}

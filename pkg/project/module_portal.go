@@ -38,6 +38,10 @@ func (m *Module) PortalNodeModule() (module *PortalNodeModule, err error) {
 	return nm.PortalNodeModule()
 }
 
+func (m PortalNodeModule) Type() target.Type {
+	return m.NodeModule.Type() + target.Dev
+}
+
 func (m *PortalNodeModule) Manifest() bundle.Manifest {
 	return m.manifest
 }

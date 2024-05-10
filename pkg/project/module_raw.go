@@ -1,6 +1,9 @@
 package project
 
-import "github.com/cryptopunkscc/go-astral-js/pkg/bundle"
+import (
+	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
+)
 
 type PortalRawModule struct {
 	*Module
@@ -16,8 +19,12 @@ func (m *Module) PortalRawModule() (module *PortalRawModule, err error) {
 	return
 }
 
-func (p *PortalRawModule) App() {}
+func (m *PortalRawModule) App() {}
 
-func (p *PortalRawModule) Manifest() bundle.Manifest {
-	return p.manifest
+func (m PortalRawModule) Type() target.Type {
+	return m.Module.Type() + target.Dev
+}
+
+func (m *PortalRawModule) Manifest() bundle.Manifest {
+	return m.manifest
 }

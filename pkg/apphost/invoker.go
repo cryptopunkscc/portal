@@ -38,7 +38,7 @@ func (inv *Invoker) Query(identity string, query string) (data string, err error
 	if err != nil && identity == "" {
 		if inv.invoke != nil {
 			if err := inv.invokeApp(query); err != nil && !errors.Is(err, ErrServiceAlreadyRunning) {
-				log.Println("service not available:", err)
+				log.Println("Invoker.Query", inv.port(query), "service not available:", err)
 				return data, err
 			} else if err == nil {
 				log.Println("invoked app for:", query)
@@ -65,7 +65,7 @@ func (inv *Invoker) invokeApp(query string) (err error) {
 		return ErrServiceAlreadyRunning
 	}
 
-	run, err := inv.invoke(inv.ctx)
+	run, err := inv.invoke(inv.Prefix()...)(inv.ctx)
 	if err != nil {
 		return
 	}
@@ -77,6 +77,6 @@ func (inv *Invoker) invokeApp(query string) (err error) {
 	return
 }
 
-type Invoke func(ctx context.Context) (func(string), error)
+type Invoke func(prefix ...string) func(ctx context.Context) (func(query string), error)
 
 var ErrServiceAlreadyRunning = errors.New("service already running")

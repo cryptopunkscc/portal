@@ -36,14 +36,14 @@ func (m *Module) Files() fs.FS {
 	return m.files
 }
 
-func (m *Module) Type() target.Type {
+func (m Module) Type() target.Type {
 	switch {
 	case m.IsFrontend():
 		return target.Frontend
 	case m.IsBackend():
 		return target.Backend
 	default:
-		return target.Invalid
+		return target.None
 	}
 }
 

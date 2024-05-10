@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	common "github.com/cryptopunkscc/go-astral-js/pkg/wails"
-	"github.com/wailsapp/wails/v2"
+	"github.com/wailsapp/wails/v2/pkg/application"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"log"
 	"os"
@@ -14,6 +14,21 @@ import (
 
 func Run(path string, opt *options.App) (err error) {
 
+	// Start frontend dev watcher
+	viteCommand := "npm run dev"
+	stopDevWatcher, url, _, err := runViteWatcher(viteCommand, path, true)
+	if err != nil {
+		return err
+	}
+	log.Println("url: ", url)
+	go func() {
+		quitChannel := make(chan os.Signal, 1)
+		signal.Notify(quitChannel, os.Interrupt, syscall.SIGTERM)
+		<-quitChannel
+		stopDevWatcher()
+	}()
+
+	// setup opt
 	front := path
 	path = path + "/dist"
 	src, err := project.NewModule(front).PortalNodeModule()
@@ -29,28 +44,16 @@ func Run(path string, opt *options.App) (err error) {
 		titleSuffix = exec
 	}
 	opt.Title = fmt.Sprintf("%s - %s", opt.Title, titleSuffix)
-
-	// Start frontend dev watcher
-	runDevWatcherCommand := "npm run dev"
-	stopDevWatcher, url, _, err := runFrontendDevWatcherCommand(front, runDevWatcherCommand, true)
-	if err != nil {
-		return err
-	}
-	log.Println("url: ", url)
-	go func() {
-		quitChannel := make(chan os.Signal, 1)
-		signal.Notify(quitChannel, os.Interrupt, syscall.SIGTERM)
-		<-quitChannel
-		stopDevWatcher()
-	}()
+	opt.LogLevel = 6
 
 	// Setup dev environment
-	os.Setenv("devserver", "localhost:34115")
-	os.Setenv("assetdir", path)
-	os.Setenv("frontenddevserverurl", url)
+	_ = os.Setenv("devserver", "localhost:34115")
+	_ = os.Setenv("assetdir", path)
+	_ = os.Setenv("frontenddevserverurl", url)
 
 	// run
 	log.Println("running wails")
-	opt.LogLevel = 6
-	return wails.Run(opt)
+	app := application.NewWithOptions(opt)
+	err = app.Run()
+	return
 }

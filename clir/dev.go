@@ -62,7 +62,7 @@ type FlagsSrv struct {
 }
 
 func (c Cli) Development(f *FlagsOpen) (err error) {
-	return dev.Run(c.bindings, f.Path)
+	return dev.Run(c.ctx, c.bindings, f.Path, f.Attach)
 }
 
 func (c Cli) Build(f *FlagsPath) error {
@@ -115,5 +115,5 @@ func (c Cli) Srv(f *FlagsSrv) error {
 	if f.Tray {
 		t = tray.Run
 	}
-	return serve.Run(c.ctx, c.bindings, open.Handlers, t)
+	return serve.Run(c.ctx, "portal", open.Handlers, t)
 }

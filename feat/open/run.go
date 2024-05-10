@@ -20,36 +20,37 @@ func Run(
 	src string,
 	attach bool,
 ) (err error) {
-	return portal.Runner[target.App]{
-		Cmd:      "open",
+	r := portal.Runner[target.App]{
+		Action:   "open",
+		Port:     "portal",
 		New:      bindings,
 		Tray:     tray.Run,
 		Serve:    serve.Run,
 		Resolve:  portal.ResolveApps,
 		Attach:   Attach,
 		Handlers: Handlers,
-	}.Run(ctx, src, attach)
+	}
+	return r.Run(ctx, src, attach)
 }
 
 func Attach(
 	ctx context.Context,
 	bindings runtime.New,
 	app target.App,
+	prefix ...string,
 ) (err error) {
-	switch app.Type() {
-
-	case target.Backend:
-		if err = goja.NewBackend(bindings(app.Type())).RunFs(app.Files()); err != nil {
+	typ := app.Type()
+	switch {
+	case typ.Is(target.Backend):
+		if err = goja.NewBackend(bindings(target.Backend, prefix...)).RunFs(app.Files()); err != nil {
 			return fmt.Errorf("goja.NewBackend().RunSource: %v", err)
 		}
 		<-ctx.Done()
-
-	case target.Frontend:
-		opt := wails.AppOptions(bindings(app.Type()))
+	case typ.Is(target.Frontend):
+		opt := wails.AppOptions(bindings(target.Frontend, prefix...))
 		if err = wails.Run(app, opt); err != nil {
 			return fmt.Errorf("dev.Run: %v", err)
 		}
-
 	default:
 		return fmt.Errorf("invalid target: %v", app.Path())
 	}

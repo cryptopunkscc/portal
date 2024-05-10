@@ -3,11 +3,14 @@ package apphost
 import (
 	"context"
 	"github.com/cryptopunkscc/astrald/lib/astral"
+	"log"
 	"syscall"
 	"time"
 )
 
 type Flat interface {
+	port(query string) string
+	Prefix() []string
 	Close() error
 	Interrupt()
 	Log(arg ...any)
@@ -25,21 +28,25 @@ type Flat interface {
 	NodeInfo(identity string) (info NodeInfo, err error)
 }
 
-func NewAdapter(ctx context.Context, serve Invoke) Flat {
+func NewAdapter(ctx context.Context, serve Invoke, prefix ...string) Flat {
+	log.Println("NewAdapter", prefix)
 	flat := &FlatAdapter{
 		listeners:   map[string]*astral.Listener{},
 		connections: map[string]*Conn{},
+		prefix:      append([]string{}, prefix...),
 	}
 	return NewInvoker(ctx, flat, serve)
 }
 
-func WithTimeout(ctx context.Context, serve Invoke) Flat {
-	timeout := NewTimout(3*time.Second, func() {
+func WithTimeout(ctx context.Context, serve Invoke, prefix ...string) Flat {
+	log.Println("NewAdapterWithTimeout", prefix)
+	timeout := NewTimout(5*time.Second, func() {
 		_ = syscall.Kill(syscall.Getpid(), syscall.SIGINT)
 	})
 	flat := &FlatAdapter{
 		listeners:   map[string]*astral.Listener{},
 		connections: map[string]*Conn{},
+		prefix:      append([]string{}, prefix...),
 		onIdle:      timeout.Enable,
 	}
 	return NewInvoker(ctx, flat, serve)

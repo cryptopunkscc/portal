@@ -12,15 +12,19 @@ import (
 	"time"
 )
 
-// runFrontendDevWatcherCommand will run the `frontend:dev:watcher` command if it was given, ex- `npm run dev`
-func runFrontendDevWatcherCommand(frontendDirectory string, devCommand string, discoverViteServerURL bool) (func(), string, string, error) {
+// runViteWatcher will run the `frontend:dev:watcher` command if it was given, ex- `npm run dev`
+func runViteWatcher(
+	command string,
+	frontendDir string,
+	discoverViteURL bool,
+) (close func(), viteUrl string, viteVersion string, err error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	scanner := NewStdoutScanner()
-	cmdSlice := strings.Split(devCommand, " ")
+	cmdSlice := strings.Split(command, " ")
 	cmd := exec.CommandContext(ctx, cmdSlice[0], cmdSlice[1:]...)
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = scanner
-	cmd.Dir = frontendDirectory
+	cmd.Dir = frontendDir
 	setParentGID(cmd)
 
 	if err := cmd.Start(); err != nil {
@@ -28,18 +32,16 @@ func runFrontendDevWatcherCommand(frontendDirectory string, devCommand string, d
 		return nil, "", "", fmt.Errorf("unable to start frontend DevWatcher: %w", err)
 	}
 
-	var viteServerURL string
-	if discoverViteServerURL {
+	if discoverViteURL {
 		select {
 		case serverURL := <-scanner.ViteServerURLChan:
-			viteServerURL = serverURL
+			viteUrl = serverURL
 		case <-time.After(time.Second * 10):
 			cancel()
 			return nil, "", "", errors.New("failed to find Vite server URL")
 		}
 	}
 
-	viteVersion := ""
 	select {
 	case version := <-scanner.ViteServerVersionC:
 		viteVersion = version
@@ -69,11 +71,12 @@ func runFrontendDevWatcherCommand(frontendDirectory string, devCommand string, d
 		wg.Done()
 	}()
 
-	return func() {
+	close = func() {
 		if atomic.CompareAndSwapInt32(&state, stateRunning, stateCanceling) {
-			killProc(cmd, devCommand)
+			killProc(cmd, command)
 		}
 		cancel()
 		wg.Wait()
-	}, viteServerURL, viteVersion, nil
+	}
+	return
 }

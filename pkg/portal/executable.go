@@ -8,6 +8,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"os"
 	"os/exec"
+	"reflect"
 	"sync"
 	"time"
 )
@@ -36,7 +37,7 @@ func (o CmdOpener[T]) Open(ctx context.Context) func(src string, background bool
 		// resolve apps from given source
 		apps, err := o.Resolve(src)
 		if len(apps) == 0 {
-			return errors.Join(fmt.Errorf("CmdOpenerCtx no apps found in %s", src), err)
+			return errors.Join(fmt.Errorf("CmdOpenerCtx %s %v no apps found in %s", o.action, reflect.TypeOf(o.Resolve), src), err)
 		}
 
 		// execute multiple targets as separate processes
@@ -65,7 +66,7 @@ func Spawn[T target.Portal](
 	for _, t := range apps {
 		go func(p target.Portal) {
 			defer wg.Done()
-			if p.Type() == target.Frontend {
+			if p.Type().Is(target.Frontend) {
 				// TODO implement a better way to spawn backends before frontends
 				time.Sleep(200 * time.Millisecond)
 			}

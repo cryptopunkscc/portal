@@ -20,9 +20,6 @@ func Run(src target.App, opt *options.App) (err error) {
 	app := application.NewWithOptions(opt)
 	err = app.Run()
 	log.Printf("portal close: (%d) %s\n", os.Getpid(), src.Manifest())
-	if err != nil {
-		return
-	}
 	return
 }
 

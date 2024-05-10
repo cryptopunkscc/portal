@@ -7,14 +7,15 @@ import (
 
 type Type int
 
-func (t Type) Has(p Type) bool {
+func (t Type) Is(p Type) bool {
 	return t&p == p
 }
 
 const (
-	Invalid Type = iota
-	Backend
-	Frontend
+	None     = Type(0x0)
+	Backend  = Type(0x1)
+	Frontend = Type(0x2)
+	Dev      = Type(0x4)
 )
 
 type Source interface {
