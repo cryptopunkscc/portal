@@ -12,11 +12,3 @@ func checkGo() {
 		log.Fatalln("required go binary have to be installed manually")
 	}
 }
-
-func buildGoDev() {
-	if err := exec.Run(".", "go", "install", "-tags", "dev", "./cmd/portal"); err != nil {
-		log.Fatalln("portal dev install failed: ", err)
-	}
-	log.Println()
-	log.Println("portal dev installed successfully")
-}

@@ -33,11 +33,12 @@ func (d *PortalDev) Install(deps ...Dependency) {
 	if dep == None {
 		dep = All
 	}
-	log.Println("Installing portal...")
+	log.Println("Portal dev installer")
 	if dep&System == System {
 		log.Println(" * native")
 		checkGo()
 		checkNpm()
+		installAstral()
 		installWails()
 		installApt()
 	}
@@ -51,6 +52,6 @@ func (d *PortalDev) Install(deps ...Dependency) {
 	}
 	if dep&Dev == Dev {
 		log.Println(" * portal dev")
-		buildGoDev()
+		buildPortalDev()
 	}
 }
