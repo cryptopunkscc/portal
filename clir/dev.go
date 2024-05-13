@@ -42,6 +42,7 @@ func Run(ctx context.Context, bindings runtime.New) {
 	cli.NewSubCommandFunction("publish", "Publish bundles from given path to storage", cli.Publish)
 	cli.NewSubCommandFunction("install", "Install bundles from given path", cli.Install)
 	cli.NewSubCommandFunction("serve", "Serve api through rpc adapter", cli.Srv)
+	cli.NewSubCommandFunction("-v", "Print version", cli.Version)
 	if err := cli.Run(); err != nil {
 		log.Fatalln(err)
 	}
