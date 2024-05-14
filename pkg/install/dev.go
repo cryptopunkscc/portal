@@ -17,12 +17,13 @@ func NewPortalDev(root string) *PortalDev {
 type Dependency int
 
 const (
-	None   = Dependency(0x0)
-	System = Dependency(0x1)
-	Libs   = Dependency(0x2)
-	Apps   = Dependency(0x4)
-	Dev    = Dependency(0x8)
-	All    = System | Libs | Apps | Dev
+	None   Dependency = 0
+	System Dependency = 1 << (iota - 1)
+	Libs
+	Apps
+	Dev
+	Portal
+	All = System | Libs | Apps | Dev | Portal
 )
 
 func (d *PortalDev) Install(deps ...Dependency) {
@@ -53,5 +54,9 @@ func (d *PortalDev) Install(deps ...Dependency) {
 	if dep&Dev == Dev {
 		log.Println(" * portal dev")
 		buildPortalDev()
+	}
+	if dep&Portal == Portal {
+		log.Println(" * portal")
+		buildPortal()
 	}
 }

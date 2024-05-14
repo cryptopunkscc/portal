@@ -21,7 +21,7 @@ func Run(
 	attach bool,
 ) (err error) {
 	return portal.Runner[target.Portal]{
-		Action:   "dev",
+		Action:   action,
 		Port:     "dev.portal",
 		New:      bindings,
 		Serve:    serve.Run,
@@ -64,9 +64,9 @@ func AttachDev(
 }
 
 var Handlers = rpc.Handlers{
-	"ping":      func() {},
-	"open":      portal.NewCmdOpener(portal.ResolvePortals, "dev").Open,
-	"observe":   appstore.Observe,
-	"install":   appstore.Install,
-	"uninstall": appstore.Uninstall,
+	"ping":    func() {},
+	"open":    portal.NewCmdOpener(portal.ResolvePortals, action).Open,
+	"observe": appstore.Observe,
 }
+
+const action = "o"

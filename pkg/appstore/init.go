@@ -1,11 +1,13 @@
 package appstore
 
 import (
+	"io/fs"
 	"os"
 	"path"
 )
 
 var portalAppsDir string
+var portalAppsFs fs.FS
 
 func init() {
 	dir, err := os.UserCacheDir()
@@ -18,4 +20,5 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+	portalAppsFs = os.DirFS(portalAppsDir)
 }

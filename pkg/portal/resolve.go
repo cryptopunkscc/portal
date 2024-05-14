@@ -7,12 +7,11 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"log"
 	"os"
 )
 
 type Resolve[T target.Portal] func(src string) (apps target.Portals[T], err error)
-
-type Apps target.Portals[target.App]
 
 func ResolveApps(src string) (apps target.Portals[target.App], err error) {
 	apps = make(target.Portals[target.App])
@@ -21,7 +20,7 @@ func ResolveApps(src string) (apps target.Portals[target.App], err error) {
 		apps, err = ResolveAppsByPath(src)
 	} else {
 		// resolve app path from appstore using given src as package name
-		apps[src], err = ResolveAppByPackageName(src)
+		apps[src], err = ResolveAppByNameOrPackage(src)
 		if err != nil {
 			apps = nil
 		}
@@ -42,7 +41,7 @@ func ResolveAppsByPath(src string) (apps target.Portals[target.App], err error) 
 	return
 }
 
-func ResolveAppByPackageName(src string) (app target.App, err error) {
+func ResolveAppByNameOrPackage(src string) (app target.App, err error) {
 	if src, err = appstore.Path(src); err != nil {
 		return
 	}
@@ -53,8 +52,6 @@ func ResolveAppByPackageName(src string) (app target.App, err error) {
 	app = bundle
 	return
 }
-
-type Projects target.Portals[target.Project]
 
 func ResolveProjects(src string) (apps target.Portals[target.Project], err error) {
 	apps = make(target.Portals[target.Project])
@@ -85,6 +82,10 @@ func ResolvePortals(src string) (portals target.Portals[target.Portal], err erro
 		for s, p := range projects {
 			portals[s] = p
 		}
+	}
+	log.Println("Resolved portals from:", src)
+	for s, portal := range portals {
+		log.Println("*", portal.Path(), s)
 	}
 	if len(portals) > 0 {
 		return

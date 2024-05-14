@@ -8,13 +8,13 @@ import (
 	"path"
 )
 
-func Path(appPackage string) (src string, err error) {
+func Path(app string) (src string, err error) {
 	for target := range project.Find[project.Bundle](os.DirFS(portalAppsDir), ".") {
 		m := bundle.Manifest{}
 		if err = m.LoadFs(target.Files(), bundle.PortalJson); err != nil {
 			return
 		}
-		if m.Package == appPackage {
+		if m.Name == app || m.Package == app {
 			src = path.Join(portalAppsDir, target.Path())
 			return
 		}

@@ -5,8 +5,8 @@
   portal.log("test log")
 
   async function run() {
-    let conn = await portal.apphost.query("", "hello")
-    await conn.write("hello I am frontend")
+    let conn = await portal.apphost.query("", "example.basic")
+    await conn.write("hello I am frontend\n")
     let result = await conn.read()
     await conn.close()
     alert(result)
