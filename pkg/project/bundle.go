@@ -1,24 +1,17 @@
-package bundle
+package project
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/zip"
 	"os"
 	"path"
 )
 
-func RunAll(dir string) (err error) {
-	base, sub, err := project.Path(dir)
-	if err != nil {
-		return
-	}
-
+func BundlePortalApps(base, sub string) (err error) {
 	found := false
-	for app := range project.Find[project.PortalRawModule](os.DirFS(base), sub) {
-		if err = Run(app); err != nil {
+	for app := range Find[PortalRawModule](os.DirFS(base), sub) {
+		if err = BundlePortalApp(app); err != nil {
 			return fmt.Errorf("bundle target %v: %v", app.Path(), err)
 		}
 		found = true
@@ -29,7 +22,7 @@ func RunAll(dir string) (err error) {
 	return
 }
 
-func Run(app project.PortalRawModule) (err error) {
+func BundlePortalApp(app PortalRawModule) (err error) {
 
 	// create build dir
 	buildDir := path.Join(app.Parent().Path(), "build")
@@ -44,18 +37,4 @@ func Run(app project.PortalRawModule) (err error) {
 	}
 
 	return
-}
-
-type PackageJson struct {
-	Name        string `json:"name"`
-	Version     string `json:"version"`
-	Description string `json:"description"`
-}
-
-func (pkg *PackageJson) Load(src string) (err error) {
-	bytes, err := os.ReadFile(src)
-	if err != nil {
-		return
-	}
-	return json.Unmarshal(bytes, pkg)
 }

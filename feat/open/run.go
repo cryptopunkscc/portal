@@ -3,8 +3,10 @@ package open
 import (
 	"context"
 	"fmt"
+	"github.com/cryptopunkscc/go-astral-js/feat/install"
 	"github.com/cryptopunkscc/go-astral-js/feat/serve"
 	"github.com/cryptopunkscc/go-astral-js/feat/tray"
+	"github.com/cryptopunkscc/go-astral-js/feat/uninstall"
 	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
 	"github.com/cryptopunkscc/go-astral-js/pkg/goja"
 	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
@@ -61,8 +63,8 @@ var Handlers = rpc.Handlers{
 	"ping":      func() {},
 	"open":      portal.NewCmdOpener(portal.ResolveApps, action).Open,
 	"observe":   appstore.Observe,
-	"install":   appstore.Install,
-	"uninstall": appstore.Uninstall,
+	"install":   install.Run,
+	"uninstall": uninstall.Run,
 }
 
 const action = "o"

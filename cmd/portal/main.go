@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/go-astral-js/clir"
+	"github.com/cryptopunkscc/go-astral-js/feat/apps"
 	"github.com/cryptopunkscc/go-astral-js/feat/install"
-	"github.com/cryptopunkscc/go-astral-js/feat/list"
 	"github.com/cryptopunkscc/go-astral-js/feat/open"
 	"github.com/cryptopunkscc/go-astral-js/feat/uninstall"
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
@@ -26,7 +26,7 @@ func main() {
 	if err := clir.RunPortal(ctx,
 		newRuntimeFactory(ctx),
 		open.Run,
-		list.Run,
+		apps.List,
 		install.Run,
 		uninstall.Run,
 		version.Run,

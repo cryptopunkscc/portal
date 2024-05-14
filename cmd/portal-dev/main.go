@@ -6,13 +6,13 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/feat/build"
 	"github.com/cryptopunkscc/go-astral-js/feat/create"
 	"github.com/cryptopunkscc/go-astral-js/feat/dev"
+	"github.com/cryptopunkscc/go-astral-js/feat/templates"
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
-	"github.com/cryptopunkscc/go-astral-js/pkg/template"
 	"log"
 	"os"
 	"time"
@@ -26,7 +26,7 @@ func main() {
 	if err := clir.RunPortalDev(ctx,
 		newRuntimeFactory(ctx),
 		dev.Run,
-		template.PrintList,
+		templates.List,
 		create.Run,
 		build.Run,
 		version.Run,

@@ -3,9 +3,9 @@ package dev
 import (
 	"context"
 	"fmt"
+	"github.com/cryptopunkscc/go-astral-js/feat/apps"
 	"github.com/cryptopunkscc/go-astral-js/feat/open"
 	"github.com/cryptopunkscc/go-astral-js/feat/serve"
-	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
 	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
@@ -66,7 +66,7 @@ func AttachDev(
 var Handlers = rpc.Handlers{
 	"ping":    func() {},
 	"open":    portal.NewCmdOpener(portal.ResolvePortals, action).Open,
-	"observe": appstore.Observe,
+	"observe": apps.Observe,
 }
 
 const action = "o"
