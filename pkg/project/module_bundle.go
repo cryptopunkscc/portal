@@ -14,7 +14,7 @@ var _ target.App = &Bundle{}
 
 type Bundle struct {
 	target.Source
-	manifest bundle.Manifest
+	manifest *bundle.Manifest
 }
 
 func NewBundle(abs string) (b *Bundle, err error) {
@@ -45,13 +45,13 @@ func ResolveBundle(source target.Source) (b *Bundle, err error) {
 	}
 	b = &Bundle{
 		Source:   s,
-		manifest: m,
+		manifest: &m,
 	}
 	return
 }
 
 func (b *Bundle) App() {}
 
-func (b *Bundle) Manifest() bundle.Manifest {
+func (b *Bundle) Manifest() *bundle.Manifest {
 	return b.manifest
 }

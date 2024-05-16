@@ -31,19 +31,15 @@ type Portals[T Portal] map[string]T
 
 type Portal interface {
 	Source
-	Manifest() bundle.Manifest
+	Manifest() *bundle.Manifest
 }
 
 type NodeModule interface {
 	Source
-	PkgJson() bundle.PackageJson
+	PkgJson() *bundle.PackageJson
 
-	// TODO temprary
-	CanNpmRunBuild() bool
-	NpmInstall() (err error)
-	NpmRunBuild() (err error)
-	InjectDependencies(modules []NodeModule) (err error)
 	IsPortalLib() bool
+	CanNpmRunBuild() bool
 }
 
 type Project interface {

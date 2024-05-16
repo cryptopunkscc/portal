@@ -16,7 +16,7 @@ var _ target.Project = &PortalNodeModule{}
 
 type PortalNodeModule struct {
 	target.NodeModule
-	manifest bundle.Manifest
+	manifest *bundle.Manifest
 }
 
 func NewPortalNodeModule(src string) (module *PortalNodeModule, err error) {
@@ -39,7 +39,7 @@ func ResolvePortalNodeModule(m target.NodeModule) (module *PortalNodeModule, err
 	if err = manifest.LoadFs(sub, bundle.PortalJson); err != nil {
 		return
 	}
-	module = &PortalNodeModule{NodeModule: m, manifest: manifest}
+	module = &PortalNodeModule{NodeModule: m, manifest: &manifest}
 	return
 }
 
@@ -47,62 +47,75 @@ func (m PortalNodeModule) Type() target.Type {
 	return m.NodeModule.Type() + target.Dev
 }
 
-func (m *PortalNodeModule) Manifest() bundle.Manifest {
+func (m *PortalNodeModule) Manifest() *bundle.Manifest {
 	return m.manifest
 }
 
-func (m *PortalNodeModule) PrepareBuild(dependencies ...target.NodeModule) (err error) {
-	if err = m.Prepare(dependencies...); err != nil {
+func BuildPortalApps(root, dir string, dependencies ...target.NodeModule) (err error) {
+	for m := range FindInPath[target.Project](path.Join(root, dir)) {
+
+		if !m.CanNpmRunBuild() {
+			continue
+		}
+		if err = PrepareBuild(m, dependencies); err != nil {
+			return err
+		}
+	}
+	return
+}
+
+func PrepareBuild(m target.Project, dependencies []target.NodeModule) (err error) {
+	if err = Prepare(m, dependencies); err != nil {
 		return
 	}
-	if err = m.Build(); err != nil {
+	if err = Build(m); err != nil {
 		return
 	}
 	return
 }
 
-func (m *PortalNodeModule) Prepare(dependencies ...target.NodeModule) (err error) {
-	if err = m.NpmInstall(); err != nil {
+func Prepare(m target.Project, dependencies []target.NodeModule) (err error) {
+	if err = NpmInstall(m); err != nil {
 		return
 	}
-	if err = m.InjectDependencies(dependencies); err != nil {
+	if err = InjectDependencies(m, dependencies); err != nil {
 		return
 	}
 	return
 }
 
-func (m *PortalNodeModule) Build() (err error) {
+func Build(m target.Project) (err error) {
 	if !m.CanNpmRunBuild() {
 		return errors.New("missing npm build in package.json")
 	}
-	if err = m.NpmRunBuild(); err != nil {
+	if err = NpmRunBuild(m); err != nil {
 		return
 	}
-	if err = m.CopyIcon(); err != nil {
+	if err = CopyIcon(m); err != nil {
 		return
 	}
-	if err = m.CopyManifest(); err != nil {
+	if err = CopyManifest(m); err != nil {
 		return
 	}
 	return
 }
 
-func (m *PortalNodeModule) CopyIcon() (err error) {
-	if m.manifest.Icon == "" {
+func CopyIcon(m target.Project) (err error) {
+	if m.Manifest().Icon == "" {
 		return
 	}
-	iconSrc := path.Join(m.Abs(), m.manifest.Icon)
-	iconName := "icon" + path.Ext(m.manifest.Icon)
+	iconSrc := path.Join(m.Abs(), m.Manifest().Icon)
+	iconName := "icon" + path.Ext(m.Manifest().Icon)
 	iconDst := path.Join(m.Abs(), "dist", iconName)
 	if err = fs.CopyFile(iconSrc, iconDst); err != nil {
 		return
 	}
-	m.manifest.Icon = iconName
+	m.Manifest().Icon = iconName
 	return
 }
 
-func (m *PortalNodeModule) CopyManifest() (err error) {
-	bytes, err := json.Marshal(m.manifest)
+func CopyManifest(m target.Project) (err error) {
+	bytes, err := json.Marshal(m.Manifest())
 	if err != nil {
 		return err
 	}

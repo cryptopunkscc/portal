@@ -15,10 +15,10 @@ func (d *PortalDev) buildJsLibs() {
 		if !p.CanNpmRunBuild() {
 			continue
 		}
-		if err := p.NpmInstall(); err != nil {
+		if err := project.NpmInstall(p); err != nil {
 			log.Fatalln(err)
 		}
-		if err := p.NpmRunBuild(); err != nil {
+		if err := project.NpmRunBuild(p); err != nil {
 			log.Fatalln(err)
 		}
 	}
