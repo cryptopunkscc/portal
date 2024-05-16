@@ -1,4 +1,4 @@
-package dev
+package goja_dev
 
 import (
 	"context"
@@ -26,7 +26,7 @@ func NewBackend(ctx context.Context, bindings runtime.New, project target.Projec
 }
 
 func (b *Backend) Start() (err error) {
-	log.Println("staring dev backend", b.Path())
+	log.Println("staring dev backend", b.Abs())
 	src := ""
 	if src, err = ResolveSrc(b.Path(), "main.js"); err != nil {
 		return fmt.Errorf("resolveSrc %v: %v", "main.js", err)
@@ -44,7 +44,7 @@ func (b *Backend) Start() (err error) {
 }
 
 func (b *Backend) serve() {
-	port := devPort(b)
+	port := target.DevPort(b)
 	s := rpc.NewApp(port)
 	s.Logger(log.New(log.Writer(), port+" ", 0))
 	s.RouteFunc("events", b.events.Subscribe)

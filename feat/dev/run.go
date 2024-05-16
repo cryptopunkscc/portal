@@ -4,12 +4,15 @@ import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/feat/apps"
-	"github.com/cryptopunkscc/go-astral-js/feat/open"
-	"github.com/cryptopunkscc/go-astral-js/feat/serve"
 	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"github.com/cryptopunkscc/go-astral-js/runner/goja"
+	"github.com/cryptopunkscc/go-astral-js/runner/goja_dev"
+	"github.com/cryptopunkscc/go-astral-js/runner/serve"
+	"github.com/cryptopunkscc/go-astral-js/runner/wails"
+	"github.com/cryptopunkscc/go-astral-js/runner/wails_dev"
 	"log"
 	"reflect"
 )
@@ -25,7 +28,7 @@ func Run(
 		Port:     "dev.portal",
 		New:      bindings,
 		Serve:    serve.Run,
-		Resolve:  portal.ResolvePortals,
+		Resolve:  resolvePortals,
 		Attach:   Attach,
 		Handlers: Handlers,
 	}.Run(ctx, src, attach)
@@ -38,34 +41,37 @@ func Attach(
 	_ ...string,
 ) (err error) {
 	log.Println("dev attach", reflect.TypeOf(t), t)
+	prefix := "dev"
 	switch v := t.(type) {
 	case target.App:
-		return open.Attach(ctx, bindings, v, "dev")
+		typ := v.Type()
+		switch {
+		case typ.Is(target.Backend):
+			return goja.Run(ctx, bindings, v, prefix)
+		case typ.Is(target.Frontend):
+			return wails.Run(bindings, v, prefix)
+		default:
+			return fmt.Errorf("invalid app target: %v", v.Path())
+		}
 	case target.Project:
-		return AttachDev(ctx, bindings, v)
+		typ := v.Type()
+		switch {
+		case typ.Is(target.Backend):
+			return goja_dev.NewBackend(ctx, bindings, v).Start()
+		case typ.Is(target.Frontend):
+			return wails_dev.NewFrontend(bindings, v).Start()
+		default:
+			return fmt.Errorf("invalid dev target: %v", t.Path())
+		}
 	}
 	return fmt.Errorf("invalid target type %T", t)
 }
 
-func AttachDev(
-	ctx context.Context,
-	bindings runtime.New,
-	t target.Project,
-) (err error) {
-	typ := t.Type()
-	switch {
-	case typ.Is(target.Backend):
-		return NewBackend(ctx, bindings, t).Start()
-	case typ.Is(target.Frontend):
-		return NewFrontend(bindings, t).Start()
-	default:
-		return fmt.Errorf("invalid target: %v", t.Path())
-	}
-}
+var resolvePortals = portal.ResolvePortals
 
 var Handlers = rpc.Handlers{
 	"ping":    func() {},
-	"open":    portal.NewCmdOpener(portal.ResolvePortals, action).Open,
+	"open":    portal.NewCmdOpener(resolvePortals, action).Open,
 	"observe": apps.Observe,
 }
 

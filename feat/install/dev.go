@@ -49,7 +49,7 @@ func (d *PortalDev) Install(deps ...Dependency) {
 	}
 	if dep&Apps == Apps {
 		log.Println(" * js apps")
-		d.BuildJsApps()
+		d.buildJsApps()
 	}
 	if dep&Dev == Dev {
 		log.Println(" * portal dev")

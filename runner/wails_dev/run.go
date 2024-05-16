@@ -1,4 +1,4 @@
-package dev
+package wails_dev
 
 import (
 	"context"
@@ -37,7 +37,7 @@ func (f *Frontend) Start() (err error) {
 }
 
 func (f *Frontend) serve() {
-	port := devPort(f)
+	port := target.DevPort(f)
 	s := rpc.NewApp(port)
 	s.Logger(log.New(log.Writer(), port+" ", 0))
 	s.RouteFunc("reload", f.Reload)

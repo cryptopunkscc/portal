@@ -1,17 +1,13 @@
 package portal
 
 import (
-	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
-	"log"
 	"path"
 )
-
-type Resolve[T target.Portal] func(src string) (apps target.Portals[T], err error)
 
 func ResolveApps(src string) (apps target.Portals[target.App], err error) {
 	apps = make(target.Portals[target.App])
@@ -38,14 +34,6 @@ func ResolveApps(src string) (apps target.Portals[target.App], err error) {
 	return
 }
 
-func ResolveAppsByPath(src string) (apps target.Portals[target.App], err error) {
-	apps = map[string]target.App{}
-	for app := range project.FindInPath[target.App](src) {
-		apps[app.Manifest().Package] = app
-	}
-	return
-}
-
 func ResolveAppByNameOrPackage(src string) (app target.App, err error) {
 	if src, err = appstore.Path(src); err != nil {
 		return
@@ -58,37 +46,10 @@ func ResolveAppByNameOrPackage(src string) (app target.App, err error) {
 	return
 }
 
-func ResolveProjects(src string) (apps target.Portals[target.Project], err error) {
-	apps = make(target.Portals[target.Project])
-	for app := range project.FindInPath[target.Project](src) {
-		if apps[app.Manifest().Package] == nil {
-			apps[app.Manifest().Package] = app
-		}
+func ResolveAppsByPath(src string) (apps target.Portals[target.App], err error) {
+	apps = map[string]target.App{}
+	for app := range project.FindInPath[target.App](src) {
+		apps[app.Manifest().Package] = app
 	}
-	return
-}
-
-func ResolvePortals(src string) (portals target.Portals[target.Portal], err error) {
-	portals = make(target.Portals[target.Portal])
-	apps, err1 := ResolveApps(src)
-	if err1 == nil {
-		for s, app := range apps {
-			portals[s] = app
-		}
-	}
-
-	projects, err2 := ResolveProjects(src)
-	if err2 == nil {
-		for s, p := range projects {
-			portals[s] = p
-		}
-	}
-	for s, portal := range portals {
-		log.Println("*", portal.Abs(), s)
-	}
-	if len(portals) > 0 {
-		return
-	}
-	err = errors.Join(fmt.Errorf("cannot find portal %v for ", src), err1, err2)
 	return
 }

@@ -34,3 +34,26 @@ flowchart
     portal.open["astral.Query(portal.open)"]
     portal.SrvOpenCtx2[portal.SrvOpenCtx]
 ```
+
+V2
+```mermaid
+flowchart
+
+
+    dispatch -. run if needed .-> serve
+    dispatch -- open --> serve
+    serve -- spawn --> serve
+    serve --> attach
+    attach --> goja_app
+    attach --> goja_dev
+    attach --> wails_app
+    attach --> wails_dev
+    
+    dispatch([dispatch])
+    serve[[serve]]
+    attach{attach}
+    goja_app[[goja_app]]
+    goja_dev[[goja_dev]]
+    wails_app[[wails_app]]
+    wails_dev[[wails_dev]]
+```

@@ -44,12 +44,13 @@ func main() {
 type Adapter struct{ apphost.Flat }
 
 func newRuntimeFactory(ctx context.Context) func(t target.Type, prefix ...string) runtime.Api {
+	opener := portal.SrvOpenerCtx
 	return func(t target.Type, prefix ...string) runtime.Api {
 		switch {
 		case t.Is(target.Frontend):
-			return &Adapter{Flat: apphost.NewAdapter(ctx, portal.SrvOpenerCtx, prefix...)}
+			return &Adapter{Flat: apphost.NewAdapter(ctx, opener, prefix...)}
 		default:
-			return apphost.WithTimeout(ctx, portal.SrvOpenerCtx, prefix...)
+			return apphost.WithTimeout(ctx, opener, prefix...)
 		}
 	}
 }

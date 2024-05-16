@@ -29,6 +29,8 @@ type CmdOpener[T target.Portal] struct {
 	action string
 }
 
+type Resolve[T target.Portal] func(src string) (apps target.Portals[T], err error)
+
 func NewCmdOpener[T target.Portal](resolve Resolve[T], action string) *CmdOpener[T] {
 	return &CmdOpener[T]{Resolve: resolve, action: action}
 }

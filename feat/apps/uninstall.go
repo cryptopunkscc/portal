@@ -1,7 +1,7 @@
-package uninstall
+package apps
 
 import "github.com/cryptopunkscc/go-astral-js/pkg/appstore"
 
-func Run(id string) error {
+func Uninstall(id string) error {
 	return appstore.Uninstall(id)
 }
