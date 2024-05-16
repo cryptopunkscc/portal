@@ -1,11 +1,13 @@
 package project
 
 import (
-	"os"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"path"
 )
 
-func BuildPortalApps(root, dir string, dependencies ...NodeModule) (err error) {
-	for m := range Find[PortalNodeModule](os.DirFS(root), dir) {
+func BuildPortalApps(root, dir string, dependencies ...target.NodeModule) (err error) {
+	for m := range FindInPath[*PortalNodeModule](path.Join(root, dir)) {
+
 		if !m.CanNpmRunBuild() {
 			continue
 		}

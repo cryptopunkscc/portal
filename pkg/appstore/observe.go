@@ -8,7 +8,6 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	"io"
 	"log"
-	"os"
 )
 
 func Observe(ctx context.Context, conn rpc.Conn) (err error) {
@@ -38,7 +37,7 @@ func send(
 	src string,
 	conn rpc.Conn,
 ) (err error) {
-	for target := range project.Find[project.Bundle](os.DirFS(src), ".") {
+	for target := range project.FindInPath[*project.Bundle](src) {
 		if err = conn.Encode(target.Manifest()); err != nil {
 			return
 		}

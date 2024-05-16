@@ -24,13 +24,13 @@ func NewFrontend(bindings runtime.New, project target.Project) *Frontend {
 }
 
 func (f *Frontend) Start() (err error) {
-	log.Println("starting dev frontend", f.Path())
+	log.Println("starting dev frontend", f.Abs())
 	opt := wails.AppOptions(f.New(target.Frontend, "dev"))
 	opt.OnStartup = func(ctx context.Context) {
 		f.frontCtx = ctx
 		go f.serve()
 	}
-	if err = wailsdev.Run(f.Path(), opt); err != nil {
+	if err = wailsdev.Run(f.Abs(), opt); err != nil {
 		log.Fatal(fmt.Errorf("dev.Run: %v", err))
 	}
 	return

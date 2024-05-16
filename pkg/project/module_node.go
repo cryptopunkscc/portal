@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"io"
 	"io/fs"
 	"log"
@@ -12,16 +13,20 @@ import (
 )
 
 type NodeModule struct {
-	*Module
+	target.Source
 	pkgJson bundle.PackageJson
 }
 
-func (m *Module) NodeModule() (module *NodeModule, err error) {
-	pkgJson, err := bundle.LoadPackageJson(m.files)
+func ResolveNodeModule(m target.Source) (module *NodeModule, err error) {
+	sub, err := fs.Sub(m.Files(), m.Path())
 	if err != nil {
 		return
 	}
-	module = &NodeModule{Module: m, pkgJson: pkgJson}
+	pkgJson, err := bundle.LoadPackageJson(sub)
+	if err != nil {
+		return
+	}
+	module = &NodeModule{Source: m, pkgJson: pkgJson}
 	return
 }
 
@@ -38,17 +43,17 @@ func (m *NodeModule) CanNpmRunBuild() bool {
 }
 
 func (m *NodeModule) NpmRunBuild() (err error) {
-	return exec.Run(m.src, "npm", "run", "build")
+	return exec.Run(m.Abs(), "npm", "run", "build")
 }
 
 func (m *NodeModule) NpmInstall() (err error) {
-	if err = exec.Run(m.src, "npm", "install"); err != nil {
-		return fmt.Errorf("cannot install node_modules in %s: %s", m.src, err)
+	if err = exec.Run(m.Abs(), "npm", "install"); err != nil {
+		return fmt.Errorf("cannot install node_modules in %s: %s", m.Abs(), err)
 	}
 	return
 }
 
-func (m *NodeModule) InjectDependencies(modules []NodeModule) (err error) {
+func (m *NodeModule) InjectDependencies(modules []target.NodeModule) (err error) {
 	for _, module := range modules {
 		if err = m.InjectDependency(module); err != nil {
 			return
@@ -57,9 +62,9 @@ func (m *NodeModule) InjectDependencies(modules []NodeModule) (err error) {
 	return
 }
 
-func (m *NodeModule) InjectDependency(module NodeModule) (err error) {
-	nm := path.Join(m.src, "node_modules", path.Base(module.Path()))
-	log.Printf("copying module %v %v into: %s", module.Path(), module.pkgJson, nm)
+func (m *NodeModule) InjectDependency(module target.NodeModule) (err error) {
+	nm := path.Join(m.Abs(), "node_modules", path.Base(module.Abs()))
+	log.Printf("copying module %v %v into: %s", module.Abs(), module.PkgJson(), nm)
 	return fs.WalkDir(module.Files(), ".", func(s string, d fs.DirEntry, err error) error {
 		path.Join(s, d.Name())
 		if d.IsDir() {

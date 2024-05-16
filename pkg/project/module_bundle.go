@@ -3,36 +3,49 @@ package project
 import (
 	"archive/zip"
 	"bytes"
+	"errors"
 	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"io/fs"
 	"log"
-	"path"
 )
 
+var _ target.App = &Bundle{}
+
 type Bundle struct {
-	*Module
+	target.Source
 	manifest bundle.Manifest
 }
 
-func (m *Module) Bundle() (b *Bundle, err error) {
+func NewBundle(abs string) (b *Bundle, err error) {
+	return ResolveBundle(NewModule(abs))
+}
 
-	file, err := fs.ReadFile(m.files, path.Base(m.Path()))
+func ResolveBundle(source target.Source) (b *Bundle, err error) {
+	if !source.Type().Is(target.Bundle) {
+		err = errors.New("not a bundle")
+		return
+	}
+
+	file, err := fs.ReadFile(source.Files(), source.Path())
 	if err != nil {
 		return
 	}
 
 	reader, err := zip.NewReader(bytes.NewReader(file), int64(len(file)))
 	if err != nil {
-		log.Println("reader err", err, m.Path())
+		log.Println("reader err", err, source.Path())
 		return
 	}
-	manifest, err := bundle.ReadManifestFs(reader)
+	s := NewModuleFS(reader, source.Path())
+	s.abs = source.Abs()
+	m, err := bundle.ReadManifestFs(reader)
 	if err != nil {
 		return
 	}
 	b = &Bundle{
-		Module:   newModuleFS(m.Path(), reader),
-		manifest: manifest,
+		Source:   s,
+		manifest: m,
 	}
 	return
 }

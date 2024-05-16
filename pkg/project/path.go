@@ -21,3 +21,14 @@ func Path(src string) (base, sub string, err error) {
 	}
 	return
 }
+
+func Abs(src string) string {
+	if path.IsAbs(src) {
+		return src
+	}
+	base, err := os.Getwd()
+	if err != nil {
+		return src
+	}
+	return path.Join(base, src)
+}

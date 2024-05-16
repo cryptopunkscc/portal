@@ -9,11 +9,7 @@ import (
 )
 
 func Install(src string) (err error) {
-	base, sub, err := project.Path(src)
-	if err != nil {
-		return err
-	}
-	for target := range project.Find[project.Bundle](os.DirFS(base), sub) {
+	for target := range project.FindInPath[*project.Bundle](src) {
 		wd := ""
 		wd, err = os.Getwd()
 		if err != nil {

@@ -8,7 +8,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"log"
-	"os"
+	"path"
 )
 
 type Resolve[T target.Portal] func(src string) (apps target.Portals[T], err error)
@@ -16,26 +16,31 @@ type Resolve[T target.Portal] func(src string) (apps target.Portals[T], err erro
 func ResolveApps(src string) (apps target.Portals[target.App], err error) {
 	apps = make(target.Portals[target.App])
 	if fs.Exists(src) {
+		if path.Base(src) == src {
+			if apps[src], err = ResolveAppByNameOrPackage(src); err == nil {
+				return
+			}
+		}
+
 		// scan src as path for portal apps
-		apps, err = ResolveAppsByPath(src)
+		if apps, err = ResolveAppsByPath(src); err == nil {
+			return
+		}
+
 	} else {
 		// resolve app path from appstore using given src as package name
-		apps[src], err = ResolveAppByNameOrPackage(src)
-		if err != nil {
-			apps = nil
+		if apps[src], err = ResolveAppByNameOrPackage(src); err == nil {
+			return
 		}
 	}
+
+	apps = nil
 	return
 }
 
 func ResolveAppsByPath(src string) (apps target.Portals[target.App], err error) {
 	apps = map[string]target.App{}
-	var base, sub string
-	base, sub, err = project.Path(src)
-	if err != nil {
-		return nil, fmt.Errorf("cannot portal apps path: %v", err)
-	}
-	for app := range project.Find[target.App](os.DirFS(base), sub) {
+	for app := range project.FindInPath[target.App](src) {
 		apps[app.Manifest().Package] = app
 	}
 	return
@@ -46,8 +51,8 @@ func ResolveAppByNameOrPackage(src string) (app target.App, err error) {
 		return
 	}
 	var bundle *project.Bundle
-	if bundle, err = project.NewModule(src).Bundle(); err != nil {
-		return nil, fmt.Errorf("cannot portal apps path: %v", err)
+	if bundle, err = project.NewBundle(src); err != nil {
+		return nil, fmt.Errorf("cannot resolve portal apps path from '%s': %v", src, err)
 	}
 	app = bundle
 	return
@@ -55,12 +60,7 @@ func ResolveAppByNameOrPackage(src string) (app target.App, err error) {
 
 func ResolveProjects(src string) (apps target.Portals[target.Project], err error) {
 	apps = make(target.Portals[target.Project])
-	var base, sub string
-	base, sub, err = project.Path(src)
-	if err != nil {
-		return nil, fmt.Errorf("cannot portal apps path: %v", err)
-	}
-	for app := range project.Find[target.Project](os.DirFS(base), sub) {
+	for app := range project.FindInPath[target.Project](src) {
 		if apps[app.Manifest().Package] == nil {
 			apps[app.Manifest().Package] = app
 		}
@@ -83,9 +83,8 @@ func ResolvePortals(src string) (portals target.Portals[target.Portal], err erro
 			portals[s] = p
 		}
 	}
-	log.Println("Resolved portals from:", src)
 	for s, portal := range portals {
-		log.Println("*", portal.Path(), s)
+		log.Println("*", portal.Abs(), s)
 	}
 	if len(portals) > 0 {
 		return

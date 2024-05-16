@@ -8,24 +8,37 @@ import (
 )
 
 type Module struct {
+	abs   string
 	src   string
 	files fs.FS
 }
 
-func (m *Module) Parent() *Module {
-	return NewModule(path.Dir(m.src))
-}
-
-func NewModule(src string) *Module {
-	if path.Ext(src) == ".portal" {
-		dir, _ := path.Split(src)
-		return newModuleFS(src, os.DirFS(dir))
+func (m *Module) Abs() string {
+	if m.abs != "" {
+		return m.abs
 	}
-	return newModuleFS(src, os.DirFS(src))
+	return m.src
 }
 
-func newModuleFS(src string, files fs.FS) *Module {
-	return &Module{src: src, files: files}
+func (m *Module) Parent() target.Source {
+	return NewModule(path.Dir(m.Abs()))
+}
+
+func NewModule(src string) (m *Module) {
+	m = &Module{}
+	m.abs = Abs(src)
+	if path.Ext(src) == ".portal" {
+		m.src = path.Base(src)
+		m.files = os.DirFS(path.Dir(m.abs))
+	} else {
+		m.src = "."
+		m.files = os.DirFS(m.abs)
+	}
+	return
+}
+
+func NewModuleFS(files fs.FS, src string) *Module {
+	return &Module{files: files, src: src}
 }
 
 func (m *Module) Path() string {
@@ -36,19 +49,22 @@ func (m *Module) Files() fs.FS {
 	return m.files
 }
 
-func (m Module) Type() target.Type {
+func (m Module) Type() (t target.Type) {
 	switch {
 	case m.IsFrontend():
-		return target.Frontend
+		t += target.Frontend
 	case m.IsBackend():
-		return target.Backend
-	default:
-		return target.None
+		t += target.Backend
 	}
+	// TODO verify blob type in addition
+	if path.Ext(m.src) == ".portal" {
+		t += target.Bundle
+	}
+	return
 }
 
 func (m *Module) IsFrontend() bool {
-	stat, err := fs.Stat(m.files, "index.html")
+	stat, err := fs.Stat(m.Files(), "index.html")
 	if err != nil {
 		return false
 	}
@@ -56,6 +72,21 @@ func (m *Module) IsFrontend() bool {
 }
 
 func (m *Module) IsBackend() bool {
-	_, err := fs.Stat(m.files, "index.html")
-	return err != nil
+	stat, err := fs.Stat(m.files, "main.js")
+	if err != nil {
+		return false
+	}
+	return stat.Mode().IsRegular()
+}
+
+func (m *Module) Lift() (mm *Module) {
+	mm = &(*m)
+	if path.Ext(m.Path()) == "" {
+		mm.files, _ = fs.Sub(mm.Files(), mm.Path())
+		mm.src = "."
+	} else {
+		mm.files, _ = fs.Sub(mm.Files(), path.Dir(mm.Path()))
+		mm.src = path.Base(mm.Path())
+	}
+	return
 }

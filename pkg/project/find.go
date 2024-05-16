@@ -1,27 +1,46 @@
 package project
 
 import (
-	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"io/fs"
 	"path"
+	"reflect"
 )
+
+func FindInPath[T target.Source](src string) (in <-chan T) {
+	return Find[T](NewModule(src))
+}
+
+func FindInFS[T target.Source](src fs.FS) (in <-chan T) {
+	return Find[T](NewModuleFS(src, "."))
+}
 
 // Find all portal targets in a given dir and stream through the returned channel.
 // Possible types are: NodeModule, PortalNodeModule, PortalRawModule, Bundle,
-func Find[T target.Source](files fs.FS, dir string) (in <-chan T) {
+func Find[T target.Source](source target.Source) (in <-chan T) {
 	out := make(chan T)
 	in = out
-	var t T
 	go func() {
 		defer close(out)
-		_ = fs.WalkDir(files, dir, func(src string, d fs.DirEntry, err error) error {
+		if source.Type().Is(target.Bundle) {
+			var sources target.Source
+			sources, _ = ResolveBundle(NewModule(source.Abs()))
+			if sources != nil && !reflect.ValueOf(sources).IsNil() {
+				switch t := sources.(type) {
+				case T:
+					out <- t
+				}
+			}
+			return
+		}
+
+		_ = fs.WalkDir(source.Files(), source.Path(), func(src string, d fs.DirEntry, err error) error {
 			if err != nil {
 				return fs.SkipAll
 			}
-			sources, err := resolveSources(files, src, d, (any)(t) == nil)
-			if sources != nil {
-				switch t := sources.(type) {
+			s, err := resolveSources(source, src, d)
+			if s != nil && !reflect.ValueOf(s).IsNil() {
+				switch t := s.(type) {
 				case T:
 					out <- t
 				}
@@ -32,64 +51,34 @@ func Find[T target.Source](files fs.FS, dir string) (in <-chan T) {
 	return
 }
 
-func resolveSources(files fs.FS, src string, d fs.DirEntry, pointer bool) (result target.Source, err error) {
+func resolveSources(root target.Source, src string, d fs.DirEntry) (result target.Source, err error) {
 	if d.Name() == "node_modules" {
 		return nil, fs.SkipDir
 	}
-	if path.Ext(src) == ".portal" && d.Type().IsRegular() {
-		var sub fs.FS
-		if sub, err = fs.Sub(files, path.Dir(src)); err != nil {
-			err = fmt.Errorf("fs.Sub: %v", err)
-			return
-		}
-		var bundle *Bundle
-		if bundle, err = newModuleFS(src, sub).Bundle(); err != nil {
-			err = fmt.Errorf("newModuleFS: %v", err)
-			return
-		}
-		err = nil
-		if pointer {
-			result = bundle
-			return
-		}
-		result = *bundle
-		return
-	}
-
-	sub, err := fs.Sub(files, src)
-	if err != nil {
-		return
-	}
-	module := newModuleFS(src, sub)
-	nodeModule, err := module.NodeModule()
+	module := NewModuleFS(root.Files(), src)
+	module.abs = path.Join(root.Abs(), src)
+	bundle, err := ResolveBundle(module)
 	if err == nil {
-		var portalModule *PortalNodeModule
-		portalModule, err = nodeModule.PortalNodeModule()
-		if err == nil {
-			if pointer {
-				result = portalModule
-				return
-			}
-			result = *portalModule
-			return
-		}
-		err = nil
-		if pointer {
-			result = nodeModule
-			return
-		}
-		result = *nodeModule
+		result = bundle
 		return
 	}
-
-	rawModule, err := module.PortalRawModule()
+	if d.Type().IsRegular() {
+		err = nil
+		return
+	}
+	module = module.Lift()
+	nodeModule, err := ResolveNodeModule(module)
+	if err == nil {
+		if result, err = ResolvePortalNodeModule(nodeModule); err == nil {
+			return
+		}
+		result = nodeModule
+		err = nil
+		return
+	}
+	result, err = ResolvePortalRawModule(module)
 	if err == nil {
 		err = fs.SkipDir
-		if pointer {
-			result = rawModule
-			return
-		}
-		result = *rawModule
 		return
 	}
 	err = nil

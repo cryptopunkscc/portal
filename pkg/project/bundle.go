@@ -10,7 +10,7 @@ import (
 
 func BundlePortalApps(base, sub string) (err error) {
 	found := false
-	for app := range Find[PortalRawModule](os.DirFS(base), sub) {
+	for app := range FindInPath[*PortalRawModule](path.Join(base, sub)) {
 		if err = BundlePortalApp(app); err != nil {
 			return fmt.Errorf("bundle target %v: %v", app.Path(), err)
 		}
@@ -22,17 +22,16 @@ func BundlePortalApps(base, sub string) (err error) {
 	return
 }
 
-func BundlePortalApp(app PortalRawModule) (err error) {
-
+func BundlePortalApp(app *PortalRawModule) (err error) {
 	// create build dir
-	buildDir := path.Join(app.Parent().Path(), "build")
+	buildDir := path.Join(app.Parent().Abs(), "build")
 	if err = os.MkdirAll(buildDir, 0775); err != nil && !os.IsExist(err) {
 		return fmt.Errorf("os.MkdirAll: %v", err)
 	}
 
 	// pack dist dir
 	bundleName := fmt.Sprintf("%s_%s.portal", app.Manifest().Name, app.Manifest().Version)
-	if err = zip.Pack(app.Path(), path.Join(buildDir, bundleName)); err != nil {
+	if err = zip.Pack(app.Abs(), path.Join(buildDir, bundleName)); err != nil {
 		return fmt.Errorf("Pack: %v", err)
 	}
 

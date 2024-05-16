@@ -6,17 +6,15 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"log"
-	"path"
 )
 
 func Uninstall(id string) (err error) {
-	for target := range project.Find[project.Bundle](portalAppsFs, ".") {
+	for target := range project.FindInPath[*project.Bundle](portalAppsDir) {
 		manifest := bundle.Manifest{}
 		_ = manifest.LoadFs(target.Files(), bundle.PortalJson)
 		if manifest.Name == id || manifest.Package == id {
-			abs := path.Join(portalAppsDir, target.Path())
-			log.Println("Uninstalling", target.Manifest().Package, "from", abs)
-			err = fs.DeleteFile(abs)
+			log.Println("Uninstalling", target.Manifest().Package, "from", target.Abs())
+			err = fs.DeleteFile(target.Abs())
 			return
 		}
 	}

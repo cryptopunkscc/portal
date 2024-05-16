@@ -1,0 +1,6 @@
+{
+  "name": "rpc-front",
+  "package": "example.rpc.ui",
+  "title": "Example RPC frontend",
+  "version": "1.0.0"
+}

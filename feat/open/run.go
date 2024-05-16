@@ -14,6 +14,8 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/pkg/wails"
+	"log"
+	"reflect"
 )
 
 func Run(
@@ -44,16 +46,19 @@ func Attach(
 	typ := app.Type()
 	switch {
 	case typ.Is(target.Backend):
+		log.Println("Attach backend", reflect.TypeOf(app), app.Path(), app.Type())
 		if err = goja.NewBackend(bindings(target.Backend, prefix...)).RunFs(app.Files()); err != nil {
 			return fmt.Errorf("goja.NewBackend().RunSource: %v", err)
 		}
 		<-ctx.Done()
 	case typ.Is(target.Frontend):
+		log.Println("Attach frontend", reflect.TypeOf(app), app.Path(), app.Type())
 		opt := wails.AppOptions(bindings(target.Frontend, prefix...))
 		if err = wails.Run(app, opt); err != nil {
 			return fmt.Errorf("dev.Run: %v", err)
 		}
 	default:
+		log.Println("Attach nothing", reflect.TypeOf(app), app.Path(), app.Type())
 		return fmt.Errorf("invalid target: %v", app.Path())
 	}
 	return

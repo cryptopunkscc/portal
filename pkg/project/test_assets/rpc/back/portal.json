@@ -1,0 +1,6 @@
+{
+  "name": "rpc-back",
+  "package": "example.rpc",
+  "title": "Example RPC backend",
+  "version": "1.0.0"
+}

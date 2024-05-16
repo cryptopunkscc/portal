@@ -7,5 +7,5 @@ import (
 )
 
 func ListApps() []target.App {
-	return arr.FromChan(project.Find[target.App](portalAppsFs, "."))
+	return arr.FromChan(project.FindInFS[target.App](portalAppsFs))
 }

@@ -3,8 +3,13 @@ package clir
 import (
 	"context"
 	portal "github.com/cryptopunkscc/go-astral-js"
+	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/leaanthony/clir"
+	"log"
+	"os"
+	"reflect"
 	"strings"
 )
 
@@ -23,6 +28,7 @@ func RunPortalDev(
 	c.Create(templates, create)
 	c.Build(build)
 	c.Version(version)
+	c.Apps()
 	return c.clir.Run()
 }
 
@@ -95,6 +101,22 @@ func (c cli) Build(handle Build) {
 	cmd.AddFlags(&flags)
 	cmd.Action(func() (err error) {
 		return handle(flags.Path)
+	})
+	return
+}
+
+func (c cli) Apps() {
+	flags := struct {
+		Path string `pos:"1" default:"."`
+	}{}
+	cmd := c.clir.NewSubCommand("t", "Print all targets in given directory.")
+	cmd.AddFlags(&flags)
+	cmd.Action(func() (err error) {
+		wd, _ := os.Getwd()
+		for source := range project.FindInPath[target.Source](flags.Path) {
+			log.Println(reflect.TypeOf(source), "\t", strings.TrimPrefix(source.Abs(), wd+"/"))
+		}
+		return
 	})
 	return
 }

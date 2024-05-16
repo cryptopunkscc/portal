@@ -2,12 +2,13 @@ package install
 
 import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"log"
-	"os"
+	"path"
 )
 
 func (d *PortalDev) buildJsLibs() {
-	for p := range project.Find[project.NodeModule](os.DirFS(d.root), "pkg") {
+	for p := range project.FindInPath[target.NodeModule](path.Join(d.root, "pkg")) {
 		if p.IsPortalLib() {
 			d.modules = append(d.modules, p)
 		}
@@ -24,7 +25,7 @@ func (d *PortalDev) buildJsLibs() {
 }
 
 func (d *PortalDev) collectPortalLibs() {
-	for p := range project.Find[project.NodeModule](os.DirFS(d.root), "pkg") {
+	for p := range project.FindInPath[target.NodeModule](path.Join(d.root, "pkg")) {
 		if p.IsPortalLib() {
 			d.modules = append(d.modules, p)
 		}
