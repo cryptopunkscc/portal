@@ -2,19 +2,27 @@ package tray
 
 import (
 	"context"
+	portal "github.com/cryptopunkscc/go-astral-js"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
-	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
+	"github.com/cryptopunkscc/go-astral-js/target"
 	"log"
 )
 import "github.com/getlantern/systray"
 
-func Run(ctx context.Context) {
-	t := tray{}
+type Runner struct {
+	open target.Dispatch
+}
+
+func NewRunner(open target.Dispatch) target.Tray {
+	return (&Runner{open: open}).Run
+}
+
+func (t *Runner) Run(ctx context.Context) {
 	systray.SetTitle(portal.Name)
 	launcherItem := systray.AddMenuItem("Launcher", "Launcher")
 	go onMenuItemClick(launcherItem, func() {
 		go func() {
-			if err := portal.CmdCtx(ctx, "launcher").Run(); err != nil {
+			if err := t.open(ctx, "launcher"); err != nil {
 				log.Println("launcher:", err)
 			}
 		}()
@@ -33,13 +41,11 @@ func Run(ctx context.Context) {
 	systray.Run(t.onReady, t.onExit)
 }
 
-type tray struct{}
-
-func (t *tray) onReady() {
+func (t *Runner) onReady() {
 	log.Println("portal tray start")
 }
 
-func (t *tray) onExit() {
+func (t *Runner) onExit() {
 	log.Println("portal tray exit")
 }
 

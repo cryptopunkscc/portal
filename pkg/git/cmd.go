@@ -15,10 +15,33 @@ func TimestampHash() (out string, err error) {
 		`--date=format-local:%Y%m%d%H%M%S`,
 		`--format="%cd-%h"`,
 	)
-	reader, writer := io.Pipe()
 	cmd.Env = append(os.Environ(), "TZ=UTC")
-	cmd.Stdout = writer
+	return ReadString(cmd)
+}
+
+func UserName(global bool) (str string) {
+	cmd := exec.Command("git", "config", "user.name")
+	if global {
+		cmd = exec.Command("git", "config", "--global", "user.name")
+	}
+	str, _ = ReadString(cmd)
+	return
+}
+
+func UserEmail(global bool) (str string) {
+	cmd := exec.Command("git", "config", "user.email")
+	if global {
+		cmd = exec.Command("git", "config", "--global", "user.email")
+	}
+	str, _ = ReadString(cmd)
+	return
+}
+
+func ReadString(cmd *exec.Cmd) (str string, err error) {
 	cmd.Stderr = os.Stderr
+
+	reader, writer := io.Pipe()
+	cmd.Stdout = writer
 	scanner := bufio.NewScanner(reader)
 	if err = cmd.Start(); err != nil {
 		return
@@ -27,7 +50,7 @@ func TimestampHash() (out string, err error) {
 		err = scanner.Err()
 		return
 	}
-	out = strings.Trim(scanner.Text(), `"`)
-	_ = cmd.Wait()
+	str = strings.Trim(scanner.Text(), `"`)
+	err = cmd.Wait()
 	return
 }

@@ -2,30 +2,29 @@ package serve
 
 import (
 	"context"
+	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"log"
 )
 
-func Run(ctx context.Context, port string, handlers rpc.Handlers, tray runtime.Tray) (err error) {
+type Runner struct {
+	handlers rpc.Handlers
+}
+
+func NewRunner(handlers rpc.Handlers) *Runner {
+	return &Runner{handlers: handlers}
+}
+
+func (r Runner) Run(ctx context.Context, port string) (err error) {
 	s := rpc.NewApp(port)
 	s.Logger(log.New(log.Writer(), "service ", 0))
-	for name, h := range handlers {
+	for name, h := range r.handlers {
 		s.RouteFunc(name, h)
 	}
 
-	go func() {
-		if err = s.Run(ctx); err != nil {
-			return
-		}
-	}()
-
-	hasTray := tray != nil
-	log.Printf("portal service started tray:%v", hasTray)
-
-	if hasTray {
-		tray(ctx)
+	if err = s.Run(ctx); err != nil {
+		return fmt.Errorf("serve.Run exit: %w", err)
 	}
-	<-ctx.Done()
+
 	return
 }

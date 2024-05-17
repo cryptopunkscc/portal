@@ -2,8 +2,8 @@
   "name": "go-astral-js",
   "version": "0.0.0",
   "scripts": {
-    "build": "rollup index.js -o dist/main.js -f iife" ,
-    "watch": "rollup index.js -o dist/main.js -f iife --watch"
+    "build": "rollup main.js -o dist/main.js -f iife" ,
+    "watch": "rollup main.js -o dist/main.js -f iife --watch"
   },
   "devDependencies": {
     "rollup": "^4.12.0"

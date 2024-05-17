@@ -2,7 +2,7 @@ package apps
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
+	"github.com/cryptopunkscc/go-astral-js/mock/appstore"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 )
 

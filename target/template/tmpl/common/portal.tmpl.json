@@ -1,0 +1,11 @@
+{
+  "name": "{{.ProjectName}}",
+  "package": "{{.PackageName}}",
+  "version": "0.0.0",
+  "title": "{{.ProjectName}}",
+  "description": "{{.Description}}",
+  "author": "{{.AuthorName}}",
+  "email": "{{.AuthorEmail}}",
+  "icon": "",
+  "url": "{{.Url}}"
+}

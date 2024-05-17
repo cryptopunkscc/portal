@@ -4,51 +4,48 @@ import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/astrald/sig"
-	backend "github.com/cryptopunkscc/go-astral-js/pkg/backend/dev"
-	"github.com/cryptopunkscc/go-astral-js/pkg/goja"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
-	"github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"github.com/cryptopunkscc/go-astral-js/runner/backend_dev"
+	"github.com/cryptopunkscc/go-astral-js/runner/goja"
+	"github.com/cryptopunkscc/go-astral-js/target"
 	"log"
 	"os"
 	"path"
 )
 
-type Backend struct {
-	ctx context.Context
-	runtime.New
-	target.Project
+type Runner struct {
+	target.NewApi
 	events sig.Queue[any]
 }
 
-func NewBackend(ctx context.Context, bindings runtime.New, project target.Project) *Backend {
-	return &Backend{ctx: ctx, New: bindings, Project: project}
+func NewRunner(newApi target.NewApi) target.Run[target.ProjectBackend] {
+	return (&Runner{NewApi: newApi}).Run
 }
 
-func (b *Backend) Start() (err error) {
-	log.Println("staring dev backend", b.Abs())
+func (b *Runner) Run(ctx context.Context, project target.ProjectBackend) (err error) {
+	log.Println("staring dev backend", project.Abs())
 	src := ""
-	if src, err = ResolveSrc(b.Path(), "main.js"); err != nil {
+	if src, err = ResolveSrc(project.Path(), "main.js"); err != nil {
 		return fmt.Errorf("resolveSrc %v: %v", "main.js", err)
 	}
 
-	go backend.NpmRunWatch(b.ctx, b.Path())
-	go b.serve()
+	go backend_dev.NpmRunWatch(ctx, project.Path())
+	go b.serve(ctx, project)
 
-	back := goja.NewBackend(b.New(target.Backend, "dev"))
-	output := func(event backend.Event) { b.events.Push(event) }
-	if err = backend.Dev(b.ctx, back, src, output); err != nil {
+	back := goja.NewBackend(b.NewApi(ctx, project))
+	output := func(event backend_dev.Event) { b.events.Push(event) }
+	if err = backend_dev.Dev(ctx, back, src, output); err != nil {
 		return fmt.Errorf("backend.Dev: %v", err)
 	}
 	return
 }
 
-func (b *Backend) serve() {
-	port := target.DevPort(b)
+func (b *Runner) serve(ctx context.Context, project target.ProjectBackend) {
+	port := target.DevPort(project)
 	s := rpc.NewApp(port)
 	s.Logger(log.New(log.Writer(), port+" ", 0))
 	s.RouteFunc("events", b.events.Subscribe)
-	err := s.Run(b.ctx)
+	err := s.Run(ctx)
 	if err != nil {
 		log.Printf("%s: %v", port, err)
 	}

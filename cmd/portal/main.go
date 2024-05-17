@@ -2,53 +2,65 @@ package main
 
 import (
 	"context"
+	manifest "github.com/cryptopunkscc/go-astral-js"
 	"github.com/cryptopunkscc/go-astral-js/clir"
-	"github.com/cryptopunkscc/go-astral-js/feat/apps"
+	featApps "github.com/cryptopunkscc/go-astral-js/feat/apps"
+	"github.com/cryptopunkscc/go-astral-js/feat/dispatch"
 	"github.com/cryptopunkscc/go-astral-js/feat/open"
+	"github.com/cryptopunkscc/go-astral-js/feat/serve"
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
-	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
-	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
-	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
-	"github.com/cryptopunkscc/go-astral-js/pkg/target"
+	osexec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
+	"github.com/cryptopunkscc/go-astral-js/runner/app"
+	"github.com/cryptopunkscc/go-astral-js/runner/exec"
+	"github.com/cryptopunkscc/go-astral-js/runner/spawn"
+	"github.com/cryptopunkscc/go-astral-js/runner/tray"
+	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/go-astral-js/target/apphost"
+	"github.com/cryptopunkscc/go-astral-js/target/apps"
 	"log"
 	"os"
-	"time"
+	"sync"
 )
 
 func main() {
 	log.Println("starting portal", os.Args)
 	ctx, cancel := context.WithCancel(context.Background())
-	go exec.OnShutdown(cancel)
+	go osexec.OnShutdown(cancel)
 
-	if err := clir.RunPortal(ctx,
-		newRuntimeFactory(ctx),
-		open.Run,
-		apps.List,
-		apps.Install,
-		apps.Uninstall,
-		version.Run,
-	); err != nil {
-		cancel()
-		log.Fatal(err)
-	}
+	executable := "portal"
+	wait := &sync.WaitGroup{}
+	proc := exec.NewRunner[target.App](executable)
+	resolve := apps.Resolve(featApps.Path)
+	launch := spawn.NewRunner(wait, resolve, proc).Run
+	apphostFactory := apphost.NewFactory(launch)
+	newApi := target.ApiFactory(
+		NewAdapter,
+		apphostFactory.NewAdapter,
+		apphostFactory.WithTimeout,
+	)
+	run := app.NewRunner(newApi)
 
-	if ctx.Err() == nil {
-		cancel()
-		time.Sleep(200 * time.Millisecond)
+	featDispatch := dispatch.NewFeat(executable)
+	featServe := serve.NewFeat(launch, tray.NewRunner(launch))
+	featOpen := open.NewFeat[target.App](resolve, run)
+
+	cli := clir.NewCli(ctx, manifest.Name, manifest.Description, version.Run)
+
+	cli.Dispatch(featDispatch)
+	cli.Serve(featServe)
+	cli.Open(featOpen)
+	cli.List(featApps.List)
+	cli.Install(featApps.Install)
+	cli.Uninstall(featApps.Uninstall)
+
+	err := cli.Run()
+	cancel()
+	if err != nil {
+		log.Println(err)
 	}
+	wait.Wait()
 }
 
-type Adapter struct{ apphost.Flat }
+type Adapter struct{ target.Api }
 
-func newRuntimeFactory(ctx context.Context) func(t target.Type, prefix ...string) runtime.Api {
-	opener := portal.SrvOpenerCtx
-	return func(t target.Type, prefix ...string) runtime.Api {
-		switch {
-		case t.Is(target.Frontend):
-			return &Adapter{Flat: apphost.NewAdapter(ctx, opener, prefix...)}
-		default:
-			return apphost.WithTimeout(ctx, opener, prefix...)
-		}
-	}
-}
+func NewAdapter(api target.Api) target.Api { return &Adapter{Api: api} }

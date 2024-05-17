@@ -1,9 +1,10 @@
 package npm
 
 import (
+	"context"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
-	"github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"github.com/cryptopunkscc/go-astral-js/target"
 	"io"
 	"io/fs"
 	"log"
@@ -12,7 +13,10 @@ import (
 )
 
 func RunBuild(m target.NodeModule) (err error) {
-	return exec.Run(m.Abs(), "npm", "run", "build")
+	if err = exec.Run(m.Abs(), "npm", "run", "build"); err != nil {
+		return fmt.Errorf("npm.RunBuild %v: %w", m.Abs(), err)
+	}
+	return
 }
 
 func Install(m target.NodeModule) (err error) {
@@ -22,20 +26,29 @@ func Install(m target.NodeModule) (err error) {
 	return
 }
 
-func InjectDependencies(m target.NodeModule, deps []target.NodeModule) (err error) {
-	for _, module := range deps {
-		if err = InjectDependency(m, module); err != nil {
-			return
+type Injector struct {
+	deps []target.NodeModule
+}
+
+func NewInjector(deps []target.NodeModule) *Injector {
+	return &Injector{deps: deps}
+}
+
+func (i Injector) Run(_ context.Context, m target.NodeModule) (err error) {
+	for _, module := range i.deps {
+		if err = Inject(m, module); err != nil {
+			return fmt.Errorf("cannot inject dependency %s in %s: %s", module.Abs(), err, module)
 		}
 	}
 	return
 }
 
-func InjectDependency(m target.NodeModule, dep target.NodeModule) (err error) {
+func Inject(m target.NodeModule, lib target.NodeModule) (err error) {
+	dep := lib.Lift()
 	nm := path.Join(m.Abs(), "node_modules", path.Base(dep.Abs()))
-	log.Printf("copying module %v %v into: %s", dep.Abs(), dep.PkgJson(), nm)
+	log.Printf("copying module %v %v into: %s", dep.Path(), dep.Abs(), nm)
 	return fs.WalkDir(dep.Files(), ".", func(s string, d fs.DirEntry, err error) error {
-		path.Join(s, d.Name())
+		log.Println("* coping file", d, s)
 		if d.IsDir() {
 			dst := path.Join(nm, s)
 			if err = os.MkdirAll(dst, 0755); err != nil {

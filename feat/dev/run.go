@@ -2,77 +2,63 @@ package dev
 
 import (
 	"context"
-	"fmt"
+	"errors"
+	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/go-astral-js/feat/apps"
-	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
+	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
-	"github.com/cryptopunkscc/go-astral-js/pkg/target"
-	"github.com/cryptopunkscc/go-astral-js/runner/goja"
-	"github.com/cryptopunkscc/go-astral-js/runner/goja_dev"
 	"github.com/cryptopunkscc/go-astral-js/runner/serve"
-	"github.com/cryptopunkscc/go-astral-js/runner/wails"
-	"github.com/cryptopunkscc/go-astral-js/runner/wails_dev"
+	"github.com/cryptopunkscc/go-astral-js/target"
 	"log"
-	"reflect"
+	"sync"
+	"time"
 )
 
-func Run(
-	ctx context.Context,
-	bindings runtime.New,
-	src string,
-	attach bool,
-) (err error) {
-	return portal.Runner[target.Portal]{
-		Action:   action,
-		Port:     "dev.portal",
-		New:      bindings,
-		Serve:    serve.Run,
-		Resolve:  resolvePortals,
-		Attach:   Attach,
-		Handlers: Handlers,
-	}.Run(ctx, src, attach)
+type Feat struct {
+	port  string
+	wait  *sync.WaitGroup
+	spawn target.Dispatch
+	serve target.Dispatch
 }
 
-func Attach(
-	ctx context.Context,
-	bindings runtime.New,
-	t target.Portal,
-	_ ...string,
-) (err error) {
-	log.Println("dev attach", reflect.TypeOf(t), t)
-	prefix := "dev"
-	switch v := t.(type) {
-	case target.App:
-		typ := v.Type()
-		switch {
-		case typ.Is(target.Backend):
-			return goja.Run(ctx, bindings, v, prefix)
-		case typ.Is(target.Frontend):
-			return wails.Run(bindings, v, prefix)
-		default:
-			return fmt.Errorf("invalid app target: %v", v.Path())
-		}
-	case target.Project:
-		typ := v.Type()
-		switch {
-		case typ.Is(target.Backend):
-			return goja_dev.NewBackend(ctx, bindings, v).Start()
-		case typ.Is(target.Frontend):
-			return wails_dev.NewFrontend(bindings, v).Start()
-		default:
-			return fmt.Errorf("invalid dev target: %v", t.Path())
-		}
+func NewFeat(wait *sync.WaitGroup, spawn target.Dispatch) target.Dispatch {
+	handlers := rpc.Handlers{
+		"ping":    func() {},
+		"open":    spawn,
+		"observe": apps.Observe,
 	}
-	return fmt.Errorf("invalid target type %T", t)
+	return Feat{
+		port:  "dev.portal",
+		wait:  wait,
+		spawn: spawn,
+		serve: serve.NewRunner(handlers).Run,
+	}.Run
 }
 
-var resolvePortals = portal.ResolvePortals
+func (f Feat) Run(ctx context.Context, src string) (err error) {
+	if err = ping(f.port); err == nil {
+		return errors.New("portal dev already running")
+	}
+	ctx, cancel := context.WithCancel(ctx)
+	f.wait.Add(1)
+	go func() {
+		defer cancel()
+		defer f.wait.Done()
 
-var Handlers = rpc.Handlers{
-	"ping":    func() {},
-	"open":    portal.NewCmdOpener(resolvePortals, action).Open,
-	"observe": apps.Observe,
+		if err = f.serve(ctx, f.port); err != nil {
+			log.Printf("serve exit: %v\n", err)
+		} else {
+			log.Println("serve exit")
+		}
+	}()
+	if err = exec.Retry(5*time.Second, func(i int, i2 int, duration time.Duration) error {
+		return ping(f.port)
+	}); err != nil {
+		return
+	}
+	return f.spawn(ctx, src)
 }
 
-const action = "o"
+func ping(port string) error {
+	return rpc.Command(rpc.NewRequest(id.Anyone, port), "ping")
+}
