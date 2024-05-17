@@ -6,7 +6,7 @@ import (
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"os"
 	osexec "os/exec"
 	"strings"
@@ -18,7 +18,7 @@ type Feat struct {
 	executable string
 }
 
-func NewFeat(executable string, prefix ...string) runtime.Spawn {
+func NewFeat(executable string, prefix ...string) target.Spawn {
 	return Feat{executable: executable, prefix: prefix}.Run
 }
 

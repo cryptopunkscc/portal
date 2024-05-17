@@ -3,7 +3,6 @@ package exec
 import (
 	"context"
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"log"
 	"os"
@@ -18,7 +17,7 @@ func NewPortal[T target.Portal](src ...string) *Portal[T] {
 	return &Portal[T]{src: src}
 }
 
-var _ runtime.Run[target.Portal] = (&Portal[target.Portal]{}).Run
+var _ target.Run[target.Portal] = (&Portal[target.Portal]{}).Run
 
 func (p *Portal[T]) Run(ctx context.Context, src T) (err error) {
 	cmd := p.src[0]
@@ -38,12 +37,12 @@ func (p *Portal[T]) Run(ctx context.Context, src T) (err error) {
 	return
 }
 
-func NewRunnerByName[T target.Portal](name string) runtime.Run[T] {
+func NewRunnerByName[T target.Portal](name string) target.Run[T] {
 	log.Println("NewRunnerByName", name)
 	return NewPortal[T]("portal", "r", name).Run
 }
 
-func NewRunner[T target.Portal]() runtime.Run[T] {
+func NewRunner[T target.Portal]() target.Run[T] {
 	return func(ctx context.Context, src T) (err error) {
 		switch v := any(src).(type) {
 		case target.Project:

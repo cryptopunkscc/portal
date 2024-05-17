@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/pkg/wails"
 	wailsdev "github.com/cryptopunkscc/go-astral-js/pkg/wails/dev"
@@ -15,11 +14,11 @@ import (
 
 type Frontend struct {
 	frontCtx context.Context
-	runtime.New
+	target.New
 	target.Project
 }
 
-func NewFrontend(bindings runtime.New, project target.Project) *Frontend {
+func NewFrontend(bindings target.New, project target.Project) *Frontend {
 	return &Frontend{New: bindings, Project: project}
 }
 

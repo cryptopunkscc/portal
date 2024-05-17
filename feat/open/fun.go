@@ -3,16 +3,15 @@ package open
 import (
 	"context"
 	"errors"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 )
 
 type Feat[T target.Portal] struct {
-	resolve runtime.Resolve[T]
-	run     runtime.Run[T]
+	resolve target.Resolve[T]
+	run     target.Run[T]
 }
 
-func NewFeat[T target.Portal](resolve runtime.Resolve[T], run runtime.Run[T]) runtime.Spawn {
+func NewFeat[T target.Portal](resolve target.Resolve[T], run target.Run[T]) target.Spawn {
 	return Feat[T]{resolve: resolve, run: run}.Run
 }
 

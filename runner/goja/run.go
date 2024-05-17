@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/goja"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"log"
 	"reflect"
@@ -12,7 +11,7 @@ import (
 
 func Run(
 	ctx context.Context,
-	bindings runtime.New,
+	bindings target.New,
 	app target.App,
 	prefix ...string,
 ) (err error) {

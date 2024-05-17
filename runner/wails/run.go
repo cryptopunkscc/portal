@@ -2,7 +2,6 @@ package wails
 
 import (
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/pkg/wails"
 	"log"
@@ -10,7 +9,7 @@ import (
 )
 
 func Run(
-	bindings runtime.New,
+	bindings target.New,
 	app target.App,
 	prefix ...string,
 ) (err error) {

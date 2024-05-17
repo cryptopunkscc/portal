@@ -1,10 +1,10 @@
 package clir
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 )
 
-func (c Cli) Dev(handle runtime.Spawn) {
+func (c Cli) Dev(handle target.Spawn) {
 	flags := &struct {
 		Src string `pos:"1" default:"" description:"Application source. The source can be a app name, package name, app bundle or app dir."`
 	}{}

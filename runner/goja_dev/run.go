@@ -7,7 +7,6 @@ import (
 	backend "github.com/cryptopunkscc/go-astral-js/pkg/backend/dev"
 	"github.com/cryptopunkscc/go-astral-js/pkg/goja"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"log"
 	"os"
@@ -16,12 +15,12 @@ import (
 
 type Backend struct {
 	ctx context.Context
-	runtime.New
+	target.New
 	target.Project
 	events sig.Queue[any]
 }
 
-func NewBackend(ctx context.Context, bindings runtime.New, project target.Project) *Backend {
+func NewBackend(ctx context.Context, bindings target.New, project target.Project) *Backend {
 	return &Backend{ctx: ctx, New: bindings, Project: project}
 }
 

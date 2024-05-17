@@ -6,16 +6,16 @@ import (
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/go-astral-js/feat/apps"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/runner/serve"
 	"log"
 )
 
 type Feat struct {
-	spawn runtime.Spawn
+	spawn target.Spawn
 }
 
-func NewFeat(spawn runtime.Spawn) runtime.Spawn {
+func NewFeat(spawn target.Spawn) target.Spawn {
 	return Feat{spawn: spawn}.Run
 }
 

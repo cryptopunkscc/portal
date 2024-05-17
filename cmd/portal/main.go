@@ -12,7 +12,6 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	osexec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/runner"
 	"github.com/cryptopunkscc/go-astral-js/runner/app"
@@ -58,9 +57,9 @@ func main() {
 
 type Adapter struct{ apphost.Flat }
 
-func newRuntimeFactory(ctx context.Context, spawn runtime.Spawn) runtime.New {
+func newRuntimeFactory(ctx context.Context, spawn target.Spawn) target.New {
 	invoke := apphost.Invoke(spawn)
-	return func(t target.Type, prefix ...string) runtime.Api {
+	return func(t target.Type, prefix ...string) target.Api {
 		switch {
 		case t.Is(target.Frontend):
 			return &Adapter{Flat: apphost.NewAdapter(ctx, invoke, prefix...)}

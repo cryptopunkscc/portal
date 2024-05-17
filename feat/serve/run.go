@@ -7,17 +7,17 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/feat/apps"
 	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/runner/serve"
 	"log"
 )
 
 type Feat struct {
-	spawn runtime.Spawn
-	tray  runtime.Tray
+	spawn target.Spawn
+	tray  target.Tray
 }
 
-func NewFeat(spawn runtime.Spawn, tray runtime.Tray) func(context.Context, bool) error {
+func NewFeat(spawn target.Spawn, tray target.Tray) func(context.Context, bool) error {
 	return Feat{spawn: spawn, tray: tray}.Run
 }
 

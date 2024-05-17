@@ -2,7 +2,6 @@ package runner
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"log"
 	"sync"
@@ -10,8 +9,8 @@ import (
 
 func NewSpawner[T target.Portal](
 	wait *sync.WaitGroup,
-	resolve runtime.Resolve[T],
-	run runtime.Run[T],
+	resolve target.Resolve[T],
+	run target.Run[T],
 ) func(context.Context, string) error {
 	return func(ctx context.Context, src string) (err error) {
 		portals, err := resolve(src)

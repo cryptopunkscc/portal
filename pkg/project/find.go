@@ -51,40 +51,6 @@ func Find[T target.Source](source target.Source) (in <-chan T) {
 	return
 }
 
-func resolveSources(root target.Source, src string, d fs.DirEntry) (result target.Source, err error) {
-	if d.Name() == "node_modules" {
-		return nil, fs.SkipDir
-	}
-	module := NewModuleFS(root.Files(), src)
-	module.abs = path.Join(root.Abs(), src)
-	bundle, err := ResolveBundle(module)
-	if err == nil {
-		result = bundle
-		return
-	}
-	if d.Type().IsRegular() {
-		err = nil
-		return
-	}
-	module = module.Lift()
-	nodeModule, err := ResolveNodeModule(module)
-	if err == nil {
-		if result, err = ResolvePortalNodeModule(nodeModule); err == nil {
-			return
-		}
-		result = nodeModule
-		err = nil
-		return
-	}
-	result, err = ResolvePortalRawModule(module)
-	if err == nil {
-		err = fs.SkipDir
-		return
-	}
-	err = nil
-	return
-}
-
 func Resolve(root target.Source, src string) (result target.Source, err error) {
 	if path.Base(src) == "node_modules" {
 		return nil, fs.SkipDir

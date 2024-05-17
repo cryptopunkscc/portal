@@ -3,17 +3,16 @@ package app
 import (
 	"context"
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/runner/goja"
 	"github.com/cryptopunkscc/go-astral-js/runner/wails"
 )
 
 type Runner struct {
-	bindings runtime.New
+	bindings target.New
 }
 
-func NewRunner(bindings runtime.New) runtime.Run[target.App] {
+func NewRunner(bindings target.New) target.Run[target.App] {
 	return Runner{bindings: bindings}.Run
 }
 

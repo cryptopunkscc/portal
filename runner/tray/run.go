@@ -4,16 +4,16 @@ import (
 	"context"
 	portal "github.com/cryptopunkscc/go-astral-js"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
-	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"log"
 )
 import "github.com/getlantern/systray"
 
 type Runner struct {
-	open runtime.Spawn
+	open target.Spawn
 }
 
-func New(open runtime.Spawn) runtime.Tray {
+func New(open target.Spawn) target.Tray {
 	return (&Runner{open: open}).Run
 }
 
