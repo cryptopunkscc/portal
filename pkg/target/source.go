@@ -25,6 +25,7 @@ type Source interface {
 	Files() fs.FS
 	Type() Type
 	Parent() Source
+	String() string
 }
 
 type Portals[T Portal] map[string]T

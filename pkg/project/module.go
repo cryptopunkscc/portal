@@ -1,16 +1,22 @@
 package project
 
 import (
+	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"io/fs"
 	"os"
 	"path"
+	"reflect"
 )
 
 type Module struct {
 	abs   string
 	src   string
 	files fs.FS
+}
+
+func (m *Module) String() string {
+	return fmt.Sprintf("%v@%s", reflect.TypeOf(m), m.abs)
 }
 
 func (m *Module) Abs() string {

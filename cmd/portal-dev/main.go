@@ -2,55 +2,68 @@ package main
 
 import (
 	"context"
+	manifest "github.com/cryptopunkscc/go-astral-js"
 	"github.com/cryptopunkscc/go-astral-js/clir"
 	"github.com/cryptopunkscc/go-astral-js/feat/build"
 	"github.com/cryptopunkscc/go-astral-js/feat/create"
-	"github.com/cryptopunkscc/go-astral-js/feat/dev"
+	dev "github.com/cryptopunkscc/go-astral-js/feat/dev"
+	"github.com/cryptopunkscc/go-astral-js/feat/open"
 	"github.com/cryptopunkscc/go-astral-js/feat/templates"
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
-	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
+	osexec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
 	"github.com/cryptopunkscc/go-astral-js/pkg/runtime"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"github.com/cryptopunkscc/go-astral-js/runner"
+	dev2 "github.com/cryptopunkscc/go-astral-js/runner/dev"
+	"github.com/cryptopunkscc/go-astral-js/runner/exec"
 	"log"
 	"os"
-	"time"
+	"sync"
 )
 
 func main() {
 	log.Println("starting portal development", os.Args)
 	ctx, cancel := context.WithCancel(context.Background())
-	go exec.OnShutdown(cancel)
+	go osexec.OnShutdown(cancel)
 
-	if err := clir.RunPortalDev(ctx,
-		newRuntimeFactory(ctx),
-		dev.Run,
-		templates.List,
-		create.Run,
-		build.Run,
-		version.Run,
-	); err != nil {
-		cancel()
-		log.Fatal(err)
-	}
+	wait := &sync.WaitGroup{}
+	proc := exec.NewRunner[target.Portal]()
+	resolve := portal.ResolvePortals
+	spawn := runner.NewSpawner(wait, resolve, proc)
+	bindings := newRuntimeFactory(ctx, spawn)
+	run := dev2.NewRunner(bindings)
 
-	if ctx.Err() == nil {
-		cancel()
-		time.Sleep(200 * time.Millisecond)
+	devFeat := dev.NewFeat(spawn)
+	attachFeat := open.NewFeat[target.Portal](resolve, run)
+
+	cli := clir.NewCli(ctx, manifest.NameDev, manifest.DescriptionDev, version.Run)
+
+	cli.Dev(devFeat)
+	cli.Attach(attachFeat)
+	cli.Create(templates.List, create.Run)
+	cli.Build(build.Run)
+	cli.Apps()
+
+	err := cli.Run()
+	cancel()
+	if err != nil {
+		log.Println(err)
 	}
+	wait.Wait()
 }
 
 type Adapter struct{ apphost.Flat }
 
-func newRuntimeFactory(ctx context.Context) func(t target.Type, prefix ...string) runtime.Api {
-	opener := portal.SrvOpenerCtx
+func newRuntimeFactory(ctx context.Context, spawn runtime.Spawn) runtime.New {
+	invoke := apphost.Invoke(spawn)
 	return func(t target.Type, prefix ...string) runtime.Api {
 		switch {
 		case t.Is(target.Frontend):
-			return &Adapter{Flat: apphost.NewAdapter(ctx, opener, prefix...)}
+			return &Adapter{Flat: apphost.NewAdapter(ctx, invoke, prefix...)}
 		default:
-			return apphost.WithTimeout(ctx, opener, prefix...)
+			return apphost.WithTimeout(ctx, invoke, prefix...)
 		}
 	}
 }

@@ -17,6 +17,8 @@ type Serve func(ctx context.Context, port string, handlers rpc.Handlers, tray Tr
 
 type Resolve[T target.Portal] func(src string) (portals target.Portals[T], err error)
 
-type Attach[T target.Portal] func(ctx context.Context, bindings New, app T, prefix ...string) (err error)
-
 type Tray func(ctx context.Context)
+
+type Spawn func(context.Context, string) error
+
+type Run[T target.Portal] func(ctx context.Context, src T) (err error)

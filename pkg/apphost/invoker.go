@@ -6,6 +6,7 @@ import (
 	"github.com/cryptopunkscc/astrald/sig"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"log"
+	"path"
 	"strings"
 	"time"
 )
@@ -65,18 +66,17 @@ func (inv *Invoker) invokeApp(query string) (err error) {
 		return ErrServiceAlreadyRunning
 	}
 
-	run, err := inv.invoke(inv.Prefix()...)(inv.ctx)
-	if err != nil {
-		return
-	}
+	src = path.Join(append(inv.Prefix(), src)...)
 
 	go func() {
-		run(src)
+		if err := inv.invoke(inv.ctx, src); err != nil {
+			log.Println("Invoker.invokeApp:", err)
+		}
 		inv.processes.Delete(src)
 	}()
 	return
 }
 
-type Invoke func(prefix ...string) func(ctx context.Context) (func(query string), error)
+type Invoke func(ctx context.Context, query string) error
 
 var ErrServiceAlreadyRunning = errors.New("service already running")
