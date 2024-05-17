@@ -26,7 +26,7 @@ func ResolvePortalRawModule(m target.Source) (module *PortalRawModule, err error
 
 func (m *PortalRawModule) App() {}
 
-func (m PortalRawModule) Type() target.Type {
+func (m *PortalRawModule) Type() target.Type {
 	return m.Source.Type() + target.Dev
 }
 

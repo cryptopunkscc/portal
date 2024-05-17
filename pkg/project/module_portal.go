@@ -37,7 +37,7 @@ func ResolvePortalNodeModule(m target.NodeModule) (module *PortalNodeModule, err
 	return
 }
 
-func (m PortalNodeModule) Type() target.Type {
+func (m *PortalNodeModule) Type() target.Type {
 	return m.NodeModule.Type() + target.Dev
 }
 

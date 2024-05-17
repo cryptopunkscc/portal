@@ -24,6 +24,7 @@ func NewSpawner[T target.Portal](
 				if err = run(ctx, t); err != nil {
 					log.Println(err)
 				}
+				log.Println("Runner", t.Abs(), "exit")
 			}(t)
 		}
 		return

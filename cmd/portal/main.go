@@ -27,14 +27,15 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	go osexec.OnShutdown(cancel)
 
+	executable := "portal"
 	wait := &sync.WaitGroup{}
-	proc := exec.NewRunner[target.App]()
+	proc := exec.NewRunner[target.App](executable)
 	resolve := portal.ResolveApps
 	spawn := runner.NewSpawner(wait, resolve, proc)
 	bindings := newRuntimeFactory(ctx, spawn)
 	run := app.NewRunner(bindings)
 
-	dispatchFeat := dispatch.NewFeat("portal")
+	dispatchFeat := dispatch.NewFeat(executable)
 	serveFeat := serve.NewFeat(spawn, tray.New(spawn))
 	attachFeat := open.NewFeat[target.App](resolve, run)
 

@@ -37,27 +37,27 @@ func (p *Portal[T]) Run(ctx context.Context, src T) (err error) {
 	return
 }
 
-func NewRunnerByName[T target.Portal](name string) target.Run[T] {
+func NewRunnerByName[T target.Portal](executable, name string) target.Run[T] {
 	log.Println("NewRunnerByName", name)
-	return NewPortal[T]("portal", "r", name).Run
+	return NewPortal[T](executable, "r", name).Run
 }
 
-func NewRunner[T target.Portal]() target.Run[T] {
+func NewRunner[T target.Portal](executable string) target.Run[T] {
 	return func(ctx context.Context, src T) (err error) {
 		switch v := any(src).(type) {
 		case target.Project:
 			switch {
 			case v.Type().Is(target.Frontend):
-				return NewRunnerByName[target.Project]("wails_dev")(ctx, v)
+				return NewRunnerByName[target.Project](executable, "wails_dev")(ctx, v)
 			case v.Type().Is(target.Backend):
-				return NewRunnerByName[target.Project]("goja_dev")(ctx, v)
+				return NewRunnerByName[target.Project](executable, "goja_dev")(ctx, v)
 			}
 		case target.App:
 			switch {
 			case v.Type().Is(target.Frontend):
-				return NewRunnerByName[target.App]("wails")(ctx, v)
+				return NewRunnerByName[target.App](executable, "wails")(ctx, v)
 			case v.Type().Is(target.Backend):
-				return NewRunnerByName[target.App]("goja")(ctx, v)
+				return NewRunnerByName[target.App](executable, "goja")(ctx, v)
 			}
 		}
 		return

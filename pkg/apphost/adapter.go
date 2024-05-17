@@ -65,10 +65,11 @@ func (api *FlatAdapter) Interrupt() {
 	for name, closer := range api.listeners {
 		log.Println("[Interrupt] closing listener:", name)
 		_ = closer.Close()
+		delete(api.listeners, name)
 	}
-	for name, closer := range api.connections {
+	for name := range api.connections {
 		log.Print("[Interrupt] closing connection:", name)
-		_ = closer.Close()
+		api.setConnectionUnsafe(name, nil)
 	}
 	api.connections = map[string]*Conn{}
 	api.listeners = map[string]*astral.Listener{}
@@ -101,6 +102,10 @@ func (api *FlatAdapter) getConnection(connectionId string) (rw *Conn, ok bool) {
 func (api *FlatAdapter) setConnection(connectionId string, connection *astral.Conn) {
 	api.connectionsMutex.Lock()
 	defer api.connectionsMutex.Unlock()
+	api.setConnectionUnsafe(connectionId, connection)
+}
+
+func (api *FlatAdapter) setConnectionUnsafe(connectionId string, connection *astral.Conn) {
 	if connection != nil {
 		api.connections[connectionId] = newConn(connection)
 	} else {

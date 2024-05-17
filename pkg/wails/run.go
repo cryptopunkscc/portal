@@ -15,10 +15,10 @@ import (
 
 func Run(src target.App, opt *options.App) (err error) {
 	log.Printf("portal open: (%d) %s\n", os.Getpid(), src.Manifest())
+	defer log.Printf("portal close: (%d) %s\n", os.Getpid(), src.Manifest())
 	SetupOptions(src, opt)
 	app := application.NewWithOptions(opt)
 	err = app.Run()
-	log.Printf("portal close: (%d) %s\n", os.Getpid(), src.Manifest())
 	return
 }
 
@@ -56,7 +56,11 @@ func AppOptions(app target.Api) *options.App {
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
 		Bind:             []interface{}{app},
 		OnDomReady: func(ctx context.Context) {
-			_ = app.Interrupt
+			app.Interrupt()
+		},
+		OnBeforeClose: func(ctx context.Context) (prevent bool) {
+			app.Interrupt()
+			return false
 		},
 	}
 }

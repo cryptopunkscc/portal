@@ -55,7 +55,7 @@ func (m *Module) Files() fs.FS {
 	return m.files
 }
 
-func (m Module) Type() (t target.Type) {
+func (m *Module) Type() (t target.Type) {
 	switch {
 	case m.IsFrontend():
 		t += target.Frontend

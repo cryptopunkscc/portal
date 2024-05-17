@@ -7,6 +7,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"path"
+	"strings"
 )
 
 func ResolveApps(src string) (apps target.Portals[target.App], err error) {
@@ -35,6 +36,7 @@ func ResolveApps(src string) (apps target.Portals[target.App], err error) {
 }
 
 func ResolveAppByNameOrPackage(src string) (app target.App, err error) {
+	src = strings.TrimPrefix(src, "dev.")
 	if src, err = appstore.Path(src); err != nil {
 		return
 	}

@@ -13,7 +13,6 @@ import (
 )
 
 func Run(path string, opt *options.App) (err error) {
-
 	// Start frontend dev watcher
 	viteCommand := "npm run dev"
 	stopDevWatcher, url, _, err := runViteWatcher(viteCommand, path, true)

@@ -62,7 +62,7 @@ func Resolve(root target.Source, src string) (result target.Source, err error) {
 		result = bundle
 		return
 	}
-	if path.Ext(src) != "" {
+	if path.Ext(src) != "" && src != "." {
 		err = nil
 		return
 	}

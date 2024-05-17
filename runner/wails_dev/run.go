@@ -10,6 +10,7 @@ import (
 	wailsdev "github.com/cryptopunkscc/go-astral-js/pkg/wails/dev"
 	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 	"log"
+	"os"
 )
 
 type Frontend struct {
@@ -23,7 +24,8 @@ func NewFrontend(bindings target.New, project target.Project) *Frontend {
 }
 
 func (f *Frontend) Start() (err error) {
-	log.Println("starting dev frontend", f.Abs())
+	log.Printf("portal dev open: (%d) %s\n", os.Getpid(), f.Manifest())
+	defer log.Printf("portal dev close: (%d) %s\n", os.Getpid(), f.Manifest())
 	opt := wails.AppOptions(f.New(target.Frontend, "dev"))
 	opt.OnStartup = func(ctx context.Context) {
 		f.frontCtx = ctx

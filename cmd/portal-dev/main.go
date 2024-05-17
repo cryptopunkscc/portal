@@ -28,13 +28,13 @@ func main() {
 	go osexec.OnShutdown(cancel)
 
 	wait := &sync.WaitGroup{}
-	proc := exec.NewRunner[target.Portal]()
+	proc := exec.NewRunner[target.Portal]("portal-dev")
 	resolve := portal.ResolvePortals
 	spawn := runner.NewSpawner(wait, resolve, proc)
 	bindings := newRuntimeFactory(ctx, spawn)
 	run := dev2.NewRunner(bindings)
 
-	devFeat := dev.NewFeat(spawn)
+	devFeat := dev.NewFeat(wait, spawn)
 	attachFeat := open.NewFeat[target.Portal](resolve, run)
 
 	cli := clir.NewCli(ctx, manifest.NameDev, manifest.DescriptionDev, version.Run)
@@ -46,10 +46,10 @@ func main() {
 	cli.Apps()
 
 	err := cli.Run()
-	cancel()
 	if err != nil {
 		log.Println(err)
 	}
+	log.Println("closing portal development")
 	wait.Wait()
 }
 

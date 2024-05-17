@@ -6,7 +6,6 @@ import (
 	"github.com/cryptopunkscc/astrald/sig"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"log"
-	"path"
 	"strings"
 	"time"
 )
@@ -66,7 +65,7 @@ func (inv *Invoker) invokeApp(query string) (err error) {
 		return ErrServiceAlreadyRunning
 	}
 
-	src = path.Join(append(inv.Prefix(), src)...)
+	src = strings.Join(append(inv.Prefix(), src), ".")
 
 	go func() {
 		if err := inv.invoke(inv.ctx, src); err != nil {
