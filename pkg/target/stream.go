@@ -7,7 +7,7 @@ import (
 
 // Stream all portal targets in a given dir and stream through the returned channel.
 // Possible types are: NodeModule, PortalNodeModule, PortalRawModule, Bundle,
-func Stream[T Source](resolve Resolve, from Source) (in <-chan T) {
+func Stream[T Source](resolve ResolveT[T], from Source) (in <-chan T) {
 	out := make(chan T)
 	in = out
 	go func() {
@@ -19,11 +19,8 @@ func Stream[T Source](resolve Resolve, from Source) (in <-chan T) {
 
 			m := NewModuleFS(from.Files(), src, from.Abs())
 			s, err := resolve(m)
-			if s != nil && !reflect.ValueOf(s).IsNil() {
-				switch t := s.(type) {
-				case T:
-					out <- t
-				}
+			if any(s) != nil && !reflect.ValueOf(s).IsNil() {
+				out <- s
 			}
 			return err
 		})

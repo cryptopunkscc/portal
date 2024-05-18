@@ -16,11 +16,11 @@ type Bundle struct {
 
 var _ target.Bundle = (*Bundle)(nil)
 
-func NewBundle(abs string) (b *Bundle, err error) {
+func NewBundle(abs string) (b target.Bundle, err error) {
 	return ResolveBundle(target.NewModule(abs))
 }
 
-func ResolveBundle(source target.Source) (b *Bundle, err error) {
+func ResolveBundle(source target.Source) (b target.Bundle, err error) {
 	source = source.Lift()
 	if !source.Type().Is(target.TypeBundle) {
 		err = errors.New("not a bundle")

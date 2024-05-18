@@ -3,6 +3,8 @@ package resolve
 import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/array"
 	js "github.com/cryptopunkscc/go-astral-js/pkg/binding/out"
+	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
+	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/stretchr/testify/assert"
 	"log"
@@ -31,4 +33,20 @@ func Test_FindLibsInFs(t *testing.T) {
 
 func PrintTarget(t target.Source) {
 	log.Println(reflect.TypeOf(t), t.Path(), t.Abs())
+}
+
+func Test_CustomFind(t *testing.T) {
+	src := target.NewModule("test_assets")
+
+	var find = target.Any[target.Source](
+		target.Try(project.SkipNodeModulesDir),
+		target.Try(portal.ResolveBundle),
+		target.Lift(target.Try(project.ResolveNodeModule))(
+			target.Try(project.ResolvePortalModule)),
+		target.Try(portal.ResolveDist),
+	)
+
+	for source := range target.Stream[target.Source](find, src) {
+		PrintTarget(source)
+	}
 }

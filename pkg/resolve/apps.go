@@ -43,7 +43,7 @@ func (a apps) ByNameOrPackage(src string) (app target.App, err error) {
 	if src, err = a.Path(src); err != nil {
 		return
 	}
-	var bundle *portal.Bundle
+	var bundle target.Bundle
 	if bundle, err = portal.NewBundle(src); err != nil {
 		return nil, fmt.Errorf("cannot resolve portal apps path from '%s': %v", src, err)
 	}

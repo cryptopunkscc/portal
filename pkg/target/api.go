@@ -19,6 +19,8 @@ type Find[T Portal] func(src string) (portals Portals[T], err error)
 
 type Resolve func(src Source) (result Source, err error)
 
+type ResolveT[T Source] func(src Source) (result T, err error)
+
 type Spawn func(context.Context, string) error
 
 type Run[T Portal] func(ctx context.Context, src T) (err error)
