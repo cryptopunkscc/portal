@@ -14,19 +14,19 @@ func Apps(src string) (apps target.Portals[target.App], err error) {
 	apps = make(target.Portals[target.App])
 	if fs.Exists(src) {
 		if path.Base(src) == src {
-			if apps[src], err = App(src); err == nil {
+			if apps[src], err = AppByNameOrPackage(src); err == nil {
 				return
 			}
 		}
 
 		// scan src as path for portal apps
-		if apps, err = ResolveAppsByPath(src); err == nil {
+		if apps, err = AppsByPath(src); err == nil {
 			return
 		}
 
 	} else {
 		// resolve app path from appstore using given src as package name
-		if apps[src], err = App(src); err == nil {
+		if apps[src], err = AppByNameOrPackage(src); err == nil {
 			return
 		}
 	}
@@ -35,8 +35,7 @@ func Apps(src string) (apps target.Portals[target.App], err error) {
 	return
 }
 
-// App by name or package
-func App(src string) (app target.App, err error) {
+func AppByNameOrPackage(src string) (app target.App, err error) {
 	src = strings.TrimPrefix(src, "dev.")
 	if src, err = appstore.Path(src); err != nil {
 		return
@@ -49,9 +48,9 @@ func App(src string) (app target.App, err error) {
 	return
 }
 
-func ResolveAppsByPath(src string) (apps target.Portals[target.App], err error) {
+func AppsByPath(src string) (apps target.Portals[target.App], err error) {
 	apps = map[string]target.App{}
-	for app := range project.FindInPath[target.App](src) {
+	for app := range FromPath[target.App](src) {
 		apps[app.Manifest().Package] = app
 	}
 	return

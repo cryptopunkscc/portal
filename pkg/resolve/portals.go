@@ -3,7 +3,6 @@ package resolve
 import (
 	"errors"
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"log"
 )
@@ -35,7 +34,7 @@ func Portals(src string) (portals target.Portals[target.Portal], err error) {
 
 func Projects(src string) (apps target.Portals[target.Project], err error) {
 	apps = make(target.Portals[target.Project])
-	for app := range project.FindInPath[target.Project](src) {
+	for app := range FromPath[target.Project](src) {
 		if apps[app.Manifest().Package] == nil {
 			apps[app.Manifest().Package] = app
 		}

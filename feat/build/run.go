@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/array"
 	js "github.com/cryptopunkscc/go-astral-js/pkg/binding/out"
-	"github.com/cryptopunkscc/go-astral-js/pkg/project"
+	"github.com/cryptopunkscc/go-astral-js/pkg/resolve"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/runner/dist"
 	"github.com/cryptopunkscc/go-astral-js/runner/pack"
@@ -13,7 +13,7 @@ import (
 )
 
 func Run(dir string) (err error) {
-	libs := array.FromChan(project.FindInFS[target.NodeModule](js.PortalLibFS))
+	libs := array.FromChan(resolve.FromFS[target.NodeModule](js.PortalLibFS))
 	if err = Dist(dir, ".", libs...); err != nil {
 		return fmt.Errorf("cannot build portal apps: %w", err)
 	}
@@ -24,7 +24,7 @@ func Run(dir string) (err error) {
 }
 
 func Dist(root, dir string, dependencies ...target.NodeModule) (err error) {
-	for m := range project.FindInPath[target.Project](path.Join(root, dir)) {
+	for m := range resolve.FromPath[target.Project](path.Join(root, dir)) {
 		if !m.CanNpmRunBuild() {
 			continue
 		}
@@ -37,7 +37,7 @@ func Dist(root, dir string, dependencies ...target.NodeModule) (err error) {
 
 func Pack(base, sub string) (err error) {
 	err = errors.New("no targets found")
-	for app := range project.FindInPath[target.Dist](path.Join(base, sub)) {
+	for app := range resolve.FromPath[target.Dist](path.Join(base, sub)) {
 		if err = pack.Run(app); err != nil {
 			return fmt.Errorf("bundle target %v: %v", app.Path(), err)
 		}
