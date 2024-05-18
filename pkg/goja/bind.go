@@ -2,10 +2,11 @@ package goja
 
 import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/dop251/goja"
 )
 
-func Bind(vm *goja.Runtime, astral apphost.Flat) (err error) {
+func Bind(vm *goja.Runtime, astral target.Apphost) (err error) {
 	var a = adapter{astral: astral, vm: vm, queue: make(chan func(), 1024)}
 	if err = vm.Set(apphost.Log, a.Log); err != nil {
 		return
@@ -55,7 +56,7 @@ func Bind(vm *goja.Runtime, astral apphost.Flat) (err error) {
 }
 
 type adapter struct {
-	astral apphost.Flat
+	astral target.Apphost
 	vm     *goja.Runtime
 	queue  chan func()
 }

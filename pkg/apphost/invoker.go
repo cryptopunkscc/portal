@@ -3,6 +3,7 @@ package apphost
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/cryptopunkscc/astrald/sig"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"log"
@@ -11,7 +12,7 @@ import (
 )
 
 type Invoker struct {
-	Flat
+	*Adapter
 	ctx       context.Context
 	cancel    context.CancelFunc
 	processes sig.Map[string, any]
@@ -20,10 +21,10 @@ type Invoker struct {
 
 func NewInvoker(
 	ctx context.Context,
-	flat Flat,
+	flat *Adapter,
 	serve Invoke,
 ) (i *Invoker) {
-	i = &Invoker{Flat: flat, invoke: serve}
+	i = &Invoker{Adapter: flat, invoke: serve}
 	i.ctx, i.cancel = context.WithCancel(ctx)
 	return
 }
@@ -34,11 +35,11 @@ func (inv *Invoker) Close() error {
 }
 
 func (inv *Invoker) Query(identity string, query string) (data string, err error) {
-	data, err = inv.Flat.Query(identity, query)
+	data, err = inv.Adapter.Query(identity, query)
 	if err != nil && identity == "" {
 		if inv.invoke != nil {
 			if err := inv.invokeApp(query); err != nil && !errors.Is(err, ErrServiceAlreadyRunning) {
-				log.Println("Invoker.Query", inv.port(query), "service not available:", err)
+				err = fmt.Errorf("Invoker.Query %s service not available: %v", query, err)
 				return data, err
 			} else if err == nil {
 				log.Println("invoked app for:", query)
@@ -49,7 +50,7 @@ func (inv *Invoker) Query(identity string, query string) (data string, err error
 			if i == 0 {
 				return data, err
 			}
-			return inv.Flat.Query(identity, query)
+			return inv.Adapter.Query(identity, query)
 		})
 		if err == nil {
 			log.Println("query succeed")

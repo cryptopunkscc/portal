@@ -2,12 +2,11 @@ package target
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 )
 
 type Api interface {
-	apphost.Flat
+	Apphost
 }
 
 type New func(p Type, prefix ...string) Api

@@ -2,11 +2,12 @@ package v8
 
 import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"log"
 	v8 "rogchap.com/v8go"
 )
 
-func Bind(iso *v8.Isolate, astral apphost.Flat) (template *v8.ObjectTemplate, err error) {
+func Bind(iso *v8.Isolate, astral target.Apphost) (template *v8.ObjectTemplate, err error) {
 	template = v8.NewObjectTemplate(iso)
 	a := adapter{astral}
 	if err = template.Set(apphost.Log, v8.NewFunctionTemplate(iso, a.Log)); err != nil {
@@ -49,7 +50,7 @@ func Bind(iso *v8.Isolate, astral apphost.Flat) (template *v8.ObjectTemplate, er
 }
 
 type adapter struct {
-	astral apphost.Flat
+	astral target.Apphost
 }
 
 func (a *adapter) Log(info *v8.FunctionCallbackInfo) *v8.Value {

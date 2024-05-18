@@ -2,6 +2,7 @@ package webview
 
 import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/webview/webview"
 )
 
@@ -13,7 +14,7 @@ func New(debug bool) *WebView {
 	return &WebView{WebView: webview.New(debug)}
 }
 
-func (view *WebView) BindApphost(astral apphost.Flat) {
+func (view *WebView) BindApphost(astral target.Apphost) {
 	if err := view.Bind(apphost.Log, astral.Log); err != nil {
 		return
 	}

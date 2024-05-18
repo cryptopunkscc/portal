@@ -32,7 +32,7 @@ const (
 	Interrupt       = "_astral_interrupt"
 )
 
-type FlatAdapter struct {
+type Adapter struct {
 	prefix []string
 
 	listeners      map[string]*astral.Listener
@@ -44,20 +44,20 @@ type FlatAdapter struct {
 	onIdle func(bool)
 }
 
-func (api *FlatAdapter) port(service string) (port string) {
+func (api *Adapter) Port(service string) (port string) {
 	return strings.Join(append(api.Prefix(), service), ".")
 }
 
-func (api *FlatAdapter) Prefix() []string {
+func (api *Adapter) Prefix() []string {
 	return api.prefix
 }
 
-func (api *FlatAdapter) Close() error {
+func (api *Adapter) Close() error {
 	api.Interrupt()
 	return nil
 }
 
-func (api *FlatAdapter) Interrupt() {
+func (api *Adapter) Interrupt() {
 	api.listenersMutex.Lock()
 	api.connectionsMutex.Lock()
 	defer api.listenersMutex.Unlock()
@@ -75,14 +75,14 @@ func (api *FlatAdapter) Interrupt() {
 	api.listeners = map[string]*astral.Listener{}
 }
 
-func (api *FlatAdapter) getListener(service string) (l *astral.Listener, ok bool) {
+func (api *Adapter) getListener(service string) (l *astral.Listener, ok bool) {
 	api.listenersMutex.RLock()
 	defer api.listenersMutex.RUnlock()
 	l, ok = api.listeners[service]
 	return
 }
 
-func (api *FlatAdapter) setListener(service string, listener *astral.Listener) {
+func (api *Adapter) setListener(service string, listener *astral.Listener) {
 	api.listenersMutex.Lock()
 	defer api.listenersMutex.Unlock()
 	if listener != nil {
@@ -92,20 +92,20 @@ func (api *FlatAdapter) setListener(service string, listener *astral.Listener) {
 	}
 }
 
-func (api *FlatAdapter) getConnection(connectionId string) (rw *Conn, ok bool) {
+func (api *Adapter) getConnection(connectionId string) (rw *Conn, ok bool) {
 	api.connectionsMutex.RLock()
 	defer api.connectionsMutex.RUnlock()
 	rw, ok = api.connections[connectionId]
 	return
 }
 
-func (api *FlatAdapter) setConnection(connectionId string, connection *astral.Conn) {
+func (api *Adapter) setConnection(connectionId string, connection *astral.Conn) {
 	api.connectionsMutex.Lock()
 	defer api.connectionsMutex.Unlock()
 	api.setConnectionUnsafe(connectionId, connection)
 }
 
-func (api *FlatAdapter) setConnectionUnsafe(connectionId string, connection *astral.Conn) {
+func (api *Adapter) setConnectionUnsafe(connectionId string, connection *astral.Conn) {
 	if connection != nil {
 		api.connections[connectionId] = newConn(connection)
 	} else {
@@ -116,20 +116,20 @@ func (api *FlatAdapter) setConnectionUnsafe(connectionId string, connection *ast
 	}
 }
 
-func (api *FlatAdapter) Log(arg ...any) {
+func (api *Adapter) Log(arg ...any) {
 	log.Println(arg...)
 }
 
-func (api *FlatAdapter) LogArr(arg []any) {
+func (api *Adapter) LogArr(arg []any) {
 	log.Println(arg...)
 }
 
-func (api *FlatAdapter) Sleep(duration int64) {
+func (api *Adapter) Sleep(duration int64) {
 	time.Sleep(time.Duration(duration) * time.Millisecond)
 }
 
-func (api *FlatAdapter) ServiceRegister(service string) (err error) {
-	port := api.port(service)
+func (api *Adapter) ServiceRegister(service string) (err error) {
+	port := api.Port(service)
 	listener, err := astral.Register(port)
 	if err != nil {
 		return
@@ -138,7 +138,7 @@ func (api *FlatAdapter) ServiceRegister(service string) (err error) {
 	return
 }
 
-func (api *FlatAdapter) ServiceClose(service string) (err error) {
+func (api *Adapter) ServiceClose(service string) (err error) {
 	listener, ok := api.getListener(service)
 	if !ok {
 		err = errors.New("[ServiceClose] not listening on port: " + service)
@@ -151,7 +151,7 @@ func (api *FlatAdapter) ServiceClose(service string) (err error) {
 	return
 }
 
-func (api *FlatAdapter) ConnAccept(service string) (data string, err error) {
+func (api *Adapter) ConnAccept(service string) (data string, err error) {
 	listener, ok := api.getListener(service)
 	if !ok {
 		err = fmt.Errorf("[ConnAccept] not listening on port: %v", service)
@@ -188,7 +188,7 @@ type queryData struct {
 	Query string `json:"query"`
 }
 
-func (api *FlatAdapter) ConnClose(id string) (err error) {
+func (api *Adapter) ConnClose(id string) (err error) {
 	conn, ok := api.getConnection(id)
 	if !ok {
 		err = errors.New("[ConnClose] not found connection with id: " + id)
@@ -199,7 +199,7 @@ func (api *FlatAdapter) ConnClose(id string) (err error) {
 	return
 }
 
-func (api *FlatAdapter) ConnWrite(id string, data string) (err error) {
+func (api *Adapter) ConnWrite(id string, data string) (err error) {
 	conn, ok := api.getConnection(id)
 	if !ok {
 		err = errors.New("[ConnWrite] not found connection with id: " + id)
@@ -212,7 +212,7 @@ func (api *FlatAdapter) ConnWrite(id string, data string) (err error) {
 	return
 }
 
-func (api *FlatAdapter) ConnRead(id string) (data string, err error) {
+func (api *Adapter) ConnRead(id string) (data string, err error) {
 	conn, ok := api.getConnection(id)
 	if !ok {
 		err = errors.New("[ConnRead] not found connection with id: " + id)
@@ -226,7 +226,7 @@ func (api *FlatAdapter) ConnRead(id string) (data string, err error) {
 	return
 }
 
-func (api *FlatAdapter) Query(identity string, query string) (data string, err error) {
+func (api *Adapter) Query(identity string, query string) (data string, err error) {
 	nid := id.Identity{}
 	if len(identity) > 0 {
 		nid, err = id.ParsePublicKeyHex(identity)
@@ -234,7 +234,7 @@ func (api *FlatAdapter) Query(identity string, query string) (data string, err e
 			return
 		}
 	}
-	conn, err := astral.Query(nid, api.port(query))
+	conn, err := astral.Query(nid, api.Port(query))
 	if err != nil {
 		return
 	}
@@ -252,8 +252,8 @@ func (api *FlatAdapter) Query(identity string, query string) (data string, err e
 	return
 }
 
-func (api *FlatAdapter) QueryName(name string, query string) (data string, err error) {
-	conn, err := astral.QueryName(name, api.port(query))
+func (api *Adapter) QueryName(name string, query string) (data string, err error) {
+	conn, err := astral.QueryName(name, api.Port(query))
 	if err != nil {
 		return
 	}
@@ -271,7 +271,7 @@ func (api *FlatAdapter) QueryName(name string, query string) (data string, err e
 	return
 }
 
-func (api *FlatAdapter) Resolve(name string) (id string, err error) {
+func (api *Adapter) Resolve(name string) (id string, err error) {
 	identity, err := astral.Resolve(name)
 	if err != nil {
 		return
@@ -280,7 +280,7 @@ func (api *FlatAdapter) Resolve(name string) (id string, err error) {
 	return
 }
 
-func (api *FlatAdapter) NodeInfo(identity string) (info NodeInfo, err error) {
+func (api *Adapter) NodeInfo(identity string) (info NodeInfo, err error) {
 	nid, err := id.ParsePublicKeyHex(identity)
 	if err != nil {
 		return
