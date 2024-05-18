@@ -1,4 +1,4 @@
-package portal
+package resolve
 
 import (
 	"fmt"
@@ -10,11 +10,11 @@ import (
 	"strings"
 )
 
-func ResolveApps(src string) (apps target.Portals[target.App], err error) {
+func Apps(src string) (apps target.Portals[target.App], err error) {
 	apps = make(target.Portals[target.App])
 	if fs.Exists(src) {
 		if path.Base(src) == src {
-			if apps[src], err = ResolveAppByNameOrPackage(src); err == nil {
+			if apps[src], err = App(src); err == nil {
 				return
 			}
 		}
@@ -26,7 +26,7 @@ func ResolveApps(src string) (apps target.Portals[target.App], err error) {
 
 	} else {
 		// resolve app path from appstore using given src as package name
-		if apps[src], err = ResolveAppByNameOrPackage(src); err == nil {
+		if apps[src], err = App(src); err == nil {
 			return
 		}
 	}
@@ -35,7 +35,8 @@ func ResolveApps(src string) (apps target.Portals[target.App], err error) {
 	return
 }
 
-func ResolveAppByNameOrPackage(src string) (app target.App, err error) {
+// App by name or package
+func App(src string) (app target.App, err error) {
 	src = strings.TrimPrefix(src, "dev.")
 	if src, err = appstore.Path(src); err != nil {
 		return

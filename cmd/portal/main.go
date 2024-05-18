@@ -11,7 +11,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	osexec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
-	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
+	"github.com/cryptopunkscc/go-astral-js/pkg/resolve"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/runner"
 	"github.com/cryptopunkscc/go-astral-js/runner/app"
@@ -30,14 +30,14 @@ func main() {
 	executable := "portal"
 	wait := &sync.WaitGroup{}
 	proc := exec.NewRunner[target.App](executable)
-	resolve := portal.ResolveApps
-	spawn := runner.NewSpawner(wait, resolve, proc)
+	find := resolve.Apps
+	spawn := runner.NewSpawner(wait, find, proc)
 	bindings := newRuntimeFactory(ctx, spawn)
 	run := app.NewRunner(bindings)
 
 	dispatchFeat := dispatch.NewFeat(executable)
 	serveFeat := serve.NewFeat(spawn, tray.New(spawn))
-	attachFeat := open.NewFeat[target.App](resolve, run)
+	attachFeat := open.NewFeat[target.App](find, run)
 
 	cli := clir.NewCli(ctx, manifest.Name, manifest.Description, version.Run)
 

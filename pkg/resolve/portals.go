@@ -1,4 +1,4 @@
-package portal
+package resolve
 
 import (
 	"errors"
@@ -8,16 +8,16 @@ import (
 	"log"
 )
 
-func ResolvePortals(src string) (portals target.Portals[target.Portal], err error) {
+func Portals(src string) (portals target.Portals[target.Portal], err error) {
 	portals = make(target.Portals[target.Portal])
-	apps, err1 := ResolveApps(src)
+	apps, err1 := Apps(src)
 	if err1 == nil {
 		for s, app := range apps {
 			portals[s] = app
 		}
 	}
 
-	projects, err2 := ResolveProjects(src)
+	projects, err2 := Projects(src)
 	if err2 == nil {
 		for s, p := range projects {
 			portals[s] = p
@@ -33,7 +33,7 @@ func ResolvePortals(src string) (portals target.Portals[target.Portal], err erro
 	return
 }
 
-func ResolveProjects(src string) (apps target.Portals[target.Project], err error) {
+func Projects(src string) (apps target.Portals[target.Project], err error) {
 	apps = make(target.Portals[target.Project])
 	for app := range project.FindInPath[target.Project](src) {
 		if apps[app.Manifest().Package] == nil {
