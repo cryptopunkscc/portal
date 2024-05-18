@@ -1,7 +1,6 @@
 package webview
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/webview/webview"
 )
@@ -15,37 +14,37 @@ func New(debug bool) *WebView {
 }
 
 func (view *WebView) BindApphost(astral target.Apphost) {
-	if err := view.Bind(apphost.Log, astral.Log); err != nil {
+	if err := view.Bind(target.Log, astral.Log); err != nil {
 		return
 	}
-	if err := view.Bind(apphost.ServiceRegister, astral.ServiceRegister); err != nil {
+	if err := view.Bind(target.ServiceRegister, astral.ServiceRegister); err != nil {
 		return
 	}
-	if err := view.Bind(apphost.ServiceClose, astral.ServiceClose); err != nil {
+	if err := view.Bind(target.ServiceClose, astral.ServiceClose); err != nil {
 		return
 	}
-	if err := view.Bind(apphost.ConnAccept, astral.ConnAccept); err != nil {
+	if err := view.Bind(target.ConnAccept, astral.ConnAccept); err != nil {
 		return
 	}
-	if err := view.Bind(apphost.ConnClose, astral.ConnClose); err != nil {
+	if err := view.Bind(target.ConnClose, astral.ConnClose); err != nil {
 		return
 	}
-	if err := view.Bind(apphost.ConnWrite, astral.ConnWrite); err != nil {
+	if err := view.Bind(target.ConnWrite, astral.ConnWrite); err != nil {
 		return
 	}
-	if err := view.Bind(apphost.ConnRead, astral.ConnRead); err != nil {
+	if err := view.Bind(target.ConnRead, astral.ConnRead); err != nil {
 		return
 	}
-	if err := view.Bind(apphost.Query, astral.Query); err != nil {
+	if err := view.Bind(target.Query, astral.Query); err != nil {
 		return
 	}
-	if err := view.Bind(apphost.QueryName, astral.QueryName); err != nil {
+	if err := view.Bind(target.QueryName, astral.QueryName); err != nil {
 		return
 	}
-	if err := view.Bind(apphost.GetNodeInfo, astral.NodeInfo); err != nil {
+	if err := view.Bind(target.GetNodeInfo, astral.NodeInfo); err != nil {
 		return
 	}
-	if err := view.Bind(apphost.Resolve, astral.Resolve); err != nil {
+	if err := view.Bind(target.ResolveId, astral.Resolve); err != nil {
 		return
 	}
 }

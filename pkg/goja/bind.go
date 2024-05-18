@@ -1,50 +1,49 @@
 package goja
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/dop251/goja"
 )
 
 func Bind(vm *goja.Runtime, astral target.Apphost) (err error) {
 	var a = adapter{astral: astral, vm: vm, queue: make(chan func(), 1024)}
-	if err = vm.Set(apphost.Log, a.Log); err != nil {
+	if err = vm.Set(target.Log, a.Log); err != nil {
 		return
 	}
-	if err = vm.Set(apphost.Sleep, a.Sleep); err != nil {
+	if err = vm.Set(target.Sleep, a.Sleep); err != nil {
 		return
 	}
-	if err = vm.Set(apphost.ServiceRegister, a.ServiceRegister); err != nil {
+	if err = vm.Set(target.ServiceRegister, a.ServiceRegister); err != nil {
 		return
 	}
-	if err = vm.Set(apphost.ServiceClose, a.ServiceClose); err != nil {
+	if err = vm.Set(target.ServiceClose, a.ServiceClose); err != nil {
 		return
 	}
-	if err = vm.Set(apphost.ConnAccept, a.ConnAccept); err != nil {
+	if err = vm.Set(target.ConnAccept, a.ConnAccept); err != nil {
 		return
 	}
-	if err = vm.Set(apphost.ConnClose, a.ConnClose); err != nil {
+	if err = vm.Set(target.ConnClose, a.ConnClose); err != nil {
 		return
 	}
-	if err = vm.Set(apphost.ConnWrite, a.ConnWrite); err != nil {
+	if err = vm.Set(target.ConnWrite, a.ConnWrite); err != nil {
 		return
 	}
-	if err = vm.Set(apphost.ConnRead, a.ConnRead); err != nil {
+	if err = vm.Set(target.ConnRead, a.ConnRead); err != nil {
 		return
 	}
-	if err = vm.Set(apphost.Query, a.Query); err != nil {
+	if err = vm.Set(target.Query, a.Query); err != nil {
 		return
 	}
-	if err = vm.Set(apphost.QueryName, a.QueryName); err != nil {
+	if err = vm.Set(target.QueryName, a.QueryName); err != nil {
 		return
 	}
-	if err = vm.Set(apphost.GetNodeInfo, a.NodeInfo); err != nil {
+	if err = vm.Set(target.GetNodeInfo, a.NodeInfo); err != nil {
 		return
 	}
-	if err = vm.Set(apphost.Resolve, a.Resolve); err != nil {
+	if err = vm.Set(target.ResolveId, a.Resolve); err != nil {
 		return
 	}
-	if err = vm.Set(apphost.Interrupt, a.Interrupt); err != nil {
+	if err = vm.Set(target.Interrupt, a.Interrupt); err != nil {
 		return
 	}
 	go func() {

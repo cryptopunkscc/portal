@@ -1,7 +1,6 @@
 package v8
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"log"
 	v8 "rogchap.com/v8go"
@@ -10,40 +9,40 @@ import (
 func Bind(iso *v8.Isolate, astral target.Apphost) (template *v8.ObjectTemplate, err error) {
 	template = v8.NewObjectTemplate(iso)
 	a := adapter{astral}
-	if err = template.Set(apphost.Log, v8.NewFunctionTemplate(iso, a.Log)); err != nil {
+	if err = template.Set(target.Log, v8.NewFunctionTemplate(iso, a.Log)); err != nil {
 		return
 	}
-	if err = template.Set(apphost.Sleep, v8.NewFunctionTemplate(iso, a.Sleep)); err != nil {
+	if err = template.Set(target.Sleep, v8.NewFunctionTemplate(iso, a.Sleep)); err != nil {
 		return
 	}
-	if err = template.Set(apphost.ServiceRegister, v8.NewFunctionTemplate(iso, a.ServiceRegister)); err != nil {
+	if err = template.Set(target.ServiceRegister, v8.NewFunctionTemplate(iso, a.ServiceRegister)); err != nil {
 		return
 	}
-	if err = template.Set(apphost.ServiceClose, v8.NewFunctionTemplate(iso, a.ServiceClose)); err != nil {
+	if err = template.Set(target.ServiceClose, v8.NewFunctionTemplate(iso, a.ServiceClose)); err != nil {
 		return
 	}
-	if err = template.Set(apphost.ConnAccept, v8.NewFunctionTemplate(iso, a.ConnAccept)); err != nil {
+	if err = template.Set(target.ConnAccept, v8.NewFunctionTemplate(iso, a.ConnAccept)); err != nil {
 		return
 	}
-	if err = template.Set(apphost.ConnClose, v8.NewFunctionTemplate(iso, a.ConnClose)); err != nil {
+	if err = template.Set(target.ConnClose, v8.NewFunctionTemplate(iso, a.ConnClose)); err != nil {
 		return
 	}
-	if err = template.Set(apphost.ConnWrite, v8.NewFunctionTemplate(iso, a.ConnWrite)); err != nil {
+	if err = template.Set(target.ConnWrite, v8.NewFunctionTemplate(iso, a.ConnWrite)); err != nil {
 		return
 	}
-	if err = template.Set(apphost.ConnRead, v8.NewFunctionTemplate(iso, a.ConnRead)); err != nil {
+	if err = template.Set(target.ConnRead, v8.NewFunctionTemplate(iso, a.ConnRead)); err != nil {
 		return
 	}
-	if err = template.Set(apphost.Query, v8.NewFunctionTemplate(iso, a.Query)); err != nil {
+	if err = template.Set(target.Query, v8.NewFunctionTemplate(iso, a.Query)); err != nil {
 		return
 	}
-	if err = template.Set(apphost.QueryName, v8.NewFunctionTemplate(iso, a.QueryName)); err != nil {
+	if err = template.Set(target.QueryName, v8.NewFunctionTemplate(iso, a.QueryName)); err != nil {
 		return
 	}
-	if err = template.Set(apphost.GetNodeInfo, v8.NewFunctionTemplate(iso, a.NodeInfo)); err != nil {
+	if err = template.Set(target.GetNodeInfo, v8.NewFunctionTemplate(iso, a.NodeInfo)); err != nil {
 		return
 	}
-	if err = template.Set(apphost.Resolve, v8.NewFunctionTemplate(iso, a.Resolve)); err != nil {
+	if err = template.Set(target.ResolveId, v8.NewFunctionTemplate(iso, a.Resolve)); err != nil {
 		return
 	}
 	return

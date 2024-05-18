@@ -2,6 +2,22 @@ package target
 
 import "github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 
+const (
+	Log             = "_log"
+	Sleep           = "_sleep"
+	ServiceRegister = "_astral_service_register"
+	ServiceClose    = "_astral_service_close"
+	ConnAccept      = "_astral_conn_accept"
+	ConnClose       = "_astral_conn_close"
+	ConnWrite       = "_astral_conn_write"
+	ConnRead        = "_astral_conn_read"
+	Query           = "_astral_query"
+	QueryName       = "_astral_query_name"
+	GetNodeInfo     = "_astral_node_info"
+	ResolveId       = "_astral_resolve"
+	Interrupt       = "_astral_interrupt"
+)
+
 type Apphost interface {
 	Prefix() []string
 	Close() error
