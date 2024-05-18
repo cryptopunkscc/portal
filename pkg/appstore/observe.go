@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
-	"github.com/cryptopunkscc/go-astral-js/pkg/resolve"
+	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"io"
@@ -38,7 +38,7 @@ func send(
 	src string,
 	conn rpc.Conn,
 ) (err error) {
-	for t := range resolve.FromPath[target.Bundle](src) {
+	for t := range portal.FromPath[target.Bundle](src) {
 		if err = conn.Encode(t.Manifest()); err != nil {
 			return
 		}

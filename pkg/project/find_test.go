@@ -1,10 +1,9 @@
-package resolve
+package project
 
 import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/array"
 	js "github.com/cryptopunkscc/go-astral-js/pkg/binding/out"
 	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
-	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/stretchr/testify/assert"
 	"log"
@@ -39,10 +38,10 @@ func Test_CustomFind(t *testing.T) {
 	src := target.NewModule("test_assets")
 
 	var find = target.Any[target.Source](
-		target.Try(project.SkipNodeModulesDir),
+		target.Skip("node_modules"),
 		target.Try(portal.ResolveBundle),
-		target.Lift(target.Try(project.ResolveNodeModule))(
-			target.Try(project.ResolvePortalModule)),
+		target.Lift(target.Try(ResolveNodeModule))(
+			target.Try(ResolvePortalModule)),
 		target.Try(portal.ResolveDist),
 	)
 

@@ -2,14 +2,14 @@ package appstore
 
 import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
-	"github.com/cryptopunkscc/go-astral-js/pkg/resolve"
+	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"log"
 	"path"
 )
 
 func Install(src string) (err error) {
-	for t := range resolve.FromPath[target.Bundle](src) {
+	for t := range portal.FromPath[target.Bundle](src) {
 		src = t.Abs()
 		dst := path.Join(portalAppsDir, path.Base(t.Path()))
 

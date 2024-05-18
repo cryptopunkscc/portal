@@ -3,13 +3,13 @@ package appstore
 import (
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
-	"github.com/cryptopunkscc/go-astral-js/pkg/resolve"
+	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"log"
 )
 
 func Uninstall(id string) (err error) {
-	for t := range resolve.FromPath[target.Bundle](portalAppsDir) {
+	for t := range portal.FromPath[target.Bundle](portalAppsDir) {
 		manifest := target.Manifest{}
 		_ = manifest.LoadFs(t.Files(), target.PortalJson)
 		if manifest.Name == id || manifest.Package == id {

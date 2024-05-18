@@ -3,7 +3,6 @@ package project
 import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"io/fs"
-	"path"
 )
 
 type NodeModule struct {
@@ -12,13 +11,6 @@ type NodeModule struct {
 }
 
 var _ target.NodeModule = (*NodeModule)(nil)
-
-func SkipNodeModulesDir(source target.Source) (result target.Source, err error) {
-	if path.Base(source.Path()) == "node_modules" {
-		return nil, fs.SkipDir
-	}
-	return
-}
 
 func ResolveNodeModule(m target.Source) (module *NodeModule, err error) {
 	sub, err := fs.Sub(m.Files(), m.Path())

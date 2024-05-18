@@ -3,6 +3,7 @@ package target
 import (
 	"errors"
 	"io/fs"
+	"path"
 )
 
 func Any[T Source](of ...func(Source) (Source, error)) func(Source) (T, error) {
@@ -54,5 +55,16 @@ func Try[A Source, B Source](f func(A) (B, error)) func(Source) (Source, error) 
 			return
 		}
 		return f(a)
+	}
+}
+
+func Skip(name ...string) func(source Source) (result Source, err error) {
+	return func(source Source) (result Source, err error) {
+		for _, n := range name {
+			if path.Base(source.Path()) == n {
+				return nil, fs.SkipDir
+			}
+		}
+		return
 	}
 }

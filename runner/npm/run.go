@@ -34,7 +34,8 @@ func InjectDependencies(m target.NodeModule, deps []target.NodeModule) (err erro
 	return
 }
 
-func InjectDependency(m target.NodeModule, dep target.NodeModule) (err error) {
+func InjectDependency(m target.NodeModule, deps target.NodeModule) (err error) {
+	dep := deps.Lift()
 	nm := path.Join(m.Abs(), "node_modules", path.Base(dep.Abs()))
 	log.Printf("copying module %v %v into: %s", dep.Path(), dep.Abs(), nm)
 	return fs.WalkDir(dep.Files(), ".", func(s string, d fs.DirEntry, err error) error {
