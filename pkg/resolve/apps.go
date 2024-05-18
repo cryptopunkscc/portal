@@ -2,7 +2,6 @@ package resolve
 
 import (
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
@@ -10,23 +9,27 @@ import (
 	"strings"
 )
 
-func Apps(src string) (apps target.Portals[target.App], err error) {
+func Apps(resolve target.Path) func(src string) (apps target.Portals[target.App], err error) {
+	return apps{resolve}.Resolve
+}
+
+type apps struct{ target.Path }
+
+func (a apps) Resolve(src string) (apps target.Portals[target.App], err error) {
 	apps = make(target.Portals[target.App])
 	if fs.Exists(src) {
 		if path.Base(src) == src {
-			if apps[src], err = AppByNameOrPackage(src); err == nil {
+			if apps[src], err = a.ByNameOrPackage(src); err == nil {
 				return
 			}
 		}
 
-		// scan src as path for portal apps
-		if apps, err = AppsByPath(src); err == nil {
+		if apps, err = a.ByPath(src); err == nil {
 			return
 		}
 
 	} else {
-		// resolve app path from appstore using given src as package name
-		if apps[src], err = AppByNameOrPackage(src); err == nil {
+		if apps[src], err = a.ByNameOrPackage(src); err == nil {
 			return
 		}
 	}
@@ -35,9 +38,9 @@ func Apps(src string) (apps target.Portals[target.App], err error) {
 	return
 }
 
-func AppByNameOrPackage(src string) (app target.App, err error) {
+func (a apps) ByNameOrPackage(src string) (app target.App, err error) {
 	src = strings.TrimPrefix(src, "dev.")
-	if src, err = appstore.Path(src); err != nil {
+	if src, err = a.Path(src); err != nil {
 		return
 	}
 	var bundle *project.Bundle
@@ -48,7 +51,7 @@ func AppByNameOrPackage(src string) (app target.App, err error) {
 	return
 }
 
-func AppsByPath(src string) (apps target.Portals[target.App], err error) {
+func (a apps) ByPath(src string) (apps target.Portals[target.App], err error) {
 	apps = map[string]target.App{}
 	for app := range FromPath[target.App](src) {
 		apps[app.Manifest().Package] = app

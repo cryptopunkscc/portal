@@ -23,3 +23,5 @@ type Resolve func(src Source) (result Source, err error)
 type Spawn func(context.Context, string) error
 
 type Run[T Portal] func(ctx context.Context, src T) (err error)
+
+type Path func(src string) (string, error)

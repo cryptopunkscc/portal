@@ -7,16 +7,22 @@ import (
 	"log"
 )
 
-func Portals(src string) (portals target.Portals[target.Portal], err error) {
+func Portals(resolve target.Path) func(src string) (portals target.Portals[target.Portal], err error) {
+	return portals{resolve}.Resolve
+}
+
+type portals apps
+
+func (p portals) Resolve(src string) (portals target.Portals[target.Portal], err error) {
 	portals = make(target.Portals[target.Portal])
-	apps, err1 := Apps(src)
+	apps, err1 := p.Resolve(src)
 	if err1 == nil {
 		for s, app := range apps {
 			portals[s] = app
 		}
 	}
 
-	projects, err2 := Projects(src)
+	projects, err2 := p.Projects(src)
 	if err2 == nil {
 		for s, p := range projects {
 			portals[s] = p
@@ -32,7 +38,7 @@ func Portals(src string) (portals target.Portals[target.Portal], err error) {
 	return
 }
 
-func Projects(src string) (apps target.Portals[target.Project], err error) {
+func (p portals) Projects(src string) (apps target.Portals[target.Project], err error) {
 	apps = make(target.Portals[target.Project])
 	for app := range FromPath[target.Project](src) {
 		if apps[app.Manifest().Package] == nil {
