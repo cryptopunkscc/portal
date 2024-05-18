@@ -14,10 +14,10 @@ import (
 
 func Run(m target.Project, dependencies []target.NodeModule) (err error) {
 	if err = Prepare(m, dependencies); err != nil {
-		return
+		return fmt.Errorf("dist.Prepare: %w", err)
 	}
 	if err = Dist(m); err != nil {
-		return
+		return fmt.Errorf("dist.Dist: %w", err)
 	}
 	return
 }

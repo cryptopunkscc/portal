@@ -1,12 +1,12 @@
-package project
+package target
 
 import (
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"io/fs"
 	"os"
 	"path"
 	"reflect"
+	"strings"
 )
 
 type Module struct {
@@ -26,7 +26,7 @@ func (m *Module) Abs() string {
 	return m.src
 }
 
-func (m *Module) Parent() target.Source {
+func (m *Module) Parent() Source {
 	dir := path.Dir(m.Abs())
 	if path.IsAbs(m.Abs()) {
 		return NewModule(dir)
@@ -58,6 +58,9 @@ func NewModuleFS(files fs.FS, src ...string) *Module {
 	}
 	if len(src) > 1 {
 		m.abs = path.Join(src[1:]...)
+		if !strings.HasSuffix(m.abs, m.src) {
+			m.abs = path.Join(m.abs, m.src)
+		}
 		if !path.IsAbs(m.abs) {
 			println("[WARNING] Module initialized with incorrect absolute path: "+m.abs, m.src)
 		}
@@ -73,16 +76,16 @@ func (m *Module) Files() fs.FS {
 	return m.files
 }
 
-func (m *Module) Type() (t target.Type) {
+func (m *Module) Type() (t Type) {
 	switch {
 	case m.IsFrontend():
-		t += target.TypeFrontend
+		t += TypeFrontend
 	case m.IsBackend():
-		t += target.TypeBackend
+		t += TypeBackend
 	}
 	// TODO verify blob type in addition
 	if path.Ext(m.src) == ".portal" {
-		t += target.TypeBundle
+		t += TypeBundle
 	}
 	return
 }
@@ -103,10 +106,10 @@ func (m *Module) IsBackend() bool {
 	return stat.Mode().IsRegular()
 }
 
-func (m *Module) Lift() target.Source {
+func (m *Module) Lift() Source {
 
 	// omit if a dir already lifted
-	if path.Dir(m.Abs()) == "." {
+	if m.Path() == "." {
 		return m
 	}
 
@@ -119,12 +122,11 @@ func (m *Module) Lift() target.Source {
 	}
 
 	// try lift a file
-	if dir := path.Dir(m.src); dir != "" {
+	if dir := path.Dir(m.src); dir != "." {
 		mm := *m
 		mm.files, _ = fs.Sub(m.files, path.Dir(m.src))
 		mm.src = path.Base(m.src)
 		return &mm
-
 	}
 
 	return m

@@ -29,7 +29,7 @@ func Dist(root, dir string, dependencies ...target.NodeModule) (err error) {
 			continue
 		}
 		if err = dist.Run(m, dependencies); err != nil {
-			return err
+			return fmt.Errorf("build.Dist: %w", err)
 		}
 	}
 	return

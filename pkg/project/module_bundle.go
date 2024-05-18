@@ -18,7 +18,7 @@ type Bundle struct {
 }
 
 func NewBundle(abs string) (b *Bundle, err error) {
-	return ResolveBundle(NewModule(abs))
+	return ResolveBundle(target.NewModule(abs))
 }
 
 func ResolveBundle(source target.Source) (b *Bundle, err error) {
@@ -38,7 +38,7 @@ func ResolveBundle(source target.Source) (b *Bundle, err error) {
 		log.Println("reader err", err, source.Path())
 		return
 	}
-	s := NewModuleFS(reader, source.Path(), source.Abs())
+	s := target.NewModuleFS(reader, source.Path(), source.Abs())
 	m, err := bundle.ReadManifestFs(reader)
 	if err != nil {
 		return

@@ -4,64 +4,27 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"io/fs"
 	"path"
-	"reflect"
 )
 
 func FindInPath[T target.Source](src string) (in <-chan T) {
-	return Find[T](NewModule(src))
+	return target.Stream[T](Resolve, target.NewModule(src))
 }
 
 func FindInFS[T target.Source](src fs.FS) (in <-chan T) {
-	return Find[T](NewModuleFS(src))
+	return target.Stream[T](Resolve, target.NewModuleFS(src))
 }
 
-// Find all portal targets in a given dir and stream through the returned channel.
-// Possible types are: NodeModule, PortalNodeModule, PortalRawModule, Bundle,
-func Find[T target.Source](source target.Source) (in <-chan T) {
-	out := make(chan T)
-	in = out
-	go func() {
-		defer close(out)
-		if source.Type().Is(target.TypeBundle) {
-			var sources target.Source
-			sources, _ = NewBundle(source.Abs())
-			if sources != nil && !reflect.ValueOf(sources).IsNil() {
-				switch t := sources.(type) {
-				case T:
-					out <- t
-				}
-			}
-			return
-		}
-
-		_ = fs.WalkDir(source.Files(), source.Path(), func(src string, d fs.DirEntry, err error) error {
-			if err != nil {
-				return fs.SkipAll
-			}
-			s, err := Resolve(source, src)
-			if s != nil && !reflect.ValueOf(s).IsNil() {
-				switch t := s.(type) {
-				case T:
-					out <- t
-				}
-			}
-			return err
-		})
-	}()
-	return
-}
-
-func Resolve(root target.Source, src string) (result target.Source, err error) {
-	if path.Base(src) == "node_modules" {
+func Resolve(module target.Source) (result target.Source, err error) {
+	if path.Base(module.Path()) == "node_modules" {
 		return nil, fs.SkipDir
 	}
-	module := NewModuleFS(root.Files(), src, root.Abs()).Lift()
+	module = module.Lift()
 	bundle, err := ResolveBundle(module)
 	if err == nil {
 		result = bundle
 		return
 	}
-	if path.Ext(src) != "" && src != "." {
+	if path.Ext(module.Path()) != "" && module.Path() != "." {
 		err = nil
 		return
 	}

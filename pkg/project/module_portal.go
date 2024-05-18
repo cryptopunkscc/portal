@@ -14,7 +14,7 @@ type PortalNodeModule struct {
 }
 
 func NewPortalNodeModule(src string) (module *PortalNodeModule, err error) {
-	nodeModule, err := ResolveNodeModule(NewModule(src))
+	nodeModule, err := ResolveNodeModule(target.NewModule(src))
 	if err != nil {
 		return
 	}
