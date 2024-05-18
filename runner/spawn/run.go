@@ -1,4 +1,4 @@
-package runner
+package spawn
 
 import (
 	"context"
@@ -7,11 +7,11 @@ import (
 	"sync"
 )
 
-func NewSpawner[T target.Portal](
+func NewRunner[T target.Portal](
 	wait *sync.WaitGroup,
 	find target.Find[T],
 	run target.Run[T],
-) func(context.Context, string) error {
+) target.Spawn {
 	return func(ctx context.Context, src string) (err error) {
 		portals, err := find(src)
 		if err != nil {

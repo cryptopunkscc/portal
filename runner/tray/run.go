@@ -13,7 +13,7 @@ type Runner struct {
 	open target.Spawn
 }
 
-func New(open target.Spawn) target.Tray {
+func NewRunner(open target.Spawn) target.Tray {
 	return (&Runner{open: open}).Run
 }
 

@@ -8,13 +8,11 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/runner/wails"
 )
 
-type Runner struct {
-	bindings target.New
-}
-
 func NewRunner(bindings target.New) target.Run[target.App] {
 	return Runner{bindings: bindings}.Run
 }
+
+type Runner struct{ bindings target.New }
 
 func (r Runner) Run(ctx context.Context, app target.App) (err error) {
 	typ := app.Type()

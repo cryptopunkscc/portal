@@ -10,13 +10,13 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/runner/wails_dev"
 )
 
+func NewRunner(bindings target.New) target.Run[target.Portal] {
+	return Runner{bindings: bindings, prefix: []string{"dev"}}.Run
+}
+
 type Runner struct {
 	bindings target.New
 	prefix   []string
-}
-
-func NewRunner(bindings target.New) target.Run[target.Portal] {
-	return Runner{bindings: bindings, prefix: []string{"dev"}}.Run
 }
 
 func (r Runner) Run(ctx context.Context, t target.Portal) (err error) {
