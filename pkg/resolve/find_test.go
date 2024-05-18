@@ -1,9 +1,8 @@
-package project
+package resolve
 
 import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/array"
 	js "github.com/cryptopunkscc/go-astral-js/pkg/binding/out"
-	"github.com/cryptopunkscc/go-astral-js/pkg/resolve"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/stretchr/testify/assert"
 	"log"
@@ -11,9 +10,9 @@ import (
 	"testing"
 )
 
-func Test_FindInPath(t *testing.T) {
+func Test_FromPath(t *testing.T) {
 	assets := target.Abs("test_assets")
-	targets := array.FromChan(resolve.FromPath[target.Source](assets))
+	targets := array.FromChan(FromPath[target.Source](assets))
 
 	for _, source := range targets {
 		PrintTarget(source)
@@ -23,7 +22,7 @@ func Test_FindInPath(t *testing.T) {
 }
 
 func Test_FindLibsInFs(t *testing.T) {
-	targets := array.FromChan(resolve.FromFS[target.Source](js.PortalLibFS))
+	targets := array.FromChan(FromFS[target.Source](js.PortalLibFS))
 
 	for _, source := range targets {
 		PrintTarget(source)

@@ -3,7 +3,7 @@ package resolve
 import (
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
-	"github.com/cryptopunkscc/go-astral-js/pkg/project"
+	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"path"
 	"strings"
@@ -43,8 +43,8 @@ func (a apps) ByNameOrPackage(src string) (app target.App, err error) {
 	if src, err = a.Path(src); err != nil {
 		return
 	}
-	var bundle *project.Bundle
-	if bundle, err = project.NewBundle(src); err != nil {
+	var bundle *portal.Bundle
+	if bundle, err = portal.NewBundle(src); err != nil {
 		return nil, fmt.Errorf("cannot resolve portal apps path from '%s': %v", src, err)
 	}
 	app = bundle

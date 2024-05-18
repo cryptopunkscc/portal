@@ -6,22 +6,22 @@ import (
 	"io/fs"
 )
 
-var _ target.Project = &PortalNodeModule{}
-
-type PortalNodeModule struct {
+type Portal struct {
 	target.NodeModule
 	manifest *bundle.Manifest
 }
 
-func NewPortalNodeModule(src string) (module *PortalNodeModule, err error) {
+var _ target.Project = (*Portal)(nil)
+
+func NewPortalModule(src string) (module *Portal, err error) {
 	nodeModule, err := ResolveNodeModule(target.NewModule(src))
 	if err != nil {
 		return
 	}
-	return ResolvePortalNodeModule(nodeModule)
+	return ResolvePortalModule(nodeModule)
 }
 
-func ResolvePortalNodeModule(m target.NodeModule) (module *PortalNodeModule, err error) {
+func ResolvePortalModule(m target.NodeModule) (module *Portal, err error) {
 	manifest := bundle.Manifest{}
 	sub, err := fs.Sub(m.Files(), m.Path())
 	if err != nil {
@@ -33,16 +33,16 @@ func ResolvePortalNodeModule(m target.NodeModule) (module *PortalNodeModule, err
 	if err = manifest.LoadFs(sub, bundle.PortalJson); err != nil {
 		return
 	}
-	module = &PortalNodeModule{NodeModule: m, manifest: &manifest}
+	module = &Portal{NodeModule: m, manifest: &manifest}
 	return
 }
 
-func (m *PortalNodeModule) Project() {}
+func (m *Portal) Project() {}
 
-func (m *PortalNodeModule) Type() target.Type {
+func (m *Portal) Type() target.Type {
 	return m.NodeModule.Type() + target.TypeDev
 }
 
-func (m *PortalNodeModule) Manifest() *bundle.Manifest {
+func (m *Portal) Manifest() *bundle.Manifest {
 	return m.manifest
 }

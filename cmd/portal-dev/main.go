@@ -6,7 +6,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/clir"
 	"github.com/cryptopunkscc/go-astral-js/feat/build"
 	"github.com/cryptopunkscc/go-astral-js/feat/create"
-	dev "github.com/cryptopunkscc/go-astral-js/feat/dev"
+	"github.com/cryptopunkscc/go-astral-js/feat/dev"
 	"github.com/cryptopunkscc/go-astral-js/feat/open"
 	"github.com/cryptopunkscc/go-astral-js/feat/templates"
 	"github.com/cryptopunkscc/go-astral-js/feat/version"

@@ -30,7 +30,7 @@ func Run(path string, opt *options.App) (err error) {
 	// setup opt
 	front := path
 	path = path + "/dist"
-	src, err := project.NewPortalNodeModule(front)
+	src, err := project.NewPortalModule(front)
 	if err != nil {
 		return err
 	}

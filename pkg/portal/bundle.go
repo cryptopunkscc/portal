@@ -1,4 +1,4 @@
-package project
+package portal
 
 import (
 	"archive/zip"
@@ -10,12 +10,12 @@ import (
 	"log"
 )
 
-var _ target.Bundle = &Bundle{}
-
 type Bundle struct {
 	target.Source
 	manifest *bundle.Manifest
 }
+
+var _ target.Bundle = (*Bundle)(nil)
 
 func NewBundle(abs string) (b *Bundle, err error) {
 	return ResolveBundle(target.NewModule(abs))

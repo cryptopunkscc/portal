@@ -11,6 +11,8 @@ type NodeModule struct {
 	pkgJson *bundle.PackageJson
 }
 
+var _ target.NodeModule = (*NodeModule)(nil)
+
 func ResolveNodeModule(m target.Source) (module *NodeModule, err error) {
 	sub, err := fs.Sub(m.Files(), m.Path())
 	if err != nil {
