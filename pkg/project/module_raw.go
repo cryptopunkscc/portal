@@ -6,9 +6,11 @@ import (
 	"io/fs"
 )
 
+var _ target.Dist = &PortalRawModule{}
+
 type PortalRawModule struct {
 	target.Source
-	manifest bundle.Manifest
+	manifest *bundle.Manifest
 }
 
 func ResolvePortalRawModule(m target.Source) (module *PortalRawModule, err error) {
@@ -20,16 +22,18 @@ func ResolvePortalRawModule(m target.Source) (module *PortalRawModule, err error
 	if err != nil {
 		return
 	}
-	module = &PortalRawModule{Source: m, manifest: manifest}
+	module = &PortalRawModule{Source: m, manifest: &manifest}
 	return
 }
 
 func (m *PortalRawModule) App() {}
 
+func (m *PortalRawModule) Dist() {}
+
 func (m *PortalRawModule) Type() target.Type {
-	return m.Source.Type() + target.Dev
+	return m.Source.Type() + target.TypeDev
 }
 
-func (m *PortalRawModule) Manifest() bundle.Manifest {
+func (m *PortalRawModule) Manifest() *bundle.Manifest {
 	return m.manifest
 }

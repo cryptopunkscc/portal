@@ -58,13 +58,13 @@ func (m *Module) Files() fs.FS {
 func (m *Module) Type() (t target.Type) {
 	switch {
 	case m.IsFrontend():
-		t += target.Frontend
+		t += target.TypeFrontend
 	case m.IsBackend():
-		t += target.Backend
+		t += target.TypeBackend
 	}
 	// TODO verify blob type in addition
 	if path.Ext(m.src) == ".portal" {
-		t += target.Bundle
+		t += target.TypeBundle
 	}
 	return
 }

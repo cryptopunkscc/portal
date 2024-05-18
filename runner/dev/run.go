@@ -25,9 +25,9 @@ func (r Runner) Run(ctx context.Context, t target.Portal) (err error) {
 	case target.App:
 		typ := v.Type()
 		switch {
-		case typ.Is(target.Backend):
+		case typ.Is(target.TypeBackend):
 			return goja.Run(ctx, r.bindings, v, prefix)
-		case typ.Is(target.Frontend):
+		case typ.Is(target.TypeFrontend):
 			return wails.Run(r.bindings, v, prefix)
 		default:
 			return fmt.Errorf("invalid app target: %v", v.Path())
@@ -35,9 +35,9 @@ func (r Runner) Run(ctx context.Context, t target.Portal) (err error) {
 	case target.Project:
 		typ := v.Type()
 		switch {
-		case typ.Is(target.Backend):
+		case typ.Is(target.TypeBackend):
 			return goja_dev.NewBackend(ctx, r.bindings, v).Start()
-		case typ.Is(target.Frontend):
+		case typ.Is(target.TypeFrontend):
 			return wails_dev.NewFrontend(r.bindings, v).Start()
 		default:
 			return fmt.Errorf("invalid dev target: %v", t.Path())

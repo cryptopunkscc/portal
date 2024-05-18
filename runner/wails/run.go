@@ -14,7 +14,7 @@ func Run(
 	prefix ...string,
 ) (err error) {
 	log.Println("Attach frontend", reflect.TypeOf(app), app.Path(), app.Type())
-	opt := wails.AppOptions(bindings(target.Frontend, prefix...))
+	opt := wails.AppOptions(bindings(target.TypeFrontend, prefix...))
 	if err = wails.Run(app, opt); err != nil {
 		return fmt.Errorf("dev.Run: %v", err)
 	}

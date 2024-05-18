@@ -59,7 +59,7 @@ func newRuntimeFactory(ctx context.Context, spawn target.Spawn) target.New {
 	invoke := apphost.Invoke(spawn)
 	return func(t target.Type, prefix ...string) target.Api {
 		switch {
-		case t.Is(target.Frontend):
+		case t.Is(target.TypeFrontend):
 			return &Adapter{Flat: apphost.NewAdapter(ctx, invoke, prefix...)}
 		default:
 			return apphost.WithTimeout(ctx, invoke, prefix...)

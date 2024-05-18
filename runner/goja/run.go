@@ -16,7 +16,7 @@ func Run(
 	prefix ...string,
 ) (err error) {
 	log.Println("Attach backend", reflect.TypeOf(app), app.Path(), app.Type())
-	if err = goja.NewBackend(bindings(target.Backend, prefix...)).RunFs(app.Files()); err != nil {
+	if err = goja.NewBackend(bindings(target.TypeBackend, prefix...)).RunFs(app.Files()); err != nil {
 		return fmt.Errorf("goja.NewBackend().RunSource: %v", err)
 	}
 	<-ctx.Done()

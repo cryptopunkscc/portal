@@ -10,7 +10,7 @@ import (
 	"log"
 )
 
-var _ target.App = &Bundle{}
+var _ target.Bundle = &Bundle{}
 
 type Bundle struct {
 	target.Source
@@ -22,7 +22,7 @@ func NewBundle(abs string) (b *Bundle, err error) {
 }
 
 func ResolveBundle(source target.Source) (b *Bundle, err error) {
-	if !source.Type().Is(target.Bundle) {
+	if !source.Type().Is(target.TypeBundle) {
 		err = errors.New("not a bundle")
 		return
 	}
@@ -51,6 +51,8 @@ func ResolveBundle(source target.Source) (b *Bundle, err error) {
 }
 
 func (b *Bundle) App() {}
+
+func (b *Bundle) Bundle() {}
 
 func (b *Bundle) Manifest() *bundle.Manifest {
 	return b.manifest

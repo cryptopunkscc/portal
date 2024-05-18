@@ -37,8 +37,10 @@ func ResolvePortalNodeModule(m target.NodeModule) (module *PortalNodeModule, err
 	return
 }
 
+func (m *PortalNodeModule) Project() {}
+
 func (m *PortalNodeModule) Type() target.Type {
-	return m.NodeModule.Type() + target.Dev
+	return m.NodeModule.Type() + target.TypeDev
 }
 
 func (m *PortalNodeModule) Manifest() *bundle.Manifest {

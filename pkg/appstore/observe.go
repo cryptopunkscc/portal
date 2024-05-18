@@ -6,6 +6,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"io"
 	"log"
 )
@@ -37,8 +38,8 @@ func send(
 	src string,
 	conn rpc.Conn,
 ) (err error) {
-	for target := range project.FindInPath[*project.Bundle](src) {
-		if err = conn.Encode(target.Manifest()); err != nil {
+	for t := range project.FindInPath[target.Bundle](src) {
+		if err = conn.Encode(t.Manifest()); err != nil {
 			return
 		}
 	}

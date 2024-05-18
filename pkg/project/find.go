@@ -22,7 +22,7 @@ func Find[T target.Source](source target.Source) (in <-chan T) {
 	in = out
 	go func() {
 		defer close(out)
-		if source.Type().Is(target.Bundle) {
+		if source.Type().Is(target.TypeBundle) {
 			var sources target.Source
 			sources, _ = ResolveBundle(NewModule(source.Abs()))
 			if sources != nil && !reflect.ValueOf(sources).IsNil() {

@@ -37,7 +37,7 @@ func Dist(root, dir string, dependencies ...target.NodeModule) (err error) {
 
 func Pack(base, sub string) (err error) {
 	err = errors.New("no targets found")
-	for app := range project.FindInPath[*project.PortalRawModule](path.Join(base, sub)) {
+	for app := range project.FindInPath[target.Dist](path.Join(base, sub)) {
 		if err = pack.Run(app); err != nil {
 			return fmt.Errorf("bundle target %v: %v", app.Path(), err)
 		}

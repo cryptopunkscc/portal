@@ -34,7 +34,7 @@ func (b *Backend) Start() (err error) {
 	go backend.NpmRunWatch(b.ctx, b.Path())
 	go b.serve()
 
-	back := goja.NewBackend(b.New(target.Backend, "dev"))
+	back := goja.NewBackend(b.New(target.TypeBackend, "dev"))
 	output := func(event backend.Event) { b.events.Push(event) }
 	if err = backend.Dev(b.ctx, back, src, output); err != nil {
 		return fmt.Errorf("backend.Dev: %v", err)
@@ -43,7 +43,7 @@ func (b *Backend) Start() (err error) {
 }
 
 func (b *Backend) serve() {
-	port := target.DevPort(b)
+	port := target.DevPort(b.Project)
 	s := rpc.NewApp(port)
 	s.Logger(log.New(log.Writer(), port+" ", 0))
 	s.RouteFunc("events", b.events.Subscribe)

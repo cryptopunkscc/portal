@@ -12,11 +12,11 @@ func (t Type) Is(p Type) bool {
 }
 
 const (
-	None     = Type(0x0)
-	Backend  = Type(0x1)
-	Frontend = Type(0x2)
-	Dev      = Type(0x4)
-	Bundle   = Type(0x8)
+	None         = Type(0x0)
+	TypeBackend  = Type(0x1)
+	TypeFrontend = Type(0x2)
+	TypeDev      = Type(0x4)
+	TypeBundle   = Type(0x8)
 )
 
 type Source interface {
@@ -44,12 +44,23 @@ type NodeModule interface {
 }
 
 type Project interface {
+	Project()
 	NodeModule
 	Portal
 }
 
 type App interface {
+	App()
 	Source
 	Portal
-	App() // required to disable Project to App type casting
+}
+
+type Bundle interface {
+	Bundle()
+	App
+}
+
+type Dist interface {
+	Dist()
+	App
 }

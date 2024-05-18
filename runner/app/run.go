@@ -19,9 +19,9 @@ func NewRunner(bindings target.New) target.Run[target.App] {
 func (r Runner) Run(ctx context.Context, app target.App) (err error) {
 	typ := app.Type()
 	switch {
-	case typ.Is(target.Backend):
+	case typ.Is(target.TypeBackend):
 		return goja.Run(ctx, r.bindings, app)
-	case typ.Is(target.Frontend):
+	case typ.Is(target.TypeFrontend):
 		return wails.Run(r.bindings, app)
 	default:
 		return fmt.Errorf("invalid app target: %v", app.Path())
