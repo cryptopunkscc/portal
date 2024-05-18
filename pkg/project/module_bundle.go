@@ -22,6 +22,7 @@ func NewBundle(abs string) (b *Bundle, err error) {
 }
 
 func ResolveBundle(source target.Source) (b *Bundle, err error) {
+	source = source.Lift()
 	if !source.Type().Is(target.TypeBundle) {
 		err = errors.New("not a bundle")
 		return
@@ -37,8 +38,7 @@ func ResolveBundle(source target.Source) (b *Bundle, err error) {
 		log.Println("reader err", err, source.Path())
 		return
 	}
-	s := NewModuleFS(reader, source.Path())
-	s.abs = source.Abs()
+	s := NewModuleFS(reader, source.Path(), source.Abs())
 	m, err := bundle.ReadManifestFs(reader)
 	if err != nil {
 		return

@@ -7,16 +7,16 @@ import (
 )
 
 type Feat[T target.Portal] struct {
-	resolve target.Resolve[T]
-	run     target.Run[T]
+	find target.Find[T]
+	run  target.Run[T]
 }
 
-func NewFeat[T target.Portal](resolve target.Resolve[T], run target.Run[T]) target.Spawn {
-	return Feat[T]{resolve: resolve, run: run}.Run
+func NewFeat[T target.Portal](find target.Find[T], run target.Run[T]) target.Spawn {
+	return Feat[T]{find: find, run: run}.Run
 }
 
 func (f Feat[T]) Run(ctx context.Context, path string) (err error) {
-	portal, err := f.resolve(path)
+	portal, err := f.find(path)
 	if err != nil {
 		return errors.New("cannot resolve portal: " + err.Error())
 	}

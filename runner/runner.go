@@ -9,11 +9,11 @@ import (
 
 func NewSpawner[T target.Portal](
 	wait *sync.WaitGroup,
-	resolve target.Resolve[T],
+	find target.Find[T],
 	run target.Run[T],
 ) func(context.Context, string) error {
 	return func(ctx context.Context, src string) (err error) {
-		portals, err := resolve(src)
+		portals, err := find(src)
 		if err != nil {
 			return
 		}

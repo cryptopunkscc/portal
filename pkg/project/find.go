@@ -12,7 +12,7 @@ func FindInPath[T target.Source](src string) (in <-chan T) {
 }
 
 func FindInFS[T target.Source](src fs.FS) (in <-chan T) {
-	return Find[T](NewModuleFS(src, "."))
+	return Find[T](NewModuleFS(src))
 }
 
 // Find all portal targets in a given dir and stream through the returned channel.
@@ -24,7 +24,7 @@ func Find[T target.Source](source target.Source) (in <-chan T) {
 		defer close(out)
 		if source.Type().Is(target.TypeBundle) {
 			var sources target.Source
-			sources, _ = ResolveBundle(NewModule(source.Abs()))
+			sources, _ = NewBundle(source.Abs())
 			if sources != nil && !reflect.ValueOf(sources).IsNil() {
 				switch t := sources.(type) {
 				case T:
@@ -55,8 +55,7 @@ func Resolve(root target.Source, src string) (result target.Source, err error) {
 	if path.Base(src) == "node_modules" {
 		return nil, fs.SkipDir
 	}
-	module := NewModuleFS(root.Files(), src)
-	module.abs = path.Join(root.Abs(), src)
+	module := NewModuleFS(root.Files(), src, root.Abs()).Lift()
 	bundle, err := ResolveBundle(module)
 	if err == nil {
 		result = bundle
@@ -66,7 +65,6 @@ func Resolve(root target.Source, src string) (result target.Source, err error) {
 		err = nil
 		return
 	}
-	module = module.Lift()
 	nodeModule, err := ResolveNodeModule(module)
 	if err == nil {
 		if result, err = ResolvePortalNodeModule(nodeModule); err == nil {

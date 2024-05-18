@@ -20,12 +20,12 @@ const (
 )
 
 type Source interface {
-	Path() string
 	Abs() string
+	Path() string
 	Files() fs.FS
 	Type() Type
+	Lift() Source
 	Parent() Source
-	String() string
 }
 
 type Portals[T Portal] map[string]T

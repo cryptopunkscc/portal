@@ -27,7 +27,15 @@ func (m *Module) Abs() string {
 }
 
 func (m *Module) Parent() target.Source {
-	return NewModule(path.Dir(m.Abs()))
+	dir := path.Dir(m.Abs())
+	if path.IsAbs(m.Abs()) {
+		return NewModule(dir)
+	}
+	sub, err := fs.Sub(m.files, dir)
+	if err != nil {
+		panic(err)
+	}
+	return NewModuleFS(sub, dir)
 }
 
 func NewModule(src string) (m *Module) {
@@ -43,8 +51,18 @@ func NewModule(src string) (m *Module) {
 	return
 }
 
-func NewModuleFS(files fs.FS, src string) *Module {
-	return &Module{files: files, src: src}
+func NewModuleFS(files fs.FS, src ...string) *Module {
+	m := &Module{files: files, src: "."}
+	if len(src) > 0 {
+		m.src = src[0]
+	}
+	if len(src) > 1 {
+		m.abs = path.Join(src[1:]...)
+		if !path.IsAbs(m.abs) {
+			println("[WARNING] Module initialized with incorrect absolute path: "+m.abs, m.src)
+		}
+	}
+	return m
 }
 
 func (m *Module) Path() string {
@@ -85,14 +103,29 @@ func (m *Module) IsBackend() bool {
 	return stat.Mode().IsRegular()
 }
 
-func (m *Module) Lift() (mm *Module) {
-	mm = &(*m)
-	if path.Ext(m.Path()) == "" {
-		mm.files, _ = fs.Sub(mm.Files(), mm.Path())
-		mm.src = "."
-	} else {
-		mm.files, _ = fs.Sub(mm.Files(), path.Dir(mm.Path()))
-		mm.src = path.Base(mm.Path())
+func (m *Module) Lift() target.Source {
+
+	// omit if a dir already lifted
+	if path.Dir(m.Abs()) == "." {
+		return m
 	}
-	return
+
+	// try lift a dir
+	if path.Ext(m.Path()) == "" {
+		mm := *m
+		mm.files, _ = fs.Sub(m.files, m.src)
+		mm.src = "."
+		return &mm
+	}
+
+	// try lift a file
+	if dir := path.Dir(m.src); dir != "" {
+		mm := *m
+		mm.files, _ = fs.Sub(m.files, path.Dir(m.src))
+		mm.src = path.Base(m.src)
+		return &mm
+
+	}
+
+	return m
 }
