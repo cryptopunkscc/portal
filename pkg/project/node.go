@@ -1,14 +1,13 @@
 package project
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"io/fs"
 )
 
 type NodeModule struct {
 	target.Source
-	pkgJson *bundle.PackageJson
+	pkgJson *target.PackageJson
 }
 
 var _ target.NodeModule = (*NodeModule)(nil)
@@ -18,7 +17,7 @@ func ResolveNodeModule(m target.Source) (module *NodeModule, err error) {
 	if err != nil {
 		return
 	}
-	pkgJson, err := bundle.LoadPackageJson(sub)
+	pkgJson, err := target.LoadPackageJson(sub)
 	if err != nil {
 		return
 	}
@@ -26,7 +25,7 @@ func ResolveNodeModule(m target.Source) (module *NodeModule, err error) {
 	return
 }
 
-func (m *NodeModule) PkgJson() *bundle.PackageJson {
+func (m *NodeModule) PkgJson() *target.PackageJson {
 	return m.pkgJson
 }
 

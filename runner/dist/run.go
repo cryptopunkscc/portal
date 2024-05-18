@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/runner/npm"
@@ -67,7 +66,7 @@ func CopyManifest(m target.Project) (err error) {
 	if err != nil {
 		return err
 	}
-	if err = os.WriteFile(path.Join(m.Abs(), "dist", bundle.PortalJson), bytes, 0644); err != nil {
+	if err = os.WriteFile(path.Join(m.Abs(), "dist", target.PortalJson), bytes, 0644); err != nil {
 		return fmt.Errorf("os.WriteFile: %v", err)
 	}
 	return

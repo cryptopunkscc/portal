@@ -1,7 +1,6 @@
 package target
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	"io/fs"
 )
 
@@ -32,12 +31,12 @@ type Portals[T Portal] map[string]T
 
 type Portal interface {
 	Source
-	Manifest() *bundle.Manifest
+	Manifest() *Manifest
 }
 
 type NodeModule interface {
 	Source
-	PkgJson() *bundle.PackageJson
+	PkgJson() *PackageJson
 
 	IsPortalLib() bool
 	CanNpmRunBuild() bool

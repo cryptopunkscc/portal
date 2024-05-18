@@ -4,7 +4,6 @@ import (
 	"archive/zip"
 	"bytes"
 	"errors"
-	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"io/fs"
 	"log"
@@ -12,7 +11,7 @@ import (
 
 type Bundle struct {
 	target.Source
-	manifest *bundle.Manifest
+	manifest *target.Manifest
 }
 
 var _ target.Bundle = (*Bundle)(nil)
@@ -39,7 +38,7 @@ func ResolveBundle(source target.Source) (b *Bundle, err error) {
 		return
 	}
 	s := target.NewModuleFS(reader, source.Path(), source.Abs())
-	m, err := bundle.ReadManifestFs(reader)
+	m, err := target.ReadManifestFs(reader)
 	if err != nil {
 		return
 	}
@@ -54,6 +53,6 @@ func (b *Bundle) App() {}
 
 func (b *Bundle) Bundle() {}
 
-func (b *Bundle) Manifest() *bundle.Manifest {
+func (b *Bundle) Manifest() *target.Manifest {
 	return b.manifest
 }

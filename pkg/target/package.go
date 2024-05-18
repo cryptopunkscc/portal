@@ -1,4 +1,4 @@
-package bundle
+package target
 
 import (
 	"encoding/json"

@@ -1,14 +1,13 @@
 package portal
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/bundle"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"io/fs"
 )
 
 type Dist struct {
 	target.Source
-	manifest *bundle.Manifest
+	manifest *target.Manifest
 }
 
 var _ target.Dist = (*Dist)(nil)
@@ -18,7 +17,7 @@ func ResolveDist(m target.Source) (module *Dist, err error) {
 	if err != nil {
 		return
 	}
-	manifest, err := bundle.ReadManifestFs(sub)
+	manifest, err := target.ReadManifestFs(sub)
 	if err != nil {
 		return
 	}
@@ -34,6 +33,6 @@ func (m *Dist) Type() target.Type {
 	return m.Source.Type() + target.TypeDev
 }
 
-func (m *Dist) Manifest() *bundle.Manifest {
+func (m *Dist) Manifest() *target.Manifest {
 	return m.manifest
 }
