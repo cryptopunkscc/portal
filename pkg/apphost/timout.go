@@ -32,7 +32,6 @@ func (t *Timout) Start() {
 	t.Stop()
 	log.Println("timout after", t.timeout)
 	t.ticker.Reset(t.timeout)
-	<-t.ticker.C
 	select {
 	case <-t.c:
 	case <-t.ticker.C:
