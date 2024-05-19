@@ -8,6 +8,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/runner/goja_dev"
 	"github.com/cryptopunkscc/go-astral-js/runner/wails"
 	"github.com/cryptopunkscc/go-astral-js/runner/wails_dev"
+	"reflect"
 )
 
 func NewRunner(bindings target.New) target.Run[target.Portal] {
@@ -22,26 +23,15 @@ type Runner struct {
 func (r Runner) Run(ctx context.Context, t target.Portal) (err error) {
 	prefix := "dev"
 	switch v := t.(type) {
-	case target.App:
-		typ := v.Type()
-		switch {
-		case typ.Is(target.TypeBackend):
-			return goja.Run(ctx, r.bindings, v, prefix)
-		case typ.Is(target.TypeFrontend):
-			return wails.Run(r.bindings, v, prefix)
-		default:
-			return fmt.Errorf("invalid app target: %v", v.Path())
-		}
-	case target.Project:
-		typ := v.Type()
-		switch {
-		case typ.Is(target.TypeBackend):
-			return goja_dev.NewBackend(ctx, r.bindings, v).Start()
-		case typ.Is(target.TypeFrontend):
-			return wails_dev.NewFrontend(r.bindings, v).Start()
-		default:
-			return fmt.Errorf("invalid dev target: %v", t.Path())
-		}
+	case target.ProjectBackend:
+		return goja_dev.NewBackend(ctx, r.bindings, v).Start()
+	case target.ProjectFrontend:
+		return wails_dev.NewFrontend(r.bindings, v).Start()
+	case target.AppBackend:
+		return goja.Run(ctx, r.bindings, v, prefix)
+	case target.AppFrontend:
+		return wails.Run(r.bindings, v, prefix)
+	default:
+		return fmt.Errorf("invalid target %v: %v", reflect.TypeOf(t), t.Path())
 	}
-	return fmt.Errorf("invalid target type %T", t)
 }

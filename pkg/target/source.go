@@ -51,7 +51,6 @@ type Project interface {
 
 type App interface {
 	IsApp()
-	Source
 	Portal
 }
 
@@ -67,6 +66,16 @@ type Dist interface {
 
 type Frontend interface {
 	IsFrontend()
+}
+
+type AppFrontend interface {
+	App
+	Frontend
+}
+
+type AppBackend interface {
+	App
+	Backend
 }
 
 type ProjectFrontend interface {

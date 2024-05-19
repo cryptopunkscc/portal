@@ -11,21 +11,15 @@ import (
 
 func NewRunner[T target.Portal](executable string) target.Run[T] {
 	return func(ctx context.Context, src T) (err error) {
-		switch v := any(src).(type) {
-		case target.Project:
-			switch {
-			case v.Type().Is(target.TypeFrontend):
-				return NewRunnerByName[target.Project](executable, "wails_dev")(ctx, v)
-			case v.Type().Is(target.TypeBackend):
-				return NewRunnerByName[target.Project](executable, "goja_dev")(ctx, v)
-			}
-		case target.App:
-			switch {
-			case v.Type().Is(target.TypeFrontend):
-				return NewRunnerByName[target.App](executable, "wails")(ctx, v)
-			case v.Type().Is(target.TypeBackend):
-				return NewRunnerByName[target.App](executable, "goja")(ctx, v)
-			}
+		switch any(src).(type) {
+		case target.ProjectFrontend:
+			return NewRunnerByName[target.Portal](executable, "wails_dev")(ctx, src)
+		case target.ProjectBackend:
+			return NewRunnerByName[target.Portal](executable, "goja_dev")(ctx, src)
+		case target.AppFrontend:
+			return NewRunnerByName[target.Portal](executable, "wails")(ctx, src)
+		case target.AppBackend:
+			return NewRunnerByName[target.Portal](executable, "goja")(ctx, src)
 		}
 		return
 	}

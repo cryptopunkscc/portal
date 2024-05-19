@@ -15,12 +15,11 @@ func NewRunner(bindings target.New) target.Run[target.App] {
 type Runner struct{ bindings target.New }
 
 func (r Runner) Run(ctx context.Context, app target.App) (err error) {
-	typ := app.Type()
-	switch {
-	case typ.Is(target.TypeBackend):
-		return goja.Run(ctx, r.bindings, app)
-	case typ.Is(target.TypeFrontend):
+	switch any(app).(type) {
+	case target.AppFrontend:
 		return wails.Run(r.bindings, app)
+	case target.AppBackend:
+		return goja.Run(ctx, r.bindings, app)
 	default:
 		return fmt.Errorf("invalid app target: %v", app.Path())
 	}
