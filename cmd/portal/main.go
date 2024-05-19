@@ -38,13 +38,13 @@ func main() {
 
 	dispatchFeat := dispatch.NewFeat(executable)
 	serveFeat := serve.NewFeat(launch, tray.NewRunner(launch))
-	attachFeat := open.NewFeat[target.App](find, run)
+	openFeat := open.NewFeat[target.App](find, run)
 
 	cli := clir.NewCli(ctx, manifest.Name, manifest.Description, version.Run)
 
-	cli.Open(dispatchFeat)
+	cli.Dispatch(dispatchFeat)
 	cli.Serve(serveFeat)
-	cli.Attach(attachFeat)
+	cli.Open(openFeat)
 	cli.List(apps.List)
 	cli.Install(apps.Install)
 	cli.Uninstall(apps.Uninstall)
@@ -59,7 +59,7 @@ func main() {
 
 type Adapter struct{ target.Apphost }
 
-func newRuntimeFactory(ctx context.Context, spawn target.Spawn) target.New {
+func newRuntimeFactory(ctx context.Context, spawn target.Dispatch) target.New {
 	invoke := apphost.Invoke(spawn)
 	return func(t target.Type, prefix ...string) target.Api {
 		switch {

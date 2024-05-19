@@ -4,18 +4,15 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 )
 
-func (c Cli) Open(handle target.Spawn) {
+func (c Cli) Open(handler target.Dispatch) {
 	flags := &struct {
-		Src string `pos:"1" default:""`
+		Runner   string `pos:"1" description:"App runner [goja, wails]."`
+		Absolute string `pos:"2" description:"Absolute path to app bundle or directory."`
 	}{}
-	f := func() error {
-		return handle(c.ctx, flags.Src)
-	}
-	cmd := c.clir.NewSubCommand("o", "Open app from a given source. The source can be a app name, package name, app bundle or app dir.")
+	cmd := c.clir.NewSubCommand("o", "Start portal app in given runner.")
 	cmd.AddFlags(flags)
-	cmd.Action(f)
-	c.clir.DefaultCommand(cmd)
-	c.clir.AddFlags(flags)
-	c.clir.Action(f)
+	cmd.Action(func() (err error) {
+		return handler(c.ctx, flags.Absolute)
+	})
 	return
 }

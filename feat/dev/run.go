@@ -17,11 +17,11 @@ import (
 type Feat struct {
 	port  string
 	wait  *sync.WaitGroup
-	spawn target.Spawn
-	serve target.Spawn
+	spawn target.Dispatch
+	serve target.Dispatch
 }
 
-func NewFeat(wait *sync.WaitGroup, spawn target.Spawn) target.Spawn {
+func NewFeat(wait *sync.WaitGroup, spawn target.Dispatch) target.Dispatch {
 	handlers := rpc.Handlers{
 		"ping":    func() {},
 		"open":    spawn,

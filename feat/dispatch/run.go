@@ -18,7 +18,7 @@ type Feat struct {
 	executable string
 }
 
-func NewFeat(executable string, prefix ...string) target.Spawn {
+func NewFeat(executable string, prefix ...string) target.Dispatch {
 	return Feat{executable: executable, prefix: prefix}.Run
 }
 

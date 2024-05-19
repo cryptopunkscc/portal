@@ -36,13 +36,13 @@ func main() {
 	run := dev2.NewRunner(bindings)
 
 	devFeat := dev.NewFeat(wait, launch)
-	attachFeat := open.NewFeat[target.Portal](find, run)
+	openFeat := open.NewFeat[target.Portal](find, run)
 	buildFeat := build.NewFeat().Run
 
 	cli := clir.NewCli(ctx, manifest.NameDev, manifest.DescriptionDev, version.Run)
 
 	cli.Dev(devFeat)
-	cli.Attach(attachFeat)
+	cli.Open(openFeat)
 	cli.Create(templates.List, create.Run)
 	cli.Build(buildFeat)
 	cli.Apps()
@@ -57,7 +57,7 @@ func main() {
 
 type Adapter struct{ target.Apphost }
 
-func newRuntimeFactory(ctx context.Context, spawn target.Spawn) target.New {
+func newRuntimeFactory(ctx context.Context, spawn target.Dispatch) target.New {
 	invoke := apphost.Invoke(spawn)
 	return func(t target.Type, prefix ...string) target.Api {
 		switch {

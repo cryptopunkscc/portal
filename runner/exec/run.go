@@ -27,7 +27,7 @@ func NewRunner[T target.Portal](executable string) target.Run[T] {
 
 func NewRunnerByName[T target.Portal](executable, name string) target.Run[T] {
 	log.Println("NewRunnerByName", name)
-	return NewPortal[T](executable, "r", name).Run
+	return NewPortal[T](executable, "o", name).Run
 }
 
 type Portal[T target.Portal] struct {

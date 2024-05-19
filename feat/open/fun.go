@@ -11,7 +11,7 @@ type Feat[T target.Portal] struct {
 	run  target.Run[T]
 }
 
-func NewFeat[T target.Portal](find target.Find[T], run target.Run[T]) target.Spawn {
+func NewFeat[T target.Portal](find target.Find[T], run target.Run[T]) target.Dispatch {
 	return Feat[T]{find: find, run: run}.Run
 }
 

@@ -10,10 +10,10 @@ import (
 import "github.com/getlantern/systray"
 
 type Runner struct {
-	open target.Spawn
+	open target.Dispatch
 }
 
-func NewRunner(open target.Spawn) target.Tray {
+func NewRunner(open target.Dispatch) target.Tray {
 	return (&Runner{open: open}).Run
 }
 

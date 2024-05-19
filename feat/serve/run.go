@@ -15,11 +15,11 @@ import (
 type Feat struct {
 	port  string
 	tray  target.Tray
-	spawn target.Spawn
-	serve target.Spawn
+	spawn target.Dispatch
+	serve target.Dispatch
 }
 
-func NewFeat(spawn target.Spawn, tray target.Tray) func(context.Context, bool) error {
+func NewFeat(spawn target.Dispatch, tray target.Tray) func(context.Context, bool) error {
 	handlers := rpc.Handlers{
 		"ping":      func() {},
 		"open":      spawn,
