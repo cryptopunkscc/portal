@@ -1,7 +1,7 @@
 package goja
 
 import (
-	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/out/common"
+	"github.com/cryptopunkscc/go-astral-js/pkg/js/embed/common"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/dop251/goja"
 	"io/fs"
@@ -18,7 +18,7 @@ type Backend struct {
 func NewBackend(flat target.Apphost) *Backend {
 	return &Backend{
 		appHost:   flat,
-		appHostJs: binding.CommonJsString,
+		appHostJs: common.JsString,
 	}
 }
 

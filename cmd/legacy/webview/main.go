@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
-	binding "github.com/cryptopunkscc/go-astral-js/pkg/binding/out/common"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
+	binding "github.com/cryptopunkscc/go-astral-js/pkg/js/embed/common"
 	frontend "github.com/cryptopunkscc/go-astral-js/pkg/webview"
 	"github.com/webview/webview"
 	"log"
@@ -32,7 +32,7 @@ func main() {
 	w.SetTitle(title)
 
 	// inject apphost js client lib
-	w.Init(binding.CommonJsString)
+	w.Init(binding.JsString)
 
 	// set app source code
 	w.SetHtml(src)

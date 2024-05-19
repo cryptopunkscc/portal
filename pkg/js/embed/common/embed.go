@@ -5,7 +5,7 @@ import (
 )
 
 //go:embed portal.js
-var CommonJsString string
+var JsString string
 
 //go:embed portal.js
-var CommonJsFs embed.FS
+var JsFs embed.FS

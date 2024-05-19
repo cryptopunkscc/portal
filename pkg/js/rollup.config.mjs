@@ -3,7 +3,7 @@ import generatePackageJson from "rollup-plugin-generate-package-json";
 export default {
   input: "all.js",
   output: {
-    file: "out/portal/portal.js",
+    file: "embed/portal/portal.js",
     format: "es",
   },
   plugins: [generatePackageJson(

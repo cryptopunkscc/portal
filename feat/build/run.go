@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/array"
-	js "github.com/cryptopunkscc/go-astral-js/pkg/binding/out"
+	js "github.com/cryptopunkscc/go-astral-js/pkg/js/embed"
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/runner/dist"

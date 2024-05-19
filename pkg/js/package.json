@@ -6,8 +6,8 @@
   "scripts": {
     "build": "npm run module && npm run backend && npm run wails",
     "module": "rollup -c",
-    "backend": "rollup common.js -o out/common/portal.js --f iife -n portal",
-    "wails": "rollup wails.js -o out/wails/portal.js --f iife -n portal"
+    "backend": "rollup common.js -o embed/common/portal.js --f iife -n portal",
+    "wails": "rollup wails.js -o embed/wails/portal.js --f iife -n portal"
   },
   "author": "yang@cryptopunks.cc",
   "license": "MIT",
