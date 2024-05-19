@@ -15,46 +15,47 @@ import (
 )
 
 type Feat struct {
+	port  string
 	wait  *sync.WaitGroup
 	spawn target.Spawn
+	serve target.Spawn
 }
 
 func NewFeat(wait *sync.WaitGroup, spawn target.Spawn) target.Spawn {
-	return Feat{wait: wait, spawn: spawn}.Run
+	handlers := rpc.Handlers{
+		"ping":    func() {},
+		"open":    spawn,
+		"observe": apps.Observe,
+	}
+	return Feat{
+		port:  "dev.portal",
+		wait:  wait,
+		spawn: spawn,
+		serve: serve.NewRunner(handlers).Run,
+	}.Run
 }
 
 func (f Feat) Run(ctx context.Context, src string) (err error) {
-
-	port := "dev.portal"
-
-	if err = ping(port); err == nil {
+	if err = ping(f.port); err == nil {
 		return errors.New("portal dev already running")
 	}
-
 	ctx, cancel := context.WithCancel(ctx)
 	f.wait.Add(1)
 	go func() {
 		defer cancel()
 		defer f.wait.Done()
-		handlers := rpc.Handlers{
-			"ping":    func() {},
-			"open":    f.spawn,
-			"observe": apps.Observe,
-		}
 
-		if err = serve.NewRunner(handlers).Run(ctx, port); err != nil {
+		if err = f.serve(ctx, f.port); err != nil {
 			log.Printf("serve exit: %v\n", err)
 		} else {
 			log.Println("serve exit")
 		}
 	}()
-
 	if err = exec.Retry(5*time.Second, func(i int, i2 int, duration time.Duration) error {
-		return ping(port)
+		return ping(f.port)
 	}); err != nil {
 		return
 	}
-
 	return f.spawn(ctx, src)
 }
 

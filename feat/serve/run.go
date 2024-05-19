@@ -13,34 +13,40 @@ import (
 )
 
 type Feat struct {
-	spawn target.Spawn
+	port  string
 	tray  target.Tray
+	spawn target.Spawn
+	serve target.Spawn
 }
 
 func NewFeat(spawn target.Spawn, tray target.Tray) func(context.Context, bool) error {
-	return Feat{spawn: spawn, tray: tray}.Run
+	handlers := rpc.Handlers{
+		"ping":      func() {},
+		"open":      spawn,
+		"observe":   appstore.Observe,
+		"install":   apps.Install,
+		"uninstall": apps.Uninstall,
+	}
+	return Feat{
+		port:  "portal",
+		tray:  tray,
+		spawn: spawn,
+		serve: serve.NewRunner(handlers).Run,
+	}.Run
 }
 
 func (f Feat) Run(
 	ctx context.Context,
 	tray bool,
 ) (err error) {
-	port := "portal"
-	if err = rpc.Command(rpc.NewRequest(id.Anyone, port), "ping"); err == nil {
+	if err = rpc.Command(rpc.NewRequest(id.Anyone, f.port), "ping"); err == nil {
 		err = fmt.Errorf("port already registered or astral not running: %v", err)
 		return
 	}
 	ctx, cancel := context.WithCancel(ctx)
 	go func() {
 		defer cancel()
-		handlers := rpc.Handlers{
-			"ping":      func() {},
-			"open":      f.spawn,
-			"observe":   appstore.Observe,
-			"install":   apps.Install,
-			"uninstall": apps.Uninstall,
-		}
-		if err = serve.NewRunner(handlers).Run(ctx, port); err != nil {
+		if err = f.serve(ctx, f.port); err != nil {
 			log.Printf("serve exit: %v\n", err)
 		} else {
 			log.Println("serve exit")
