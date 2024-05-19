@@ -25,6 +25,7 @@ type Source interface {
 	Type() Type
 	Lift() Source
 	Parent() Source
+	IsFile() bool
 }
 
 type Portals[T Portal] map[string]T
@@ -43,23 +44,61 @@ type NodeModule interface {
 }
 
 type Project interface {
-	Project()
+	IsProject()
 	NodeModule
 	Portal
 }
 
 type App interface {
-	App()
+	IsApp()
 	Source
 	Portal
 }
 
 type Bundle interface {
-	Bundle()
+	IsBundle()
 	App
 }
 
 type Dist interface {
-	Dist()
+	IsDist()
 	App
+}
+
+type Frontend interface {
+	IsFrontend()
+}
+
+type ProjectFrontend interface {
+	Project
+	Frontend
+}
+
+type DistFrontend interface {
+	Dist
+	Frontend
+}
+
+type BundleFrontend interface {
+	Bundle
+	Frontend
+}
+
+type Backend interface {
+	IsBackend()
+}
+
+type ProjectBackend interface {
+	Project
+	Backend
+}
+
+type DistBackend interface {
+	Dist
+	Backend
+}
+
+type BundleBackend interface {
+	Bundle
+	Backend
 }

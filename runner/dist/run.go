@@ -66,7 +66,7 @@ func CopyManifest(m target.Project) (err error) {
 	if err != nil {
 		return err
 	}
-	if err = os.WriteFile(path.Join(m.Abs(), "dist", target.PortalJson), bytes, 0644); err != nil {
+	if err = os.WriteFile(path.Join(m.Abs(), "dist", target.PortalJsonFilename), bytes, 0644); err != nil {
 		return fmt.Errorf("os.WriteFile: %v", err)
 	}
 	return

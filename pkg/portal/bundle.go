@@ -16,6 +16,16 @@ type Bundle struct {
 
 var _ target.Bundle = (*Bundle)(nil)
 
+type FrontendBundle struct {
+	target.Frontend
+	target.Bundle
+}
+
+type BackendBundle struct {
+	target.Backend
+	target.Bundle
+}
+
 func NewBundle(abs string) (b target.Bundle, err error) {
 	return ResolveBundle(target.NewModule(abs))
 }
@@ -46,12 +56,18 @@ func ResolveBundle(source target.Source) (b target.Bundle, err error) {
 		Source:   s,
 		manifest: &m,
 	}
+	switch {
+	case b.Type().Is(target.TypeFrontend):
+		b = &FrontendBundle{Bundle: b}
+	case b.Type().Is(target.TypeBackend):
+		b = &BackendBundle{Bundle: b}
+	}
 	return
 }
 
-func (b *Bundle) App() {}
+func (b *Bundle) IsApp() {}
 
-func (b *Bundle) Bundle() {}
+func (b *Bundle) IsBundle() {}
 
 func (b *Bundle) Manifest() *target.Manifest {
 	return b.manifest

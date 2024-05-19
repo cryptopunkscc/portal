@@ -15,29 +15,6 @@ type Module struct {
 	files fs.FS
 }
 
-func (m *Module) String() string {
-	return fmt.Sprintf("%v@%s", reflect.TypeOf(m), m.abs)
-}
-
-func (m *Module) Abs() string {
-	if m.abs != "" {
-		return m.abs
-	}
-	return m.src
-}
-
-func (m *Module) Parent() Source {
-	dir := path.Dir(m.Abs())
-	if path.IsAbs(m.Abs()) {
-		return NewModule(dir)
-	}
-	sub, err := fs.Sub(m.files, dir)
-	if err != nil {
-		panic(err)
-	}
-	return NewModuleFS(sub, dir)
-}
-
 func NewModule(src string) (m *Module) {
 	m = &Module{}
 	m.abs = Abs(src)
@@ -68,12 +45,39 @@ func NewModuleFS(files fs.FS, src ...string) *Module {
 	return m
 }
 
+func (m *Module) String() string {
+	return fmt.Sprintf("%v@%s", reflect.TypeOf(m), m.abs)
+}
+
+func (m *Module) Abs() string {
+	if m.abs != "" {
+		return m.abs
+	}
+	return m.src
+}
+
+func (m *Module) Parent() Source {
+	dir := path.Dir(m.Abs())
+	if path.IsAbs(m.Abs()) {
+		return NewModule(dir)
+	}
+	sub, err := fs.Sub(m.files, dir)
+	if err != nil {
+		panic(err)
+	}
+	return NewModuleFS(sub, dir)
+}
+
 func (m *Module) Path() string {
 	return m.src
 }
 
 func (m *Module) Files() fs.FS {
 	return m.files
+}
+
+func (m *Module) IsFile() bool {
+	return m.Path() != "." && path.Ext(m.Path()) != ""
 }
 
 func (m *Module) Type() (t Type) {
@@ -99,11 +103,13 @@ func (m *Module) IsFrontend() bool {
 }
 
 func (m *Module) IsBackend() bool {
-	stat, err := fs.Stat(m.files, "main.js")
-	if err != nil {
-		return false
+	if stat, err := fs.Stat(m.files, "main.js"); err == nil {
+		return stat.Mode().IsRegular()
 	}
-	return stat.Mode().IsRegular()
+	if stat, err := fs.Stat(m.files, "index.js"); err == nil {
+		return stat.Mode().IsRegular()
+	}
+	return false
 }
 
 func (m *Module) Lift() Source {

@@ -10,7 +10,7 @@ import (
 func Path(app string) (src string, err error) {
 	for t := range portal.FromPath[target.Bundle](portalAppsDir) {
 		m := target.Manifest{}
-		if err = m.LoadFs(t.Files(), target.PortalJson); err != nil {
+		if err = m.LoadFs(t.Files(), target.PortalJsonFilename); err != nil {
 			return
 		}
 		if m.Name == app || m.Package == app {

@@ -19,7 +19,7 @@ func Test_FromPath(t *testing.T) {
 		PrintTarget(source)
 	}
 
-	assert.Equal(t, 8, len(targets))
+	assert.Equal(t, 12, len(targets))
 }
 
 func Test_FindLibsInFs(t *testing.T) {
@@ -41,7 +41,7 @@ func Test_CustomFind(t *testing.T) {
 		target.Skip("node_modules"),
 		target.Try(portal.ResolveBundle),
 		target.Lift(target.Try(ResolveNodeModule))(
-			target.Try(ResolvePortalModule)),
+			target.Try(ResolvePortal)),
 		target.Try(portal.ResolveDist),
 	)
 

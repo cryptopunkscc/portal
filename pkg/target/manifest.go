@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-const PortalJson = "portal.json"
+const PortalJsonFilename = "portal.json"
 
 type Manifest struct {
 	Name        string `json:"name,omitempty"`
@@ -26,7 +26,7 @@ func Base(src string) Manifest {
 }
 
 func ReadManifestFs(src fs.FS) (p Manifest, err error) {
-	err = p.LoadFs(src, PortalJson)
+	err = p.LoadFs(src, PortalJsonFilename)
 	return
 }
 

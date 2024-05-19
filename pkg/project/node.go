@@ -1,8 +1,8 @@
 package project
 
 import (
+	"errors"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
-	"io/fs"
 )
 
 type NodeModule struct {
@@ -12,12 +12,14 @@ type NodeModule struct {
 
 var _ target.NodeModule = (*NodeModule)(nil)
 
+var ErrNotNodeModule = errors.New("not a node module")
+
 func ResolveNodeModule(m target.Source) (module *NodeModule, err error) {
-	sub, err := fs.Sub(m.Files(), m.Path())
-	if err != nil {
-		return
+	if m.IsFile() {
+		return nil, ErrNotNodeModule
 	}
-	pkgJson, err := target.LoadPackageJson(sub)
+	m = m.Lift()
+	pkgJson, err := target.LoadPackageJson(m.Files())
 	if err != nil {
 		return
 	}

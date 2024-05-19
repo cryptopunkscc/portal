@@ -1,8 +1,8 @@
 package portal
 
 import (
+	"errors"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
-	"io/fs"
 )
 
 type Dist struct {
@@ -12,22 +12,44 @@ type Dist struct {
 
 var _ target.Dist = (*Dist)(nil)
 
-func ResolveDist(m target.Source) (module *Dist, err error) {
-	sub, err := fs.Sub(m.Files(), m.Path())
+type FrontendDist struct {
+	target.Frontend
+	target.Dist
+}
+
+type BackendDist struct {
+	target.Backend
+	target.Dist
+}
+
+var ErrNotDist = errors.New("not a dist")
+
+func ResolveDist(m target.Source) (b target.Dist, err error) {
+	if m.IsFile() {
+		return nil, ErrNotDist
+	}
+	m = m.Lift()
+	if f, err := m.Files().Open(target.PackageJsonFilename); err == nil {
+		_ = f.Close()
+		return nil, ErrNotDist
+	}
+	manifest, err := target.ReadManifestFs(m.Files())
 	if err != nil {
 		return
 	}
-	manifest, err := target.ReadManifestFs(sub)
-	if err != nil {
-		return
+	b = &Dist{Source: m, manifest: &manifest}
+	switch {
+	case b.Type().Is(target.TypeFrontend):
+		b = &FrontendDist{Dist: b}
+	case b.Type().Is(target.TypeBackend):
+		b = &BackendDist{Dist: b}
 	}
-	module = &Dist{Source: m, manifest: &manifest}
 	return
 }
 
-func (m *Dist) App() {}
+func (m *Dist) IsApp() {}
 
-func (m *Dist) Dist() {}
+func (m *Dist) IsDist() {}
 
 func (m *Dist) Type() target.Type {
 	return m.Source.Type() + target.TypeDev

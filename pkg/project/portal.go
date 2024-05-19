@@ -12,31 +12,47 @@ type Portal struct {
 
 var _ target.Project = (*Portal)(nil)
 
-func NewPortalModule(src string) (module *Portal, err error) {
+type Frontend struct {
+	target.Project
+	target.Frontend
+}
+
+type Backend struct {
+	target.Project
+	target.Backend
+}
+
+func NewPortal(src string) (module target.Project, err error) {
 	nodeModule, err := ResolveNodeModule(target.NewModule(src))
 	if err != nil {
 		return
 	}
-	return ResolvePortalModule(nodeModule)
+	return ResolvePortal(nodeModule)
 }
 
-func ResolvePortalModule(m target.NodeModule) (module *Portal, err error) {
+func ResolvePortal(m target.NodeModule) (b target.Project, err error) {
 	manifest := target.Manifest{}
 	sub, err := fs.Sub(m.Files(), m.Path())
 	if err != nil {
 		return
 	}
-	if err = manifest.LoadFs(sub, "package.json"); err != nil {
+	if err = manifest.LoadFs(sub, target.PackageJsonFilename); err != nil {
 		return
 	}
-	if err = manifest.LoadFs(sub, target.PortalJson); err != nil {
+	if err = manifest.LoadFs(sub, target.PortalJsonFilename); err != nil {
 		return
 	}
-	module = &Portal{NodeModule: m, manifest: &manifest}
+	b = &Portal{NodeModule: m, manifest: &manifest}
+	switch {
+	case b.Type().Is(target.TypeFrontend):
+		b = &Frontend{Project: b}
+	case b.Type().Is(target.TypeBackend):
+		b = &Backend{Project: b}
+	}
 	return
 }
 
-func (m *Portal) Project() {}
+func (m *Portal) IsProject() {}
 
 func (m *Portal) Type() target.Type {
 	return m.NodeModule.Type() + target.TypeDev

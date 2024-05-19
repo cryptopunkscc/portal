@@ -5,6 +5,8 @@ import (
 	"io/fs"
 )
 
+const PackageJsonFilename = "package.json"
+
 type PackageJson struct {
 	Module  string `json:"module,omitempty"`
 	Scripts struct {
@@ -13,7 +15,7 @@ type PackageJson struct {
 }
 
 func LoadPackageJson(files fs.FS) (pkgJson PackageJson, err error) {
-	file, err := fs.ReadFile(files, "package.json")
+	file, err := fs.ReadFile(files, PackageJsonFilename)
 	if err != nil {
 		return
 	}

@@ -63,7 +63,7 @@ func Dev[T target.Source]() func(target.Source) (T, error) {
 		target.Skip("node_modules"),
 		target.Try(portal.ResolveBundle),
 		target.Lift(target.Try(ResolveNodeModule))(
-			target.Try(ResolvePortalModule)),
+			target.Try(ResolvePortal)),
 		target.Try(portal.ResolveDist),
 	)
 }
