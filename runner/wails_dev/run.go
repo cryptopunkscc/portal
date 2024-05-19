@@ -13,32 +13,31 @@ import (
 	"os"
 )
 
-type Frontend struct {
+type Runner struct {
 	frontCtx context.Context
 	target.New
-	target.Project
 }
 
-func NewFrontend(bindings target.New, project target.Project) *Frontend {
-	return &Frontend{New: bindings, Project: project}
+func NewRunner(bindings target.New) target.Run[target.ProjectFrontend] {
+	return Runner{New: bindings}.Run
 }
 
-func (f *Frontend) Start() (err error) {
-	log.Printf("portal dev open: (%d) %s\n", os.Getpid(), f.Manifest())
-	defer log.Printf("portal dev close: (%d) %s\n", os.Getpid(), f.Manifest())
+func (f Runner) Run(ctx context.Context, project target.ProjectFrontend) (err error) {
+	log.Printf("portal dev open: (%d) %s\n", os.Getpid(), project.Manifest())
+	defer log.Printf("portal dev close: (%d) %s\n", os.Getpid(), project.Manifest())
 	opt := wails.AppOptions(f.New(target.TypeFrontend, "dev"))
 	opt.OnStartup = func(ctx context.Context) {
 		f.frontCtx = ctx
-		go f.serve()
+		go f.serve(project)
 	}
-	if err = wailsdev.Run(f.Abs(), opt); err != nil {
+	if err = wailsdev.Run(project.Abs(), opt); err != nil {
 		log.Fatal(fmt.Errorf("dev.Run: %v", err))
 	}
 	return
 }
 
-func (f *Frontend) serve() {
-	port := target.DevPort(f.Project)
+func (f Runner) serve(project target.ProjectFrontend) {
+	port := target.DevPort(project)
 	s := rpc.NewApp(port)
 	s.Logger(log.New(log.Writer(), port+" ", 0))
 	s.RouteFunc("reload", f.Reload)
@@ -48,7 +47,7 @@ func (f *Frontend) serve() {
 	}
 }
 
-func (f *Frontend) Reload() (err error) {
+func (f Runner) Reload() (err error) {
 	if f.frontCtx == nil {
 		return errors.New("nil context")
 	}

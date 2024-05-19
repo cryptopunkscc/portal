@@ -1,6 +1,7 @@
 package pack
 
 import (
+	"context"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/pkg/zip"
@@ -8,7 +9,7 @@ import (
 	"path"
 )
 
-func Run(app target.Dist) (err error) {
+func Run(_ context.Context, app target.Dist) (err error) {
 	// create build dir
 	buildDir := path.Join(app.Parent().Abs(), "build")
 	if err = os.MkdirAll(buildDir, 0775); err != nil && !os.IsExist(err) {

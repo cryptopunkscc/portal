@@ -40,7 +40,7 @@ func (f Feat) Run(
 			"install":   apps.Install,
 			"uninstall": apps.Uninstall,
 		}
-		if err = serve.Run(ctx, port, handlers); err != nil {
+		if err = serve.NewRunner(handlers).Run(ctx, port); err != nil {
 			log.Printf("serve exit: %v\n", err)
 		} else {
 			log.Println("serve exit")

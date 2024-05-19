@@ -9,14 +9,18 @@ import (
 	"reflect"
 )
 
-func Run(
-	ctx context.Context,
-	bindings target.New,
-	app target.App,
-	prefix ...string,
-) (err error) {
+type Runner struct {
+	bindings target.New
+	prefix   []string
+}
+
+func NewRunner(bindings target.New, prefix ...string) target.Run[target.AppBackend] {
+	return Runner{bindings: bindings, prefix: prefix}.Run
+}
+
+func (r Runner) Run(ctx context.Context, app target.AppBackend) (err error) {
 	log.Println("Attach backend", reflect.TypeOf(app), app.Path(), app.Type())
-	if err = goja.NewBackend(bindings(target.TypeBackend, prefix...)).RunFs(app.Files()); err != nil {
+	if err = goja.NewBackend(r.bindings(target.TypeBackend, r.prefix...)).RunFs(app.Files()); err != nil {
 		return fmt.Errorf("goja.NewBackend().RunSource: %v", err)
 	}
 	<-ctx.Done()

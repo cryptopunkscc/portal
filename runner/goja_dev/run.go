@@ -13,41 +13,39 @@ import (
 	"path"
 )
 
-type Backend struct {
-	ctx context.Context
+type Runner struct {
 	target.New
-	target.Project
 	events sig.Queue[any]
 }
 
-func NewBackend(ctx context.Context, bindings target.New, project target.Project) *Backend {
-	return &Backend{ctx: ctx, New: bindings, Project: project}
+func NewRunner(bindings target.New) target.Run[target.ProjectBackend] {
+	return (&Runner{New: bindings}).Run
 }
 
-func (b *Backend) Start() (err error) {
-	log.Println("staring dev backend", b.Abs())
+func (b *Runner) Run(ctx context.Context, project target.ProjectBackend) (err error) {
+	log.Println("staring dev backend", project.Abs())
 	src := ""
-	if src, err = ResolveSrc(b.Path(), "main.js"); err != nil {
+	if src, err = ResolveSrc(project.Path(), "main.js"); err != nil {
 		return fmt.Errorf("resolveSrc %v: %v", "main.js", err)
 	}
 
-	go backend.NpmRunWatch(b.ctx, b.Path())
-	go b.serve()
+	go backend.NpmRunWatch(ctx, project.Path())
+	go b.serve(ctx, project)
 
 	back := goja.NewBackend(b.New(target.TypeBackend, "dev"))
 	output := func(event backend.Event) { b.events.Push(event) }
-	if err = backend.Dev(b.ctx, back, src, output); err != nil {
+	if err = backend.Dev(ctx, back, src, output); err != nil {
 		return fmt.Errorf("backend.Dev: %v", err)
 	}
 	return
 }
 
-func (b *Backend) serve() {
-	port := target.DevPort(b.Project)
+func (b *Runner) serve(ctx context.Context, project target.ProjectBackend) {
+	port := target.DevPort(project)
 	s := rpc.NewApp(port)
 	s.Logger(log.New(log.Writer(), port+" ", 0))
 	s.RouteFunc("events", b.events.Subscribe)
-	err := s.Run(b.ctx)
+	err := s.Run(ctx)
 	if err != nil {
 		log.Printf("%s: %v", port, err)
 	}

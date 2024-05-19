@@ -1,6 +1,7 @@
 package create
 
 import (
+	"context"
 	"github.com/cryptopunkscc/go-astral-js/feat/build"
 	"github.com/cryptopunkscc/go-astral-js/pkg/template"
 	"github.com/pkg/errors"
@@ -84,7 +85,7 @@ func runSingle(opt template.Options) (err error) {
 	time.Sleep(1000 * time.Millisecond)
 
 	// build project
-	if err = build.Run(opt.TargetDir); err != nil {
+	if err = build.NewFeat().Run(context.TODO(), opt.TargetDir); err != nil {
 		return
 	}
 	time.Sleep(500 * time.Millisecond)

@@ -73,9 +73,9 @@ type AppFrontend interface {
 	Frontend
 }
 
-type AppBackend interface {
-	App
-	Backend
+type PortalFrontend interface {
+	Portal
+	Frontend
 }
 
 type ProjectFrontend interface {
@@ -99,6 +99,16 @@ type Backend interface {
 
 type ProjectBackend interface {
 	Project
+	Backend
+}
+
+type AppBackend interface {
+	App
+	Backend
+}
+
+type PortalBackend interface {
+	Portal
 	Backend
 }
 

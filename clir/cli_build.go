@@ -1,6 +1,8 @@
 package clir
 
-type Build func(string) error
+import "context"
+
+type Build func(context.Context, string) error
 
 func (c Cli) Build(handle Build) {
 	flags := struct {
@@ -9,7 +11,7 @@ func (c Cli) Build(handle Build) {
 	cmd := c.clir.NewSubCommand("b", "Build project and generate portal app bundle.")
 	cmd.AddFlags(&flags)
 	cmd.Action(func() (err error) {
-		return handle(flags.Path)
+		return handle(c.ctx, flags.Path)
 	})
 	return
 }

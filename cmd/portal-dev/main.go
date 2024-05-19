@@ -31,19 +31,20 @@ func main() {
 	wait := &sync.WaitGroup{}
 	proc := exec.NewRunner[target.Portal]("portal-dev")
 	find := project.Resolve(appstore.Path)
-	launch := spawn.NewRunner(wait, find, proc)
+	launch := spawn.NewRunner(wait, find, proc).Run
 	bindings := newRuntimeFactory(ctx, launch)
 	run := dev2.NewRunner(bindings)
 
 	devFeat := dev.NewFeat(wait, launch)
 	attachFeat := open.NewFeat[target.Portal](find, run)
+	buildFeat := build.NewFeat().Run
 
 	cli := clir.NewCli(ctx, manifest.NameDev, manifest.DescriptionDev, version.Run)
 
 	cli.Dev(devFeat)
 	cli.Attach(attachFeat)
 	cli.Create(templates.List, create.Run)
-	cli.Build(build.Run)
+	cli.Build(buildFeat)
 	cli.Apps()
 
 	err := cli.Run()

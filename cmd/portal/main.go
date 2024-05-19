@@ -32,7 +32,7 @@ func main() {
 	wait := &sync.WaitGroup{}
 	proc := exec.NewRunner[target.App](executable)
 	find := portal.Resolve(appstore.Path)
-	launch := spawn.NewRunner(wait, find, proc)
+	launch := spawn.NewRunner(wait, find, proc).Run
 	bindings := newRuntimeFactory(ctx, launch)
 	run := app.NewRunner(bindings)
 

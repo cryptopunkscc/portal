@@ -1,6 +1,7 @@
 package dist
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,43 +12,51 @@ import (
 	"path"
 )
 
-func Run(m target.Project, dependencies []target.NodeModule) (err error) {
-	if err = Prepare(m, dependencies); err != nil {
+type Runner struct {
+	dependencies []target.NodeModule
+}
+
+func NewRunner(dependencies []target.NodeModule) *Runner {
+	return &Runner{dependencies: dependencies}
+}
+
+func (r Runner) Run(ctx context.Context, m target.Project) (err error) {
+	if err = r.Prepare(ctx, m); err != nil {
 		return fmt.Errorf("dist.Prepare: %w", err)
 	}
-	if err = Dist(m); err != nil {
+	if err = r.Dist(ctx, m); err != nil {
 		return fmt.Errorf("dist.Dist: %w", err)
 	}
 	return
 }
 
-func Prepare(m target.Project, dependencies []target.NodeModule) (err error) {
+func (r Runner) Prepare(ctx context.Context, m target.Project) (err error) {
 	if err = npm.Install(m); err != nil {
 		return
 	}
-	if err = npm.InjectDependencies(m, dependencies); err != nil {
+	if err = npm.NewInjector(r.dependencies).Run(ctx, m); err != nil {
 		return
 	}
 	return
 }
 
-func Dist(m target.Project) (err error) {
+func (r Runner) Dist(ctx context.Context, m target.Project) (err error) {
 	if !m.CanNpmRunBuild() {
 		return errors.New("missing npm build in package.json")
 	}
 	if err = npm.RunBuild(m); err != nil {
 		return
 	}
-	if err = CopyIcon(m); err != nil {
+	if err = r.CopyIcon(ctx, m); err != nil {
 		return
 	}
-	if err = CopyManifest(m); err != nil {
+	if err = r.CopyManifest(ctx, m); err != nil {
 		return
 	}
 	return
 }
 
-func CopyIcon(m target.Project) (err error) {
+func (r Runner) CopyIcon(_ context.Context, m target.Project) (err error) {
 	if m.Manifest().Icon == "" {
 		return
 	}
@@ -61,7 +70,7 @@ func CopyIcon(m target.Project) (err error) {
 	return
 }
 
-func CopyManifest(m target.Project) (err error) {
+func (r Runner) CopyManifest(_ context.Context, m target.Project) (err error) {
 	bytes, err := json.Marshal(m.Manifest())
 	if err != nil {
 		return err

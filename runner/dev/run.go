@@ -24,13 +24,13 @@ func (r Runner) Run(ctx context.Context, t target.Portal) (err error) {
 	prefix := "dev"
 	switch v := t.(type) {
 	case target.ProjectBackend:
-		return goja_dev.NewBackend(ctx, r.bindings, v).Start()
+		return goja_dev.NewRunner(r.bindings)(ctx, v)
 	case target.ProjectFrontend:
-		return wails_dev.NewFrontend(r.bindings, v).Start()
+		return wails_dev.NewRunner(r.bindings)(ctx, v)
 	case target.AppBackend:
-		return goja.Run(ctx, r.bindings, v, prefix)
+		return goja.NewRunner(r.bindings, prefix)(ctx, v)
 	case target.AppFrontend:
-		return wails.Run(r.bindings, v, prefix)
+		return wails.NewRunner(r.bindings, prefix)(ctx, v)
 	default:
 		return fmt.Errorf("invalid target %v: %v", reflect.TypeOf(t), t.Path())
 	}
