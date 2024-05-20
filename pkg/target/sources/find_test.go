@@ -8,6 +8,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/target/dist"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target/npm"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target/project"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target/source"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"reflect"
@@ -18,8 +19,8 @@ func Test_FromPath(t *testing.T) {
 	assets := target.Abs("test_assets")
 	targets := array.FromChan(FromPath[target.Portal](assets))
 
-	for _, source := range targets {
-		PrintTarget(source)
+	for _, s := range targets {
+		PrintTarget(s)
 	}
 
 	assert.Equal(t, 13, len(targets))
@@ -28,8 +29,8 @@ func Test_FromPath(t *testing.T) {
 func Test_FindLibsInFs(t *testing.T) {
 	targets := array.FromChan(FromFS[target.Source](js.PortalLibFS))
 
-	for _, source := range targets {
-		PrintTarget(source)
+	for _, s := range targets {
+		PrintTarget(s)
 	}
 }
 
@@ -38,7 +39,7 @@ func PrintTarget(t target.Source) {
 }
 
 func Test_CustomFind(t *testing.T) {
-	src := target.NewModule("test_assets")
+	src := source.New("test_assets")
 
 	var find = target.Any[target.Source](
 		target.Skip("node_modules"),
@@ -48,7 +49,7 @@ func Test_CustomFind(t *testing.T) {
 		target.Try(dist.Resolve),
 	)
 
-	for source := range target.Stream[target.Source](find, src) {
-		PrintTarget(source)
+	for s := range source.Stream[target.Source](find, src) {
+		PrintTarget(s)
 	}
 }
