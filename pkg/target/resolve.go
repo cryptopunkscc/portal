@@ -58,9 +58,9 @@ func Try[A Source, B Source](f func(A) (B, error)) func(Source) (Source, error) 
 	}
 }
 
-func Skip(name ...string) func(source Source) (result Source, err error) {
+func Skip(names ...string) func(source Source) (result Source, err error) {
 	return func(source Source) (result Source, err error) {
-		for _, n := range name {
+		for _, n := range names {
 			if path.Base(source.Path()) == n {
 				return nil, fs.SkipDir
 			}

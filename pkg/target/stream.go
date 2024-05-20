@@ -7,7 +7,7 @@ import (
 
 // Stream all portal targets in a given dir and stream through the returned channel.
 // Possible types are: NodeModule, PortalNodeModule, PortalRawModule, Bundle,
-func Stream[T Source](resolve ResolveT[T], from Source) (in <-chan T) {
+func Stream[T Source](resolve Resolve[T], from Source) (in <-chan T) {
 	out := make(chan T)
 	in = out
 	go func() {

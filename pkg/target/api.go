@@ -12,11 +12,11 @@ type New func(p Type, prefix ...string) Api
 
 type Tray func(ctx context.Context)
 
-type Path func(src string) (string, error)
+type Path func(src string) (path string, err error)
 
-type Dispatch func(context.Context, string) error
+type Dispatch func(context.Context, string) (err error)
 
-type ResolveT[T Source] func(src Source) (result T, err error)
+type Resolve[T Source] func(src Source) (result T, err error)
 
 type Find[T Portal] func(src string) (portals Portals[T], err error)
 
