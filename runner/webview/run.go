@@ -2,8 +2,8 @@ package webview
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
-	binding "github.com/cryptopunkscc/go-astral-js/pkg/js/embed/common"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target/apphost"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target/js/embed/common"
 	"github.com/webview/webview"
 )
 
@@ -15,7 +15,7 @@ func Run(ctx context.Context, title, src string) {
 	w.SetTitle(title)
 
 	// inject apphost js client lib
-	w.Init(binding.JsString)
+	w.Init(common.JsString)
 
 	// set app source code
 	w.SetHtml(src)

@@ -1,4 +1,4 @@
-package embed
+package js
 
 import "embed"
 
