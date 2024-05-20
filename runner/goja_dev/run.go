@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/astrald/sig"
-	backend "github.com/cryptopunkscc/go-astral-js/pkg/backend/dev"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"github.com/cryptopunkscc/go-astral-js/runner/backend_dev"
 	"github.com/cryptopunkscc/go-astral-js/runner/goja"
 	"log"
 	"os"
@@ -29,12 +29,12 @@ func (b *Runner) Run(ctx context.Context, project target.ProjectBackend) (err er
 		return fmt.Errorf("resolveSrc %v: %v", "main.js", err)
 	}
 
-	go backend.NpmRunWatch(ctx, project.Path())
+	go backend_dev.NpmRunWatch(ctx, project.Path())
 	go b.serve(ctx, project)
 
 	back := goja.NewBackend(b.New(target.TypeBackend, "dev"))
-	output := func(event backend.Event) { b.events.Push(event) }
-	if err = backend.Dev(ctx, back, src, output); err != nil {
+	output := func(event backend_dev.Event) { b.events.Push(event) }
+	if err = backend_dev.Dev(ctx, back, src, output); err != nil {
 		return fmt.Errorf("backend.Dev: %v", err)
 	}
 	return

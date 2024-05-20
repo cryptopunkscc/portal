@@ -1,9 +1,8 @@
-package backend
+package backend_dev
 
 import (
 	"context"
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/backend"
 	"log"
 	"path"
 	"time"
@@ -15,7 +14,7 @@ const (
 	EventReload = Event(iota + 1)
 )
 
-func Dev(ctx context.Context, backend backend.Backend, file string, output func(Event)) (err error) {
+func Dev(ctx context.Context, backend Backend, file string, output func(Event)) (err error) {
 	if err = backend.Run(file); err != nil {
 		return fmt.Errorf("failed to run %s %v", file, err)
 	}
