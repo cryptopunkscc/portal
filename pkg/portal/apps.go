@@ -2,9 +2,9 @@ package portal
 
 import (
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
+	fsUtil "github.com/cryptopunkscc/go-astral-js/pkg/fs"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
-	fs2 "io/fs"
+	"io/fs"
 	"path"
 	"strings"
 )
@@ -17,7 +17,7 @@ type Apps struct{ target.Path }
 
 func (a Apps) Resolve(src string) (apps target.Portals[target.App], err error) {
 	apps = make(target.Portals[target.App])
-	if fs.Exists(src) {
+	if fsUtil.Exists(src) {
 		if path.Base(src) == src {
 			if apps[src], err = a.ByNameOrPackage(src); err == nil {
 				return
@@ -63,7 +63,7 @@ func FromPath[T target.App](src string) (in <-chan T) {
 	return target.Stream[T](App[T](), target.NewModule(src))
 }
 
-func FromFS[T target.App](src fs2.FS) (in <-chan T) {
+func FromFS[T target.App](src fs.FS) (in <-chan T) {
 	return target.Stream[T](App[T](), target.NewModuleFS(src))
 }
 
