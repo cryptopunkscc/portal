@@ -1,8 +1,8 @@
 package clir
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target/sources"
 	"log"
 	"os"
 	"reflect"
@@ -17,7 +17,7 @@ func (c Cli) Apps() {
 	cmd.AddFlags(&flags)
 	cmd.Action(func() (err error) {
 		wd, _ := os.Getwd()
-		for source := range project.FromPath[target.Source](flags.Path) {
+		for source := range sources.FromPath[target.Source](flags.Path) {
 			log.Println(reflect.TypeOf(source), "\t", strings.TrimPrefix(source.Abs(), wd+"/"))
 		}
 		return

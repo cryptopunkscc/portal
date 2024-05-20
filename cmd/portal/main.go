@@ -4,7 +4,7 @@ import (
 	"context"
 	manifest "github.com/cryptopunkscc/go-astral-js"
 	"github.com/cryptopunkscc/go-astral-js/clir"
-	"github.com/cryptopunkscc/go-astral-js/feat/apps"
+	featApps "github.com/cryptopunkscc/go-astral-js/feat/apps"
 	"github.com/cryptopunkscc/go-astral-js/feat/dispatch"
 	"github.com/cryptopunkscc/go-astral-js/feat/open"
 	"github.com/cryptopunkscc/go-astral-js/feat/serve"
@@ -12,8 +12,8 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
 	osexec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
-	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target/apps"
 	"github.com/cryptopunkscc/go-astral-js/runner/app"
 	"github.com/cryptopunkscc/go-astral-js/runner/exec"
 	"github.com/cryptopunkscc/go-astral-js/runner/spawn"
@@ -31,23 +31,23 @@ func main() {
 	executable := "portal"
 	wait := &sync.WaitGroup{}
 	proc := exec.NewRunner[target.App](executable)
-	find := portal.Resolve(appstore.Path)
-	launch := spawn.NewRunner(wait, find, proc).Run
+	resolve := apps.Resolve(appstore.Path)
+	launch := spawn.NewRunner(wait, resolve, proc).Run
 	bindings := newRuntimeFactory(ctx, launch)
 	run := app.NewRunner(bindings)
 
-	dispatchFeat := dispatch.NewFeat(executable)
-	serveFeat := serve.NewFeat(launch, tray.NewRunner(launch))
-	openFeat := open.NewFeat[target.App](find, run)
+	featDispatch := dispatch.NewFeat(executable)
+	featServe := serve.NewFeat(launch, tray.NewRunner(launch))
+	featOpen := open.NewFeat[target.App](resolve, run)
 
 	cli := clir.NewCli(ctx, manifest.Name, manifest.Description, version.Run)
 
-	cli.Dispatch(dispatchFeat)
-	cli.Serve(serveFeat)
-	cli.Open(openFeat)
-	cli.List(apps.List)
-	cli.Install(apps.Install)
-	cli.Uninstall(apps.Uninstall)
+	cli.Dispatch(featDispatch)
+	cli.Serve(featServe)
+	cli.Open(featOpen)
+	cli.List(featApps.List)
+	cli.Install(featApps.Install)
+	cli.Uninstall(featApps.Uninstall)
 
 	err := cli.Run()
 	cancel()

@@ -12,8 +12,8 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
 	osExec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
-	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target/portals"
 	devRunner "github.com/cryptopunkscc/go-astral-js/runner/dev"
 	"github.com/cryptopunkscc/go-astral-js/runner/exec"
 	"github.com/cryptopunkscc/go-astral-js/runner/spawn"
@@ -29,7 +29,7 @@ func main() {
 
 	wait := &sync.WaitGroup{}
 	proc := exec.NewRunner[target.Portal]("portal-dev")
-	find := project.Resolve(appstore.Path)
+	find := portals.Resolve(appstore.Path)
 	launch := spawn.NewRunner(wait, find, proc).Run
 	bindings := newRuntimeFactory(ctx, launch)
 	run := devRunner.NewRunner(bindings)

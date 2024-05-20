@@ -2,7 +2,7 @@ package dev
 
 import (
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/project"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target/project"
 	common "github.com/cryptopunkscc/go-astral-js/pkg/wails"
 	"github.com/wailsapp/wails/v2/pkg/application"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -30,7 +30,7 @@ func Run(path string, opt *options.App) (err error) {
 	// setup opt
 	front := path
 	path = path + "/dist"
-	src, err := project.NewPortal(front)
+	src, err := project.New(front)
 	if err != nil {
 		return err
 	}

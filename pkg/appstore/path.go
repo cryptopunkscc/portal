@@ -1,16 +1,17 @@
 package appstore
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target/apps"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target/manifest"
 	"io/fs"
 	"path"
 )
 
 func Path(app string) (src string, err error) {
-	for t := range portal.FromPath[target.Bundle](portalAppsDir) {
+	for t := range apps.FromPath[target.Bundle](portalAppsDir) {
 		var m target.Manifest
-		if m, err = portal.ReadManifest(t.Files()); err != nil {
+		if m, err = manifest.Read(t.Files()); err != nil {
 			return
 		}
 		if m.Name == app || m.Package == app {

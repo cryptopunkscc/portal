@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/astrald/lib/astral"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/google/uuid"
 	"io"
 	"log"
@@ -264,7 +265,7 @@ func (api *Adapter) Resolve(name string) (id string, err error) {
 	return
 }
 
-func (api *Adapter) NodeInfo(identity string) (info NodeInfo, err error) {
+func (api *Adapter) NodeInfo(identity string) (info target.NodeInfo, err error) {
 	nid, err := id.ParsePublicKeyHex(identity)
 	if err != nil {
 		return
@@ -273,7 +274,7 @@ func (api *Adapter) NodeInfo(identity string) (info NodeInfo, err error) {
 	if err != nil {
 		return
 	}
-	info = NodeInfo{
+	info = target.NodeInfo{
 		Identity: i.Identity.String(),
 		Name:     i.Name,
 	}
@@ -292,9 +293,4 @@ func newConn(conn *astral.Conn) *Conn {
 		Reader:      bufio.NewReader(conn),
 		WriteCloser: conn,
 	}
-}
-
-type NodeInfo struct {
-	Identity string
-	Name     string
 }

@@ -3,14 +3,15 @@ package appstore
 import (
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
-	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target/apps"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target/manifest"
 	"log"
 )
 
 func Uninstall(id string) (err error) {
-	for t := range portal.FromPath[target.Bundle](portalAppsDir) {
-		manifest, _ := portal.ReadManifest(t.Files())
+	for t := range apps.FromPath[target.Bundle](portalAppsDir) {
+		manifest, _ := manifest.Read(t.Files())
 		if manifest.Name == id || manifest.Package == id {
 			log.Println("Uninstalling", t.Manifest().Package, "from", t.Abs())
 			err = fs.DeleteFile(t.Abs())

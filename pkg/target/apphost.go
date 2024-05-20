@@ -1,7 +1,5 @@
 package target
 
-import "github.com/cryptopunkscc/go-astral-js/pkg/apphost"
-
 const (
 	Log             = "_log"
 	Sleep           = "_sleep"
@@ -34,5 +32,10 @@ type Apphost interface {
 	Query(identity string, query string) (data string, err error)
 	QueryName(name string, query string) (data string, err error)
 	Resolve(name string) (id string, err error)
-	NodeInfo(identity string) (info apphost.NodeInfo, err error)
+	NodeInfo(identity string) (info NodeInfo, err error)
+}
+
+type NodeInfo struct {
+	Identity string
+	Name     string
 }
