@@ -1,6 +1,6 @@
 //go:build windows
 
-package dev
+package wails_dev
 
 import (
 	"bytes"
