@@ -1,7 +1,7 @@
 package v8
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"github.com/cryptopunkscc/go-astral-js/target"
 	"log"
 	v8 "rogchap.com/v8go"
 )

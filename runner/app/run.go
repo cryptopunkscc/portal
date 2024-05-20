@@ -3,9 +3,9 @@ package app
 import (
 	"context"
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/runner/goja"
 	"github.com/cryptopunkscc/go-astral-js/runner/wails"
+	"github.com/cryptopunkscc/go-astral-js/target"
 )
 
 func NewRunner(bindings target.New) target.Run[target.App] {

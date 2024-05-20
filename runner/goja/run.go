@@ -3,7 +3,7 @@ package goja
 import (
 	"context"
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"github.com/cryptopunkscc/go-astral-js/target"
 	"log"
 	"reflect"
 )

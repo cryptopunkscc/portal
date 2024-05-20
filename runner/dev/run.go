@@ -3,11 +3,11 @@ package dev
 import (
 	"context"
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/runner/goja"
 	"github.com/cryptopunkscc/go-astral-js/runner/goja_dev"
 	"github.com/cryptopunkscc/go-astral-js/runner/wails"
 	"github.com/cryptopunkscc/go-astral-js/runner/wails_dev"
+	"github.com/cryptopunkscc/go-astral-js/target"
 	"reflect"
 )
 

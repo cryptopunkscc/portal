@@ -6,8 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
-	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/runner/npm"
+	"github.com/cryptopunkscc/go-astral-js/target"
 	"os"
 	"path"
 )

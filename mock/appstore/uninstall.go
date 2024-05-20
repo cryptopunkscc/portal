@@ -3,9 +3,9 @@ package appstore
 import (
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
-	"github.com/cryptopunkscc/go-astral-js/pkg/target"
-	"github.com/cryptopunkscc/go-astral-js/pkg/target/apps"
-	"github.com/cryptopunkscc/go-astral-js/pkg/target/manifest"
+	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/go-astral-js/target/apps"
+	"github.com/cryptopunkscc/go-astral-js/target/manifest"
 	"log"
 )
 

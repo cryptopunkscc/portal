@@ -1,7 +1,7 @@
 package webview
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/webview/webview"
 )
 

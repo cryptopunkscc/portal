@@ -3,8 +3,8 @@ package create
 import (
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/git"
-	"github.com/cryptopunkscc/go-astral-js/pkg/target"
-	"github.com/cryptopunkscc/go-astral-js/pkg/target/template"
+	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/go-astral-js/target/template"
 	"os"
 	"path/filepath"
 )

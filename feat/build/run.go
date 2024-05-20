@@ -5,11 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/array"
-	"github.com/cryptopunkscc/go-astral-js/pkg/target"
-	js "github.com/cryptopunkscc/go-astral-js/pkg/target/js/embed"
-	"github.com/cryptopunkscc/go-astral-js/pkg/target/sources"
 	"github.com/cryptopunkscc/go-astral-js/runner/dist"
 	"github.com/cryptopunkscc/go-astral-js/runner/pack"
+	"github.com/cryptopunkscc/go-astral-js/target"
+	js "github.com/cryptopunkscc/go-astral-js/target/js/embed"
+	"github.com/cryptopunkscc/go-astral-js/target/sources"
 	"path"
 )
 

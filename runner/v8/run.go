@@ -2,8 +2,8 @@ package v8
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/pkg/target/apphost"
-	"github.com/cryptopunkscc/go-astral-js/pkg/target/js/embed/common"
+	"github.com/cryptopunkscc/go-astral-js/target/apphost"
+	"github.com/cryptopunkscc/go-astral-js/target/js/embed/common"
 	"log"
 	"rogchap.com/v8go"
 )

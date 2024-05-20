@@ -1,7 +1,7 @@
 package clir
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"github.com/cryptopunkscc/go-astral-js/target"
 )
 
 func (c Cli) Dispatch(handle target.Dispatch) {

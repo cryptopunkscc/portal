@@ -4,7 +4,7 @@ import (
 	"context"
 	portal "github.com/cryptopunkscc/go-astral-js"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
-	"github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"github.com/cryptopunkscc/go-astral-js/target"
 	"log"
 )
 import "github.com/getlantern/systray"
