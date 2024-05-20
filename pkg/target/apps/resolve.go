@@ -6,6 +6,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target/bundle"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target/dist"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target/source"
 	"io/fs"
 	"path"
 	"strings"
@@ -62,11 +63,11 @@ func (a Resolver) ByPath(src string) (apps target.Portals[target.App], err error
 }
 
 func FromPath[T target.App](src string) (in <-chan T) {
-	return target.Stream[T](resolve[T](), target.NewModule(src))
+	return source.Stream[T](resolve[T](), source.New(src))
 }
 
 func FromFS[T target.App](src fs.FS) (in <-chan T) {
-	return target.Stream[T](resolve[T](), target.NewModuleFS(src))
+	return source.Stream[T](resolve[T](), source.Resolve(src))
 }
 
 func resolve[T target.App]() func(target.Source) (T, error) {

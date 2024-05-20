@@ -5,12 +5,13 @@ import (
 	"bytes"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target/manifest"
+	targetSource "github.com/cryptopunkscc/go-astral-js/pkg/target/source"
 	"io/fs"
 	"log"
 )
 
 func New(abs string) (b target.Bundle, err error) {
-	return Resolve(target.NewModule(abs))
+	return Resolve(targetSource.New(abs))
 }
 
 func Resolve(t target.Source) (b target.Bundle, err error) {
@@ -29,7 +30,7 @@ func Resolve(t target.Source) (b target.Bundle, err error) {
 		log.Println("reader err", err, t.Path())
 		return
 	}
-	s := target.NewModuleFS(reader, t.Path(), t.Abs())
+	s := targetSource.Resolve(reader, t.Path(), t.Abs())
 	m, err := manifest.Read(reader)
 	if err != nil {
 		return

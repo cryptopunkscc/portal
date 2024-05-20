@@ -6,15 +6,16 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/target/dist"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target/npm"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target/project"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target/source"
 	"io/fs"
 )
 
 func FromPath[T target.Source](src string) (in <-chan T) {
-	return target.Stream[T](resolve[T](), target.NewModule(src))
+	return source.Stream[T](resolve[T](), source.New(src))
 }
 
 func FromFS[T target.Source](src fs.FS) (in <-chan T) {
-	return target.Stream[T](resolve[T](), target.NewModuleFS(src))
+	return source.Stream[T](resolve[T](), source.Resolve(src))
 }
 
 func resolve[T target.Source]() func(target.Source) (T, error) {

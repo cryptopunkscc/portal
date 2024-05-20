@@ -4,11 +4,12 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target/manifest"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target/npm"
+	targetSource "github.com/cryptopunkscc/go-astral-js/pkg/target/source"
 	"io/fs"
 )
 
 func New(src string) (module target.Project, err error) {
-	nodeModule, err := npm.ResolveNodeModule(target.NewModule(src))
+	nodeModule, err := npm.ResolveNodeModule(targetSource.New(src))
 	if err != nil {
 		return
 	}

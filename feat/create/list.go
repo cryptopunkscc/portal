@@ -2,6 +2,7 @@ package create
 
 import (
 	. "github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target/source"
 	template2 "github.com/cryptopunkscc/go-astral-js/pkg/target/template"
 	"github.com/cryptopunkscc/go-astral-js/pkg/template"
 	"github.com/pterm/pterm"
@@ -9,10 +10,10 @@ import (
 
 func List() (err error) {
 	resolve := Any[Template](Try(template2.Resolve))
-	source := NewModuleFS(template.TemplatesFs)
+	s := source.Resolve(template.TemplatesFs)
 	table := pterm.TableData{{"Short Name", "Template", "Description"}}
 
-	for tt := range Stream(resolve, source) {
+	for tt := range source.Stream(resolve, s) {
 		t := tt.Info()
 		table = append(table, []string{t.ShortName, t.Name, t.Description})
 	}

@@ -1,100 +1,69 @@
-package target
+package source
 
 import (
 	"fmt"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"io/fs"
-	"os"
 	"path"
 	"reflect"
-	"strings"
 )
 
-type Module struct {
+type source struct {
 	abs   string
 	src   string
 	files fs.FS
 }
 
-func NewModule(src string) (m *Module) {
-	m = &Module{}
-	m.abs = Abs(src)
-	if path.Ext(src) == ".portal" {
-		m.src = path.Base(src)
-		m.files = os.DirFS(path.Dir(m.abs))
-	} else {
-		m.src = "."
-		m.files = os.DirFS(m.abs)
-	}
-	return
-}
-
-func NewModuleFS(files fs.FS, src ...string) *Module {
-	m := &Module{files: files, src: "."}
-	if len(src) > 0 {
-		m.src = src[0]
-	}
-	if len(src) > 1 {
-		m.abs = path.Join(src[1:]...)
-		if !strings.HasSuffix(m.abs, m.src) {
-			m.abs = path.Join(m.abs, m.src)
-		}
-		//if !path.IsAbs(m.abs) {
-		//	println("[WARNING] Module initialized with incorrect absolute path: "+m.abs, m.src)
-		//}
-	}
-	return m
-}
-
-func (m *Module) String() string {
+func (m *source) String() string {
 	return fmt.Sprintf("%v@%s", reflect.TypeOf(m), m.abs)
 }
 
-func (m *Module) Abs() string {
+func (m *source) Abs() string {
 	if m.abs != "" {
 		return m.abs
 	}
 	return m.src
 }
 
-func (m *Module) Parent() Source {
+func (m *source) Parent() target.Source {
 	dir := path.Dir(m.Abs())
 	if path.IsAbs(m.Abs()) {
-		return NewModule(dir)
+		return New(dir)
 	}
 	sub, err := fs.Sub(m.files, dir)
 	if err != nil {
 		panic(err)
 	}
-	return NewModuleFS(sub, dir)
+	return Resolve(sub, dir)
 }
 
-func (m *Module) Path() string {
+func (m *source) Path() string {
 	return m.src
 }
 
-func (m *Module) Files() fs.FS {
+func (m *source) Files() fs.FS {
 	return m.files
 }
 
-func (m *Module) IsFile() bool {
+func (m *source) IsFile() bool {
 	return m.Path() != "." && path.Ext(m.Path()) != ""
 }
 
-func (m *Module) Type() (t Type) {
+func (m *source) Type() (t target.Type) {
 	switch {
 	case m.IsFrontend():
-		t += TypeFrontend
+		t += target.TypeFrontend
 	case m.IsBackend():
-		t += TypeBackend
+		t += target.TypeBackend
 	}
 	// TODO verify blob type in addition
 	if path.Ext(m.src) == ".portal" {
-		t += TypeBundle
+		t += target.TypeBundle
 	}
 	return
 }
 
-func (m *Module) IsFrontend() bool {
+func (m *source) IsFrontend() bool {
 	stat, err := fs.Stat(m.Files(), "index.html")
 	if err != nil {
 		return false
@@ -102,7 +71,7 @@ func (m *Module) IsFrontend() bool {
 	return stat.Mode().IsRegular()
 }
 
-func (m *Module) IsBackend() bool {
+func (m *source) IsBackend() bool {
 	if stat, err := fs.Stat(m.files, "main.js"); err == nil {
 		return stat.Mode().IsRegular()
 	}
@@ -112,7 +81,7 @@ func (m *Module) IsBackend() bool {
 	return false
 }
 
-func (m *Module) Lift() Source {
+func (m *source) Lift() target.Source {
 
 	// omit if a dir already lifted
 	if m.Path() == "." {

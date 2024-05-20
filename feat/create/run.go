@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/cryptopunkscc/go-astral-js/feat/build"
 	. "github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target/source"
 	template2 "github.com/cryptopunkscc/go-astral-js/pkg/target/template"
 	"github.com/cryptopunkscc/go-astral-js/pkg/template"
 	"github.com/cryptopunkscc/go-astral-js/runner/create"
@@ -21,9 +22,9 @@ func (f Feat) Run(
 ) (err error) {
 	runner := create.NewRunner(dir, targets)
 	resolve := Any[Template](Try(template2.Resolve))
-	source := NewModuleFS(template.TemplatesFs)
+	src := source.Resolve(template.TemplatesFs)
 
-	for t := range Stream(resolve, source) {
+	for t := range source.Stream(resolve, src) {
 		if _, ok := targets[t.Name()]; !ok {
 			continue
 		}

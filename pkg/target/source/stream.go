@@ -1,13 +1,14 @@
-package target
+package source
 
 import (
+	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"io/fs"
 	"reflect"
 )
 
 // Stream all portal targets in a given dir and stream through the returned channel.
 // Possible types are: NodeModule, PortalNodeModule, PortalRawModule, Bundle,
-func Stream[T Source](resolve Resolve[T], from Source) (in <-chan T) {
+func Stream[T target.Source](resolve target.Resolve[T], from target.Source) (in <-chan T) {
 	out := make(chan T)
 	in = out
 	go func() {
@@ -17,7 +18,7 @@ func Stream[T Source](resolve Resolve[T], from Source) (in <-chan T) {
 				return fs.SkipAll
 			}
 
-			m := NewModuleFS(from.Files(), src, from.Abs())
+			m := Resolve(from.Files(), src, from.Abs())
 			s, err := resolve(m)
 			if any(s) != nil && !reflect.ValueOf(s).IsNil() {
 				out <- s
