@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/go-astral-js/feat/apps"
-	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/runner/serve"
@@ -23,7 +22,7 @@ func NewFeat(spawn target.Dispatch, tray target.Tray) func(context.Context, bool
 	handlers := rpc.Handlers{
 		"ping":      func() {},
 		"open":      spawn,
-		"observe":   appstore.Observe,
+		"observe":   apps.Observe,
 		"install":   apps.Install,
 		"uninstall": apps.Uninstall,
 	}

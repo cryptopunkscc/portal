@@ -2,6 +2,6 @@ package apps
 
 import "github.com/cryptopunkscc/go-astral-js/mock/appstore"
 
-func Install(src string) error {
-	return appstore.Install(src)
+func Path(app string) (src string, err error) {
+	return appstore.Path(app)
 }

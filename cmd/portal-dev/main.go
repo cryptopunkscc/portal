@@ -9,7 +9,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/feat/dev"
 	"github.com/cryptopunkscc/go-astral-js/feat/open"
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
-	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
+	"github.com/cryptopunkscc/go-astral-js/mock/appstore"
 	osExec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target/apphost"

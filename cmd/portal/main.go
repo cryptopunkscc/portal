@@ -9,7 +9,6 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/feat/open"
 	"github.com/cryptopunkscc/go-astral-js/feat/serve"
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
-	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
 	osexec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target/apphost"
@@ -31,7 +30,7 @@ func main() {
 	executable := "portal"
 	wait := &sync.WaitGroup{}
 	proc := exec.NewRunner[target.App](executable)
-	resolve := apps.Resolve(appstore.Path)
+	resolve := apps.Resolve(featApps.Path)
 	launch := spawn.NewRunner(wait, resolve, proc).Run
 	bindings := newRuntimeFactory(ctx, launch)
 	run := app.NewRunner(bindings)
