@@ -1,0 +1,23 @@
+package create
+
+import (
+	"github.com/cryptopunkscc/go-astral-js/pkg/project"
+	. "github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"github.com/cryptopunkscc/go-astral-js/pkg/template"
+	"github.com/pterm/pterm"
+)
+
+func List() (err error) {
+	resolve := Any[Template](Try(project.ResolveTemplate))
+	source := NewModuleFS(template.TemplatesFs)
+	table := pterm.TableData{{"Short Name", "Template", "Description"}}
+
+	for tt := range Stream(resolve, source) {
+		t := tt.Info()
+		table = append(table, []string{t.ShortName, t.Name, t.Description})
+	}
+
+	err = pterm.DefaultTable.WithHasHeader(true).WithBoxed(true).WithData(table).Render()
+	pterm.Println()
+	return
+}

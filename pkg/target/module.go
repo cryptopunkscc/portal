@@ -38,9 +38,9 @@ func NewModuleFS(files fs.FS, src ...string) *Module {
 		if !strings.HasSuffix(m.abs, m.src) {
 			m.abs = path.Join(m.abs, m.src)
 		}
-		if !path.IsAbs(m.abs) {
-			println("[WARNING] Module initialized with incorrect absolute path: "+m.abs, m.src)
-		}
+		//if !path.IsAbs(m.abs) {
+		//	println("[WARNING] Module initialized with incorrect absolute path: "+m.abs, m.src)
+		//}
 	}
 	return m
 }

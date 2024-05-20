@@ -35,6 +35,12 @@ type Portal interface {
 	Manifest() *Manifest
 }
 
+type Template interface {
+	Source
+	Info() TemplateInfo
+	Name() string
+}
+
 type NodeModule interface {
 	Source
 	PkgJson() *PackageJson

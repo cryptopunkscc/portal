@@ -8,14 +8,13 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/feat/create"
 	"github.com/cryptopunkscc/go-astral-js/feat/dev"
 	"github.com/cryptopunkscc/go-astral-js/feat/open"
-	"github.com/cryptopunkscc/go-astral-js/feat/templates"
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	"github.com/cryptopunkscc/go-astral-js/pkg/appstore"
-	osexec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
+	osExec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/project"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
-	dev2 "github.com/cryptopunkscc/go-astral-js/runner/dev"
+	devRunner "github.com/cryptopunkscc/go-astral-js/runner/dev"
 	"github.com/cryptopunkscc/go-astral-js/runner/exec"
 	"github.com/cryptopunkscc/go-astral-js/runner/spawn"
 	"log"
@@ -26,25 +25,26 @@ import (
 func main() {
 	log.Println("starting portal development", os.Args)
 	ctx, cancel := context.WithCancel(context.Background())
-	go osexec.OnShutdown(cancel)
+	go osExec.OnShutdown(cancel)
 
 	wait := &sync.WaitGroup{}
 	proc := exec.NewRunner[target.Portal]("portal-dev")
 	find := project.Resolve(appstore.Path)
 	launch := spawn.NewRunner(wait, find, proc).Run
 	bindings := newRuntimeFactory(ctx, launch)
-	run := dev2.NewRunner(bindings)
+	run := devRunner.NewRunner(bindings)
 
-	devFeat := dev.NewFeat(wait, launch)
-	openFeat := open.NewFeat[target.Portal](find, run)
-	buildFeat := build.NewFeat().Run
+	featDev := dev.NewFeat(wait, launch)
+	featOpen := open.NewFeat[target.Portal](find, run)
+	featBuild := build.NewFeat().Run
+	featCreate := create.NewFeat().Run
 
 	cli := clir.NewCli(ctx, manifest.NameDev, manifest.DescriptionDev, version.Run)
 
-	cli.Dev(devFeat)
-	cli.Open(openFeat)
-	cli.Create(templates.List, create.Run)
-	cli.Build(buildFeat)
+	cli.Dev(featDev)
+	cli.Open(featOpen)
+	cli.Create(create.List, featCreate)
+	cli.Build(featBuild)
 	cli.Apps()
 
 	err := cli.Run()

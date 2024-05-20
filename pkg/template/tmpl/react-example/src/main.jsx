@@ -8,6 +8,7 @@ const container = document.getElementById('root')
 const root = createRoot(container)
 
 root.render(
+    // strict mode makes the component App call twice
     // <React.StrictMode>
         <App/>
     // </React.StrictMode>

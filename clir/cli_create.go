@@ -1,14 +1,16 @@
 package clir
 
-import "strings"
+import (
+	"context"
+	"strings"
+)
 
 type Templates func() error
 
 type Create func(
-	projectName string,
-	targetDir string,
-	templates []string,
-	force bool,
+	ctx context.Context,
+	dir string,
+	targets map[string]string,
 ) (err error)
 
 func (c Cli) Create(
@@ -16,11 +18,10 @@ func (c Cli) Create(
 	create Create,
 ) {
 	emptyFlags := struct {
-		Dir      string `pos:"1" description:"Project directory"`
-		Name     string `name:"n" description:"Name of project"`
-		Template string `name:"t" description:"Name of built-in template to use, path to template or template url"`
-		Force    bool   `name:"f" description:"Force recreate project"`
-		List     bool   `name:"l" description:"List available templates"`
+		Dir string `pos:"1" description:"Project directory."`
+		//Name    string `name:"n" description:"Name of project. If not specified, is taken from project directory."`
+		Targets string `name:"t" description:"List of templates with optional module names like: 'svelte backend' or 'svelte:front backend:back'."`
+		List    bool   `name:"l" description:"List available templates"`
 	}{}
 	flags := emptyFlags
 	cmd := c.clir.NewSubCommand("c", "Create new project from template.")
@@ -30,9 +31,23 @@ func (c Cli) Create(
 		case flags == emptyFlags || flags.List:
 			return templates()
 		default:
-			temps := strings.Split(flags.Template, " ")
-			return create(flags.Name, flags.Dir, temps, flags.Force)
+			targets := parseTargets(flags.Targets)
+			return create(c.ctx, flags.Dir, targets)
 		}
 	})
+	return
+}
+
+func parseTargets(targets string) (out map[string]string) {
+	out = make(map[string]string)
+	for _, s := range strings.Split(targets, " ") {
+		chunks := strings.Split(s, ":")
+		template := chunks[0]
+		name := template
+		if len(chunks) > 1 {
+			name = chunks[1]
+		}
+		out[template] = name
+	}
 	return
 }

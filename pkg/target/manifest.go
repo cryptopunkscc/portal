@@ -18,13 +18,6 @@ type Manifest struct {
 	Icon        string `json:"icon,omitempty"`
 }
 
-func Base(src string) Manifest {
-	return Manifest{
-		Name:    path.Base(src),
-		Version: "0.0.0",
-	}
-}
-
 func ReadManifestFs(src fs.FS) (p Manifest, err error) {
 	err = p.LoadFs(src, PortalJsonFilename)
 	return

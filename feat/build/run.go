@@ -25,7 +25,7 @@ func NewFeat(dependencies ...target.NodeModule) *Feat {
 }
 
 func (r Feat) Run(ctx context.Context, dir string) (err error) {
-	if err = r.Dist(ctx, dir, "."); err != nil {
+	if err = r.Dist(ctx, dir); err != nil {
 		return fmt.Errorf("cannot build portal apps: %w", err)
 	}
 	if err = r.Pack(ctx, dir, "."); err != nil {
@@ -34,8 +34,8 @@ func (r Feat) Run(ctx context.Context, dir string) (err error) {
 	return
 }
 
-func (r Feat) Dist(ctx context.Context, root, dir string) (err error) {
-	for m := range project.FromPath[target.Project](path.Join(root, dir)) {
+func (r Feat) Dist(ctx context.Context, dir ...string) (err error) {
+	for m := range project.FromPath[target.Project](path.Join(dir...)) {
 		if !m.CanNpmRunBuild() {
 			continue
 		}
