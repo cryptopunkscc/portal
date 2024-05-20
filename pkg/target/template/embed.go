@@ -2,7 +2,7 @@ package template
 
 import (
 	"embed"
-	"github.com/cryptopunkscc/go-astral-js/pkg/target/source"
+	targetSource "github.com/cryptopunkscc/go-astral-js/pkg/target/source"
 	"io/fs"
 )
 
@@ -12,7 +12,7 @@ var TemplatesFs embed.FS
 var CommonsFs fs.FS
 
 func init() {
-	if CommonsFs = source.Resolve(TemplatesFs, "tmpl/common").Lift().Files(); CommonsFs == nil {
+	if CommonsFs = targetSource.Resolve(TemplatesFs, "tmpl/common").Lift().Files(); CommonsFs == nil {
 		panic("cannot resolve templates commons.")
 	}
 }

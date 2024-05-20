@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/git"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
-	"github.com/cryptopunkscc/go-astral-js/pkg/template"
+	"github.com/cryptopunkscc/go-astral-js/pkg/target/template"
 	"os"
 	"path/filepath"
 )
