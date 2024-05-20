@@ -1,12 +1,5 @@
 package target
 
-import (
-	"encoding/json"
-	"io/fs"
-	"os"
-	"path"
-)
-
 const PortalJsonFilename = "portal.json"
 
 type Manifest struct {
@@ -16,26 +9,4 @@ type Manifest struct {
 	Package     string `json:"package,omitempty"`
 	Version     string `json:"version,omitempty"`
 	Icon        string `json:"icon,omitempty"`
-}
-
-func ReadManifestFs(src fs.FS) (p Manifest, err error) {
-	err = p.LoadFs(src, PortalJsonFilename)
-	return
-}
-
-func (m *Manifest) LoadFs(src fs.FS, name string) (err error) {
-	file, err := fs.ReadFile(src, name)
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal(file, &m)
-	return
-}
-
-func (m *Manifest) LoadPath(src string, name string) (err error) {
-	bytes, err := os.ReadFile(path.Join(src, name))
-	if err != nil {
-		return
-	}
-	return json.Unmarshal(bytes, &m)
 }

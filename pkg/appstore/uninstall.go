@@ -10,8 +10,7 @@ import (
 
 func Uninstall(id string) (err error) {
 	for t := range portal.FromPath[target.Bundle](portalAppsDir) {
-		manifest := target.Manifest{}
-		_ = manifest.LoadFs(t.Files(), target.PortalJsonFilename)
+		manifest, _ := portal.ReadManifest(t.Files())
 		if manifest.Name == id || manifest.Package == id {
 			log.Println("Uninstalling", t.Manifest().Package, "from", t.Abs())
 			err = fs.DeleteFile(t.Abs())

@@ -36,7 +36,7 @@ func (r Feat) Run(ctx context.Context, dir string) (err error) {
 
 func (r Feat) Dist(ctx context.Context, dir ...string) (err error) {
 	for m := range project.FromPath[target.Project](path.Join(dir...)) {
-		if !m.CanNpmRunBuild() {
+		if !m.PkgJson().CanBuild() {
 			continue
 		}
 		if err = dist.NewRunner(r.dependencies).Run(ctx, m); err != nil {

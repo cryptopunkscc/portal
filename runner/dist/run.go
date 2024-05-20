@@ -41,7 +41,7 @@ func (r Runner) Prepare(ctx context.Context, m target.Project) (err error) {
 }
 
 func (r Runner) Dist(ctx context.Context, m target.Project) (err error) {
-	if !m.CanNpmRunBuild() {
+	if !m.PkgJson().CanBuild() {
 		return errors.New("missing npm build in package.json")
 	}
 	if err = npm.RunBuild(m); err != nil {

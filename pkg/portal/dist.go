@@ -33,7 +33,7 @@ func ResolveDist(m target.Source) (b target.Dist, err error) {
 		_ = f.Close()
 		return nil, ErrNotDist
 	}
-	manifest, err := target.ReadManifestFs(m.Files())
+	manifest, err := ReadManifest(m.Files())
 	if err != nil {
 		return
 	}

@@ -1,8 +1,10 @@
 package project
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"io/fs"
 	"path"
 )
 
@@ -34,7 +36,7 @@ func ResolveTemplate(m target.Source) (t target.Template, err error) {
 		return nil, ErrNotTemplate
 	}
 	m = m.Lift()
-	info, err := target.ReadTemplateInfoFS(m.Files())
+	info, err := ReadTemplateInfo(m.Files())
 	if err != nil {
 		return
 	}
@@ -42,5 +44,14 @@ func ResolveTemplate(m target.Source) (t target.Template, err error) {
 		Source: m,
 		info:   info,
 	}
+	return
+}
+
+func ReadTemplateInfo(src fs.FS) (i target.TemplateInfo, err error) {
+	file, err := fs.ReadFile(src, target.TemplateInfoFileName)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(file, &i)
 	return
 }

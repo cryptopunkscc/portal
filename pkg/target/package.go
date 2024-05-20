@@ -1,10 +1,5 @@
 package target
 
-import (
-	"encoding/json"
-	"io/fs"
-)
-
 const PackageJsonFilename = "package.json"
 
 type PackageJson struct {
@@ -14,19 +9,10 @@ type PackageJson struct {
 	} `json:"scripts,omitempty"`
 }
 
-func LoadPackageJson(files fs.FS) (pkgJson PackageJson, err error) {
-	file, err := fs.ReadFile(files, PackageJsonFilename)
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal(file, &pkgJson)
-	return
-}
-
-func (p PackageJson) HasBuildScript() bool {
-	return p.Scripts.Build != ""
-}
-
 func (p PackageJson) IsPortalLib() bool {
 	return p.Module == "portal"
+}
+
+func (p PackageJson) CanBuild() bool {
+	return p.Scripts.Build != ""
 }

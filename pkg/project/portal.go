@@ -1,6 +1,7 @@
 package project
 
 import (
+	"github.com/cryptopunkscc/go-astral-js/pkg/portal"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
 	"io/fs"
 )
@@ -36,10 +37,10 @@ func ResolvePortal(m target.NodeModule) (b target.Project, err error) {
 	if err != nil {
 		return
 	}
-	if err = manifest.LoadFs(sub, target.PackageJsonFilename); err != nil {
+	if err = portal.LoadManifest(&manifest, sub, target.PackageJsonFilename); err != nil {
 		return
 	}
-	if err = manifest.LoadFs(sub, target.PortalJsonFilename); err != nil {
+	if err = portal.LoadManifest(&manifest, sub, target.PortalJsonFilename); err != nil {
 		return
 	}
 	b = &Portal{NodeModule: m, manifest: &manifest}

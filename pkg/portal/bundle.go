@@ -48,7 +48,7 @@ func ResolveBundle(source target.Source) (b target.Bundle, err error) {
 		return
 	}
 	s := target.NewModuleFS(reader, source.Path(), source.Abs())
-	m, err := target.ReadManifestFs(reader)
+	m, err := ReadManifest(reader)
 	if err != nil {
 		return
 	}

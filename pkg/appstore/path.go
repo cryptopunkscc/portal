@@ -9,8 +9,8 @@ import (
 
 func Path(app string) (src string, err error) {
 	for t := range portal.FromPath[target.Bundle](portalAppsDir) {
-		m := target.Manifest{}
-		if err = m.LoadFs(t.Files(), target.PortalJsonFilename); err != nil {
+		var m target.Manifest
+		if m, err = portal.ReadManifest(t.Files()); err != nil {
 			return
 		}
 		if m.Name == app || m.Package == app {

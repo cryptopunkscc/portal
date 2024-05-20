@@ -1,8 +1,10 @@
 package project
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target"
+	"io/fs"
 )
 
 type NodeModule struct {
@@ -19,7 +21,7 @@ func ResolveNodeModule(m target.Source) (module *NodeModule, err error) {
 		return nil, ErrNotNodeModule
 	}
 	m = m.Lift()
-	pkgJson, err := target.LoadPackageJson(m.Files())
+	pkgJson, err := loadPackageJson(m.Files())
 	if err != nil {
 		return
 	}
@@ -31,10 +33,11 @@ func (m *NodeModule) PkgJson() *target.PackageJson {
 	return m.pkgJson
 }
 
-func (m *NodeModule) IsPortalLib() bool {
-	return m.pkgJson.IsPortalLib()
-}
-
-func (m *NodeModule) CanNpmRunBuild() bool {
-	return m.pkgJson.Scripts.Build != ""
+func loadPackageJson(files fs.FS) (pkgJson target.PackageJson, err error) {
+	file, err := fs.ReadFile(files, target.PackageJsonFilename)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(file, &pkgJson)
+	return
 }

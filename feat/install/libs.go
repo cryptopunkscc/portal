@@ -10,10 +10,10 @@ import (
 
 func (d *PortalDev) buildJsLibs() {
 	for p := range project.FromPath[target.NodeModule](path.Join(d.root, "pkg")) {
-		if p.IsPortalLib() {
+		if p.PkgJson().IsPortalLib() {
 			d.modules = append(d.modules, p)
 		}
-		if !p.CanNpmRunBuild() {
+		if !p.PkgJson().CanBuild() {
 			continue
 		}
 		if err := npm.Install(p); err != nil {
@@ -27,7 +27,7 @@ func (d *PortalDev) buildJsLibs() {
 
 func (d *PortalDev) collectPortalLibs() {
 	for p := range project.FromPath[target.NodeModule](path.Join(d.root, "pkg")) {
-		if p.IsPortalLib() {
+		if p.PkgJson().IsPortalLib() {
 			d.modules = append(d.modules, p)
 		}
 	}

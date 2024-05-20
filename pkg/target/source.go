@@ -44,9 +44,6 @@ type Template interface {
 type NodeModule interface {
 	Source
 	PkgJson() *PackageJson
-
-	IsPortalLib() bool
-	CanNpmRunBuild() bool
 }
 
 type Project interface {
