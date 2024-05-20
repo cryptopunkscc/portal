@@ -3,7 +3,7 @@ package dev
 import (
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/target/project"
-	common "github.com/cryptopunkscc/go-astral-js/pkg/wails"
+	"github.com/cryptopunkscc/go-astral-js/runner/wails"
 	"github.com/wailsapp/wails/v2/pkg/application"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"log"
@@ -34,7 +34,7 @@ func Run(path string, opt *options.App) (err error) {
 	if err != nil {
 		return err
 	}
-	common.SetupOptions(src, opt)
+	wails.SetupOptions(src, opt)
 	if opt.Title == "" {
 		opt.Title = "development"
 	}
