@@ -44,7 +44,7 @@ func (r *Runner) Run(t target.Template) (err error) {
 	}
 
 	args := r.targetArgs(t)
-	if err = template.Install(dir, t.Files(), args); err != nil {
+	if err = Install(dir, t.Files(), args); err != nil {
 		err = fmt.Errorf("cannot install template: %w", err)
 	}
 	return
