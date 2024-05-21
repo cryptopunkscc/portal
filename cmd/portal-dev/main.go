@@ -29,11 +29,19 @@ func main() {
 
 	wait := &sync.WaitGroup{}
 	proc := exec.NewRunner[target.Portal]("portal-dev")
-	find := portals.Resolve(appstore.Path)
-	launch := spawn.NewRunner(wait, find, proc).Run
-	bindings := newRuntimeFactory(ctx, launch)
-	run := devRunner.NewRunner(bindings)
+	find := target.Cached(portals.Find)(appstore.Path)
 
+	launch := spawn.NewRunner(wait, find, proc).Run
+	apphostFactory := apphost.NewFactory(launch, "dev")
+	newApi := target.ApiFactory(
+		NewAdapter,
+		apphostFactory.NewAdapter,
+		apphostFactory.WithTimeout,
+	)
+
+	run := devRunner.NewRunner(newApi)
+
+	launch = spawn.NewRunner(wait, find, proc).Run
 	featDev := dev.NewFeat(wait, launch)
 	featOpen := open.NewFeat[target.Portal](find, run)
 	featBuild := build.NewFeat().Run
@@ -51,20 +59,12 @@ func main() {
 	if err != nil {
 		log.Println(err)
 	}
-	log.Println("closing portal development")
 	wait.Wait()
+	log.Println("closing portal development")
 }
 
-type Adapter struct{ target.Apphost }
+type Adapter struct{ target.Api }
 
-func newRuntimeFactory(ctx context.Context, spawn target.Dispatch) target.New {
-	invoke := apphost.Invoke(spawn)
-	return func(t target.Type, prefix ...string) target.Api {
-		switch {
-		case t.Is(target.TypeFrontend):
-			return &Adapter{Apphost: apphost.NewAdapter(ctx, invoke, prefix...)}
-		default:
-			return apphost.WithTimeout(ctx, invoke, prefix...)
-		}
-	}
+func NewAdapter(api target.Api) target.Api {
+	return &Adapter{Api: api}
 }

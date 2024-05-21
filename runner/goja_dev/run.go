@@ -14,12 +14,12 @@ import (
 )
 
 type Runner struct {
-	target.New
+	target.NewApi
 	events sig.Queue[any]
 }
 
-func NewRunner(bindings target.New) target.Run[target.ProjectBackend] {
-	return (&Runner{New: bindings}).Run
+func NewRunner(newApi target.NewApi) target.Run[target.ProjectBackend] {
+	return (&Runner{NewApi: newApi}).Run
 }
 
 func (b *Runner) Run(ctx context.Context, project target.ProjectBackend) (err error) {
@@ -32,7 +32,7 @@ func (b *Runner) Run(ctx context.Context, project target.ProjectBackend) (err er
 	go backend_dev.NpmRunWatch(ctx, project.Path())
 	go b.serve(ctx, project)
 
-	back := goja.NewBackend(b.New(target.TypeBackend, "dev"))
+	back := goja.NewBackend(b.NewApi(ctx, project))
 	output := func(event backend_dev.Event) { b.events.Push(event) }
 	if err = backend_dev.Dev(ctx, back, src, output); err != nil {
 		return fmt.Errorf("backend.Dev: %v", err)

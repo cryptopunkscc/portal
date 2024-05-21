@@ -11,26 +11,26 @@ import (
 	"reflect"
 )
 
-func NewRunner(bindings target.New) target.Run[target.Portal] {
-	return Runner{bindings: bindings, prefix: []string{"dev"}}.Run
+func NewRunner(newApi target.NewApi) target.Run[target.Portal] {
+	return Runner{newApi: newApi, prefix: []string{"dev"}}.Run
 }
 
 type Runner struct {
-	bindings target.New
-	prefix   []string
+	newApi target.NewApi
+	prefix []string
 }
 
 func (r Runner) Run(ctx context.Context, t target.Portal) (err error) {
 	prefix := "dev"
 	switch v := t.(type) {
 	case target.ProjectBackend:
-		return goja_dev.NewRunner(r.bindings)(ctx, v)
+		return goja_dev.NewRunner(r.newApi)(ctx, v)
 	case target.ProjectFrontend:
-		return wails_dev.NewRunner(r.bindings)(ctx, v)
+		return wails_dev.NewRunner(r.newApi)(ctx, v)
 	case target.AppBackend:
-		return goja.NewRunner(r.bindings, prefix)(ctx, v)
+		return goja.NewRunner(r.newApi, prefix)(ctx, v)
 	case target.AppFrontend:
-		return wails.NewRunner(r.bindings, prefix)(ctx, v)
+		return wails.NewRunner(r.newApi, prefix)(ctx, v)
 	default:
 		return fmt.Errorf("invalid target %v: %v", reflect.TypeOf(t), t.Path())
 	}

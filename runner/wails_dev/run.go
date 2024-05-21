@@ -19,17 +19,17 @@ import (
 
 type Runner struct {
 	frontCtx context.Context
-	target.New
+	target.NewApi
 }
 
-func NewRunner(bindings target.New) target.Run[target.ProjectFrontend] {
-	return Runner{New: bindings}.Run
+func NewRunner(newApi target.NewApi) target.Run[target.ProjectFrontend] {
+	return Runner{NewApi: newApi}.Run
 }
 
 func (f Runner) Run(ctx context.Context, project target.ProjectFrontend) (err error) {
 	log.Printf("portal dev open: (%d) %s\n", os.Getpid(), project.Manifest())
 	defer log.Printf("portal dev close: (%d) %s\n", os.Getpid(), project.Manifest())
-	opt := wails.AppOptions(f.New(target.TypeFrontend, "dev"))
+	opt := wails.AppOptions(f.NewApi(ctx, project))
 	opt.OnStartup = func(ctx context.Context) {
 		f.frontCtx = ctx
 		go f.serve(project)

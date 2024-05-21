@@ -9,7 +9,7 @@ import (
 	"log"
 )
 
-func Resolve(resolve target.Path) func(src string) (portals target.Portals[target.Portal], err error) {
+func Find(resolve target.Path) target.Find[target.Portal] {
 	return resolver{Resolver: apps.Resolver{Path: resolve}}.resolve
 }
 

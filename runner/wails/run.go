@@ -16,17 +16,17 @@ import (
 )
 
 type Runner struct {
-	bindings target.New
+	bindings target.NewApi
 	prefix   []string
 }
 
-func NewRunner(bindings target.New, prefix ...string) target.Run[target.AppFrontend] {
-	return Runner{bindings: bindings, prefix: prefix}.Run
+func NewRunner(newApi target.NewApi, prefix ...string) target.Run[target.AppFrontend] {
+	return Runner{bindings: newApi, prefix: prefix}.Run
 }
 
-func (r Runner) Run(_ context.Context, app target.AppFrontend) (err error) {
+func (r Runner) Run(ctx context.Context, app target.AppFrontend) (err error) {
 	log.Println("Attach frontend", reflect.TypeOf(app), app.Path(), app.Type())
-	opt := AppOptions(r.bindings(target.TypeFrontend, r.prefix...))
+	opt := AppOptions(r.bindings(ctx, app))
 	if err = Run2(app, opt); err != nil {
 		return fmt.Errorf("dev.Run: %v", err)
 	}

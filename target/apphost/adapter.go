@@ -18,6 +18,7 @@ import (
 )
 
 type Adapter struct {
+	pkg    []string
 	prefix []string
 
 	listeners      map[string]*astral.Listener
@@ -29,8 +30,8 @@ type Adapter struct {
 	onIdle func(bool)
 }
 
-func (api *Adapter) Port(service string) (port string) {
-	return strings.Join(append(api.Prefix(), service), ".")
+func (api *Adapter) Port(service ...string) (port string) {
+	return strings.Join(append(api.Prefix(), service...), ".")
 }
 
 func (api *Adapter) Prefix() []string {

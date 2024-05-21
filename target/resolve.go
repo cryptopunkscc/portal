@@ -6,7 +6,7 @@ import (
 	"path"
 )
 
-func Any[T Source](of ...func(Source) (Source, error)) func(Source) (T, error) {
+func Any[T Source](of ...func(Source) (Source, error)) Resolve[T] {
 	return func(entry Source) (s T, err error) {
 		for _, f := range of {
 			var v Source

@@ -8,11 +8,11 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/target"
 )
 
-func NewRunner(bindings target.New) target.Run[target.App] {
+func NewRunner(bindings target.NewApi) target.Run[target.App] {
 	return Runner{bindings: bindings}.Run
 }
 
-type Runner struct{ bindings target.New }
+type Runner struct{ bindings target.NewApi }
 
 func (r Runner) Run(ctx context.Context, app target.App) (err error) {
 	switch v := any(app).(type) {

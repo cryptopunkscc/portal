@@ -32,8 +32,13 @@ func main() {
 	proc := exec.NewRunner[target.App](executable)
 	resolve := apps.Resolve(featApps.Path)
 	launch := spawn.NewRunner(wait, resolve, proc).Run
-	bindings := newRuntimeFactory(ctx, launch)
-	run := app.NewRunner(bindings)
+	apphostFactory := apphost.NewFactory(launch)
+	newApi := target.ApiFactory(
+		NewAdapter,
+		apphostFactory.NewAdapter,
+		apphostFactory.WithTimeout,
+	)
+	run := app.NewRunner(newApi)
 
 	featDispatch := dispatch.NewFeat(executable)
 	featServe := serve.NewFeat(launch, tray.NewRunner(launch))
@@ -56,16 +61,6 @@ func main() {
 	wait.Wait()
 }
 
-type Adapter struct{ target.Apphost }
+type Adapter struct{ target.Api }
 
-func newRuntimeFactory(ctx context.Context, spawn target.Dispatch) target.New {
-	invoke := apphost.Invoke(spawn)
-	return func(t target.Type, prefix ...string) target.Api {
-		switch {
-		case t.Is(target.TypeFrontend):
-			return &Adapter{Apphost: apphost.NewAdapter(ctx, invoke, prefix...)}
-		default:
-			return apphost.WithTimeout(ctx, invoke, prefix...)
-		}
-	}
-}
+func NewAdapter(api target.Api) target.Api { return &Adapter{Api: api} }

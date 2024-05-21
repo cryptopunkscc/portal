@@ -11,11 +11,12 @@ func (t Type) Is(p Type) bool {
 }
 
 const (
-	None         = Type(0x0)
+	TypeNone     = Type(0x0)
 	TypeBackend  = Type(0x1)
 	TypeFrontend = Type(0x2)
 	TypeDev      = Type(0x4)
 	TypeBundle   = Type(0x8)
+	TypeAll      = TypeBackend | TypeFrontend | TypeDev | TypeBundle
 )
 
 type Source interface {
