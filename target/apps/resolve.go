@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-func Resolve(resolve target.Path) func(src string) (apps target.Portals[target.App], err error) {
+func Find(resolve target.Path) func(src string) (apps target.Portals[target.App], err error) {
 	return Resolver{resolve}.Resolve
 }
 

@@ -12,11 +12,12 @@ import (
 	osexec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/runner/app"
 	"github.com/cryptopunkscc/go-astral-js/runner/exec"
+	"github.com/cryptopunkscc/go-astral-js/runner/query"
 	"github.com/cryptopunkscc/go-astral-js/runner/spawn"
 	"github.com/cryptopunkscc/go-astral-js/runner/tray"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/apphost"
-	"github.com/cryptopunkscc/go-astral-js/target/apps"
+	apps "github.com/cryptopunkscc/go-astral-js/target/apps"
 	"log"
 	"os"
 	"sync"
@@ -27,22 +28,24 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	go osexec.OnShutdown(cancel)
 
-	executable := "portal"
 	wait := &sync.WaitGroup{}
-	proc := exec.NewRunner[target.App](executable)
-	resolve := apps.Resolve(featApps.Path)
-	launch := spawn.NewRunner(wait, resolve, proc).Run
-	apphostFactory := apphost.NewFactory(launch)
-	newApi := target.ApiFactory(
-		NewAdapter,
+	executable := "portal"
+
+	findApps := apps.Find(featApps.Path)
+
+	runQuery := query.NewRunner[target.App]().Run
+	apphostFactory := apphost.NewFactory(runQuery)
+	newApi := target.ApiFactory(NewAdapter,
 		apphostFactory.NewAdapter,
 		apphostFactory.WithTimeout,
 	)
-	run := app.NewRunner(newApi)
+	runApp := app.NewRunner(newApi)
+	runProc := exec.NewRunner[target.App](executable)
+	runSpawn := spawn.NewRunner(wait, findApps, runProc).Run
 
 	featDispatch := dispatch.NewFeat(executable)
-	featServe := serve.NewFeat(launch, tray.NewRunner(launch))
-	featOpen := open.NewFeat[target.App](resolve, run)
+	featServe := serve.NewFeat(runSpawn, tray.NewRunner(runSpawn))
+	featOpen := open.NewFeat[target.App](findApps, runApp)
 
 	cli := clir.NewCli(ctx, manifest.Name, manifest.Description, version.Run)
 

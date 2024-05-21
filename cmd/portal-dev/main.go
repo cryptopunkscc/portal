@@ -13,6 +13,7 @@ import (
 	osExec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	devRunner "github.com/cryptopunkscc/go-astral-js/runner/dev"
 	"github.com/cryptopunkscc/go-astral-js/runner/exec"
+	"github.com/cryptopunkscc/go-astral-js/runner/query"
 	"github.com/cryptopunkscc/go-astral-js/runner/spawn"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/apphost"
@@ -28,22 +29,23 @@ func main() {
 	go osExec.OnShutdown(cancel)
 
 	wait := &sync.WaitGroup{}
-	proc := exec.NewRunner[target.Portal]("portal-dev")
-	find := target.Cached(portals.Find)(appstore.Path)
+	prefix := "dev"
 
-	launch := spawn.NewRunner(wait, find, proc).Run
-	apphostFactory := apphost.NewFactory(launch, "dev")
+	findPortals := target.Cached(portals.Find)(appstore.Path)
+
+	runQuery := query.NewRunner[target.Portal](prefix).Run
+	apphostFactory := apphost.NewFactory(runQuery, prefix)
 	newApi := target.ApiFactory(
 		NewAdapter,
 		apphostFactory.NewAdapter,
 		apphostFactory.WithTimeout,
 	)
+	runDev := devRunner.NewRunner(newApi)
+	runProc := exec.NewRunner[target.Portal]("portal-dev")
+	runSpawn := spawn.NewRunner(wait, findPortals, runProc).Run
 
-	run := devRunner.NewRunner(newApi)
-
-	launch = spawn.NewRunner(wait, find, proc).Run
-	featDev := dev.NewFeat(wait, launch)
-	featOpen := open.NewFeat[target.Portal](find, run)
+	featDev := dev.NewFeat(wait, runSpawn, "dev.portal")
+	featOpen := open.NewFeat[target.Portal](findPortals, runDev)
 	featBuild := build.NewFeat().Run
 	featCreate := create.NewFeat().Run
 
@@ -65,6 +67,4 @@ func main() {
 
 type Adapter struct{ target.Api }
 
-func NewAdapter(api target.Api) target.Api {
-	return &Adapter{Api: api}
-}
+func NewAdapter(api target.Api) target.Api { return &Adapter{Api: api} }
