@@ -44,4 +44,5 @@ func (t *Timout) Stop() {
 		close(t.c)
 	}
 	t.c = make(chan any)
+	t.ticker.Stop()
 }

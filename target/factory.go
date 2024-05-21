@@ -8,8 +8,8 @@ import (
 
 func ApiFactory(
 	wrap func(Api) Api,
-	backendApphost NewApphost,
 	frontendApphost NewApphost,
+	backendApphost NewApphost,
 ) func(context.Context, Portal) Api {
 	return func(ctx context.Context, p Portal) (a Api) {
 		var n NewApphost

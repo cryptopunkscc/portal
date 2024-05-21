@@ -21,14 +21,18 @@ type Feat struct {
 	serve target.Dispatch
 }
 
-func NewFeat(wait *sync.WaitGroup, spawn target.Dispatch) target.Dispatch {
+func NewFeat(
+	wait *sync.WaitGroup,
+	spawn target.Dispatch,
+	port string,
+) target.Dispatch {
 	handlers := rpc.Handlers{
 		"ping":    func() {},
 		"open":    spawn,
 		"observe": apps.Observe,
 	}
 	return Feat{
-		port:  "dev.portal",
+		port:  port,
 		wait:  wait,
 		spawn: spawn,
 		serve: serve.NewRunner(handlers).Run,
