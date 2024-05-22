@@ -1,52 +1,43 @@
 package portals
 
 import (
-	"fmt"
+	"errors"
+	"github.com/cryptopunkscc/go-astral-js/pkg/array"
 	"github.com/cryptopunkscc/go-astral-js/target"
-	"github.com/cryptopunkscc/go-astral-js/target/apps"
-	"github.com/cryptopunkscc/go-astral-js/target/sources"
-	"log"
-	"strings"
+	"github.com/cryptopunkscc/go-astral-js/target/source"
 )
 
-func Find(resolve target.Path) target.Find[target.Portal] {
-	return resolver{Resolver: apps.Resolver{Path: resolve}}.resolve
+type Resolver[T target.Portal] struct {
+	resolve target.Resolve[T]
+	source  target.Source
 }
 
-type resolver struct{ apps.Resolver }
+func NewResolver[T target.Portal](
+	resolve target.Resolve[T],
+	source target.Source,
+) *Resolver[T] {
+	return &Resolver[T]{
+		resolve: resolve,
+		source:  source,
+	}
+}
 
-func (p resolver) resolve(src string) (portals target.Portals[target.Portal], err error) {
-	src = strings.TrimPrefix(src, "dev.")
-	portals = make(target.Portals[target.Portal])
-	a, err1 := p.Resolver.Resolve(src)
-	if err1 == nil {
-		for s, app := range a {
-			portals[s] = app
+func (f Resolver[T]) ById(id string) (t T, err error) {
+	for _, t = range array.FromChan(source.Stream[T](f.resolve, f.source)) {
+		m := t.Manifest()
+		if id == m.Name || id == m.Package {
+			return
 		}
 	}
-
-	projects, err2 := p.projects(src)
-	if err2 == nil {
-		for s, p := range projects {
-			portals[s] = p
-		}
-	}
-	for s, pp := range portals {
-		log.Println("*", pp.Abs(), s)
-	}
-	if len(portals) > 0 {
-		return
-	}
-	err = fmt.Errorf("cannot find portal for %v: %v: %v ", src, err1, err2)
+	err = errors.New("not found")
 	return
 }
 
-func (p resolver) projects(src string) (apps target.Portals[target.Project], err error) {
-	apps = make(target.Portals[target.Project])
-	for app := range sources.FromPath[target.Project](src) {
-		if apps[app.Manifest().Package] == nil {
-			apps[app.Manifest().Package] = app
-		}
+func (f Resolver[T]) Path(id string) (p string, err error) {
+	t, err := f.ById(id)
+	if err != nil {
+		return
 	}
+	p = t.Abs()
 	return
 }

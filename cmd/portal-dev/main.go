@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	manifest "github.com/cryptopunkscc/go-astral-js"
+	embedApps "github.com/cryptopunkscc/go-astral-js/apps"
 	"github.com/cryptopunkscc/go-astral-js/clir"
 	"github.com/cryptopunkscc/go-astral-js/feat/build"
 	"github.com/cryptopunkscc/go-astral-js/feat/create"
@@ -17,7 +18,9 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/runner/spawn"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/apphost"
+	"github.com/cryptopunkscc/go-astral-js/target/apps"
 	"github.com/cryptopunkscc/go-astral-js/target/portals"
+	"github.com/cryptopunkscc/go-astral-js/target/source"
 	"log"
 	"os"
 	"sync"
@@ -32,7 +35,15 @@ func main() {
 	executable := "portal-dev"
 	prefix := "dev"
 
-	findPortals := target.Cached(portals.Find)(appstore.Path)
+	resolveEmbed := portals.NewResolver[target.App](
+		apps.Resolve[target.App](),
+		source.Resolve(embedApps.LauncherSvelteFS),
+	)
+	findPath := target.Mapper[string, string](
+		resolveEmbed.Path,
+		appstore.Path,
+	)
+	findPortals := target.Cached(portals.Find)(findPath)
 
 	runQuery := query.NewRunner[target.Portal](prefix).Run
 	newApphost := apphost.NewFactory(runQuery, prefix)

@@ -7,9 +7,13 @@ import (
 )
 
 func Any[T Source](of ...func(Source) (Source, error)) Resolve[T] {
-	return func(entry Source) (s T, err error) {
+	return Mapper[Source, T](of...)
+}
+
+func Mapper[A any, T any](of ...func(A) (A, error)) func(A) (T, error) {
+	return func(entry A) (s T, err error) {
 		for _, f := range of {
-			var v Source
+			var v A
 			v, err = f(entry)
 			if err != nil {
 				if errors.Is(err, fs.SkipDir) {
@@ -19,7 +23,7 @@ func Any[T Source](of ...func(Source) (Source, error)) Resolve[T] {
 				continue
 			}
 			ok := false
-			if s, ok = v.(T); ok {
+			if s, ok = any(v).(T); ok {
 				return
 			}
 		}

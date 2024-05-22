@@ -11,14 +11,14 @@ import (
 )
 
 func FromPath[T target.Source](src string) (in <-chan T) {
-	return source.Stream[T](resolve[T](), source.New(src))
+	return source.Stream[T](Resolve[T](), source.New(src))
 }
 
 func FromFS[T target.Source](src fs.FS) (in <-chan T) {
-	return source.Stream[T](resolve[T](), source.Resolve(src))
+	return source.Stream[T](Resolve[T](), source.Resolve(src))
 }
 
-func resolve[T target.Source]() func(target.Source) (T, error) {
+func Resolve[T target.Source]() func(target.Source) (T, error) {
 	return target.Any[T](
 		target.Skip("node_modules"),
 		target.Try(bundle.Resolve),

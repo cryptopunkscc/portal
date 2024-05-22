@@ -13,29 +13,29 @@ import (
 )
 
 func Find(resolve target.Path) func(src string) (apps target.Portals[target.App], err error) {
-	return Resolver{resolve}.Resolve
+	return Finder{resolve}.Find
 }
 
-type Resolver struct{ target.Path }
+type Finder struct{ target.Path }
 
-func (a Resolver) Resolve(src string) (apps target.Portals[target.App], err error) {
+func (a Finder) Find(src string) (apps target.Portals[target.App], err error) {
 	apps = make(target.Portals[target.App])
 	if !fsUtil.Exists(src) {
 		tmp := src
 		if src, err = a.Path(src); err != nil {
-			err = fmt.Errorf("app.Resolver cannot resolve path from %v: %v", tmp, err)
+			err = fmt.Errorf("apps.Finder cannot resolve path from %v: %v", tmp, err)
 			return
 		}
 	}
 	log.Println("resolving app from:", src)
 	if apps, err = a.ByPath(src); err != nil {
-		err = fmt.Errorf("app.Resolver cannot resolve app by path %v", src)
+		err = fmt.Errorf("apps.Finder cannot resolve app by path %v", src)
 		return
 	}
 	return
 }
 
-func (a Resolver) ByNameOrPackage(src string) (app target.App, err error) {
+func (a Finder) ByNameOrPackage(src string) (app target.App, err error) {
 	src = strings.TrimPrefix(src, "dev.")
 	if src, err = a.Path(src); err != nil {
 		return
@@ -48,7 +48,7 @@ func (a Resolver) ByNameOrPackage(src string) (app target.App, err error) {
 	return
 }
 
-func (a Resolver) ByPath(src string) (apps target.Portals[target.App], err error) {
+func (a Finder) ByPath(src string) (apps target.Portals[target.App], err error) {
 	apps = map[string]target.App{}
 	for app := range FromPath[target.App](src) {
 		apps[app.Manifest().Package] = app
@@ -57,14 +57,14 @@ func (a Resolver) ByPath(src string) (apps target.Portals[target.App], err error
 }
 
 func FromPath[T target.App](src string) (in <-chan T) {
-	return source.Stream[T](resolve[T](), source.New(src))
+	return source.Stream[T](Resolve[T](), source.New(src))
 }
 
 func FromFS[T target.App](src fs.FS) (in <-chan T) {
-	return source.Stream[T](resolve[T](), source.Resolve(src))
+	return source.Stream[T](Resolve[T](), source.Resolve(src))
 }
 
-func resolve[T target.App]() func(target.Source) (T, error) {
+func Resolve[T target.App]() func(target.Source) (T, error) {
 	return target.Any[T](
 		target.Skip("node_modules"),
 		target.Try(bundle.Resolve),
