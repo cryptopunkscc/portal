@@ -15,7 +15,7 @@ func NewFeat[T target.Portal](find target.Find[T], run target.Run[T]) target.Dis
 	return Feat[T]{find: find, run: run}.Run
 }
 
-func (f Feat[T]) Run(ctx context.Context, path string) (err error) {
+func (f Feat[T]) Run(ctx context.Context, path string, _ ...string) (err error) {
 	portal, err := f.find(path)
 	if err != nil {
 		return errors.New("cannot resolve portal: " + err.Error())

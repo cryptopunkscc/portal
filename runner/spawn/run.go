@@ -25,7 +25,7 @@ func NewRunner[T target.Portal](
 	}
 }
 
-func (r Runner[T]) Run(ctx context.Context, src string) (err error) {
+func (r Runner[T]) Run(ctx context.Context, src string, _ ...string) (err error) {
 	portals, err := r.find(src)
 	if err != nil {
 		return

@@ -19,7 +19,7 @@ func NewRunner[T target.Portal](prefix ...string) *Runner[T] {
 	return &Runner[T]{prefix: prefix}
 }
 
-func (r Runner[T]) Run(ctx context.Context, src string) (err error) {
+func (r Runner[T]) Run(ctx context.Context, src string, _ ...string) (err error) {
 	srv := strings.Join(append(r.prefix, port), ".")
 	flow, err := rpc.QueryFlow(id.Anyone, srv)
 	if err != nil {
