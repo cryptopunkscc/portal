@@ -20,7 +20,7 @@ func TestApp_Run_basic(t *testing.T) {
 		cases  []int
 		routes int
 	}{
-		{routes: 2, client: 1, cases: []int{6, 7, 10, 11, 12, 13, 14, 15, 18, 19, 21, 22, 23, 24, 26, 27, 28, 31, 32, 34, 35, 38, 39}},
+		{routes: 2, client: 1, cases: []int{6, 7, 10, 11, 12, 13, 14, 15, 18, 19, 21, 22, 23, 24, 26, 27, 28, 31, 32, 34, 35, 38, 39, 42}},
 		{routes: 2, client: 2},
 		{routes: 3, client: 2},
 	}
@@ -54,6 +54,7 @@ func TestApp_Run_basic(t *testing.T) {
 		app.Func("func8", function8)
 		app.Func("func9", function9)
 		app.Func("func10", function10)
+		app.Func("func11", function11)
 	}
 	routes := [][]string{
 		{"*"},
@@ -134,6 +135,7 @@ func TestApp_Run_basic(t *testing.T) {
 		{query: `func10{"i":{"i":1}}`, expected: struct3{structI{1}, structB{false}}},
 		{query: `func10`, arg: struct3{structI{1}, structB{true}}, expected: struct3{structI{1}, structB{true}}},
 		{query: `func10`, arg: struct3{StructI: structI{1}}, expected: struct3{structI{1}, structB{false}}},
+		{query: `func11`, args: []any{"a", "b", "c"}, expected: []any{"b", "c", "a"}},
 	}
 	skip := func(t *testing.T, routes int, client int, case_ int, err error) {
 		for _, s := range skipped {
@@ -281,4 +283,10 @@ func function9(i *structI, b *structB) *struct2 {
 
 func function10(s struct3) struct3 {
 	return s
+}
+
+func function11(arg string, args ...string) (arr []string) {
+	arr = append(args, arg)
+	log.Println(arr)
+	return
 }

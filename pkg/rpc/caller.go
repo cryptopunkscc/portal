@@ -1,6 +1,8 @@
 package rpc
 
 import (
+	"log"
+	"math"
 	"reflect"
 )
 
@@ -64,13 +66,14 @@ func (c *Caller) call(args ByteScannerReader) (out []reflect.Value, err error) {
 }
 
 func (c *Caller) decodeIn(args ByteScannerReader) (values []reflect.Value, err error) {
+	injected := 0
+	t := c.f.Type()
+
+	// Inject dependencies
 	var initial []reflect.Value
 	for _, a := range c.env {
 		initial = append(initial, reflect.ValueOf(a))
 	}
-
-	t := c.f.Type()
-
 	for i := 0; i < t.NumIn() && len(initial) > 0; i++ {
 		for len(initial) > 0 && !initial[0].Type().AssignableTo(t.In(i)) {
 			initial = initial[1:]
@@ -79,11 +82,12 @@ func (c *Caller) decodeIn(args ByteScannerReader) (values []reflect.Value, err e
 		if len(initial) > 0 {
 			values = append(values, initial[0])
 			initial = initial[1:]
+			injected++
 		}
 	}
 
+	// prepare parameters for decoding
 	var decoded []any
-
 	for i := len(values); i < t.NumIn(); i++ {
 		at := t.In(i)
 		av := reflect.New(at)
@@ -91,12 +95,43 @@ func (c *Caller) decodeIn(args ByteScannerReader) (values []reflect.Value, err e
 		decoded = append(decoded, av.Interface())
 	}
 
+	variadicStartsAt := math.MaxInt
+
+	// unfold varargs if needed
+	if t.IsVariadic() {
+		lastIndex := len(values) - 1
+		decoded = decoded[:len(decoded)-1]
+		last := values[lastIndex]
+		values = values[:lastIndex]
+		variadicStartsAt = lastIndex
+		log.Println("last", last, "type", last.Type(), last.Type().Elem())
+		typ := last.Type().Elem()
+		buffer := 20
+		for i := 0; i < buffer; i++ {
+			av := reflect.New(typ)
+			values = append(values, av.Elem())
+			decoded = append(decoded, av.Interface())
+		}
+	}
+
+	// decode args
 	if len(decoded) > 0 {
 		if err = c.decoder.Decode(args, decoded); err != nil {
 			return
 		}
 	}
 
+	// trim empty varargs
+	for i := variadicStartsAt; i < len(values); i++ {
+		if values[i].IsZero() {
+			values = values[0:i]
+			break
+		}
+		log.Println(values[i])
+	}
+	//for i, a := range decoded {
+	//	log.Println(i, a, a == nil, reflect.ValueOf(a).Elem().IsZero())
+	//}
 	return
 }
 
