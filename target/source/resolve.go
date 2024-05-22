@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func New(src string) target.Source {
+func FromPath(src string) target.Source {
 	m := &source{}
 	m.abs = target.Abs(src)
 	if path.Ext(src) == ".portal" {
@@ -21,7 +21,7 @@ func New(src string) target.Source {
 	return m
 }
 
-func Resolve(files fs.FS, src ...string) target.Source {
+func FromFS(files fs.FS, src ...string) target.Source {
 	m := &source{files: files, src: "."}
 	if len(src) > 0 {
 		m.src = src[0]

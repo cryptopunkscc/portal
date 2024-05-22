@@ -8,8 +8,8 @@ import (
 	"io/fs"
 )
 
-func New(src string) (module target.Project, err error) {
-	nodeModule, err := npm.ResolveNodeModule(targetSource.New(src))
+func FromPath(src string) (module target.Project, err error) {
+	nodeModule, err := npm.ResolveNodeModule(targetSource.FromPath(src))
 	if err != nil {
 		return
 	}

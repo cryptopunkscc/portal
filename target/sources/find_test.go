@@ -39,7 +39,7 @@ func PrintTarget(t target.Source) {
 }
 
 func Test_CustomFind(t *testing.T) {
-	src := source.New("test_assets")
+	src := source.FromPath("test_assets")
 
 	var find = target.Any[target.Source](
 		target.Skip("node_modules"),

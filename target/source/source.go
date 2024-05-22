@@ -28,13 +28,13 @@ func (m *source) Abs() string {
 func (m *source) Parent() target.Source {
 	dir := path.Dir(m.Abs())
 	if path.IsAbs(m.Abs()) {
-		return New(dir)
+		return FromPath(dir)
 	}
 	sub, err := fs.Sub(m.files, dir)
 	if err != nil {
 		panic(err)
 	}
-	return Resolve(sub, dir)
+	return FromFS(sub, dir)
 }
 
 func (m *source) Path() string {

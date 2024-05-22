@@ -21,7 +21,7 @@ func (f Feat) Run(
 ) (err error) {
 	runner := create.NewRunner(dir, targets)
 	resolve := Any[Template](Try(template.Resolve))
-	src := source.Resolve(template.TemplatesFs)
+	src := source.FromFS(template.TemplatesFs)
 
 	for t := range source.Stream(resolve, src) {
 		if _, ok := targets[t.Name()]; !ok {

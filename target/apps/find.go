@@ -41,7 +41,7 @@ func (a Finder) ByNameOrPackage(src string) (app target.App, err error) {
 		return
 	}
 	var t target.Bundle
-	if t, err = bundle.New(src); err != nil {
+	if t, err = bundle.FromPath(src); err != nil {
 		return nil, fmt.Errorf("cannot resolve portal apps path from '%s': %v", src, err)
 	}
 	app = t
@@ -57,11 +57,11 @@ func (a Finder) ByPath(src string) (apps target.Portals[target.App], err error) 
 }
 
 func FromPath[T target.App](src string) (in <-chan T) {
-	return source.Stream[T](Resolve[T](), source.New(src))
+	return source.Stream[T](Resolve[T](), source.FromPath(src))
 }
 
 func FromFS[T target.App](src fs.FS) (in <-chan T) {
-	return source.Stream[T](Resolve[T](), source.Resolve(src))
+	return source.Stream[T](Resolve[T](), source.FromFS(src))
 }
 
 func Resolve[T target.App]() func(target.Source) (T, error) {

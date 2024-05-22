@@ -18,7 +18,7 @@ func Stream[T target.Source](resolve target.Resolve[T], from target.Source) (in 
 				return fs.SkipAll
 			}
 
-			m := Resolve(from.Files(), src, from.Abs())
+			m := FromFS(from.Files(), src, from.Abs())
 			s, err := resolve(m)
 			if any(s) != nil && !reflect.ValueOf(s).IsNil() {
 				out <- s
