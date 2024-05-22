@@ -12,7 +12,7 @@ var TemplatesFs embed.FS
 var CommonsFs fs.FS
 
 func init() {
-	if CommonsFs = targetSource.Resolve(TemplatesFs, "tmpl/common").Lift().Files(); CommonsFs == nil {
+	if CommonsFs = targetSource.FromFS(TemplatesFs, "tmpl/common").Lift().Files(); CommonsFs == nil {
 		panic("cannot resolve templates commons.")
 	}
 }

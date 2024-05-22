@@ -11,8 +11,8 @@ import (
 	"log"
 )
 
-func New(abs string) (b target.Bundle, err error) {
-	return Resolve(targetSource.New(abs))
+func FromPath(src string) (b target.Bundle, err error) {
+	return Resolve(targetSource.FromPath(src))
 }
 
 var ErrNotBundle = errors.New("not a bundle")
@@ -33,7 +33,7 @@ func Resolve(t target.Source) (b target.Bundle, err error) {
 		log.Println("reader err", err, t.Path())
 		return
 	}
-	s := targetSource.Resolve(reader, t.Path(), t.Abs())
+	s := targetSource.FromFS(reader, t.Path(), t.Abs())
 	m, err := manifest.Read(reader)
 	if err != nil {
 		return

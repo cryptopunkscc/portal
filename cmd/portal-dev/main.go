@@ -37,7 +37,7 @@ func main() {
 
 	resolveEmbed := portals.NewResolver[target.App](
 		apps.Resolve[target.App](),
-		source.Resolve(embedApps.LauncherSvelteFS),
+		source.FromFS(embedApps.LauncherSvelteFS),
 	)
 	findPath := target.Mapper[string, string](
 		resolveEmbed.Path,

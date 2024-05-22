@@ -19,7 +19,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/runner/tray"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/apphost"
-	apps "github.com/cryptopunkscc/go-astral-js/target/apps"
+	"github.com/cryptopunkscc/go-astral-js/target/apps"
 	"github.com/cryptopunkscc/go-astral-js/target/portals"
 	"github.com/cryptopunkscc/go-astral-js/target/source"
 	"log"
@@ -34,30 +34,11 @@ func main() {
 
 	wait := &sync.WaitGroup{}
 	executable := "portal"
-
-	resolveEmbed := portals.NewResolver[target.App](
-		apps.Resolve[target.App](),
-		source.Resolve(embedApps.LauncherSvelteFS),
-	)
-	findPath := target.Mapper[string, string](
-		resolveEmbed.Path,
-		appstore.Path,
-	)
-	findApps := apps.Find(findPath)
-
-	runQuery := query.NewRunner[target.App]().Run
-	newApphost := apphost.NewFactory(runQuery)
-	newApi := target.ApiFactory(NewAdapter,
-		newApphost.NewAdapter,
-		newApphost.WithTimeout,
-	)
-	runApp := app.NewRunner(newApi)
-	runProc := exec.NewRunner[target.App](executable)
-	runSpawn := spawn.NewRunner(wait, findApps, runProc).Run
+	findApps := createAppsFind()
 
 	featDispatch := dispatch.NewFeat(executable)
-	featServe := serve.NewFeat(runSpawn, tray.NewRunner(runSpawn))
-	featOpen := open.NewFeat[target.App](findApps, runApp)
+	featServe := createServeFeature(wait, executable, findApps)
+	featOpen := createOpenFeature(findApps)
 
 	cli := clir.NewCli(ctx, manifest.Name, manifest.Description, version.Run)
 
@@ -79,3 +60,39 @@ func main() {
 type Adapter struct{ target.Api }
 
 func NewAdapter(api target.Api) target.Api { return &Adapter{Api: api} }
+
+func createOpenFeature(
+	findApps target.Find[target.App],
+) target.Dispatch {
+	runQuery := query.NewRunner[target.App]().Run
+	newApphost := apphost.NewFactory(runQuery)
+	newApi := target.ApiFactory(NewAdapter,
+		newApphost.NewAdapter,
+		newApphost.WithTimeout,
+	)
+	runApp := app.NewRunner(newApi)
+
+	return open.NewFeat[target.App](findApps, runApp)
+}
+
+func createServeFeature(
+	wait *sync.WaitGroup,
+	executable string,
+	findApps target.Find[target.App],
+) func(context.Context, bool) error {
+	runProc := exec.NewRunner[target.App](executable)
+	runSpawn := spawn.NewRunner(wait, findApps, runProc).Run
+	return serve.NewFeat(runSpawn, tray.NewRunner(runSpawn))
+}
+
+func createAppsFind() target.Find[target.App] {
+	resolveEmbed := portals.NewResolver[target.App](
+		apps.Resolve[target.App](),
+		source.FromFS(embedApps.LauncherSvelteFS),
+	)
+	findPath := target.Mapper[string, string](
+		resolveEmbed.Path,
+		appstore.Path,
+	)
+	return apps.Find(findPath)
+}

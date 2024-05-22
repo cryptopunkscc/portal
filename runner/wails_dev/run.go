@@ -77,7 +77,7 @@ func Run(path string, opt *options.App) (err error) {
 	// setup opt
 	front := path
 	path = path + "/dist"
-	src, err := project.New(front)
+	src, err := project.FromPath(front)
 	if err != nil {
 		return err
 	}

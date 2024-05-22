@@ -9,7 +9,7 @@ import (
 
 func List() (err error) {
 	resolve := Any[Template](Try(template.Resolve))
-	s := source.Resolve(template.TemplatesFs)
+	s := source.FromFS(template.TemplatesFs)
 	table := pterm.TableData{{"Short Name", "Template", "Description"}}
 
 	for tt := range source.Stream(resolve, s) {
