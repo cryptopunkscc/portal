@@ -3,7 +3,7 @@
 <script src="portal.js"></script>
 <script>
     async function rpc() {
-        let srv = await portal.apphost.query("", "portal.example.rpc")
+        let srv = await portal.apphost.query("", "example.rpc")
         await srv.bindRpc()
 
         let result = await srv.get("Hello from front")

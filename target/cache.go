@@ -1,6 +1,7 @@
 package target
 
 import (
+	"log"
 	"sync"
 )
 
@@ -44,9 +45,13 @@ func (c *cache[T]) Add(portals Portals[T]) {
 	for s, portal := range portals {
 		c.portals[s] = portal
 	}
+	log.Println("added to cache:", c.portals)
 }
 
 func (c *cache[T]) Get(src string) (portal Portal, ok bool) {
+	defer func() {
+		log.Println("get from cache:", src, ok, portal, c.portals)
+	}()
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	for _, p := range c.portals {

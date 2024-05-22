@@ -156,7 +156,7 @@ async function astral_rpc_handle(conn) {
     for (; ;) {
       if (!single) {
         query = await conn.read();
-        log(conn.id + " service <= " + query)
+        log(conn.id + " service <== " + query)
       }
       [method, args] = parseQuery(query)
 

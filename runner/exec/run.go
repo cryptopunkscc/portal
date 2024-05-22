@@ -9,8 +9,17 @@ import (
 	"os/exec"
 )
 
-func NewRunner[T target.Portal](executable string) target.Run[T] {
+func NewRunner[T target.Portal](executable string, filter ...target.Type) target.Run[T] {
+	t := target.TypeNone
+	for _, f := range filter {
+		t += f
+	}
 	return func(ctx context.Context, src T) (err error) {
+		if t != target.TypeNone && !src.Type().Is(t) {
+			log.Println(src.Path(), src.Abs(), src.Manifest().Package, src.Type())
+			return target.ErrNotTarget
+		}
+		log.Println("exec Running target:", src.Abs(), src.Manifest().Package)
 		switch any(src).(type) {
 		case target.ProjectFrontend:
 			return NewRunnerByName[target.Portal](executable, "wails_dev")(ctx, src)

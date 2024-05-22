@@ -17,14 +17,15 @@ import (
 type Feat struct {
 	port  string
 	wait  *sync.WaitGroup
-	spawn target.Dispatch
+	query target.Dispatch
 	serve target.Dispatch
 }
 
 func NewFeat(
+	port string,
 	wait *sync.WaitGroup,
 	spawn target.Dispatch,
-	port string,
+	query target.Dispatch,
 ) target.Dispatch {
 	handlers := rpc.Handlers{
 		"ping":    func() {},
@@ -34,7 +35,7 @@ func NewFeat(
 	return Feat{
 		port:  port,
 		wait:  wait,
-		spawn: spawn,
+		query: query,
 		serve: serve.NewRunner(handlers).Run,
 	}.Run
 }
@@ -60,7 +61,7 @@ func (f Feat) Run(ctx context.Context, src string) (err error) {
 	}); err != nil {
 		return
 	}
-	return f.spawn(ctx, src)
+	return f.query(ctx, src)
 }
 
 func ping(port string) error {
