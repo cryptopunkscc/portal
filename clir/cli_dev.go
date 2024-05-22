@@ -11,7 +11,7 @@ func (c Cli) Dev(handle target.Dispatch) {
 	f := func() error {
 		return handle(c.ctx, flags.Src)
 	}
-	cmd := c.clir.NewSubCommand("o", "Dispatch project or app from a given source in development environment.")
+	cmd := c.clir.NewSubCommand("d", "Dispatch project or app from a given source in development environment.")
 	cmd.AddFlags(flags)
 	cmd.Action(f)
 	c.clir.DefaultCommand(cmd)

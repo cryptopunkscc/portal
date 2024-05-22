@@ -115,7 +115,15 @@ func (api *Adapter) Sleep(duration int64) {
 }
 
 func (api *Adapter) ServiceRegister(service string) (err error) {
-	port := api.Port(service)
+	port := service
+	switch service {
+	case "*":
+		port = api.Port(api.pkg...) + service
+	case "":
+		port = api.Port(api.pkg...)
+	default:
+		port = api.Port(append(api.pkg, service)...)
+	}
 	listener, err := astral.Register(port)
 	if err != nil {
 		return
@@ -156,7 +164,8 @@ func (api *Adapter) ConnAccept(service string) (data string, err error) {
 	connId := uuid.New().String()
 	api.setConnection(connId, conn)
 
-	query := strings.TrimPrefix(conn.Query(), strings.Join(api.Prefix(), "."))
+	pkg := strings.Join(append(api.Prefix(), api.pkg...), ".")
+	query := strings.TrimPrefix(conn.Query(), pkg)
 	query = strings.TrimPrefix(query, ".")
 	bytes, err := json.Marshal(queryData{
 		Id:    connId,

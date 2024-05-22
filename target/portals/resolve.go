@@ -1,12 +1,12 @@
 package portals
 
 import (
-	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/apps"
 	"github.com/cryptopunkscc/go-astral-js/target/sources"
 	"log"
+	"strings"
 )
 
 func Find(resolve target.Path) target.Find[target.Portal] {
@@ -16,6 +16,7 @@ func Find(resolve target.Path) target.Find[target.Portal] {
 type resolver struct{ apps.Resolver }
 
 func (p resolver) resolve(src string) (portals target.Portals[target.Portal], err error) {
+	src = strings.TrimPrefix(src, "dev.")
 	portals = make(target.Portals[target.Portal])
 	a, err1 := p.Resolver.Resolve(src)
 	if err1 == nil {
@@ -36,7 +37,7 @@ func (p resolver) resolve(src string) (portals target.Portals[target.Portal], er
 	if len(portals) > 0 {
 		return
 	}
-	err = errors.Join(fmt.Errorf("cannot find portal %v for ", src), err1, err2)
+	err = fmt.Errorf("cannot find portal for %v: %v: %v ", src, err1, err2)
 	return
 }
 

@@ -3,6 +3,7 @@ package bundle
 import (
 	"archive/zip"
 	"bytes"
+	"errors"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/manifest"
 	targetSource "github.com/cryptopunkscc/go-astral-js/target/source"
@@ -14,10 +15,12 @@ func New(abs string) (b target.Bundle, err error) {
 	return Resolve(targetSource.New(abs))
 }
 
+var ErrNotBundle = errors.New("not a bundle")
+
 func Resolve(t target.Source) (b target.Bundle, err error) {
 	t = t.Lift()
 	if !t.Type().Is(target.TypeBundle) {
-		return nil, target.ErrNotTarget
+		return nil, ErrNotBundle
 	}
 
 	file, err := fs.ReadFile(t.Files(), t.Path())

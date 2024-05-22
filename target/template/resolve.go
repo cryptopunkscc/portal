@@ -2,13 +2,16 @@ package template
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"io/fs"
 )
 
+var ErrNotTemplate = errors.New("not a template")
+
 func Resolve(m target.Source) (t target.Template, err error) {
 	if m.IsFile() {
-		return nil, target.ErrNotTarget
+		return nil, ErrNotTemplate
 	}
 	m = m.Lift()
 	info, err := readTemplateInfo(m.Files())

@@ -8,7 +8,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/target/dist"
 	"github.com/cryptopunkscc/go-astral-js/target/source"
 	"io/fs"
-	"path"
+	"log"
 	"strings"
 )
 
@@ -20,24 +20,18 @@ type Resolver struct{ target.Path }
 
 func (a Resolver) Resolve(src string) (apps target.Portals[target.App], err error) {
 	apps = make(target.Portals[target.App])
-	if fsUtil.Exists(src) {
-		if path.Base(src) == src {
-			if apps[src], err = a.ByNameOrPackage(src); err == nil {
-				return
-			}
-		}
-
-		if apps, err = a.ByPath(src); err == nil {
-			return
-		}
-
-	} else {
-		if apps[src], err = a.ByNameOrPackage(src); err == nil {
+	if !fsUtil.Exists(src) {
+		tmp := src
+		if src, err = a.Path(src); err != nil {
+			err = fmt.Errorf("app.Resolver cannot resolve path from %v: %v", tmp, err)
 			return
 		}
 	}
-
-	apps = nil
+	log.Println("resolving app from:", src)
+	if apps, err = a.ByPath(src); err != nil {
+		err = fmt.Errorf("app.Resolver cannot resolve app by path %v", src)
+		return
+	}
 	return
 }
 

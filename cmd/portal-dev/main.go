@@ -29,22 +29,23 @@ func main() {
 	go osExec.OnShutdown(cancel)
 
 	wait := &sync.WaitGroup{}
+	executable := "portal-dev"
 	prefix := "dev"
 
 	findPortals := target.Cached(portals.Find)(appstore.Path)
 
 	runQuery := query.NewRunner[target.Portal](prefix).Run
-	apphostFactory := apphost.NewFactory(runQuery, prefix)
+	newApphost := apphost.NewFactory(runQuery, prefix)
 	newApi := target.ApiFactory(
 		NewAdapter,
-		apphostFactory.NewAdapter,
-		apphostFactory.WithTimeout,
+		newApphost.NewAdapter,
+		newApphost.WithTimeout,
 	)
 	runDev := devRunner.NewRunner(newApi)
-	runProc := exec.NewRunner[target.Portal]("portal-dev")
+	runProc := exec.NewRunner[target.Portal](executable)
 	runSpawn := spawn.NewRunner(wait, findPortals, runProc).Run
 
-	featDev := dev.NewFeat(wait, runSpawn, "dev.portal")
+	featDev := dev.NewFeat("dev.portal", wait, runSpawn, runQuery)
 	featOpen := open.NewFeat[target.Portal](findPortals, runDev)
 	featBuild := build.NewFeat().Run
 	featCreate := create.NewFeat().Run

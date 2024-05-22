@@ -34,10 +34,10 @@ func main() {
 	findApps := apps.Find(featApps.Path)
 
 	runQuery := query.NewRunner[target.App]().Run
-	apphostFactory := apphost.NewFactory(runQuery)
+	newApphost := apphost.NewFactory(runQuery)
 	newApi := target.ApiFactory(NewAdapter,
-		apphostFactory.NewAdapter,
-		apphostFactory.WithTimeout,
+		newApphost.NewAdapter,
+		newApphost.WithTimeout,
 	)
 	runApp := app.NewRunner(newApi)
 	runProc := exec.NewRunner[target.App](executable)
