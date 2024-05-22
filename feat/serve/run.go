@@ -14,7 +14,6 @@ import (
 type Feat struct {
 	port  string
 	tray  target.Tray
-	spawn target.Dispatch
 	serve target.Dispatch
 }
 
@@ -29,7 +28,6 @@ func NewFeat(spawn target.Dispatch, tray target.Tray) func(context.Context, bool
 	return Feat{
 		port:  "portal",
 		tray:  tray,
-		spawn: spawn,
 		serve: serve.NewRunner(handlers).Run,
 	}.Run
 }

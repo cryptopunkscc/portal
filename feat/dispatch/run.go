@@ -25,6 +25,7 @@ func NewFeat(executable string, prefix ...string) target.Dispatch {
 func (f Feat) Run(
 	ctx context.Context,
 	src string,
+	_ ...string,
 ) (err error) {
 
 	if err = f.queryOpen(ctx, src); err == nil {

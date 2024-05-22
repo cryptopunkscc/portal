@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/astrald/sig"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
+	"github.com/cryptopunkscc/go-astral-js/target"
 	"log"
 	"strings"
 	"time"
@@ -16,15 +17,15 @@ type Invoker struct {
 	ctx       context.Context
 	cancel    context.CancelFunc
 	processes sig.Map[string, any]
-	invoke    Invoke
+	invoke    target.Dispatch
 }
 
 func NewInvoker(
 	ctx context.Context,
 	flat *Adapter,
-	serve Invoke,
+	invoke target.Dispatch,
 ) (i *Invoker) {
-	i = &Invoker{Adapter: flat, invoke: serve}
+	i = &Invoker{Adapter: flat, invoke: invoke}
 	i.ctx, i.cancel = context.WithCancel(ctx)
 	return
 }
@@ -76,7 +77,5 @@ func (inv *Invoker) invokeApp(query string) (err error) {
 	}()
 	return
 }
-
-type Invoke func(ctx context.Context, query string) error
 
 var ErrServiceAlreadyRunning = errors.New("service already running")

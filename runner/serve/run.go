@@ -15,7 +15,7 @@ func NewRunner(handlers rpc.Handlers) *Runner {
 	return &Runner{handlers: handlers}
 }
 
-func (r Runner) Run(ctx context.Context, port string) (err error) {
+func (r Runner) Run(ctx context.Context, port string, _ ...string) (err error) {
 	s := rpc.NewApp(port)
 	s.Logger(log.New(log.Writer(), "service ", 0))
 	for name, h := range r.handlers {

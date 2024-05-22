@@ -40,7 +40,7 @@ func NewFeat(
 	}.Run
 }
 
-func (f Feat) Run(ctx context.Context, src string) (err error) {
+func (f Feat) Run(ctx context.Context, src string, _ ...string) (err error) {
 	if err = ping(f.port); err == nil {
 		return errors.New("portal dev already running")
 	}

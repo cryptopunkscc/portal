@@ -14,7 +14,7 @@ type Tray func(ctx context.Context)
 
 type Path func(src string) (path string, err error)
 
-type Dispatch func(context.Context, string) (err error)
+type Dispatch func(context.Context, string, ...string) (err error)
 
 type Resolve[T Source] func(src Source) (result T, err error)
 
