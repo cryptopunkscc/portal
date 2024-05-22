@@ -3,12 +3,14 @@ package main
 import (
 	"context"
 	manifest "github.com/cryptopunkscc/go-astral-js"
+	embedApps "github.com/cryptopunkscc/go-astral-js/apps"
 	"github.com/cryptopunkscc/go-astral-js/clir"
 	featApps "github.com/cryptopunkscc/go-astral-js/feat/apps"
 	"github.com/cryptopunkscc/go-astral-js/feat/dispatch"
 	"github.com/cryptopunkscc/go-astral-js/feat/open"
 	"github.com/cryptopunkscc/go-astral-js/feat/serve"
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
+	"github.com/cryptopunkscc/go-astral-js/mock/appstore"
 	osexec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/runner/app"
 	"github.com/cryptopunkscc/go-astral-js/runner/exec"
@@ -18,6 +20,8 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/apphost"
 	apps "github.com/cryptopunkscc/go-astral-js/target/apps"
+	"github.com/cryptopunkscc/go-astral-js/target/portals"
+	"github.com/cryptopunkscc/go-astral-js/target/source"
 	"log"
 	"os"
 	"sync"
@@ -31,7 +35,15 @@ func main() {
 	wait := &sync.WaitGroup{}
 	executable := "portal"
 
-	findApps := apps.Find(featApps.Path)
+	resolveEmbed := portals.NewResolver[target.App](
+		apps.Resolve[target.App](),
+		source.Resolve(embedApps.LauncherSvelteFS),
+	)
+	findPath := target.Mapper[string, string](
+		resolveEmbed.Path,
+		appstore.Path,
+	)
+	findApps := apps.Find(findPath)
 
 	runQuery := query.NewRunner[target.App]().Run
 	newApphost := apphost.NewFactory(runQuery)
