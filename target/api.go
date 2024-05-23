@@ -2,6 +2,7 @@ package target
 
 import (
 	"context"
+	"io/fs"
 )
 
 type Api interface {
@@ -20,6 +21,6 @@ type Resolve[T Source] func(src Source) (result T, err error)
 
 type Find[T Portal] func(src string) (portals Portals[T], err error)
 
-type Finder[T Portal] func(resolve Path) Find[T]
+type Finder[T Portal] func(resolve Path, files ...fs.FS) Find[T]
 
 type Run[T Portal] func(ctx context.Context, src T) (err error)
