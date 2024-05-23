@@ -1,13 +1,14 @@
 package target
 
 import (
+	"io/fs"
 	"log"
 	"sync"
 )
 
 func Cached[T Portal](finder Finder[T]) Finder[T] {
 	store := newCache[T]()
-	return func(resolve Path) Find[T] {
+	return func(resolve Path, files ...fs.FS) Find[T] {
 		resolveCached := func(src string) (path string, err error) {
 			// try resolve from cache
 			if portal, ok := store.Get(src); ok {
@@ -19,7 +20,7 @@ func Cached[T Portal](finder Finder[T]) Finder[T] {
 			return
 		}
 
-		find := finder(resolveCached)
+		find := finder(resolveCached, files...)
 		return func(src string) (portals Portals[T], err error) {
 			portals, err = find(src)
 			if err == nil {
