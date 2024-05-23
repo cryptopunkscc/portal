@@ -17,7 +17,7 @@ func (c Cli) Apps() {
 	cmd.AddFlags(&flags)
 	cmd.Action(func() (err error) {
 		wd, _ := os.Getwd()
-		for source := range sources.FromPath[target.Source](flags.Path) {
+		for _, source := range sources.FromPath[target.Source](flags.Path) {
 			log.Println(reflect.TypeOf(source), "\t", strings.TrimPrefix(source.Abs(), wd+"/"))
 		}
 		return

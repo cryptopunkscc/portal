@@ -17,12 +17,10 @@ func (mfs MapFS) Open(name string) (fs.File, error) {
 	return nil, os.ErrNotExist
 }
 
-type ArrayFs struct {
-	Array []fs.FS
-}
+type ArrayFs []fs.FS
 
 func (cfs ArrayFs) Open(name string) (fs.File, error) {
-	for _, inner := range cfs.Array {
+	for _, inner := range cfs {
 		if file, err := inner.Open(name); err == nil {
 			return file, err
 		}

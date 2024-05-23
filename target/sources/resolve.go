@@ -10,12 +10,12 @@ import (
 	"io/fs"
 )
 
-func FromPath[T target.Source](src string) (in <-chan T) {
-	return source.Stream[T](Resolve[T](), source.FromPath(src))
+func FromPath[T target.Source](src string) []T {
+	return source.List[T](Resolve[T](), source.FromPath(src))
 }
 
-func FromFS[T target.Source](src fs.FS) (in <-chan T) {
-	return source.Stream[T](Resolve[T](), source.FromFS(src))
+func FromFS[T target.Source](src fs.FS) []T {
+	return source.List[T](Resolve[T](), source.FromFS(src))
 }
 
 func Resolve[T target.Source]() func(target.Source) (T, error) {

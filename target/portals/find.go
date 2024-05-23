@@ -5,45 +5,55 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/apps"
 	"github.com/cryptopunkscc/go-astral-js/target/sources"
+	"io/fs"
 	"log"
 	"strings"
 )
 
-func Find(resolve target.Path) target.Find[target.Portal] {
-	return finder{Finder: apps.Finder{Path: resolve}}.find
+func Find(
+	getPath target.Path,
+	files ...fs.FS,
+) target.Find[target.Portal] {
+	return Finder{apps.NewFinder(getPath, files...)}.find
 }
 
-type finder struct{ apps.Finder }
+type Finder struct{ apps.Finder }
 
-func (p finder) find(src string) (portals target.Portals[target.Portal], err error) {
+func (p Finder) find(src string) (portals target.Portals[target.Portal], err error) {
+	base := src
 	src = strings.TrimPrefix(src, "dev.")
 	portals = make(target.Portals[target.Portal])
-	a, err1 := p.Finder.Find(src)
-	if err1 == nil {
+
+	if s, _ := p.GetPath(src); s != "" {
+		src = s
+	}
+
+	if a, err1 := p.Finder.ByPath(src); err1 == nil {
 		for s, app := range a {
 			portals[s] = app
 		}
 	}
 
-	projects, err2 := p.projects(src)
-	if err2 == nil {
-		for s, p := range projects {
-			portals[s] = p
+	if projects, err2 := p.projects(src); err2 == nil {
+		for s, t := range projects {
+			portals[s] = t
 		}
 	}
+
 	for s, pp := range portals {
 		log.Println("*", pp.Abs(), s)
 	}
+
 	if len(portals) > 0 {
 		return
 	}
-	err = fmt.Errorf("cannot find portal for %v: %v: %v ", src, err1, err2)
+	err = fmt.Errorf("cannot find portal for %v", base)
 	return
 }
 
-func (p finder) projects(src string) (apps target.Portals[target.Project], err error) {
+func (p Finder) projects(src string) (apps target.Portals[target.Project], err error) {
 	apps = make(target.Portals[target.Project])
-	for app := range sources.FromPath[target.Project](src) {
+	for _, app := range sources.FromPath[target.Project](src) {
 		if apps[app.Manifest().Package] == nil {
 			apps[app.Manifest().Package] = app
 		}

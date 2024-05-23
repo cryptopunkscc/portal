@@ -91,7 +91,10 @@ func (m *source) Lift() target.Source {
 	// try lift a dir
 	if path.Ext(m.Path()) == "" {
 		mm := *m
-		mm.files, _ = fs.Sub(m.files, m.src)
+		var err error
+		if mm.files, err = fs.Sub(m.files, m.src); err != nil {
+			mm.files = nil
+		}
 		mm.src = "."
 		return &mm
 	}
@@ -99,7 +102,10 @@ func (m *source) Lift() target.Source {
 	// try lift a file
 	if dir := path.Dir(m.src); dir != "." {
 		mm := *m
-		mm.files, _ = fs.Sub(m.files, path.Dir(m.src))
+		var err error
+		if mm.files, err = fs.Sub(m.files, path.Dir(m.src)); err != nil {
+			mm.files = nil
+		}
 		mm.src = path.Base(m.src)
 		return &mm
 	}

@@ -9,7 +9,7 @@ import (
 )
 
 func (d *PortalDev) buildJsLibs() {
-	for p := range d.streamLibs() {
+	for _, p := range d.streamLibs() {
 		if p.PkgJson().IsPortalLib() {
 			d.modules = append(d.modules, p)
 		}
@@ -26,7 +26,7 @@ func (d *PortalDev) buildJsLibs() {
 }
 
 func (d *PortalDev) collectPortalLibs() {
-	for p := range d.streamLibs() {
+	for _, p := range d.streamLibs() {
 		if p.PkgJson().IsPortalLib() {
 			d.modules = append(d.modules, p)
 		}
@@ -35,6 +35,6 @@ func (d *PortalDev) collectPortalLibs() {
 
 const libsPath = "target/js"
 
-func (d *PortalDev) streamLibs() <-chan target.NodeModule {
+func (d *PortalDev) streamLibs() []target.NodeModule {
 	return sources.FromPath[target.NodeModule](path.Join(d.root, libsPath))
 }

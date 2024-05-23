@@ -1,6 +1,6 @@
 {
   "name": "basic-back",
   "package": "example.basic",
-  "title": "Example basic frontend",
+  "title": "Example basic backend",
   "version": "1.0.0"
 }
