@@ -23,7 +23,7 @@ func (f Feat) Run(
 	resolve := Any[Template](Try(template.Resolve))
 	src := source.FromFS(template.TemplatesFs)
 
-	for t := range source.Stream(resolve, src) {
+	for _, t := range source.List(resolve, src) {
 		if _, ok := targets[t.Name()]; !ok {
 			continue
 		}

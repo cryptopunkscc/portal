@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<script src="portal.js"></script>
+<script>
+    async function rpc() {
+        let srv = await portal.apphost.query("", "portal.example.rpc")
+        await srv.bindRpc()
+
+        let result = await srv.get("Hello from front")
+        alert(JSON.stringify(result))
+
+        result = await srv.sum(1, 2)
+        alert(result)
+
+        await srv.close()
+    }
+
+    rpc()
+</script>
+</html>

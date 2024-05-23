@@ -34,6 +34,8 @@ func FromFS(files fs.FS, src ...string) target.Source {
 		//if !path.IsAbs(m.abs) {
 		//	println("[WARNING] source initialized with incorrect absolute path: "+m.abs, m.src)
 		//}
+	} else {
+		m.abs = m.src
 	}
 	return m
 }

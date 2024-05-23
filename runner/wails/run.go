@@ -9,7 +9,6 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/application"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
-	"io/fs"
 	"log"
 	"os"
 	"reflect"
@@ -58,7 +57,7 @@ func SetupOptions(src target.Portal, opt *options.App) {
 	apphostJsFs := wails.JsFs
 
 	// Setup fs assets
-	opt.AssetServer.Assets = assets.ArrayFs{Array: []fs.FS{src.Files(), apphostJsFs}}
+	opt.AssetServer.Assets = assets.ArrayFs{src.Files(), apphostJsFs}
 
 	// Setup http assets
 	opt.AssetServer.Handler = assets.StoreHandler{

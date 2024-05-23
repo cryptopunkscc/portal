@@ -9,7 +9,7 @@ import (
 )
 
 func Install(src string) (err error) {
-	for t := range apps.FromPath[target.Bundle](src) {
+	for _, t := range apps.FromPath[target.Bundle](src) {
 		src = t.Abs()
 		dst := path.Join(portalAppsDir, path.Base(t.Path()))
 

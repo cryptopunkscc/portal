@@ -10,9 +10,9 @@ import (
 )
 
 func Uninstall(id string) (err error) {
-	for t := range apps.FromPath[target.Bundle](portalAppsDir) {
-		manifest, _ := manifest.Read(t.Files())
-		if manifest.Name == id || manifest.Package == id {
+	for _, t := range apps.FromPath[target.Bundle](portalAppsDir) {
+		m, _ := manifest.Read(t.Files())
+		if m.Name == id || m.Package == id {
 			log.Println("Uninstalling", t.Manifest().Package, "from", t.Abs())
 			err = fs.DeleteFile(t.Abs())
 			return

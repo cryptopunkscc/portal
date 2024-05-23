@@ -12,7 +12,7 @@ func List() (err error) {
 	s := source.FromFS(template.TemplatesFs)
 	table := pterm.TableData{{"Short Name", "Template", "Description"}}
 
-	for tt := range source.Stream(resolve, s) {
+	for _, tt := range source.List(resolve, s) {
 		t := tt.Info()
 		table = append(table, []string{t.ShortName, t.Name, t.Description})
 	}

@@ -19,6 +19,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/apphost"
 	"github.com/cryptopunkscc/go-astral-js/target/apps"
+	"github.com/cryptopunkscc/go-astral-js/target/portal"
 	"github.com/cryptopunkscc/go-astral-js/target/portals"
 	"github.com/cryptopunkscc/go-astral-js/target/source"
 	"log"
@@ -35,7 +36,7 @@ func main() {
 	executable := "portal-dev"
 	prefix := "dev"
 
-	resolveEmbed := portals.NewResolver[target.App](
+	resolveEmbed := portal.NewResolver[target.App](
 		apps.Resolve[target.App](),
 		source.FromFS(embedApps.LauncherSvelteFS),
 	)

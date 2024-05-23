@@ -38,7 +38,7 @@ func send(
 	src string,
 	conn rpc.Conn,
 ) (err error) {
-	for t := range apps.FromPath[target.Bundle](src) {
+	for _, t := range apps.FromPath[target.Bundle](src) {
 		if err = conn.Encode(t.Manifest()); err != nil {
 			return
 		}

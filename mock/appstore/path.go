@@ -9,7 +9,7 @@ import (
 )
 
 func Path(app string) (src string, err error) {
-	for t := range apps.FromPath[target.Bundle](portalAppsDir) {
+	for _, t := range apps.FromPath[target.Bundle](portalAppsDir) {
 		var m target.Manifest
 		if m, err = manifest.Read(t.Files()); err != nil {
 			return

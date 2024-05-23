@@ -1,7 +1,6 @@
 package sources
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/array"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/bundle"
 	"github.com/cryptopunkscc/go-astral-js/target/dist"
@@ -17,7 +16,7 @@ import (
 
 func Test_FromPath(t *testing.T) {
 	assets := target.Abs("test_assets")
-	targets := array.FromChan(FromPath[target.Portal](assets))
+	targets := FromPath[target.Portal](assets)
 
 	for _, s := range targets {
 		PrintTarget(s)
@@ -27,7 +26,7 @@ func Test_FromPath(t *testing.T) {
 }
 
 func Test_FindLibsInFs(t *testing.T) {
-	targets := array.FromChan(FromFS[target.Source](js.PortalLibFS))
+	targets := FromFS[target.Source](js.PortalLibFS)
 
 	for _, s := range targets {
 		PrintTarget(s)
@@ -39,8 +38,6 @@ func PrintTarget(t target.Source) {
 }
 
 func Test_CustomFind(t *testing.T) {
-	src := source.FromPath("test_assets")
-
 	var find = target.Any[target.Source](
 		target.Skip("node_modules"),
 		target.Try(bundle.Resolve),
@@ -48,8 +45,8 @@ func Test_CustomFind(t *testing.T) {
 			target.Try(project.Resolve)),
 		target.Try(dist.Resolve),
 	)
-
-	for s := range source.Stream[target.Source](find, src) {
+	src := source.FromPath("test_assets")
+	for _, s := range source.List[target.Source](find, src) {
 		PrintTarget(s)
 	}
 }

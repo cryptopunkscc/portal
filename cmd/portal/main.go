@@ -20,7 +20,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/apphost"
 	"github.com/cryptopunkscc/go-astral-js/target/apps"
-	"github.com/cryptopunkscc/go-astral-js/target/portals"
+	"github.com/cryptopunkscc/go-astral-js/target/portal"
 	"github.com/cryptopunkscc/go-astral-js/target/source"
 	"log"
 	"os"
@@ -86,7 +86,7 @@ func createServeFeature(
 }
 
 func createAppsFind() target.Find[target.App] {
-	resolveEmbed := portals.NewResolver[target.App](
+	resolveEmbed := portal.NewResolver[target.App](
 		apps.Resolve[target.App](),
 		source.FromFS(embedApps.LauncherSvelteFS),
 	)
@@ -94,5 +94,5 @@ func createAppsFind() target.Find[target.App] {
 		resolveEmbed.Path,
 		appstore.Path,
 	)
-	return apps.Find(findPath)
+	return apps.NewFinder(findPath, embedApps.LauncherSvelteFS).Find
 }
