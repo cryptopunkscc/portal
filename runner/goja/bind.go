@@ -183,7 +183,7 @@ func (a *adapter) Query(identity string, query string) *goja.Promise {
 func (a *adapter) QueryName(name string, query string) *goja.Promise {
 	promise, resolve, reject := a.vm.NewPromise()
 	go func() {
-		val, err := a.astral.Query(name, query)
+		val, err := a.astral.QueryName(name, query)
 		a.queue <- func() {
 			if err != nil {
 				reject(err)

@@ -72,7 +72,7 @@ func createOpenFeature(
 		newApphost.NewAdapter,
 		newApphost.WithTimeout,
 	)
-	runApp := app.NewRunner(newApi)
+	runApp := app.NewRun(newApi)
 
 	return open.NewFeat[target.App](findApps, runApp)
 }
@@ -82,9 +82,9 @@ func createServeFeature(
 	executable string,
 	findApps target.Find[target.App],
 ) func(context.Context, bool) error {
-	runProc := exec.NewRunner[target.App](executable)
+	runProc := exec.NewRun[target.App](executable)
 	runSpawn := spawn.NewRunner(wait, findApps, runProc).Run
-	return serve.NewFeat(runSpawn, tray.NewRunner(runSpawn))
+	return serve.NewFeat(runSpawn, tray.New(runSpawn))
 }
 
 func createAppsFind() target.Find[target.App] {

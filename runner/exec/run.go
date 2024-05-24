@@ -9,7 +9,7 @@ import (
 	"os/exec"
 )
 
-func NewRunner[T target.Portal](executable string, filter ...target.Type) target.Run[T] {
+func NewRun[T target.Portal](executable string, filter ...target.Type) target.Run[T] {
 	t := target.TypeNone
 	for _, f := range filter {
 		t += f
@@ -23,33 +23,33 @@ func NewRunner[T target.Portal](executable string, filter ...target.Type) target
 		log.Println("target:", src.Abs(), src.Manifest().Package)
 		switch any(src).(type) {
 		case target.ProjectFrontend:
-			return NewRunnerByName[target.Portal](executable, "wails_dev")(ctx, src)
+			return newRunByName[target.Portal](executable, "wails_dev")(ctx, src)
 		case target.ProjectBackend:
-			return NewRunnerByName[target.Portal](executable, "goja_dev")(ctx, src)
+			return newRunByName[target.Portal](executable, "goja_dev")(ctx, src)
 		case target.AppFrontend:
-			return NewRunnerByName[target.Portal](executable, "wails")(ctx, src)
+			return newRunByName[target.Portal](executable, "wails")(ctx, src)
 		case target.AppBackend:
-			return NewRunnerByName[target.Portal](executable, "goja")(ctx, src)
+			return newRunByName[target.Portal](executable, "goja")(ctx, src)
 		}
 		return
 	}
 }
 
-func NewRunnerByName[T target.Portal](executable, name string) target.Run[T] {
-	return NewPortal[T](executable, "o", name).Run
+func newRunByName[T target.Portal](executable, name string) target.Run[T] {
+	return newPortal[T](executable, "o", name).run
 }
 
-type Portal[T target.Portal] struct {
+type portal[T target.Portal] struct {
 	src []string
 }
 
-var _ target.Run[target.Portal] = (&Portal[target.Portal]{}).Run
+var _ target.Run[target.Portal] = (&portal[target.Portal]{}).run
 
-func NewPortal[T target.Portal](src ...string) *Portal[T] {
-	return &Portal[T]{src: src}
+func newPortal[T target.Portal](src ...string) *portal[T] {
+	return &portal[T]{src: src}
 }
 
-func (p *Portal[T]) Run(ctx context.Context, src T) (err error) {
+func (p *portal[T]) run(ctx context.Context, src T) (err error) {
 	cmd := p.src[0]
 	args := append(p.src[1:], src.Abs())
 	plog.Get(ctx).Type(src).Printf("%s %v", cmd, args)

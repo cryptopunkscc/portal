@@ -13,14 +13,14 @@ import (
 	"path"
 )
 
+func NewRun(newApi target.NewApi) target.Run[target.ProjectBackend] {
+	return (&Runner{NewApi: newApi}).Run
+}
+
 type Runner struct {
 	target.NewApi
 	events sig.Queue[any]
 	log    plog.Logger
-}
-
-func NewRunner(newApi target.NewApi) target.Run[target.ProjectBackend] {
-	return (&Runner{NewApi: newApi}).Run
 }
 
 func (b *Runner) Run(ctx context.Context, project target.ProjectBackend) (err error) {

@@ -20,62 +20,62 @@ func NewRunner(dependencies []target.NodeModule) *Runner {
 	return &Runner{dependencies: dependencies}
 }
 
-func (r Runner) Run(ctx context.Context, m target.Project) (err error) {
-	if err = r.Prepare(ctx, m); err != nil {
+func (r Runner) Run(ctx context.Context, project target.Project) (err error) {
+	if err = r.Prepare(ctx, project); err != nil {
 		return fmt.Errorf("dist.Prepare: %w", err)
 	}
-	if err = r.Dist(ctx, m); err != nil {
+	if err = r.Dist(ctx, project); err != nil {
 		return fmt.Errorf("dist.Dist: %w", err)
 	}
 	return
 }
 
-func (r Runner) Prepare(ctx context.Context, m target.Project) (err error) {
-	if err = npm.Install(m); err != nil {
+func (r Runner) Prepare(ctx context.Context, project target.Project) (err error) {
+	if err = npm.Install(project); err != nil {
 		return
 	}
-	if err = npm.NewInjector(r.dependencies).Run(ctx, m); err != nil {
+	if err = npm.NewInjector(r.dependencies).Run(ctx, project); err != nil {
 		return
 	}
 	return
 }
 
-func (r Runner) Dist(ctx context.Context, m target.Project) (err error) {
-	if !m.PkgJson().CanBuild() {
+func (r Runner) Dist(ctx context.Context, project target.Project) (err error) {
+	if !project.PkgJson().CanBuild() {
 		return errors.New("missing npm build in package.json")
 	}
-	if err = npm.RunBuild(m); err != nil {
+	if err = npm.RunBuild(project); err != nil {
 		return
 	}
-	if err = r.CopyIcon(ctx, m); err != nil {
+	if err = r.CopyIcon(ctx, project); err != nil {
 		return
 	}
-	if err = r.CopyManifest(ctx, m); err != nil {
+	if err = r.CopyManifest(ctx, project); err != nil {
 		return
 	}
 	return
 }
 
-func (r Runner) CopyIcon(_ context.Context, m target.Project) (err error) {
-	if m.Manifest().Icon == "" {
+func (r Runner) CopyIcon(_ context.Context, project target.Project) (err error) {
+	if project.Manifest().Icon == "" {
 		return
 	}
-	iconSrc := path.Join(m.Abs(), m.Manifest().Icon)
-	iconName := "icon" + path.Ext(m.Manifest().Icon)
-	iconDst := path.Join(m.Abs(), "dist", iconName)
+	iconSrc := path.Join(project.Abs(), project.Manifest().Icon)
+	iconName := "icon" + path.Ext(project.Manifest().Icon)
+	iconDst := path.Join(project.Abs(), "dist", iconName)
 	if err = fs.CopyFile(iconSrc, iconDst); err != nil {
 		return
 	}
-	m.Manifest().Icon = iconName
+	project.Manifest().Icon = iconName
 	return
 }
 
-func (r Runner) CopyManifest(_ context.Context, m target.Project) (err error) {
-	bytes, err := json.Marshal(m.Manifest())
+func (r Runner) CopyManifest(_ context.Context, project target.Project) (err error) {
+	bytes, err := json.Marshal(project.Manifest())
 	if err != nil {
 		return err
 	}
-	if err = os.WriteFile(path.Join(m.Abs(), "dist", target.PortalJsonFilename), bytes, 0644); err != nil {
+	if err = os.WriteFile(path.Join(project.Abs(), "dist", target.PortalJsonFilename), bytes, 0644); err != nil {
 		return fmt.Errorf("os.WriteFile: %v", err)
 	}
 	return

@@ -10,10 +10,6 @@ import (
 	"io/fs"
 )
 
-func FromPath(src string) (bundle target.Bundle, err error) {
-	return Resolve(targetSource.FromPath(src))
-}
-
 var ErrNotBundle = errors.New("not a bundle")
 
 func Resolve(src target.Source) (bundle target.Bundle, err error) {

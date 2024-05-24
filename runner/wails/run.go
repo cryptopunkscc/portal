@@ -14,20 +14,20 @@ import (
 	"reflect"
 )
 
-type Runner struct {
-	bindings target.NewApi
-	prefix   []string
-	log      plog.Logger
+func NewRun(newApi target.NewApi, prefix ...string) target.Run[target.AppFrontend] {
+	return Runner{newApi: newApi, prefix: prefix}.Run
 }
 
-func NewRunner(newApi target.NewApi, prefix ...string) target.Run[target.AppFrontend] {
-	return Runner{bindings: newApi, prefix: prefix}.Run
+type Runner struct {
+	newApi target.NewApi
+	prefix []string
+	log    plog.Logger
 }
 
 func (r Runner) Run(ctx context.Context, app target.AppFrontend) (err error) {
 	r.log = plog.Get(ctx).Type(r).Set(&ctx)
 	r.log.Println("Attach frontend", reflect.TypeOf(app), app.Path(), app.Type())
-	opt := AppOptions(r.bindings(ctx, app))
+	opt := AppOptions(r.newApi(ctx, app))
 	if err = r.run(app, opt); err != nil {
 		return fmt.Errorf("dev.Run: %v", err)
 	}

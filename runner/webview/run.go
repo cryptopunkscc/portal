@@ -21,7 +21,7 @@ func Run(ctx context.Context, title, src string) {
 	w.SetHtml(src)
 
 	// bind apphost adapter to js env
-	w.BindApphost(apphost.NewAdapter(ctx, nil))
+	w.BindApphost(apphost.NewFactory(nil).NewAdapter(ctx, "src"))
 
 	// start js application frontend
 	w.Run()
