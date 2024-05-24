@@ -13,7 +13,8 @@ func Run(ctx context.Context, file, src string) (err error) {
 	defer iso.Dispose()
 
 	// bind apphost adapter to js env
-	global, err := Bind(iso, apphost.NewAdapter(ctx, nil))
+	ah := apphost.NewFactory(nil).WithTimeout(ctx, "src")
+	global, err := Bind(iso, ah)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -6,16 +6,16 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/getlantern/systray"
 )
-import "github.com/getlantern/systray"
+
+func New(open target.Dispatch) target.Tray {
+	return (&Runner{open: open}).Run
+}
 
 type Runner struct {
 	open target.Dispatch
 	log  plog.Logger
-}
-
-func NewRunner(open target.Dispatch) target.Tray {
-	return (&Runner{open: open}).Run
 }
 
 func (t *Runner) Run(ctx context.Context) {

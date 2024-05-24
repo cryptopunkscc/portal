@@ -17,14 +17,14 @@ import (
 	"syscall"
 )
 
+func NewRun(newApi target.NewApi) target.Run[target.ProjectFrontend] {
+	return Runner{NewApi: newApi}.Run
+}
+
 type Runner struct {
 	frontCtx context.Context
 	target.NewApi
 	log plog.Logger
-}
-
-func NewRunner(newApi target.NewApi) target.Run[target.ProjectFrontend] {
-	return Runner{NewApi: newApi}.Run
 }
 
 func (f Runner) Run(ctx context.Context, project target.ProjectFrontend) (err error) {

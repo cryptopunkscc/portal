@@ -8,13 +8,13 @@ import (
 	"reflect"
 )
 
+func NewRun(newApi target.NewApi, prefix ...string) target.Run[target.AppBackend] {
+	return Runner{bindings: newApi, prefix: prefix}.Run
+}
+
 type Runner struct {
 	bindings target.NewApi
 	prefix   []string
-}
-
-func NewRunner(newApi target.NewApi, prefix ...string) target.Run[target.AppBackend] {
-	return Runner{bindings: newApi, prefix: prefix}.Run
 }
 
 func (r Runner) Run(ctx context.Context, app target.AppBackend) (err error) {

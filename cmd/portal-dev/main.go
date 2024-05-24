@@ -54,8 +54,8 @@ func main() {
 		newApphost.NewAdapter,
 		newApphost.WithTimeout,
 	)
-	runDev := devRunner.NewRunner(newApi)
-	runProc := exec.NewRunner[target.Portal](executable)
+	runDev := devRunner.NewRun(newApi)
+	runProc := exec.NewRun[target.Portal](executable)
 	runSpawn := spawn.NewRunner(wait, findPortals, runProc).Run
 
 	featDev := dev.NewFeat("dev.portal", wait, runSpawn, runQuery)

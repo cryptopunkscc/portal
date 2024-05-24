@@ -8,18 +8,18 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/target"
 )
 
-func NewRunner(bindings target.NewApi) target.Run[target.App] {
-	return Runner{bindings: bindings}.Run
+func NewRun(newApi target.NewApi) target.Run[target.App] {
+	return Runner{newApi: newApi}.Run
 }
 
-type Runner struct{ bindings target.NewApi }
+type Runner struct{ newApi target.NewApi }
 
 func (r Runner) Run(ctx context.Context, app target.App) (err error) {
 	switch v := any(app).(type) {
 	case target.AppFrontend:
-		return wails.NewRunner(r.bindings)(ctx, v)
+		return wails.NewRun(r.newApi)(ctx, v)
 	case target.AppBackend:
-		return goja.NewRunner(r.bindings)(ctx, v)
+		return goja.NewRun(r.newApi)(ctx, v)
 	default:
 		return fmt.Errorf("invalid app target: %v", app.Path())
 	}
