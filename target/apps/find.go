@@ -6,8 +6,6 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/assets"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/target"
-	"github.com/cryptopunkscc/go-astral-js/target/bundle"
-	"github.com/cryptopunkscc/go-astral-js/target/dist"
 	"github.com/cryptopunkscc/go-astral-js/target/source"
 	"io/fs"
 )
@@ -73,12 +71,4 @@ func FromFS[T target.App](src fs.FS) []T {
 
 func FromSource[T target.App](src target.Source) []T {
 	return source.List[T](Resolve[T](), src)
-}
-
-func Resolve[T target.App]() func(target.Source) (T, error) {
-	return target.Any[T](
-		target.Skip("node_modules"),
-		target.Try(bundle.Resolve),
-		target.Try(dist.Resolve),
-	)
 }
