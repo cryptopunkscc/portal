@@ -1,16 +1,17 @@
 package rpc
 
 import (
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"io"
-	"log"
+	"strings"
 )
 
 type ConnLogger struct {
 	io.ReadWriteCloser
-	*log.Logger
+	plog.Logger
 }
 
-func NewConnLogger(conn io.ReadWriteCloser, logger *log.Logger) *ConnLogger {
+func NewConnLogger(conn io.ReadWriteCloser, logger plog.Logger) *ConnLogger {
 	return &ConnLogger{
 		ReadWriteCloser: conn,
 		Logger:          logger,
@@ -20,7 +21,7 @@ func NewConnLogger(conn io.ReadWriteCloser, logger *log.Logger) *ConnLogger {
 func (cl *ConnLogger) Read(b []byte) (n int, err error) {
 	n, err = cl.ReadWriteCloser.Read(b)
 	if n > 0 {
-		cl.Print("< ", string(b[:n]))
+		cl.Println("< ", strings.Trim(string(b[:n]), "\n"))
 	}
 	return
 }
@@ -28,7 +29,7 @@ func (cl *ConnLogger) Read(b []byte) (n int, err error) {
 func (cl *ConnLogger) Write(b []byte) (n int, err error) {
 	n, err = cl.ReadWriteCloser.Write(b)
 	if n > 0 {
-		cl.Print("> ", string(b[:n]))
+		cl.Println("> ", strings.Trim(string(b[:n]), "\n"))
 	}
 	return
 }

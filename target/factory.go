@@ -2,7 +2,7 @@ package target
 
 import (
 	"context"
-	"log"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"reflect"
 )
 
@@ -19,7 +19,7 @@ func ApiFactory(
 		case Backend:
 			n = backendApphost
 		default:
-			log.Panicln("cannot create target.NewApi unknown type:", reflect.TypeOf(p))
+			plog.Get(ctx).P().Println("cannot create target.NewApi unknown type:", reflect.TypeOf(p))
 		}
 		pkg := p.Manifest().Package
 		a = wrap(n(ctx, pkg))

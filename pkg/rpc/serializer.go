@@ -3,8 +3,8 @@ package rpc
 import (
 	"errors"
 	"github.com/cryptopunkscc/astrald/auth/id"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"io"
-	"log"
 	"reflect"
 )
 
@@ -36,12 +36,12 @@ func (s *Serializer) Codecs(codecs Codecs) {
 	s.codecs = codecs
 }
 
-func (s *Serializer) Logger(logger *log.Logger) {
+func (s *Serializer) Logger(logger plog.Logger) {
 	s.setLogger(logger)
 	s.setupEncoding()
 }
 
-func (s *Serializer) setLogger(logger *log.Logger) {
+func (s *Serializer) setLogger(logger plog.Logger) {
 	if s.logger == nil {
 		s.logger = NewConnLogger(s, logger)
 	} else {

@@ -8,7 +8,6 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/target/manifest"
 	targetSource "github.com/cryptopunkscc/go-astral-js/target/source"
 	"io/fs"
-	"log"
 )
 
 func FromPath(src string) (b target.Bundle, err error) {
@@ -30,7 +29,6 @@ func Resolve(t target.Source) (b target.Bundle, err error) {
 
 	reader, err := zip.NewReader(bytes.NewReader(file), int64(len(file)))
 	if err != nil {
-		log.Println("reader err", err, t.Path())
 		return
 	}
 	s := targetSource.FromFS(reader, t.Path(), t.Abs())

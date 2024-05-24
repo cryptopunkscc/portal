@@ -12,6 +12,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
 	"github.com/cryptopunkscc/go-astral-js/mock/appstore"
 	osExec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	devRunner "github.com/cryptopunkscc/go-astral-js/runner/dev"
 	"github.com/cryptopunkscc/go-astral-js/runner/exec"
 	"github.com/cryptopunkscc/go-astral-js/runner/query"
@@ -22,14 +23,14 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/target/portal"
 	"github.com/cryptopunkscc/go-astral-js/target/portals"
 	"github.com/cryptopunkscc/go-astral-js/target/source"
-	"log"
 	"os"
 	"sync"
 )
 
 func main() {
-	log.Println("starting portal development", os.Args)
 	ctx, cancel := context.WithCancel(context.Background())
+	log := plog.New().D().Scope("dev").Set(&ctx)
+	log.Println("starting portal development", os.Args)
 	go osExec.OnShutdown(cancel)
 
 	wait := &sync.WaitGroup{}

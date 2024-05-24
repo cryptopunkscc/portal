@@ -6,8 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/astrald/auth/id"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"io"
-	"log"
 	"reflect"
 	"strings"
 	"sync"
@@ -15,7 +15,7 @@ import (
 )
 
 type Router struct {
-	logger        *log.Logger
+	logger        plog.Logger
 	registry      *Registry[*Caller]
 	routes        []string
 	env           []any
@@ -41,7 +41,8 @@ func (r *Router) Routes(routes ...string) *Router {
 	return r
 }
 
-func (r *Router) Logger(logger *log.Logger) *Router {
+// TODO deprecated
+func (r *Router) Logger(logger plog.Logger) *Router {
 	r.logger = logger
 	return r
 }

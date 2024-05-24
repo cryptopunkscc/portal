@@ -2,14 +2,14 @@ package rpc
 
 import (
 	"errors"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"io"
-	"log"
 )
 
 type Conn interface {
 	io.WriteCloser
 	ByteScannerReader
-	Logger(logger *log.Logger)
+	Logger(logger plog.Logger)
 	Copy() Conn
 	Call(method string, value any) (err error)
 	Encode(value any) (err error)

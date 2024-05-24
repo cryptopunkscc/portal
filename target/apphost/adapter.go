@@ -8,16 +8,18 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/astrald/lib/astral"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/google/uuid"
 	"io"
-	"log"
 	"strings"
 	"sync"
 	"time"
 )
 
 type Adapter struct {
+	log plog.Logger
+
 	pkg    []string
 	prefix []string
 
@@ -49,12 +51,12 @@ func (api *Adapter) Interrupt() {
 	defer api.listenersMutex.Unlock()
 	defer api.connectionsMutex.Unlock()
 	for name, closer := range api.listeners {
-		log.Println("[Interrupt] closing listener:", name)
+		api.log.Println("[Interrupt] closing listener:", name)
 		_ = closer.Close()
 		delete(api.listeners, name)
 	}
 	for name := range api.connections {
-		log.Print("[Interrupt] closing connection:", name)
+		api.log.Println("[Interrupt] closing connection:", name)
 		api.setConnectionUnsafe(name, nil)
 	}
 	api.connections = map[string]*Conn{}
@@ -103,11 +105,11 @@ func (api *Adapter) setConnectionUnsafe(connectionId string, connection *astral.
 }
 
 func (api *Adapter) Log(arg ...any) {
-	log.Println(arg...)
+	api.log.Scope("js").Println(arg...)
 }
 
 func (api *Adapter) LogArr(arg []any) {
-	log.Println(arg...)
+	api.log.Scope("js").Println(arg...)
 }
 
 func (api *Adapter) Sleep(duration int64) {
@@ -124,6 +126,7 @@ func (api *Adapter) ServiceRegister(service string) (err error) {
 	default:
 		port = api.Port(append(api.pkg, service)...)
 	}
+	api.log.Println("register:", service)
 	listener, err := astral.Register(port)
 	if err != nil {
 		return
@@ -162,6 +165,7 @@ func (api *Adapter) ConnAccept(service string) (data string, err error) {
 	}
 
 	connId := uuid.New().String()
+	api.log.Println("accepted connection:", connId)
 	api.setConnection(connId, conn)
 
 	pkg := strings.Join(append(api.Prefix(), api.pkg...), ".")
@@ -195,6 +199,7 @@ func (api *Adapter) ConnClose(id string) (err error) {
 }
 
 func (api *Adapter) ConnWrite(id string, data string) (err error) {
+	api.log.Printf("[%s] write: %s", id, strings.TrimRight(data, "\r\n"))
 	conn, ok := api.getConnection(id)
 	if !ok {
 		err = errors.New("[ConnWrite] not found connection with id: " + id)
@@ -208,6 +213,7 @@ func (api *Adapter) ConnWrite(id string, data string) (err error) {
 }
 
 func (api *Adapter) ConnRead(id string) (data string, err error) {
+	api.log.Printf("[%s] read: %s", id, data)
 	conn, ok := api.getConnection(id)
 	if !ok {
 		err = errors.New("[ConnRead] not found connection with id: " + id)
@@ -222,6 +228,7 @@ func (api *Adapter) ConnRead(id string) (data string, err error) {
 }
 
 func (api *Adapter) Query(identity string, query string) (data string, err error) {
+	api.log.Printf("[%s] query: %s", identity, query)
 	nid := id.Identity{}
 	if len(identity) > 0 {
 		nid, err = id.ParsePublicKeyHex(identity)

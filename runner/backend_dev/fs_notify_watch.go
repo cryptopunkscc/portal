@@ -2,8 +2,8 @@ package backend_dev
 
 import (
 	"context"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/fsnotify/fsnotify"
-	"log"
 	"strings"
 )
 
@@ -15,6 +15,7 @@ func fsNotifyWatchWrite(ctx context.Context, path string, file string) (out <-ch
 
 	c := make(chan any, 64)
 	out = c
+	log := plog.Get(ctx).Scope("fsNotifyWatchWrite")
 	go func() {
 		defer close(c)
 		c <- struct{}{}

@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/go-astral-js/feat/apps"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	"github.com/cryptopunkscc/go-astral-js/runner/serve"
 	"github.com/cryptopunkscc/go-astral-js/target"
-	"log"
 )
 
 type Feat struct {
@@ -36,6 +36,7 @@ func (f Feat) Run(
 	ctx context.Context,
 	tray bool,
 ) (err error) {
+	log := plog.Get(ctx).Type(f).Set(&ctx)
 	if err = rpc.Command(rpc.NewRequest(id.Anyone, f.port), "ping"); err == nil {
 		err = fmt.Errorf("port already registered or astral not running: %v", err)
 		return

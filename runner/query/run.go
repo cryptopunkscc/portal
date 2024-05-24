@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/astrald/auth/id"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"strings"
@@ -28,7 +29,8 @@ func (r Runner[T]) Run(ctx context.Context, src string, _ ...string) (err error)
 	defer flow.Close()
 	err = rpc.Command(flow, "", src)
 	if err != nil {
-		return fmt.Errorf("query.Runner cannot query %s: %w", src, err)
+		plog.Get(ctx).Type(r).E().Printf("cannot query %s: %v", src, err)
+		return fmt.Errorf("cannot query %s: %w", src, err)
 	}
 	c := make(chan any)
 	go func() {

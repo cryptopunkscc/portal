@@ -3,8 +3,8 @@ package exec
 import (
 	"context"
 	"fmt"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/target"
-	"log"
 	"os"
 	"os/exec"
 )
@@ -15,11 +15,12 @@ func NewRunner[T target.Portal](executable string, filter ...target.Type) target
 		t += f
 	}
 	return func(ctx context.Context, src T) (err error) {
+		log := plog.Get(ctx).Scope("exec.Runner").Set(&ctx)
 		if t != target.TypeNone && !src.Type().Is(t) {
-			log.Println(src.Path(), src.Abs(), src.Manifest().Package, src.Type())
+			log.F().Println(src.Abs(), target.ErrNotTarget)
 			return target.ErrNotTarget
 		}
-		log.Println("exec Running target:", src.Abs(), src.Manifest().Package)
+		log.Println("target:", src.Abs(), src.Manifest().Package)
 		switch any(src).(type) {
 		case target.ProjectFrontend:
 			return NewRunnerByName[target.Portal](executable, "wails_dev")(ctx, src)
@@ -35,7 +36,6 @@ func NewRunner[T target.Portal](executable string, filter ...target.Type) target
 }
 
 func NewRunnerByName[T target.Portal](executable, name string) target.Run[T] {
-	log.Println("NewRunnerByName", name)
 	return NewPortal[T](executable, "o", name).Run
 }
 
@@ -52,6 +52,7 @@ func NewPortal[T target.Portal](src ...string) *Portal[T] {
 func (p *Portal[T]) Run(ctx context.Context, src T) (err error) {
 	cmd := p.src[0]
 	args := append(p.src[1:], src.Abs())
+	plog.Get(ctx).Type(src).Printf("%s %v", cmd, args)
 	var c *exec.Cmd
 	if ctx != nil {
 		c = exec.CommandContext(ctx, cmd, args...)

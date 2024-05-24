@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"io"
 	"io/fs"
-	"log"
 	"os"
 	"path"
 )
@@ -34,16 +34,17 @@ func NewInjector(deps []target.NodeModule) *Injector {
 	return &Injector{deps: deps}
 }
 
-func (i Injector) Run(_ context.Context, m target.NodeModule) (err error) {
+func (i Injector) Run(ctx context.Context, m target.NodeModule) (err error) {
+	log := plog.Get(ctx).Type(i).Set(&ctx)
 	for _, module := range i.deps {
-		if err = Inject(m, module); err != nil {
+		if err = inject(log, m, module); err != nil {
 			return fmt.Errorf("cannot inject dependency %s in %s: %s", module.Abs(), err, module)
 		}
 	}
 	return
 }
 
-func Inject(m target.NodeModule, lib target.NodeModule) (err error) {
+func inject(log plog.Logger, m target.NodeModule, lib target.NodeModule) (err error) {
 	dep := lib.Lift()
 	nm := path.Join(m.Abs(), "node_modules", path.Base(dep.Abs()))
 	log.Printf("copying module %v %v into: %s", dep.Path(), dep.Abs(), nm)

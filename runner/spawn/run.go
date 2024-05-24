@@ -2,8 +2,8 @@ package spawn
 
 import (
 	"context"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/target"
-	"log"
 	"sync"
 )
 
@@ -26,7 +26,9 @@ func NewRunner[T target.Portal](
 }
 
 func (r Runner[T]) Run(ctx context.Context, src string, _ ...string) (err error) {
+	log := plog.Get(ctx).Type(r).Set(&ctx)
 	portals, err := r.find(src)
+	log.D().Printf("found %d portals for %s", len(portals), src)
 	if err != nil {
 		return
 	}
