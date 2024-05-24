@@ -12,16 +12,19 @@ import (
 )
 
 type logger struct {
-	out Output
-	Log
+	out    Output
 	module string
+	Log
 }
 
 func New() Logger {
 	return &logger{
 		out:    DefaultOutput,
-		Log:    Log{Pid: os.Getpid()},
 		module: portal.Module,
+		Log: Log{
+			Pid:   os.Getpid(),
+			Level: Info,
+		},
 	}
 }
 

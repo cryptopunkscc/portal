@@ -13,11 +13,11 @@ import (
 )
 
 func NewFinder(
-	resolve target.Path,
+	getPath target.Path,
 	files ...fs.FS,
 ) (f Finder) {
 	f = Finder{
-		GetPath: resolve,
+		GetPath: getPath,
 		Files:   assets.ArrayFs(files),
 	}
 	return

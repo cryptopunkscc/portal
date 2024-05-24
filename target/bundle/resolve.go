@@ -10,19 +10,19 @@ import (
 	"io/fs"
 )
 
-func FromPath(src string) (b target.Bundle, err error) {
+func FromPath(src string) (bundle target.Bundle, err error) {
 	return Resolve(targetSource.FromPath(src))
 }
 
 var ErrNotBundle = errors.New("not a bundle")
 
-func Resolve(t target.Source) (b target.Bundle, err error) {
-	t = t.Lift()
-	if !t.Type().Is(target.TypeBundle) {
+func Resolve(src target.Source) (bundle target.Bundle, err error) {
+	src = src.Lift()
+	if !src.Type().Is(target.TypeBundle) {
 		return nil, ErrNotBundle
 	}
 
-	file, err := fs.ReadFile(t.Files(), t.Path())
+	file, err := fs.ReadFile(src.Files(), src.Path())
 	if err != nil {
 		return
 	}
@@ -31,20 +31,20 @@ func Resolve(t target.Source) (b target.Bundle, err error) {
 	if err != nil {
 		return
 	}
-	s := targetSource.FromFS(reader, t.Path(), t.Abs())
+	s := targetSource.FromFS(reader, src.Path(), src.Abs())
 	m, err := manifest.Read(reader)
 	if err != nil {
 		return
 	}
-	b = &source{
+	bundle = &source{
 		Source:   s,
 		manifest: &m,
 	}
 	switch {
-	case b.Type().Is(target.TypeFrontend):
-		b = &frontend{Bundle: b}
-	case b.Type().Is(target.TypeBackend):
-		b = &backend{Bundle: b}
+	case bundle.Type().Is(target.TypeFrontend):
+		bundle = &frontend{Bundle: bundle}
+	case bundle.Type().Is(target.TypeBackend):
+		bundle = &backend{Bundle: bundle}
 	}
 	return
 }

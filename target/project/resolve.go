@@ -8,7 +8,7 @@ import (
 	"io/fs"
 )
 
-func FromPath(src string) (module target.Project, err error) {
+func FromPath(src string) (project target.Project, err error) {
 	nodeModule, err := npm.ResolveNodeModule(targetSource.FromPath(src))
 	if err != nil {
 		return
@@ -16,9 +16,9 @@ func FromPath(src string) (module target.Project, err error) {
 	return Resolve(nodeModule)
 }
 
-func Resolve(t target.NodeModule) (b target.Project, err error) {
+func Resolve(nodeModule target.NodeModule) (project target.Project, err error) {
 	m := target.Manifest{}
-	sub, err := fs.Sub(t.Files(), t.Path())
+	sub, err := fs.Sub(nodeModule.Files(), nodeModule.Path())
 	if err != nil {
 		return
 	}
@@ -28,12 +28,12 @@ func Resolve(t target.NodeModule) (b target.Project, err error) {
 	if err = manifest.Load(&m, sub, target.PortalJsonFilename); err != nil {
 		return
 	}
-	b = &source{NodeModule: t, manifest: &m}
+	project = &source{NodeModule: nodeModule, manifest: &m}
 	switch {
-	case b.Type().Is(target.TypeFrontend):
-		b = &frontend{Project: b}
-	case b.Type().Is(target.TypeBackend):
-		b = &backend{Project: b}
+	case project.Type().Is(target.TypeFrontend):
+		project = &frontend{Project: project}
+	case project.Type().Is(target.TypeBackend):
+		project = &backend{Project: project}
 	}
 	return
 }

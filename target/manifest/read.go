@@ -11,11 +11,11 @@ func Read(src fs.FS) (p target.Manifest, err error) {
 	return
 }
 
-func Load(m *target.Manifest, src fs.FS, name string) (err error) {
+func Load(manifest *target.Manifest, src fs.FS, name string) (err error) {
 	file, err := fs.ReadFile(src, name)
 	if err != nil {
 		return
 	}
-	err = json.Unmarshal(file, m)
+	err = json.Unmarshal(file, manifest)
 	return
 }

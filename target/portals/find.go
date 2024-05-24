@@ -10,18 +10,16 @@ import (
 	"strings"
 )
 
-func NewFinder() func(
+func NewFind(
 	getPath target.Path,
 	files ...fs.FS,
 ) target.Find[target.Portal] {
-	return func(getPath target.Path, files ...fs.FS) target.Find[target.Portal] {
-		return Finder{apps.NewFinder(getPath, files...)}.find
-	}
+	return Finder{apps.NewFinder(getPath, files...)}.findPortals
 }
 
 type Finder struct{ apps.Finder }
 
-func (p Finder) find(ctx context.Context, src string) (portals target.Portals[target.Portal], err error) {
+func (p Finder) findPortals(ctx context.Context, src string) (portals target.Portals[target.Portal], err error) {
 	base := src
 	src = strings.TrimPrefix(src, "dev.")
 	portals = make(target.Portals[target.Portal])
@@ -30,15 +28,15 @@ func (p Finder) find(ctx context.Context, src string) (portals target.Portals[ta
 		src = s
 	}
 
-	if a, err1 := p.Finder.ByPath(ctx, src); err1 == nil {
+	if a, err := p.Finder.ByPath(ctx, src); err == nil {
 		for s, app := range a {
 			portals[s] = app
 		}
 	}
 
-	if projects, err2 := p.projects(src); err2 == nil {
-		for s, t := range projects {
-			portals[s] = t
+	for _, a := range sources.FromPath[target.Project](src) {
+		if portals[a.Manifest().Package] == nil {
+			portals[a.Manifest().Package] = a
 		}
 	}
 
@@ -46,15 +44,5 @@ func (p Finder) find(ctx context.Context, src string) (portals target.Portals[ta
 		return
 	}
 	err = fmt.Errorf("cannot find portal for %v", base)
-	return
-}
-
-func (p Finder) projects(src string) (apps target.Portals[target.Project], err error) {
-	apps = make(target.Portals[target.Project])
-	for _, app := range sources.FromPath[target.Project](src) {
-		if apps[app.Manifest().Package] == nil {
-			apps[app.Manifest().Package] = app
-		}
-	}
 	return
 }
