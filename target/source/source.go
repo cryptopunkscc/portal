@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"io/fs"
+	"log"
 	"path"
 	"reflect"
 )
@@ -93,6 +94,7 @@ func (m *source) Lift() target.Source {
 		mm := *m
 		var err error
 		if mm.files, err = fs.Sub(m.files, m.src); err != nil {
+			log.Printf("[ERROR] cannot lift dir %s: %v %T %v", m.src, err, m.files, m.files)
 			mm.files = nil
 		}
 		mm.src = "."
@@ -104,6 +106,7 @@ func (m *source) Lift() target.Source {
 		mm := *m
 		var err error
 		if mm.files, err = fs.Sub(m.files, path.Dir(m.src)); err != nil {
+			log.Printf("[ERROR] cannot lift file %s: %v", m.src, err)
 			mm.files = nil
 		}
 		mm.src = path.Base(m.src)

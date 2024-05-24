@@ -1,6 +1,7 @@
 package test
 
 import (
+	"context"
 	embedApps "github.com/cryptopunkscc/go-astral-js/apps"
 	"github.com/cryptopunkscc/go-astral-js/mock/appstore"
 	"github.com/cryptopunkscc/go-astral-js/target"
@@ -20,7 +21,7 @@ func Test__apps_Find__embed_launcher(t *testing.T) {
 		resolveEmbed.Path,
 		appstore.Path,
 	)
-	find := apps.NewFinder(findPath, embedApps.LauncherSvelteFS).Find
+	find := apps.NewFinder(context.TODO(), findPath, embedApps.LauncherSvelteFS).Find
 
 	tests := []Case[string]{
 		{Matcher: Launcher, Src: Launcher.Manifest.Name},

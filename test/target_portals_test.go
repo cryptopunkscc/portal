@@ -1,6 +1,7 @@
 package test
 
 import (
+	"context"
 	embedApps "github.com/cryptopunkscc/go-astral-js/apps"
 	"github.com/cryptopunkscc/go-astral-js/mock/appstore"
 	"github.com/cryptopunkscc/go-astral-js/target"
@@ -21,7 +22,7 @@ func Test__portals_Find__embed_launcher(t *testing.T) {
 		resolveEmbed.Path,
 		appstore.Path,
 	)
-	find := portals.Find(findPath, embedFs)
+	find := portals.NewFinder(context.TODO())(findPath, embedFs)
 
 	tests := []Case[string]{
 		{Src: ".", Matchers: []*Target{
@@ -32,6 +33,10 @@ func Test__portals_Find__embed_launcher(t *testing.T) {
 			ProjectFrontend,
 			ProjectBackend,
 			Launcher,
+		}},
+		{Src: "test_data/rpc", Matchers: []*Target{
+			RpcBackend,
+			RpcFrontend,
 		}},
 		{Matcher: Launcher, Src: Launcher.Manifest.Name},
 		{Matcher: Launcher, Src: Launcher.Manifest.Package},

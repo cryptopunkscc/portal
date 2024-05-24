@@ -1,27 +1,32 @@
 package apps
 
 import (
+	"context"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/assets"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/bundle"
 	"github.com/cryptopunkscc/go-astral-js/target/dist"
 	"github.com/cryptopunkscc/go-astral-js/target/source"
 	"io/fs"
-	"strings"
 )
 
 func NewFinder(
+	ctx context.Context,
 	resolve target.Path,
 	files ...fs.FS,
-) Finder {
-	return Finder{
+) (f Finder) {
+	f = Finder{
 		GetPath: resolve,
 		Files:   assets.ArrayFs(files),
 	}
+	f.log = plog.Get(ctx).D().Type(f)
+	return
 }
 
 type Finder struct {
+	log     plog.Logger
 	GetPath target.Path
 	Files   fs.FS
 }
@@ -31,40 +36,27 @@ func (a Finder) Find(src string) (apps target.Portals[target.App], err error) {
 	tmp := src
 	if src, _ = a.GetPath(src); src == "" {
 		src = tmp
+		a.log.Println("cannot resolve path for:", src)
 	}
 
 	if apps, err = a.ByPath(src); err != nil {
+		a.log.Printf("cannot find apps for %s: %v", src, err)
 		err = fmt.Errorf("apps.Finder cannot resolve app by path %v", src)
 		return
 	}
 	return
 }
 
-func (a Finder) ByNameOrPackage(src string) (app target.App, err error) {
-	src = strings.TrimPrefix(src, "dev.")
-	if src, err = a.GetPath(src); err != nil {
-		return
-	}
-	var t target.Bundle
-	if t, err = bundle.FromPath(src); err != nil {
-		return nil, fmt.Errorf("cannot resolve portal apps path from '%s': %v", src, err)
-	}
-	app = t
-	return
-}
-
 func (a Finder) ByPath(src string) (apps target.Portals[target.App], err error) {
-	//log.Println("Finder.ByPath:", src)
-	s := source.FromFS(a.Files, src)
-	s = s.Lift()
-	if s.Files() == nil {
-		return
+	apps = map[string]target.App{}
+	if s := source.FromFS(a.Files, src).Lift(); s.Files() != nil {
+		a.log.Println("Collecting from source", src)
+		for _, app := range FromSource[target.App](s) {
+			apps[app.Manifest().Package] = app
+		}
 	}
 
-	apps = map[string]target.App{}
-	for _, app := range FromSource[target.App](s) {
-		apps[app.Manifest().Package] = app
-	}
+	a.log.Println("Collecting from path", src)
 	for _, app := range FromPath[target.App](src) {
 		apps[app.Manifest().Package] = app
 	}

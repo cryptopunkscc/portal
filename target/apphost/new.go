@@ -27,15 +27,12 @@ func newAdapter(ctx context.Context, pkg string, prefix ...string) *Adapter {
 	if pkg != "" {
 		a.pkg = []string{pkg}
 	}
-	//port := strings.Join(append(a.prefix, a.pkg...), ".")
-	//a.log = plog.Get(ctx).Type(a).Scope(port)
-	a.log = plog.Get(ctx).Type(a)
+	a.log = plog.Get(ctx).Type(a).Set(&ctx)
 	return a
 }
 
 func (f Factory) NewAdapter(ctx context.Context, pkg string) target.Apphost {
 	flat := newAdapter(ctx, pkg, f.prefix...)
-	flat.log = flat.log.Scope("F").Set(&ctx)
 	return NewInvoker(ctx, flat, f.invoke)
 }
 
@@ -45,6 +42,5 @@ func (f Factory) WithTimeout(ctx context.Context, pkg string) target.Apphost {
 	})
 	flat := newAdapter(ctx, pkg, f.prefix...)
 	flat.onIdle = timeout.Enable
-	flat.log = flat.log.Scope("B").Set(&ctx)
 	return NewInvoker(ctx, flat, f.invoke)
 }

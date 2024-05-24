@@ -1,6 +1,7 @@
 package portals
 
 import (
+	"context"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/apps"
@@ -9,11 +10,13 @@ import (
 	"strings"
 )
 
-func Find(
+func NewFinder(ctx context.Context) func(
 	getPath target.Path,
 	files ...fs.FS,
 ) target.Find[target.Portal] {
-	return Finder{apps.NewFinder(getPath, files...)}.find
+	return func(getPath target.Path, files ...fs.FS) target.Find[target.Portal] {
+		return Finder{apps.NewFinder(ctx, getPath, files...)}.find
+	}
 }
 
 type Finder struct{ apps.Finder }
