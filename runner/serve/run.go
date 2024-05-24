@@ -3,6 +3,7 @@ package serve
 import (
 	"context"
 	"fmt"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 )
 
@@ -15,6 +16,7 @@ func NewRunner(handlers rpc.Handlers) *Runner {
 }
 
 func (r Runner) Run(ctx context.Context, port string, _ ...string) (err error) {
+	plog.Get(ctx).Type(r).Set(&ctx)
 	s := rpc.NewApp(port)
 	//s.Logger(log.New(log.Writer(), "service ", 0))
 	for name, h := range r.handlers {

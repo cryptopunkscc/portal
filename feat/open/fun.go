@@ -18,7 +18,7 @@ func NewFeat[T target.Portal](find target.Find[T], run target.Run[T]) target.Dis
 
 func (f Feat[T]) Run(ctx context.Context, path string, _ ...string) (err error) {
 	plog.Get(ctx).Type(f).Set(&ctx)
-	portal, err := f.find(path)
+	portal, err := f.find(ctx, path)
 	if err != nil {
 		return errors.New("cannot resolve portal: " + err.Error())
 	}

@@ -21,7 +21,7 @@ func Test__apps_Find__embed_launcher(t *testing.T) {
 		resolveEmbed.Path,
 		appstore.Path,
 	)
-	find := apps.NewFinder(context.TODO(), findPath, embedApps.LauncherSvelteFS).Find
+	find := apps.NewFinder(findPath, embedApps.LauncherSvelteFS).Find
 
 	tests := []Case[string]{
 		{Matcher: Launcher, Src: Launcher.Manifest.Name},
@@ -40,7 +40,7 @@ func Test__apps_Find__embed_launcher(t *testing.T) {
 	for _, test := range tests {
 		test := test
 		t.Run(test.Src, func(t *testing.T) {
-			apps_, err := find(test.Src)
+			apps_, err := find(context.TODO(), test.Src)
 			if err != nil {
 				t.Fatal(err)
 			}
