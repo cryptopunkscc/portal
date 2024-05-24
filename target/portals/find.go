@@ -10,18 +10,18 @@ import (
 	"strings"
 )
 
-func NewFinder(ctx context.Context) func(
+func NewFinder() func(
 	getPath target.Path,
 	files ...fs.FS,
 ) target.Find[target.Portal] {
 	return func(getPath target.Path, files ...fs.FS) target.Find[target.Portal] {
-		return Finder{apps.NewFinder(ctx, getPath, files...)}.find
+		return Finder{apps.NewFinder(getPath, files...)}.find
 	}
 }
 
 type Finder struct{ apps.Finder }
 
-func (p Finder) find(src string) (portals target.Portals[target.Portal], err error) {
+func (p Finder) find(ctx context.Context, src string) (portals target.Portals[target.Portal], err error) {
 	base := src
 	src = strings.TrimPrefix(src, "dev.")
 	portals = make(target.Portals[target.Portal])
@@ -30,7 +30,7 @@ func (p Finder) find(src string) (portals target.Portals[target.Portal], err err
 		src = s
 	}
 
-	if a, err1 := p.Finder.ByPath(src); err1 == nil {
+	if a, err1 := p.Finder.ByPath(ctx, src); err1 == nil {
 		for s, app := range a {
 			portals[s] = app
 		}

@@ -13,7 +13,6 @@ import (
 )
 
 func NewFinder(
-	ctx context.Context,
 	resolve target.Path,
 	files ...fs.FS,
 ) (f Finder) {
@@ -21,42 +20,43 @@ func NewFinder(
 		GetPath: resolve,
 		Files:   assets.ArrayFs(files),
 	}
-	f.log = plog.Get(ctx).D().Type(f)
 	return
 }
 
 type Finder struct {
-	log     plog.Logger
 	GetPath target.Path
 	Files   fs.FS
 }
 
-func (a Finder) Find(src string) (apps target.Portals[target.App], err error) {
+func (a Finder) Find(ctx context.Context, src string) (apps target.Portals[target.App], err error) {
+	log := plog.Get(ctx).Type(a).Set(&ctx)
 	apps = make(target.Portals[target.App])
 	tmp := src
 	if src, _ = a.GetPath(src); src == "" {
 		src = tmp
-		a.log.Println("cannot resolve path for:", src)
+		log.Println("cannot resolve path for:", src)
 	}
 
-	if apps, err = a.ByPath(src); err != nil {
-		a.log.Printf("cannot find apps for %s: %v", src, err)
+	if apps, err = a.ByPath(ctx, src); err != nil {
+		log.Printf("cannot find apps for %s: %v", src, err)
 		err = fmt.Errorf("apps.Finder cannot resolve app by path %v", src)
 		return
 	}
 	return
 }
 
-func (a Finder) ByPath(src string) (apps target.Portals[target.App], err error) {
+func (a Finder) ByPath(ctx context.Context, src string) (apps target.Portals[target.App], err error) {
+	log := plog.Get(ctx)
+
 	apps = map[string]target.App{}
 	if s := source.FromFS(a.Files, src).Lift(); s.Files() != nil {
-		a.log.Println("Collecting from source", src)
+		log.Println("Collecting from source", src)
 		for _, app := range FromSource[target.App](s) {
 			apps[app.Manifest().Package] = app
 		}
 	}
 
-	a.log.Println("Collecting from path", src)
+	log.Println("Collecting from path", src)
 	for _, app := range FromPath[target.App](src) {
 		apps[app.Manifest().Package] = app
 	}

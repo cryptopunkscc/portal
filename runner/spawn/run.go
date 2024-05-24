@@ -27,7 +27,7 @@ func NewRunner[T target.Portal](
 
 func (r Runner[T]) Run(ctx context.Context, src string, _ ...string) (err error) {
 	log := plog.Get(ctx).Type(r).Set(&ctx)
-	portals, err := r.find(src)
+	portals, err := r.find(ctx, src)
 	log.D().Printf("found %d portals for %s", len(portals), src)
 	if err != nil {
 		return

@@ -19,7 +19,7 @@ type Dispatch func(context.Context, string, ...string) (err error)
 
 type Resolve[T Source] func(src Source) (result T, err error)
 
-type Find[T Portal] func(src string) (portals Portals[T], err error)
+type Find[T Portal] func(ctx context.Context, src string) (portals Portals[T], err error)
 
 type Finder[T Portal] func(resolve Path, files ...fs.FS) Find[T]
 

@@ -1,6 +1,7 @@
 package target
 
 import (
+	"context"
 	"io/fs"
 	"log"
 	"sync"
@@ -21,8 +22,8 @@ func Cached[T Portal](finder Finder[T]) Finder[T] {
 		}
 
 		find := finder(resolveCached, files...)
-		return func(src string) (portals Portals[T], err error) {
-			portals, err = find(src)
+		return func(ctx context.Context, src string) (portals Portals[T], err error) {
+			portals, err = find(ctx, src)
 			if err == nil {
 				store.Add(portals)
 			}
