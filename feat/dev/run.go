@@ -6,10 +6,10 @@ import (
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/go-astral-js/feat/apps"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	"github.com/cryptopunkscc/go-astral-js/runner/serve"
 	"github.com/cryptopunkscc/go-astral-js/target"
-	"log"
 	"sync"
 	"time"
 )
@@ -41,6 +41,7 @@ func NewFeat(
 }
 
 func (f Feat) Run(ctx context.Context, src string, _ ...string) (err error) {
+	log := plog.Get(ctx).Type(f).Set(&ctx)
 	if err = ping(f.port); err == nil {
 		return errors.New("portal dev already running")
 	}
@@ -51,12 +52,12 @@ func (f Feat) Run(ctx context.Context, src string, _ ...string) (err error) {
 		defer f.wait.Done()
 
 		if err = f.serve(ctx, f.port); err != nil {
-			log.Printf("serve exit: %v\n", err)
+			log.Printf("serve exit: %v", err)
 		} else {
 			log.Println("serve exit")
 		}
 	}()
-	if err = exec.Retry(5*time.Second, func(i int, i2 int, duration time.Duration) error {
+	if err = exec.Retry(ctx, 5*time.Second, func(i int, i2 int, duration time.Duration) error {
 		return ping(f.port)
 	}); err != nil {
 		return

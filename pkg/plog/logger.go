@@ -3,21 +3,25 @@ package plog
 import (
 	"context"
 	"fmt"
+	portal "github.com/cryptopunkscc/go-astral-js"
 	"os"
 	"reflect"
 	"runtime/debug"
+	"strings"
 	"time"
 )
 
 type logger struct {
 	out Output
 	Log
+	module string
 }
 
 func New() Logger {
 	return &logger{
-		out: DefaultOutput,
-		Log: Log{Pid: os.Getpid()},
+		out:    DefaultOutput,
+		Log:    Log{Pid: os.Getpid()},
+		module: portal.Module,
 	}
 }
 
@@ -47,12 +51,14 @@ func (l logger) Scope(format string, args ...any) Logger {
 }
 
 func (l logger) Type(a any) Logger {
-	l.Scopes = append(l.Scopes, reflect.TypeOf(a))
+	t := reflect.TypeOf(a)
+	s := strings.Replace(t.String(), l.module, "", -1)
+	l.Scopes = append(l.Scopes, s)
 	return l
 }
 
 func (l logger) Any(a any) Logger {
-	l.Scopes = append(l.Scopes, a)
+	l.Scopes = append(l.Scopes, fmt.Sprint(a))
 	return l
 }
 
@@ -87,17 +93,17 @@ func (l logger) D() Logger {
 }
 
 func (l logger) Msg(message string) Logger {
-	l.Message = message
+	l.Message += message
 	return l
 }
 
 func (l logger) Printf(format string, a ...any) {
-	l.Message = fmt.Sprintf(format, a...)
+	l.Message += fmt.Sprintf(format, a...) + "\n"
 	l.Flush()
 }
 
 func (l logger) Println(a ...any) {
-	l.Message = fmt.Sprintln(a...)
+	l.Message += fmt.Sprintln(a...)
 	l.Flush()
 }
 

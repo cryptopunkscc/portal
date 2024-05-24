@@ -4,13 +4,14 @@ import (
 	"context"
 	portal "github.com/cryptopunkscc/go-astral-js"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/target"
-	"log"
 )
 import "github.com/getlantern/systray"
 
 type Runner struct {
 	open target.Dispatch
+	log  plog.Logger
 }
 
 func NewRunner(open target.Dispatch) target.Tray {
@@ -18,12 +19,13 @@ func NewRunner(open target.Dispatch) target.Tray {
 }
 
 func (t *Runner) Run(ctx context.Context) {
+	t.log = plog.Get(ctx).Type(t).Set(&ctx)
 	systray.SetTitle(portal.Name)
 	launcherItem := systray.AddMenuItem("Launcher", "Launcher")
 	go onMenuItemClick(launcherItem, func() {
 		go func() {
 			if err := t.open(ctx, "launcher"); err != nil {
-				log.Println("launcher:", err)
+				t.log.Println("launcher:", err)
 			}
 		}()
 	})
@@ -31,7 +33,7 @@ func (t *Runner) Run(ctx context.Context) {
 	go onMenuItemClick(quit, func() {
 		systray.Quit()
 		if err := exec.Shutdown(); err != nil {
-			log.Println("quit:", err)
+			t.log.Println("quit:", err)
 		}
 	})
 	go func() {
@@ -42,11 +44,11 @@ func (t *Runner) Run(ctx context.Context) {
 }
 
 func (t *Runner) onReady() {
-	log.Println("portal tray start")
+	t.log.Println("portal tray start")
 }
 
 func (t *Runner) onExit() {
-	log.Println("portal tray exit")
+	t.log.Println("portal tray exit")
 }
 
 func onMenuItemClick(item *systray.MenuItem, onClick func()) {

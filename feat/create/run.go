@@ -3,11 +3,11 @@ package create
 import (
 	"context"
 	"github.com/cryptopunkscc/go-astral-js/feat/build"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/runner/create"
 	. "github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/source"
 	"github.com/cryptopunkscc/go-astral-js/target/template"
-	"log"
 )
 
 type Feat struct{}
@@ -19,6 +19,7 @@ func (f Feat) Run(
 	dir string,
 	targets map[string]string,
 ) (err error) {
+	log := plog.Get(ctx).Type(f).Set(&ctx)
 	runner := create.NewRunner(dir, targets)
 	resolve := Any[Template](Try(template.Resolve))
 	src := source.FromFS(template.TemplatesFs)
@@ -28,7 +29,7 @@ func (f Feat) Run(
 			continue
 		}
 		if err = runner.Run(t); err != nil {
-			log.Printf("Error creating project from template: %v", err)
+			log.E().Printf("Error creating project from template: %v", err)
 		}
 	}
 

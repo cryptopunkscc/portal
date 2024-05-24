@@ -8,7 +8,6 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/target/dist"
 	"github.com/cryptopunkscc/go-astral-js/target/source"
 	"io/fs"
-	"log"
 	"strings"
 )
 
@@ -28,19 +27,16 @@ type Finder struct {
 }
 
 func (a Finder) Find(src string) (apps target.Portals[target.App], err error) {
-	log.Println("resolving app from:", src)
 	apps = make(target.Portals[target.App])
 	tmp := src
 	if src, _ = a.GetPath(src); src == "" {
 		src = tmp
 	}
-	log.Println("resolving app path:", src)
 
 	if apps, err = a.ByPath(src); err != nil {
 		err = fmt.Errorf("apps.Finder cannot resolve app by path %v", src)
 		return
 	}
-	log.Println("resolved apps from:", src, apps)
 	return
 }
 

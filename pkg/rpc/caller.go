@@ -1,7 +1,6 @@
 package rpc
 
 import (
-	"log"
 	"math"
 	"reflect"
 )
@@ -104,7 +103,6 @@ func (c *Caller) decodeIn(args ByteScannerReader) (values []reflect.Value, err e
 		last := values[lastIndex]
 		values = values[:lastIndex]
 		variadicStartsAt = lastIndex
-		log.Println("last", last, "type", last.Type(), last.Type().Elem())
 		typ := last.Type().Elem()
 		buffer := 20
 		for i := 0; i < buffer; i++ {
@@ -127,11 +125,7 @@ func (c *Caller) decodeIn(args ByteScannerReader) (values []reflect.Value, err e
 			values = values[0:i]
 			break
 		}
-		log.Println(values[i])
 	}
-	//for i, a := range decoded {
-	//	log.Println(i, a, a == nil, reflect.ValueOf(a).Elem().IsZero())
-	//}
 	return
 }
 

@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/astrald/auth/id"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
-	"log"
 	"time"
 )
 
@@ -12,7 +12,6 @@ func main() {
 
 	// register service
 	ctx, cancel := context.WithCancel(context.Background())
-
 	srv := NewApiService()
 	app := rpc.NewApp("testApi")
 	app.Routes(
@@ -21,13 +20,14 @@ func main() {
 		//"method1",
 	)
 	app.Interface(srv)
-	app.Logger(log.New(log.Writer(), "service ", 0))
+	//app.Logger(log.New(log.Writer(), "service ", 0))
 	//rpc.Func("method", srv.Method)
 	//rpc.Func("method1", srv.Method1)
 	//rpc.Func("method2", srv.Method2)
 	//rpc.Func("method2B", srv.Method2B)
 	//rpc.Func("methodC", srv.MethodC
 	//rpc.Func("method2S", srv.Method2S)
+	plog.New().Type(srv).Set(&ctx)
 	if err := app.Run(ctx); err != nil {
 		panic(err)
 	}
@@ -40,7 +40,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	rpcConn.Logger(log.New(log.Writer(), " client ", 0))
+	rpcConn.Logger(plog.New().Scope("client"))
 
 	// case
 	if _, err = rpc.Query[[]string](rpcConn, "api"); err != nil {

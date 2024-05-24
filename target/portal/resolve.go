@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/source"
-	"log"
 )
 
 type Resolver[T target.Portal] struct {
@@ -24,7 +23,6 @@ func NewResolver[T target.Portal](
 
 func (f Resolver[T]) ById(id string) (t T, err error) {
 	for _, t = range source.List[T](f.resolve, f.source) {
-		log.Println(t.Abs(), t.Manifest())
 		m := t.Manifest()
 		if id == m.Name || id == m.Package {
 			return

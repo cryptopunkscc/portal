@@ -7,7 +7,6 @@ import (
 	"github.com/cryptopunkscc/astrald/sig"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/target"
-	"log"
 	"strings"
 	"time"
 )
@@ -43,18 +42,18 @@ func (inv *Invoker) Query(identity string, query string) (data string, err error
 				err = fmt.Errorf("Invoker.Query %s service not available: %v", query, err)
 				return data, err
 			} else if err == nil {
-				log.Println("invoked app for:", query)
+				inv.log.Println("invoked app for:", query)
 			}
 		}
 
-		data, err = exec.RetryT[string](8188*time.Millisecond, func(i, n int, d time.Duration) (string, error) {
+		data, err = exec.RetryT[string](inv.ctx, 8188*time.Millisecond, func(i, n int, d time.Duration) (string, error) {
 			if i == 0 {
 				return data, err
 			}
 			return inv.Adapter.Query(identity, query)
 		})
 		if err == nil {
-			log.Println("query succeed")
+			inv.log.Println("query succeed")
 			return
 		}
 	}
@@ -71,7 +70,7 @@ func (inv *Invoker) invokeApp(query string) (err error) {
 
 	go func() {
 		if err := inv.invoke(inv.ctx, src); err != nil {
-			log.Println("Invoker.invokeApp:", err)
+			inv.log.Println("Invoker.invokeApp:", err)
 		}
 		inv.processes.Delete(src)
 	}()

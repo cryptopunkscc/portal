@@ -6,7 +6,6 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/target/apps"
 	"github.com/cryptopunkscc/go-astral-js/target/sources"
 	"io/fs"
-	"log"
 	"strings"
 )
 
@@ -38,10 +37,6 @@ func (p Finder) find(src string) (portals target.Portals[target.Portal], err err
 		for s, t := range projects {
 			portals[s] = t
 		}
-	}
-
-	for s, pp := range portals {
-		log.Println("*", pp.Abs(), s)
 	}
 
 	if len(portals) > 0 {

@@ -3,6 +3,7 @@ package plog
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 const DefaultTimeFormat = "2006-01-02 15:04:05.000000"
@@ -17,25 +18,34 @@ var DefaultOutput Output = func(log Log) {
 }
 
 type Formatter struct {
-	format string
-	time   string
-	level  string
+	format    string
+	time      string
+	level     string
+	scopeSize int
 }
 
 func NewFormatter(format, time, level string) *Formatter {
-	return &Formatter{format, time, level}
+	return &Formatter{format: format, time: time, level: level}
 }
 
-func (f Formatter) Bytes(l Log) []byte {
+func (f *Formatter) Bytes(l Log) []byte {
 	return []byte(f.String(l))
 }
 
-func (f Formatter) String(l Log) (line string) {
+func (f *Formatter) String(l Log) (line string) {
+	scopes := strings.Join(l.Scopes, ">")
+	//scopesSize := len(scopes)
+	//if scopesSize > f.scopeSize {
+	//	f.scopeSize = scopesSize
+	//} else {
+	//	scopes += strings.Repeat(" ", f.scopeSize-scopesSize)
+	//}
+
 	line = fmt.Sprintf(f.format,
 		l.Time.Format(f.time),
 		l.Pid,
 		f.level[l.Level],
-		l.Scopes,
+		"|"+scopes+"|",
 		l.Message,
 	)
 	if l.Level <= Fatal {

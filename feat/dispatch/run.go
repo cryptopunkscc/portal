@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"os"
@@ -27,6 +28,7 @@ func (f Feat) Run(
 	src string,
 	_ ...string,
 ) (err error) {
+	plog.Get(ctx).Type(f).Set(&ctx)
 
 	if err = f.queryOpen(ctx, src); err == nil {
 		return
@@ -36,7 +38,7 @@ func (f Feat) Run(
 		return
 	}
 
-	if err = exec.Retry(8*time.Second, func(i int, n int, duration time.Duration) error {
+	if err = exec.Retry(ctx, 8*time.Second, func(i int, n int, duration time.Duration) error {
 		return f.queryOpen(ctx, src)
 	}); err != nil {
 		return
@@ -46,6 +48,7 @@ func (f Feat) Run(
 }
 
 func (f Feat) queryOpen(ctx context.Context, src string) (err error) {
+	plog.Get(ctx).D().Println("query", src)
 	port := strings.Join(append(f.prefix, "portal.open"), ".")
 	var conn rpc.Conn
 	if conn, err = rpc.QueryFlow(id.Anyone, port); err != nil {

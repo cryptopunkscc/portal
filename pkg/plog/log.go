@@ -27,7 +27,7 @@ type Output func(Log)
 type Log struct {
 	Level   Level
 	Pid     int
-	Scopes  []any
+	Scopes  []string
 	Time    time.Time
 	Message string
 	Stack   []byte

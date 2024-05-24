@@ -4,15 +4,15 @@ import (
 	"context"
 	"errors"
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/apps"
 	"io"
-	"log"
 )
 
 func Observe(ctx context.Context, conn rpc.Conn) (err error) {
-	log.Println("Observing...")
+	plog.Get(ctx).Println("Observing...")
 	err = send(portalAppsDir, conn)
 	if err != nil {
 		return
