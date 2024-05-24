@@ -45,7 +45,7 @@ func main() {
 		resolveEmbed.Path,
 		appstore.Path,
 	)
-	findPortals := target.Cached(portals.NewFinder())(findPath)
+	findPortals := target.Cached(portals.NewFind)(findPath)
 
 	runQuery := query.NewRunner[target.Portal](prefix).Run
 	newApphost := apphost.NewFactory(runQuery, prefix)

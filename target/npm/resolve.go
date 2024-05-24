@@ -9,16 +9,16 @@ import (
 
 var ErrNotNodeModule = errors.New("not a node module")
 
-func ResolveNodeModule(m target.Source) (module target.NodeModule, err error) {
-	if m.IsFile() {
+func ResolveNodeModule(src target.Source) (nodeModule target.NodeModule, err error) {
+	if src.IsFile() {
 		return nil, ErrNotNodeModule
 	}
-	m = m.Lift()
-	pkgJson, err := loadPackageJson(m.Files())
+	src = src.Lift()
+	pkgJson, err := loadPackageJson(src.Files())
 	if err != nil {
 		return
 	}
-	module = &source{Source: m, pkgJson: &pkgJson}
+	nodeModule = &source{Source: src, pkgJson: &pkgJson}
 	return
 }
 

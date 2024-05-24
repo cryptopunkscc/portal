@@ -8,25 +8,25 @@ import (
 
 var ErrNotDist = errors.New("not a dist target")
 
-func Resolve(t target.Source) (d target.Dist, err error) {
-	if t.IsFile() {
+func Resolve(src target.Source) (dist target.Dist, err error) {
+	if src.IsFile() {
 		return nil, ErrNotDist
 	}
-	t = t.Lift()
-	if f, err := t.Files().Open(target.PackageJsonFilename); err == nil {
+	src = src.Lift()
+	if f, err := src.Files().Open(target.PackageJsonFilename); err == nil {
 		_ = f.Close()
 		return nil, ErrNotDist
 	}
-	m, err := manifest.Read(t.Files())
+	m, err := manifest.Read(src.Files())
 	if err != nil {
 		return
 	}
-	d = &source{Source: t, manifest: &m}
+	dist = &source{Source: src, manifest: &m}
 	switch {
-	case d.Type().Is(target.TypeFrontend):
-		d = &frontend{Dist: d}
-	case d.Type().Is(target.TypeBackend):
-		d = &backend{Dist: d}
+	case dist.Type().Is(target.TypeFrontend):
+		dist = &frontend{Dist: dist}
+	case dist.Type().Is(target.TypeBackend):
+		dist = &backend{Dist: dist}
 	}
 	return
 }
