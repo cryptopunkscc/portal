@@ -52,7 +52,7 @@ func (f Feat) queryOpen(ctx context.Context, src string) (err error) {
 	port := strings.Join(append(f.prefix, "portal.open"), ".")
 	var conn rpc.Conn
 	if conn, err = rpc.QueryFlow(id.Anyone, port); err != nil {
-		err = fmt.Errorf("Feat.queryOpen %s: %v", port, err)
+		err = fmt.Errorf("%s: %v", port, err)
 		return
 	}
 	err = rpc.Command(conn, "", src)

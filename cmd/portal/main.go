@@ -36,7 +36,7 @@ func main() {
 
 	wait := &sync.WaitGroup{}
 	executable := "portal"
-	findApps := createAppsFind()
+	findApps := createAppsFind(ctx)
 
 	featDispatch := dispatch.NewFeat(executable)
 	featServe := createServeFeature(wait, executable, findApps)
@@ -87,7 +87,7 @@ func createServeFeature(
 	return serve.NewFeat(runSpawn, tray.NewRunner(runSpawn))
 }
 
-func createAppsFind() target.Find[target.App] {
+func createAppsFind(ctx context.Context) target.Find[target.App] {
 	resolveEmbed := portal.NewResolver[target.App](
 		apps.Resolve[target.App](),
 		source.FromFS(embedApps.LauncherSvelteFS),
@@ -96,5 +96,5 @@ func createAppsFind() target.Find[target.App] {
 		resolveEmbed.Path,
 		appstore.Path,
 	)
-	return apps.NewFinder(findPath, embedApps.LauncherSvelteFS).Find
+	return apps.NewFinder(ctx, findPath, embedApps.LauncherSvelteFS).Find
 }

@@ -28,7 +28,10 @@ func New() Logger {
 const key = "plog"
 
 func Get(ctx context.Context) Logger {
-	return ctx.Value(key).(Logger)
+	if l, ok := ctx.Value(key).(Logger); ok {
+		return l
+	}
+	return New().Scope("detached")
 }
 
 func (l logger) Set(ctx *context.Context) Logger {
