@@ -50,6 +50,7 @@ func main() {
 	cli.List(featApps.List)
 	cli.Install(featApps.Install)
 	cli.Uninstall(featApps.Uninstall)
+	cli.Apps(findApps)
 
 	err := cli.Run()
 	cancel()
@@ -96,5 +97,6 @@ func createAppsFind() target.Find[target.App] {
 		resolveEmbed.Path,
 		appstore.Path,
 	)
-	return apps.NewFinder(findPath, embedApps.LauncherSvelteFS).Find
+
+	return target.Cached(apps.NewFind)(findPath, embedApps.LauncherSvelteFS)
 }

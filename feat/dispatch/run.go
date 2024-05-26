@@ -26,11 +26,13 @@ func NewFeat(executable string, prefix ...string) target.Dispatch {
 func (f Feat) Run(
 	ctx context.Context,
 	src string,
-	_ ...string,
+	args ...string,
 ) (err error) {
 	plog.Get(ctx).Type(f).Set(&ctx)
 
-	if err = f.queryOpen(ctx, src); err == nil {
+	typ := target.ParseType(target.TypeFrontend, args...)
+
+	if err = f.queryOpen(ctx, src, typ); err == nil {
 		return
 	}
 
@@ -39,7 +41,7 @@ func (f Feat) Run(
 	}
 
 	if err = exec.Retry(ctx, 8*time.Second, func(i int, n int, duration time.Duration) error {
-		return f.queryOpen(ctx, src)
+		return f.queryOpen(ctx, src, typ)
 	}); err != nil {
 		return
 	}
@@ -47,15 +49,17 @@ func (f Feat) Run(
 	return
 }
 
-func (f Feat) queryOpen(ctx context.Context, src string) (err error) {
-	plog.Get(ctx).D().Println("query", src)
+func (f Feat) queryOpen(ctx context.Context, src string, typ target.Type) (err error) {
+	log := plog.Get(ctx).D()
+	log.Println("query", src)
 	port := strings.Join(append(f.prefix, "portal.open"), ".")
 	var conn rpc.Conn
 	if conn, err = rpc.QueryFlow(id.Anyone, port); err != nil {
 		err = fmt.Errorf("%s: %v", port, err)
 		return
 	}
-	err = rpc.Command(conn, "", src)
+	conn.Logger(log)
+	err = rpc.Command(conn, "", src, fmt.Sprintf("%d", typ))
 	if err != nil {
 		return
 

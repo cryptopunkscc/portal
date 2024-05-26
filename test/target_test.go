@@ -7,6 +7,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/target/npm"
 	"github.com/cryptopunkscc/go-astral-js/target/project"
 	"github.com/cryptopunkscc/go-astral-js/target/source"
+	"github.com/stretchr/testify/assert"
 	"log"
 	"reflect"
 	"testing"
@@ -28,4 +29,8 @@ func Test__target_Any__test_assets(t *testing.T) {
 
 func PrintTarget(t target.Source) {
 	log.Println(reflect.TypeOf(t), t.Path(), t.Abs())
+}
+
+func Test__target_Type(t *testing.T) {
+	assert.True(t, target.TypeFrontend.Is(target.TypeAny))
 }

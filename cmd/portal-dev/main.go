@@ -69,7 +69,7 @@ func main() {
 	cli.Open(featOpen)
 	cli.Create(create.List, featCreate)
 	cli.Build(featBuild)
-	cli.Apps()
+	cli.Portals(findPortals)
 
 	err := cli.Run()
 	if err != nil {
