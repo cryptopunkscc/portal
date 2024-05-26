@@ -36,11 +36,14 @@ func main() {
 
 	wait := &sync.WaitGroup{}
 	executable := "portal"
+	port := "portal"
+	portOpen := "portal.open"
 	findApps := createAppsFind()
+	runQuery := query.NewRunner[target.App](portOpen).Run
 
-	featDispatch := dispatch.NewFeat(executable)
-	featServe := createServeFeature(wait, executable, findApps)
-	featOpen := createOpenFeature(findApps)
+	featDispatch := dispatch.NewFeat(executable, runQuery)
+	featServe := createServeFeature(wait, executable, port, findApps)
+	featOpen := createOpenFeature(runQuery, findApps)
 
 	cli := clir.NewCli(ctx, manifest.Name, manifest.Description, version.Run)
 
@@ -65,10 +68,10 @@ type Adapter struct{ target.Api }
 func NewAdapter(api target.Api) target.Api { return &Adapter{Api: api} }
 
 func createOpenFeature(
+	queryOpen target.Dispatch,
 	findApps target.Find[target.App],
 ) target.Dispatch {
-	runQuery := query.NewRunner[target.App]().Run
-	newApphost := apphost.NewFactory(runQuery)
+	newApphost := apphost.NewFactory(queryOpen)
 	newApi := target.ApiFactory(NewAdapter,
 		newApphost.NewAdapter,
 		newApphost.WithTimeout,
@@ -81,11 +84,12 @@ func createOpenFeature(
 func createServeFeature(
 	wait *sync.WaitGroup,
 	executable string,
+	port string,
 	findApps target.Find[target.App],
 ) func(context.Context, bool) error {
 	runProc := exec.NewRun[target.App](executable)
 	runSpawn := spawn.NewRunner(wait, findApps, runProc).Run
-	return serve.NewFeat(runSpawn, tray.New(runSpawn))
+	return serve.NewFeat(port, runSpawn, tray.New(runSpawn))
 }
 
 func createAppsFind() target.Find[target.App] {
