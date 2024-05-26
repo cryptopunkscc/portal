@@ -7,27 +7,25 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	"github.com/cryptopunkscc/go-astral-js/target"
-	"strings"
 )
 
-const port = "portal.open"
-
 type Runner[T target.Portal] struct {
-	prefix []string
+	port string
 }
 
-func NewRunner[T target.Portal](prefix ...string) *Runner[T] {
-	return &Runner[T]{prefix: prefix}
+func NewRunner[T target.Portal](port string) *Runner[T] {
+	return &Runner[T]{port: port}
 }
 
-func (r Runner[T]) Run(ctx context.Context, src string, _ ...string) (err error) {
-	srv := strings.Join(append(r.prefix, port), ".")
-	flow, err := rpc.QueryFlow(id.Anyone, srv)
+func (r Runner[T]) Run(ctx context.Context, src string, args ...string) (err error) {
+	flow, err := rpc.QueryFlow(id.Anyone, r.port)
 	if err != nil {
 		return err
 	}
 	defer flow.Close()
-	err = rpc.Command(flow, "", src)
+	typ := target.ParseType(target.TypeAny, args...)
+	sTyp := fmt.Sprintf("%d", typ)
+	err = rpc.Command(flow, "", src, sTyp)
 	if err != nil {
 		plog.Get(ctx).Type(r).E().Printf("cannot query %s: %v", src, err)
 		return fmt.Errorf("cannot query %s: %w", src, err)

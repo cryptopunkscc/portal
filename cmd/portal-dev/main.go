@@ -34,8 +34,10 @@ func main() {
 	go osExec.OnShutdown(cancel)
 
 	wait := &sync.WaitGroup{}
-	executable := "portal-dev"
 	prefix := "dev"
+	executable := "portal-dev"
+	port := "dev.portal"
+	portOpen := "dev.portal.open"
 
 	resolveEmbed := portal.NewResolver[target.App](
 		apps.Resolve[target.App](),
@@ -47,7 +49,7 @@ func main() {
 	)
 	findPortals := target.Cached(portals.NewFind)(findPath)
 
-	runQuery := query.NewRunner[target.Portal](prefix).Run
+	runQuery := query.NewRunner[target.Portal](portOpen).Run
 	newApphost := apphost.NewFactory(runQuery, prefix)
 	newApi := target.ApiFactory(
 		NewAdapter,
@@ -58,7 +60,7 @@ func main() {
 	runProc := exec.NewRun[target.Portal](executable)
 	runSpawn := spawn.NewRunner(wait, findPortals, runProc).Run
 
-	featDev := dev.NewFeat("dev.portal", wait, runSpawn, runQuery)
+	featDev := dev.NewFeat(port, wait, runSpawn, runQuery)
 	featOpen := open.NewFeat[target.Portal](findPortals, runDev)
 	featBuild := build.NewFeat().Run
 	featCreate := create.NewFeat().Run

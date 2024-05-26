@@ -17,7 +17,7 @@ type Feat struct {
 	serve target.Dispatch
 }
 
-func NewFeat(spawn target.Dispatch, tray target.Tray) func(context.Context, bool) error {
+func NewFeat(port string, spawn target.Dispatch, tray target.Tray) func(context.Context, bool) error {
 	handlers := rpc.Handlers{
 		"ping":      func() {},
 		"open":      spawn,
@@ -26,7 +26,7 @@ func NewFeat(spawn target.Dispatch, tray target.Tray) func(context.Context, bool
 		"uninstall": apps.Uninstall,
 	}
 	return Feat{
-		port:  "portal",
+		port:  port,
 		tray:  tray,
 		serve: serve.NewRunner(handlers).Run,
 	}.Run
