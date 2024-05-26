@@ -4,21 +4,6 @@ import (
 	"io/fs"
 )
 
-type Type int
-
-func (t Type) Is(p Type) bool {
-	return t&p == p
-}
-
-const (
-	TypeNone     = Type(0x0)
-	TypeBackend  = Type(0x1)
-	TypeFrontend = Type(0x2)
-	TypeDev      = Type(0x4)
-	TypeBundle   = Type(0x8)
-	TypeAll      = TypeBackend | TypeFrontend | TypeDev | TypeBundle
-)
-
 type Source interface {
 	Abs() string
 	Path() string

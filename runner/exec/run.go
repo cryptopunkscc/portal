@@ -10,13 +10,13 @@ import (
 )
 
 func NewRun[T target.Portal](executable string, filter ...target.Type) target.Run[T] {
-	t := target.TypeNone
+	t := target.TypeAny
 	for _, f := range filter {
 		t += f
 	}
 	return func(ctx context.Context, src T) (err error) {
 		log := plog.Get(ctx).Scope("exec.Runner").Set(&ctx)
-		if t != target.TypeNone && !src.Type().Is(t) {
+		if !src.Type().Is(t) {
 			log.F().Println(src.Abs(), target.ErrNotTarget)
 			return target.ErrNotTarget
 		}

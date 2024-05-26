@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-func (c Cli) Apps(
-	find target.Find[target.App],
+func (c Cli) Portals(
+	find target.Find[target.Portal],
 ) {
 	flags := struct {
 		Path string `pos:"1" default:"."`

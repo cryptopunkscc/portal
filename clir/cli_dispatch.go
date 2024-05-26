@@ -6,7 +6,8 @@ import (
 
 func (c Cli) Dispatch(handle target.Dispatch) {
 	flags := &struct {
-		Src string `pos:"1" default:""`
+		Src  string `pos:"1" default:""`
+		Type int    `pos:"2" default:""`
 	}{}
 	f := func() error {
 		return handle(c.ctx, flags.Src)

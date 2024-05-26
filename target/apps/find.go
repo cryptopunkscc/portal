@@ -10,6 +10,13 @@ import (
 	"io/fs"
 )
 
+func NewFind(
+	getPath target.Path,
+	files ...fs.FS,
+) target.Find[target.App] {
+	return NewFinder(getPath, files...).Find
+}
+
 func NewFinder(
 	getPath target.Path,
 	files ...fs.FS,
@@ -29,10 +36,9 @@ type Finder struct {
 func (a Finder) Find(ctx context.Context, src string) (apps target.Portals[target.App], err error) {
 	log := plog.Get(ctx).Type(a).Set(&ctx)
 	apps = make(target.Portals[target.App])
-	tmp := src
-	if src, _ = a.GetPath(src); src == "" {
-		src = tmp
-		log.Println("cannot resolve path for:", src)
+	if p, _ := a.GetPath(src); p != "" {
+		src = p
+		log.Println("resolved path for:", src)
 	}
 
 	if apps, err = a.ByPath(ctx, src); err != nil {

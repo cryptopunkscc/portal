@@ -25,7 +25,8 @@ func NewRunner[T target.Portal](
 	}
 }
 
-func (r Runner[T]) Run(ctx context.Context, src string, _ ...string) (err error) {
+func (r Runner[T]) Run(ctx context.Context, src string, args ...string) (err error) {
+	typ := target.ParseType(target.TypeAny, args...)
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	portals, err := r.find(ctx, src)
 	log.D().Printf("found %d portals for %s", len(portals), src)
@@ -33,6 +34,9 @@ func (r Runner[T]) Run(ctx context.Context, src string, _ ...string) (err error)
 		return
 	}
 	for _, t := range portals {
+		if !t.Type().Is(typ) {
+			continue
+		}
 		r.wait.Add(1)
 		go func(t T) {
 			defer r.wait.Done()
