@@ -37,9 +37,7 @@ type Scope[T target.Portal] struct {
 	DispatchTarget  target.Dispatch
 	DispatchService target.Dispatch
 
-	FeatObserve   func(ctx context.Context, conn rpc.Conn) (err error)
-	FeatInstall   func(src string) error
-	FeatUninstall func(src string) error
+	FeatObserve func(ctx context.Context, conn rpc.Conn) (err error)
 
 	// auto dependencies
 	TargetFind   target.Find[T]

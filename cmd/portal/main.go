@@ -7,7 +7,7 @@ import (
 	feature "github.com/cryptopunkscc/go-astral-js/feat"
 	featApps "github.com/cryptopunkscc/go-astral-js/feat/apps"
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
-	osexec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
+	osExec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	"github.com/cryptopunkscc/go-astral-js/runner/app"
@@ -23,7 +23,7 @@ import (
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
-	go osexec.OnShutdown(cancel)
+	go osExec.OnShutdown(cancel)
 
 	println("...")
 	log := plog.New().I().Set(&ctx).Scope("main")
@@ -42,8 +42,6 @@ func main() {
 		TargetFinder:    apps.NewFind,
 		GetPath:         featApps.Path,
 		FeatObserve:     featApps.Observe,
-		FeatInstall:     featApps.Install,
-		FeatUninstall:   featApps.Uninstall,
 		DispatchTarget:  query.NewRunner[target.App]("portal.open").Run,
 		DispatchService: exec.NewService("portal").Run,
 	}
@@ -56,16 +54,15 @@ func main() {
 	cli.Dispatch(scope.GetDispatchFeature())
 	cli.Serve(scope.GetServeFeature().Run)
 	cli.Open(scope.GetOpenFeature())
-	cli.Install(scope.FeatInstall)
-	cli.Uninstall(scope.FeatUninstall)
 	cli.Apps(scope.GetTargetFind())
+	cli.Install(featApps.Install)
+	cli.Uninstall(featApps.Uninstall)
 	cli.List(featApps.List)
 
-	err := cli.Run()
-	cancel()
-	if err != nil {
+	if err := cli.Run(); err != nil {
 		log.Println(err)
 	}
+	cancel()
 	scope.WaitGroup.Wait()
 }
 

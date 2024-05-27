@@ -11,7 +11,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
 	osExec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
-	devRunner "github.com/cryptopunkscc/go-astral-js/runner/dev"
+	"github.com/cryptopunkscc/go-astral-js/runner/dev"
 	"github.com/cryptopunkscc/go-astral-js/runner/exec"
 	"github.com/cryptopunkscc/go-astral-js/runner/query"
 	"github.com/cryptopunkscc/go-astral-js/runner/service"
@@ -36,7 +36,7 @@ func main() {
 		WrapApi:        NewAdapter,
 		WaitGroup:      &sync.WaitGroup{},
 		TargetCache:    target.NewCache[target.Portal](),
-		NewRunTarget:   devRunner.NewRun,
+		NewRunTarget:   dev.NewRun,
 		NewRunService:  service.NewRun,
 		TargetFinder:   portals.NewFind,
 		ExecTarget:     exec.NewRun[target.Portal]("portal-dev"),
@@ -53,10 +53,10 @@ func main() {
 	cli.Build(build.NewFeat().Run)
 	cli.Portals(scope.GetTargetFind())
 
-	err := cli.Run()
-	if err != nil {
+	if err := cli.Run(); err != nil {
 		log.Println(err)
 	}
+	cancel()
 	scope.WaitGroup.Wait()
 }
 
