@@ -7,12 +7,11 @@ import (
 	"sync"
 )
 
-func Cached[T Portal](finder Finder[T]) Finder[T] {
-	store := newCache[T]()
+func (finder Finder[T]) Cached(c *Cache[T]) Finder[T] {
 	return func(resolve Path, files ...fs.FS) Find[T] {
 		resolveCached := func(src string) (path string, err error) {
 			// try resolve from cache
-			if portal, ok := store.Get(src); ok {
+			if portal, ok := c.Get(src); ok {
 				return portal.Abs(), err
 			}
 
@@ -25,23 +24,23 @@ func Cached[T Portal](finder Finder[T]) Finder[T] {
 		return func(ctx context.Context, src string) (portals Portals[T], err error) {
 			portals, err = find(ctx, src)
 			if err == nil {
-				store.Add(portals)
+				c.Add(portals)
 			}
 			return
 		}
 	}
 }
 
-type cache[T Portal] struct {
+type Cache[T Portal] struct {
 	portals Portals[T]
 	mu      sync.Mutex
 }
 
-func newCache[T Portal]() *cache[T] {
-	return &cache[T]{portals: make(Portals[T])}
+func NewCache[T Portal]() *Cache[T] {
+	return &Cache[T]{portals: make(Portals[T])}
 }
 
-func (c *cache[T]) Add(portals Portals[T]) {
+func (c *Cache[T]) Add(portals Portals[T]) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	for s, portal := range portals {
@@ -50,7 +49,7 @@ func (c *cache[T]) Add(portals Portals[T]) {
 	log.Println("added to cache:", c.portals)
 }
 
-func (c *cache[T]) Get(src string) (portal Portal, ok bool) {
+func (c *Cache[T]) Get(src string) (portal Portal, ok bool) {
 	defer func() {
 		log.Println("get from cache:", src, ok, portal, c.portals)
 	}()

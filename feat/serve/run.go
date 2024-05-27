@@ -4,10 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/astrald/auth/id"
-	"github.com/cryptopunkscc/go-astral-js/feat/apps"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
-	"github.com/cryptopunkscc/go-astral-js/runner/serve"
 	"github.com/cryptopunkscc/go-astral-js/target"
 )
 
@@ -17,18 +15,33 @@ type Feat struct {
 	serve target.Dispatch
 }
 
-func NewFeat(port string, spawn target.Dispatch, tray target.Tray) func(context.Context, bool) error {
+type (
+	Observe   func(ctx context.Context, conn rpc.Conn) (err error)
+	Install   func(src string) error
+	Uninstall func(id string) error
+	Service   func(handlers rpc.Handlers) target.Dispatch
+)
+
+func NewFeat(
+	port string,
+	spawn target.Dispatch,
+	tray target.Tray,
+	service Service,
+	observe Observe,
+	install Install,
+	uninstall Uninstall,
+) func(context.Context, bool) error {
 	handlers := rpc.Handlers{
 		"ping":      func() {},
 		"open":      spawn,
-		"observe":   apps.Observe,
-		"install":   apps.Install,
-		"uninstall": apps.Uninstall,
+		"observe":   observe,
+		"install":   install,
+		"uninstall": uninstall,
 	}
 	return Feat{
 		port:  port,
 		tray:  tray,
-		serve: serve.NewRunner(handlers).Run,
+		serve: service(handlers),
 	}.Run
 }
 

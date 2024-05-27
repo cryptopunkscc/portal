@@ -5,7 +5,12 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
+	"github.com/cryptopunkscc/go-astral-js/target"
 )
+
+func NewRun(handlers rpc.Handlers) target.Dispatch {
+	return NewRunner(handlers).Run
+}
 
 type Runner struct {
 	handlers rpc.Handlers
