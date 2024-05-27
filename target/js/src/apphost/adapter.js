@@ -2,7 +2,7 @@ import {bindings} from "../bindings";
 
 // ================== Object oriented adapter ==================
 
-export class AppHostClient {
+export class ApphostClient {
   async register(service) {
     await bindings.astral_service_register(service)
     return new AppHostListener(service)
