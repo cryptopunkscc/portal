@@ -3,15 +3,17 @@ package main
 import (
 	"context"
 	manifest "github.com/cryptopunkscc/go-astral-js"
+	"github.com/cryptopunkscc/go-astral-js/builder"
 	"github.com/cryptopunkscc/go-astral-js/clir"
-	"github.com/cryptopunkscc/go-astral-js/deps/dispatch"
-	"github.com/cryptopunkscc/go-astral-js/deps/find"
-	"github.com/cryptopunkscc/go-astral-js/deps/open"
-	"github.com/cryptopunkscc/go-astral-js/deps/serve"
 	featApps "github.com/cryptopunkscc/go-astral-js/feat/apps"
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
 	osexec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
+	"github.com/cryptopunkscc/go-astral-js/runner/app"
+	"github.com/cryptopunkscc/go-astral-js/runner/exec"
+	"github.com/cryptopunkscc/go-astral-js/runner/query"
+	"github.com/cryptopunkscc/go-astral-js/runner/serve"
+	"github.com/cryptopunkscc/go-astral-js/runner/tray"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/apps"
 	"os"
@@ -26,30 +28,39 @@ func main() {
 	log := plog.New().I().Set(&ctx)
 	log.Scope("main").Println("starting portal", os.Args)
 
-	executable := "portal"
-	port := "portal"
-	portOpen := "portal.open"
-	wait := &sync.WaitGroup{}
-	targetCache := target.NewCache[target.App]()
-	findApps := find.Create(targetCache, apps.NewFind)
-	featDispatch := dispatch.Create(executable, portOpen)
-	featServe := serve.Create(wait, executable, port, findApps)
-	featOpen := open.Create(portOpen, NewAdapter, findApps)
+	scope := builder.Scope[target.App]{
+		Port:            "portal",
+		WrapApi:         NewAdapter,
+		WaitGroup:       &sync.WaitGroup{},
+		TargetCache:     target.NewCache[target.App](),
+		NewTargetRun:    app.NewRun,
+		NewTray:         tray.New,
+		NewServe:        serve.NewRun,
+		TargetFinder:    apps.NewFind,
+		ExecTarget:      exec.NewRun[target.App]("portal"),
+		AppsPath:        featApps.Path,
+		FeatObserve:     featApps.Observe,
+		FeatInstall:     featApps.Install,
+		FeatUninstall:   featApps.Uninstall,
+		DispatchTarget:  query.NewRunner[target.App]("portal.open").Run,
+		DispatchService: exec.NewService("portal").Run,
+	}
+
 	cli := clir.NewCli(ctx, manifest.Name, manifest.Description, version.Run)
-	cli.Dispatch(featDispatch)
-	cli.Serve(featServe)
-	cli.Open(featOpen)
+	cli.Dispatch(scope.GetDispatchFeature())
+	cli.Serve(scope.GetServeFeature())
+	cli.Open(scope.GetOpenFeature())
+	cli.Install(scope.FeatInstall)
+	cli.Uninstall(scope.FeatUninstall)
+	cli.Apps(scope.GetTargetFind())
 	cli.List(featApps.List)
-	cli.Install(featApps.Install)
-	cli.Uninstall(featApps.Uninstall)
-	cli.Apps(findApps)
 
 	err := cli.Run()
 	cancel()
 	if err != nil {
 		log.Println(err)
 	}
-	wait.Wait()
+	scope.WaitGroup.Wait()
 }
 
 type Adapter struct{ target.Api }
