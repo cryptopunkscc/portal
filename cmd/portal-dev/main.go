@@ -3,82 +3,71 @@ package main
 import (
 	"context"
 	manifest "github.com/cryptopunkscc/go-astral-js"
-	embedApps "github.com/cryptopunkscc/go-astral-js/apps"
+	"github.com/cryptopunkscc/go-astral-js/builder"
 	"github.com/cryptopunkscc/go-astral-js/clir"
+	featApps "github.com/cryptopunkscc/go-astral-js/feat/apps"
 	"github.com/cryptopunkscc/go-astral-js/feat/build"
 	"github.com/cryptopunkscc/go-astral-js/feat/create"
-	"github.com/cryptopunkscc/go-astral-js/feat/dev"
-	"github.com/cryptopunkscc/go-astral-js/feat/open"
+	serve2 "github.com/cryptopunkscc/go-astral-js/feat/serve"
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
-	"github.com/cryptopunkscc/go-astral-js/mock/appstore"
 	osExec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	devRunner "github.com/cryptopunkscc/go-astral-js/runner/dev"
 	"github.com/cryptopunkscc/go-astral-js/runner/exec"
 	"github.com/cryptopunkscc/go-astral-js/runner/query"
-	"github.com/cryptopunkscc/go-astral-js/runner/spawn"
+	"github.com/cryptopunkscc/go-astral-js/runner/serve"
 	"github.com/cryptopunkscc/go-astral-js/target"
-	"github.com/cryptopunkscc/go-astral-js/target/apphost"
-	"github.com/cryptopunkscc/go-astral-js/target/apps"
-	"github.com/cryptopunkscc/go-astral-js/target/portal"
 	"github.com/cryptopunkscc/go-astral-js/target/portals"
-	"github.com/cryptopunkscc/go-astral-js/target/source"
 	"os"
 	"sync"
 )
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
-	log := plog.New().D().Scope("dev").Set(&ctx)
-	log.Println("starting portal development", os.Args)
 	go osExec.OnShutdown(cancel)
 
-	wait := &sync.WaitGroup{}
-	prefix := "dev"
-	executable := "portal-dev"
-	port := "dev.portal"
-	portOpen := "dev.portal.open"
+	println("...")
+	log := plog.New().D().Scope("dev").Set(&ctx)
+	log.Println("starting portal development", os.Args)
+	defer log.Println("closing portal development")
 
-	resolveEmbed := portal.NewResolver[target.App](
-		apps.Resolve[target.App](),
-		source.FromFS(embedApps.LauncherSvelteFS),
-	)
-	findPath := target.Mapper[string, string](
-		resolveEmbed.Path,
-		appstore.Path,
-	)
-	findPortals := portals.Finder.Cached(target.NewCache[target.Portal]())(findPath)
+	scope := builder.Scope[target.Portal]{
+		Port:           "dev.portal",
+		Prefix:         []string{"dev"},
+		WrapApi:        NewAdapter,
+		WaitGroup:      &sync.WaitGroup{},
+		TargetCache:    target.NewCache[target.Portal](),
+		NewTargetRun:   devRunner.NewRun,
+		NewServe:       serve.NewRun,
+		TargetFinder:   portals.NewFind,
+		ExecTarget:     exec.NewRun[target.Portal]("portal-dev"),
+		AppsPath:       featApps.Path,
+		FeatObserve:    featApps.Observe,
+		DispatchTarget: query.NewRunner[target.App]("dev.portal.open").Run,
+	}
 
-	runQuery := query.NewRunner[target.Portal](portOpen).Run
-	newApphost := apphost.NewFactory(runQuery, prefix)
-	newApi := target.ApiFactory(
-		NewAdapter,
-		newApphost.NewAdapter,
-		newApphost.WithTimeout,
-	)
-	runDev := devRunner.NewRun(newApi)
-	runProc := exec.NewRun[target.Portal](executable)
-	runSpawn := spawn.NewRunner(wait, findPortals, runProc).Run
-
-	featDev := dev.NewFeat(port, wait, runSpawn, runQuery)
-	featOpen := open.NewFeat[target.Portal](findPortals, runDev)
-	featBuild := build.NewFeat().Run
-	featCreate := create.NewFeat().Run
+	scope.DispatchService = func(ctx context.Context, _ string, _ ...string) (err error) {
+		srv := scope.GetServeFeature()
+		go func() {
+			if err = srv(ctx, false); err != nil {
+				plog.Get(ctx).Type(serve2.Feat{}).Println(err)
+			}
+		}()
+		return
+	}
 
 	cli := clir.NewCli(ctx, manifest.NameDev, manifest.DescriptionDev, version.Run)
-
-	cli.Dev(featDev)
-	cli.Open(featOpen)
-	cli.Create(create.List, featCreate)
-	cli.Build(featBuild)
-	cli.Portals(findPortals)
+	cli.Dev(scope.GetDispatchFeature())
+	cli.Open(scope.GetOpenFeature())
+	cli.Create(create.List, create.NewFeat().Run)
+	cli.Build(build.NewFeat().Run)
+	cli.Portals(scope.GetTargetFind())
 
 	err := cli.Run()
 	if err != nil {
 		log.Println(err)
 	}
-	wait.Wait()
-	log.Println("closing portal development")
+	scope.WaitGroup.Wait()
 }
 
 type Adapter struct{ target.Api }

@@ -9,6 +9,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
 	osexec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
+	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	"github.com/cryptopunkscc/go-astral-js/runner/app"
 	"github.com/cryptopunkscc/go-astral-js/runner/exec"
 	"github.com/cryptopunkscc/go-astral-js/runner/query"
@@ -25,8 +26,9 @@ func main() {
 	go osexec.OnShutdown(cancel)
 
 	println("...")
-	log := plog.New().I().Set(&ctx)
-	log.Scope("main").Println("starting portal", os.Args)
+	log := plog.New().I().Set(&ctx).Scope("main")
+	log.Println("starting portal", os.Args)
+	defer log.Println("closing portal")
 
 	scope := builder.Scope[target.App]{
 		Port:            "portal",
@@ -44,6 +46,10 @@ func main() {
 		FeatUninstall:   featApps.Uninstall,
 		DispatchTarget:  query.NewRunner[target.App]("portal.open").Run,
 		DispatchService: exec.NewService("portal").Run,
+	}
+	scope.RpcHandlers = rpc.Handlers{
+		"install":   featApps.Install,
+		"uninstall": featApps.Uninstall,
 	}
 
 	cli := clir.NewCli(ctx, manifest.Name, manifest.Description, version.Run)

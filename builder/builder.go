@@ -23,6 +23,7 @@ type Scope[T target.Portal] struct {
 	Port        string
 	WaitGroup   *sync.WaitGroup
 	TargetCache *target.Cache[T]
+	RpcHandlers rpc.Handlers
 
 	WrapApi      func(target.Api) target.Api
 	NewTargetRun func(target.NewApi) target.Run[T]
@@ -72,16 +73,21 @@ func (s *Scope[T]) GetTargetFind() target.Find[T] {
 }
 
 func (s *Scope[T]) GetServeFeature() func(context.Context, bool) error {
-
 	runSpawn := spawn.NewRunner(s.GetWait(), s.GetTargetFind(), s.GetExecTarget()).Run
+	runTray := target.Tray(nil)
+	if s.NewTray != nil {
+		runTray = s.NewTray(runSpawn)
+	}
+	if s.RpcHandlers == nil {
+		s.RpcHandlers = rpc.Handlers{}
+	}
 	return serve.NewFeat(
 		assert(s.Port),
-		assert(runSpawn),
-		s.NewTray(runSpawn),
 		assert(s.NewServe),
+		assert(s.RpcHandlers),
+		assert(runSpawn),
 		assert(s.FeatObserve),
-		assert(s.FeatInstall),
-		assert(s.FeatUninstall),
+		runTray,
 	)
 }
 
