@@ -5,20 +5,21 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/target"
-	"os"
-	osexec "os/exec"
 	"time"
 )
 
 type Feat struct {
-	dispatch   target.Dispatch
-	executable string
+	runTarget  target.Dispatch
+	runService target.Dispatch
 }
 
-func NewFeat(executable string, dispatch target.Dispatch) target.Dispatch {
+func NewFeat(
+	runTarget target.Dispatch,
+	runService target.Dispatch,
+) target.Dispatch {
 	return Feat{
-		dispatch:   dispatch,
-		executable: executable,
+		runTarget:  runTarget,
+		runService: runService,
 	}.Run
 }
 
@@ -29,26 +30,19 @@ func (f Feat) Run(
 ) (err error) {
 	plog.Get(ctx).Type(f).Set(&ctx)
 
-	if err = f.dispatch(ctx, src, args...); err == nil {
+	if err = f.runTarget(ctx, src, args...); err == nil {
 		return
 	}
 
-	if err = f.portalServe(ctx); err != nil {
+	if err = f.runService(ctx, "s", "-t"); err != nil {
 		return
 	}
 
 	if err = exec.Retry(ctx, 8*time.Second, func(i int, n int, duration time.Duration) error {
-		return f.dispatch(ctx, src, args...)
+		return f.runTarget(ctx, src, args...)
 	}); err != nil {
 		return
 	}
 
 	return
-}
-
-func (f Feat) portalServe(ctx context.Context) (err error) {
-	c := osexec.CommandContext(ctx, f.executable, "s", "-t")
-	c.Stdout = os.Stdout
-	c.Stderr = os.Stderr
-	return c.Start()
 }
