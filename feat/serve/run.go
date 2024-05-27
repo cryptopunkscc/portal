@@ -29,15 +29,18 @@ func NewFeat(
 	spawn target.Dispatch,
 	observe Observe,
 	tray target.Tray,
-) func(context.Context, bool) error {
+) *Feat {
+	if handlers == nil {
+		handlers = rpc.Handlers{}
+	}
 	handlers["ping"] = func() {}
 	handlers["open"] = spawn
 	handlers["observe"] = observe
-	return Feat{
+	return &Feat{
 		port:  port,
 		tray:  tray,
 		serve: service(handlers),
-	}.Run
+	}
 }
 
 func (f Feat) Run(
@@ -65,5 +68,14 @@ func (f Feat) Run(
 		}()
 	}
 	<-ctx.Done()
+	return
+}
+
+func (f Feat) Dispatch(ctx context.Context, _ string, _ ...string) (err error) {
+	go func() {
+		if err = f.Run(ctx, false); err != nil {
+			plog.Get(ctx).Type(f).Println("dispatch:", err)
+		}
+	}()
 	return
 }

@@ -3,17 +3,17 @@ package main
 import (
 	"context"
 	manifest "github.com/cryptopunkscc/go-astral-js"
-	"github.com/cryptopunkscc/go-astral-js/builder"
 	"github.com/cryptopunkscc/go-astral-js/clir"
+	feature "github.com/cryptopunkscc/go-astral-js/feat"
 	featApps "github.com/cryptopunkscc/go-astral-js/feat/apps"
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
-	osexec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
+	osExec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	"github.com/cryptopunkscc/go-astral-js/runner/app"
 	"github.com/cryptopunkscc/go-astral-js/runner/exec"
 	"github.com/cryptopunkscc/go-astral-js/runner/query"
-	"github.com/cryptopunkscc/go-astral-js/runner/serve"
+	"github.com/cryptopunkscc/go-astral-js/runner/service"
 	"github.com/cryptopunkscc/go-astral-js/runner/tray"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/apps"
@@ -23,27 +23,25 @@ import (
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
-	go osexec.OnShutdown(cancel)
+	go osExec.OnShutdown(cancel)
 
 	println("...")
 	log := plog.New().I().Set(&ctx).Scope("main")
 	log.Println("starting portal", os.Args)
 	defer log.Println("closing portal")
 
-	scope := builder.Scope[target.App]{
+	scope := feature.Scope[target.App]{
 		Port:            "portal",
 		WrapApi:         NewAdapter,
 		WaitGroup:       &sync.WaitGroup{},
 		TargetCache:     target.NewCache[target.App](),
-		NewTargetRun:    app.NewRun,
-		NewTray:         tray.New,
-		NewServe:        serve.NewRun,
-		TargetFinder:    apps.NewFind,
+		NewRunTarget:    app.NewRun,
+		NewRunTray:      tray.NewRun,
+		NewRunService:   service.NewRun,
 		ExecTarget:      exec.NewRun[target.App]("portal"),
-		AppsPath:        featApps.Path,
+		TargetFinder:    apps.NewFind,
+		GetPath:         featApps.Path,
 		FeatObserve:     featApps.Observe,
-		FeatInstall:     featApps.Install,
-		FeatUninstall:   featApps.Uninstall,
 		DispatchTarget:  query.NewRunner[target.App]("portal.open").Run,
 		DispatchService: exec.NewService("portal").Run,
 	}
@@ -54,18 +52,17 @@ func main() {
 
 	cli := clir.NewCli(ctx, manifest.Name, manifest.Description, version.Run)
 	cli.Dispatch(scope.GetDispatchFeature())
-	cli.Serve(scope.GetServeFeature())
+	cli.Serve(scope.GetServeFeature().Run)
 	cli.Open(scope.GetOpenFeature())
-	cli.Install(scope.FeatInstall)
-	cli.Uninstall(scope.FeatUninstall)
 	cli.Apps(scope.GetTargetFind())
+	cli.Install(featApps.Install)
+	cli.Uninstall(featApps.Uninstall)
 	cli.List(featApps.List)
 
-	err := cli.Run()
-	cancel()
-	if err != nil {
+	if err := cli.Run(); err != nil {
 		log.Println(err)
 	}
+	cancel()
 	scope.WaitGroup.Wait()
 }
 

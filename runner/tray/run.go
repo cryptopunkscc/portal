@@ -9,7 +9,7 @@ import (
 	"github.com/getlantern/systray"
 )
 
-func New(open target.Dispatch) target.Tray {
+func NewRun(open target.Dispatch) target.Tray {
 	return (&Runner{open: open}).Run
 }
 

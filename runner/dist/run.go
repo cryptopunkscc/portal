@@ -12,6 +12,10 @@ import (
 	"path"
 )
 
+func NewRun(dependencies []target.NodeModule) target.Run[target.Project] {
+	return NewRunner(dependencies).Run
+}
+
 type Runner struct {
 	dependencies []target.NodeModule
 }

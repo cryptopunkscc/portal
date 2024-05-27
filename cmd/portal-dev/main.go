@@ -3,19 +3,21 @@ package main
 import (
 	"context"
 	manifest "github.com/cryptopunkscc/go-astral-js"
-	"github.com/cryptopunkscc/go-astral-js/builder"
 	"github.com/cryptopunkscc/go-astral-js/clir"
+	feature "github.com/cryptopunkscc/go-astral-js/feat"
 	featApps "github.com/cryptopunkscc/go-astral-js/feat/apps"
 	"github.com/cryptopunkscc/go-astral-js/feat/build"
 	"github.com/cryptopunkscc/go-astral-js/feat/create"
-	serve2 "github.com/cryptopunkscc/go-astral-js/feat/serve"
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
 	osExec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
-	devRunner "github.com/cryptopunkscc/go-astral-js/runner/dev"
+	create2 "github.com/cryptopunkscc/go-astral-js/runner/create"
+	"github.com/cryptopunkscc/go-astral-js/runner/dev"
+	"github.com/cryptopunkscc/go-astral-js/runner/dist"
 	"github.com/cryptopunkscc/go-astral-js/runner/exec"
+	"github.com/cryptopunkscc/go-astral-js/runner/pack"
 	"github.com/cryptopunkscc/go-astral-js/runner/query"
-	"github.com/cryptopunkscc/go-astral-js/runner/serve"
+	"github.com/cryptopunkscc/go-astral-js/runner/service"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/portals"
 	"os"
@@ -31,42 +33,36 @@ func main() {
 	log.Println("starting portal development", os.Args)
 	defer log.Println("closing portal development")
 
-	scope := builder.Scope[target.Portal]{
+	scope := feature.Scope[target.Portal]{
 		Port:           "dev.portal",
 		Prefix:         []string{"dev"},
 		WrapApi:        NewAdapter,
 		WaitGroup:      &sync.WaitGroup{},
 		TargetCache:    target.NewCache[target.Portal](),
-		NewTargetRun:   devRunner.NewRun,
-		NewServe:       serve.NewRun,
+		NewRunTarget:   dev.NewRun,
+		NewRunService:  service.NewRun,
 		TargetFinder:   portals.NewFind,
 		ExecTarget:     exec.NewRun[target.Portal]("portal-dev"),
-		AppsPath:       featApps.Path,
+		GetPath:        featApps.Path,
 		FeatObserve:    featApps.Observe,
 		DispatchTarget: query.NewRunner[target.App]("dev.portal.open").Run,
 	}
+	scope.DispatchService = scope.GetServeFeature().Dispatch
 
-	scope.DispatchService = func(ctx context.Context, _ string, _ ...string) (err error) {
-		srv := scope.GetServeFeature()
-		go func() {
-			if err = srv(ctx, false); err != nil {
-				plog.Get(ctx).Type(serve2.Feat{}).Println(err)
-			}
-		}()
-		return
-	}
+	featBuild := build.NewFeat(dist.NewRun, pack.Run)
+	featCreate := create.NewFeat(create2.NewRun, featBuild.Dist).Run
 
 	cli := clir.NewCli(ctx, manifest.NameDev, manifest.DescriptionDev, version.Run)
 	cli.Dev(scope.GetDispatchFeature())
 	cli.Open(scope.GetOpenFeature())
-	cli.Create(create.List, create.NewFeat().Run)
-	cli.Build(build.NewFeat().Run)
+	cli.Create(create.List, featCreate)
+	cli.Build(featBuild.Run)
 	cli.Portals(scope.GetTargetFind())
 
-	err := cli.Run()
-	if err != nil {
+	if err := cli.Run(); err != nil {
 		log.Println(err)
 	}
+	cancel()
 	scope.WaitGroup.Wait()
 }
 

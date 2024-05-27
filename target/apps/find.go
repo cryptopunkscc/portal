@@ -10,10 +10,7 @@ import (
 	"io/fs"
 )
 
-func NewFind(
-	getPath target.Path,
-	files ...fs.FS,
-) target.Find[target.App] {
+func NewFind(getPath target.Path, files ...fs.FS) target.Find[target.App] {
 	return NewFinder(getPath, files...).Find
 }
 

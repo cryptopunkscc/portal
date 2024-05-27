@@ -34,9 +34,7 @@ func (p finder) find(ctx context.Context, src string) (portals target.Portals[ta
 	}
 
 	for _, a := range sources.FromPath[target.Project](src) {
-		if portals[a.Manifest().Package] == nil {
-			portals[a.Manifest().Package] = a
-		}
+		portals[a.Manifest().Package] = a
 	}
 
 	if len(portals) > 0 {

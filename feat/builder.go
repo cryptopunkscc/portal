@@ -1,4 +1,4 @@
-package builder
+package feat
 
 import (
 	"context"
@@ -7,12 +7,12 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/feat/open"
 	"github.com/cryptopunkscc/go-astral-js/feat/serve"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
-	"github.com/cryptopunkscc/go-astral-js/runner/spawn"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/apphost"
 	"github.com/cryptopunkscc/go-astral-js/target/apps"
 	"github.com/cryptopunkscc/go-astral-js/target/portal"
 	"github.com/cryptopunkscc/go-astral-js/target/source"
+	"github.com/cryptopunkscc/go-astral-js/target/spawn"
 	"log"
 	"reflect"
 	"sync"
@@ -25,31 +25,29 @@ type Scope[T target.Portal] struct {
 	TargetCache *target.Cache[T]
 	RpcHandlers rpc.Handlers
 
-	WrapApi      func(target.Api) target.Api
-	NewTargetRun func(target.NewApi) target.Run[T]
-	NewTray      func(target.Dispatch) target.Tray
-	NewServe     func(rpc.Handlers) target.Dispatch
+	WrapApi       func(target.Api) target.Api
+	NewRunTarget  func(target.NewApi) target.Run[T]
+	NewRunTray    func(target.Dispatch) target.Tray
+	NewRunService func(rpc.Handlers) target.Dispatch
 
-	TargetFinder target.Finder[T]
 	ExecTarget   target.Run[T]
+	TargetFinder target.Finder[T]
 
-	AppsPath        target.Path
+	GetPath         target.Path
 	DispatchTarget  target.Dispatch
 	DispatchService target.Dispatch
 
-	FeatObserve   func(ctx context.Context, conn rpc.Conn) (err error)
-	FeatInstall   func(src string) error
-	FeatUninstall func(src string) error
+	FeatObserve func(ctx context.Context, conn rpc.Conn) (err error)
 
 	// auto dependencies
 	TargetFind   target.Find[T]
 	FeatDispatch target.Dispatch
 	FeatOpen     target.Dispatch
-	FeatServe    func(context.Context, bool) error
+	FeatServe    *serve.Feat
 	FeatList     func() []target.App
 }
 
-func (s *Scope[T]) GetWait() *sync.WaitGroup            { return assert(s.WaitGroup) }
+func (s *Scope[T]) GetWaitGroup() *sync.WaitGroup       { return assert(s.WaitGroup) }
 func (s *Scope[T]) GetExecTarget() target.Run[T]        { return assert(s.ExecTarget) }
 func (s *Scope[T]) GetTargetFinder() target.Finder[T]   { return assert(s.TargetFinder) }
 func (s *Scope[T]) GetTargetCache() *target.Cache[T]    { return assert(s.TargetCache) }
@@ -65,30 +63,31 @@ func (s *Scope[T]) GetTargetFind() target.Find[T] {
 		)
 		findPath := target.Mapper[string, string](
 			resolveEmbed.Path,
-			assert(s.AppsPath),
+			assert(s.GetPath),
 		)
 		s.TargetFind = s.GetTargetFinder().Cached(s.GetTargetCache())(findPath, launcherSvelteFs)
 	}
 	return s.TargetFind
 }
 
-func (s *Scope[T]) GetServeFeature() func(context.Context, bool) error {
-	runSpawn := spawn.NewRunner(s.GetWait(), s.GetTargetFind(), s.GetExecTarget()).Run
-	runTray := target.Tray(nil)
-	if s.NewTray != nil {
-		runTray = s.NewTray(runSpawn)
+func (s *Scope[T]) GetServeFeature() *serve.Feat {
+	if s.FeatServe == nil {
+		runSpawn := spawn.NewRunner(s.GetWaitGroup(), s.GetTargetFind(), s.GetExecTarget()).Run
+		runTray := target.Tray(nil)
+		if s.NewRunTray != nil {
+			runTray = s.NewRunTray(runSpawn)
+		}
+
+		s.FeatServe = serve.NewFeat(
+			assert(s.Port),
+			assert(s.NewRunService),
+			s.RpcHandlers,
+			assert(runSpawn),
+			assert(s.FeatObserve),
+			runTray,
+		)
 	}
-	if s.RpcHandlers == nil {
-		s.RpcHandlers = rpc.Handlers{}
-	}
-	return serve.NewFeat(
-		assert(s.Port),
-		assert(s.NewServe),
-		assert(s.RpcHandlers),
-		assert(runSpawn),
-		assert(s.FeatObserve),
-		runTray,
-	)
+	return s.FeatServe
 }
 
 func (s *Scope[T]) GetOpenFeature() target.Dispatch {
@@ -98,7 +97,7 @@ func (s *Scope[T]) GetOpenFeature() target.Dispatch {
 			newApphost.NewAdapter,
 			newApphost.WithTimeout,
 		)
-		s.FeatOpen = open.NewFeat[T](s.GetTargetFind(), s.NewTargetRun(newApi))
+		s.FeatOpen = open.NewFeat[T](s.GetTargetFind(), s.NewRunTarget(newApi))
 	}
 	return s.FeatOpen
 }
