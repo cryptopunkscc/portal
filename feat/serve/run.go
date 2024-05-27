@@ -24,20 +24,15 @@ type (
 
 func NewFeat(
 	port string,
-	spawn target.Dispatch,
-	tray target.Tray,
 	service Service,
+	handlers rpc.Handlers,
+	spawn target.Dispatch,
 	observe Observe,
-	install Install,
-	uninstall Uninstall,
+	tray target.Tray,
 ) func(context.Context, bool) error {
-	handlers := rpc.Handlers{
-		"ping":      func() {},
-		"open":      spawn,
-		"observe":   observe,
-		"install":   install,
-		"uninstall": uninstall,
-	}
+	handlers["ping"] = func() {}
+	handlers["open"] = spawn
+	handlers["observe"] = observe
 	return Feat{
 		port:  port,
 		tray:  tray,
