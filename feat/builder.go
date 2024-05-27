@@ -33,7 +33,7 @@ type Scope[T target.Portal] struct {
 	ExecTarget   target.Run[T]
 	TargetFinder target.Finder[T]
 
-	AppsPath        target.Path
+	GetPath         target.Path
 	DispatchTarget  target.Dispatch
 	DispatchService target.Dispatch
 
@@ -49,7 +49,7 @@ type Scope[T target.Portal] struct {
 	FeatList     func() []target.App
 }
 
-func (s *Scope[T]) GetWait() *sync.WaitGroup            { return assert(s.WaitGroup) }
+func (s *Scope[T]) GetWaitGroup() *sync.WaitGroup       { return assert(s.WaitGroup) }
 func (s *Scope[T]) GetExecTarget() target.Run[T]        { return assert(s.ExecTarget) }
 func (s *Scope[T]) GetTargetFinder() target.Finder[T]   { return assert(s.TargetFinder) }
 func (s *Scope[T]) GetTargetCache() *target.Cache[T]    { return assert(s.TargetCache) }
@@ -65,7 +65,7 @@ func (s *Scope[T]) GetTargetFind() target.Find[T] {
 		)
 		findPath := target.Mapper[string, string](
 			resolveEmbed.Path,
-			assert(s.AppsPath),
+			assert(s.GetPath),
 		)
 		s.TargetFind = s.GetTargetFinder().Cached(s.GetTargetCache())(findPath, launcherSvelteFs)
 	}
@@ -74,18 +74,16 @@ func (s *Scope[T]) GetTargetFind() target.Find[T] {
 
 func (s *Scope[T]) GetServeFeature() *serve.Feat {
 	if s.FeatServe == nil {
-		runSpawn := spawn.NewRunner(s.GetWait(), s.GetTargetFind(), s.GetExecTarget()).Run
+		runSpawn := spawn.NewRunner(s.GetWaitGroup(), s.GetTargetFind(), s.GetExecTarget()).Run
 		runTray := target.Tray(nil)
 		if s.NewRunTray != nil {
 			runTray = s.NewRunTray(runSpawn)
 		}
-		if s.RpcHandlers == nil {
-			s.RpcHandlers = rpc.Handlers{}
-		}
+
 		s.FeatServe = serve.NewFeat(
 			assert(s.Port),
 			assert(s.NewRunService),
-			assert(s.RpcHandlers),
+			s.RpcHandlers,
 			assert(runSpawn),
 			assert(s.FeatObserve),
 			runTray,

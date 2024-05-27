@@ -40,7 +40,7 @@ func main() {
 		NewRunService:   service.NewRun,
 		ExecTarget:      exec.NewRun[target.App]("portal"),
 		TargetFinder:    apps.NewFind,
-		AppsPath:        featApps.Path,
+		GetPath:         featApps.Path,
 		FeatObserve:     featApps.Observe,
 		FeatInstall:     featApps.Install,
 		FeatUninstall:   featApps.Uninstall,

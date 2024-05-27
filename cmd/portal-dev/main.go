@@ -40,7 +40,7 @@ func main() {
 		NewRunService:  service.NewRun,
 		TargetFinder:   portals.NewFind,
 		ExecTarget:     exec.NewRun[target.Portal]("portal-dev"),
-		AppsPath:       featApps.Path,
+		GetPath:        featApps.Path,
 		FeatObserve:    featApps.Observe,
 		DispatchTarget: query.NewRunner[target.App]("dev.portal.open").Run,
 	}

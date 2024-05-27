@@ -30,6 +30,9 @@ func NewFeat(
 	observe Observe,
 	tray target.Tray,
 ) *Feat {
+	if handlers == nil {
+		handlers = rpc.Handlers{}
+	}
 	handlers["ping"] = func() {}
 	handlers["open"] = spawn
 	handlers["observe"] = observe
