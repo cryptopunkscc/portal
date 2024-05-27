@@ -11,8 +11,11 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
 	osExec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
+	create2 "github.com/cryptopunkscc/go-astral-js/runner/create"
 	"github.com/cryptopunkscc/go-astral-js/runner/dev"
+	"github.com/cryptopunkscc/go-astral-js/runner/dist"
 	"github.com/cryptopunkscc/go-astral-js/runner/exec"
+	"github.com/cryptopunkscc/go-astral-js/runner/pack"
 	"github.com/cryptopunkscc/go-astral-js/runner/query"
 	"github.com/cryptopunkscc/go-astral-js/runner/service"
 	"github.com/cryptopunkscc/go-astral-js/target"
@@ -46,11 +49,14 @@ func main() {
 	}
 	scope.DispatchService = scope.GetServeFeature().Dispatch
 
+	featBuild := build.NewFeat(dist.NewRun, pack.Run)
+	featCreate := create.NewFeat(create2.NewRun, featBuild.Dist).Run
+
 	cli := clir.NewCli(ctx, manifest.NameDev, manifest.DescriptionDev, version.Run)
 	cli.Dev(scope.GetDispatchFeature())
 	cli.Open(scope.GetOpenFeature())
-	cli.Create(create.List, create.NewFeat().Run)
-	cli.Build(build.NewFeat().Run)
+	cli.Create(create.List, featCreate)
+	cli.Build(featBuild.Run)
 	cli.Portals(scope.GetTargetFind())
 
 	if err := cli.Run(); err != nil {

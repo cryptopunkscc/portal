@@ -9,6 +9,10 @@ import (
 	"path/filepath"
 )
 
+func NewRun(dir string, templates map[string]string) func(target.Template) error {
+	return NewRunner(dir, templates).Run
+}
+
 type Runner struct {
 	dir       string
 	templates map[string]string

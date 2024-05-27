@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/runner/dist"
-	"github.com/cryptopunkscc/go-astral-js/runner/pack"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	js "github.com/cryptopunkscc/go-astral-js/target/js/embed"
 	"github.com/cryptopunkscc/go-astral-js/target/sources"
@@ -13,14 +11,24 @@ import (
 )
 
 type Feat struct {
+	newRunDist   func([]target.NodeModule) target.Run[target.Project]
+	runPack      target.Run[target.Dist]
 	dependencies []target.NodeModule
 }
 
-func NewFeat(dependencies ...target.NodeModule) *Feat {
+func NewFeat(
+	newRunDist func([]target.NodeModule) target.Run[target.Project],
+	runPack target.Run[target.Dist],
+	dependencies ...target.NodeModule,
+) *Feat {
 	if len(dependencies) == 0 {
 		dependencies = sources.FromFS[target.NodeModule](js.PortalLibFS)
 	}
-	return &Feat{dependencies: dependencies}
+	return &Feat{
+		newRunDist:   newRunDist,
+		runPack:      runPack,
+		dependencies: dependencies,
+	}
 }
 
 func (r Feat) Run(ctx context.Context, dir string) (err error) {
@@ -38,7 +46,8 @@ func (r Feat) Dist(ctx context.Context, dir ...string) (err error) {
 		if !m.PkgJson().CanBuild() {
 			continue
 		}
-		if err = dist.NewRunner(r.dependencies).Run(ctx, m); err != nil {
+		//if err = dist.NewRunner(r.dependencies).Run(ctx, m); err != nil {
+		if err = r.newRunDist(r.dependencies)(ctx, m); err != nil {
 			return fmt.Errorf("build.Dist: %w", err)
 		}
 	}
@@ -48,7 +57,8 @@ func (r Feat) Dist(ctx context.Context, dir ...string) (err error) {
 func (r Feat) Pack(ctx context.Context, base, sub string) (err error) {
 	err = errors.New("no targets found")
 	for _, app := range sources.FromPath[target.Dist](path.Join(base, sub)) {
-		if err = pack.Run(ctx, app); err != nil {
+		//if err = pack.Run(ctx, app); err != nil {
+		if err = r.runPack(ctx, app); err != nil {
 			return fmt.Errorf("bundle target %v: %v", app.Path(), err)
 		}
 	}
