@@ -14,7 +14,7 @@ import (
 	devRunner "github.com/cryptopunkscc/go-astral-js/runner/dev"
 	"github.com/cryptopunkscc/go-astral-js/runner/exec"
 	"github.com/cryptopunkscc/go-astral-js/runner/query"
-	"github.com/cryptopunkscc/go-astral-js/runner/serve"
+	"github.com/cryptopunkscc/go-astral-js/runner/service"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/portals"
 	"os"
@@ -36,8 +36,8 @@ func main() {
 		WrapApi:        NewAdapter,
 		WaitGroup:      &sync.WaitGroup{},
 		TargetCache:    target.NewCache[target.Portal](),
-		NewTargetRun:   devRunner.NewRun,
-		NewServe:       serve.NewRun,
+		NewRunTarget:   devRunner.NewRun,
+		NewRunService:  service.NewRun,
 		TargetFinder:   portals.NewFind,
 		ExecTarget:     exec.NewRun[target.Portal]("portal-dev"),
 		AppsPath:       featApps.Path,

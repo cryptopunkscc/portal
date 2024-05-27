@@ -25,13 +25,13 @@ type Scope[T target.Portal] struct {
 	TargetCache *target.Cache[T]
 	RpcHandlers rpc.Handlers
 
-	WrapApi      func(target.Api) target.Api
-	NewTargetRun func(target.NewApi) target.Run[T]
-	NewTray      func(target.Dispatch) target.Tray
-	NewServe     func(rpc.Handlers) target.Dispatch
+	WrapApi       func(target.Api) target.Api
+	NewRunTarget  func(target.NewApi) target.Run[T]
+	NewRunTray    func(target.Dispatch) target.Tray
+	NewRunService func(rpc.Handlers) target.Dispatch
 
-	TargetFinder target.Finder[T]
 	ExecTarget   target.Run[T]
+	TargetFinder target.Finder[T]
 
 	AppsPath        target.Path
 	DispatchTarget  target.Dispatch
@@ -75,15 +75,15 @@ func (s *Scope[T]) GetTargetFind() target.Find[T] {
 func (s *Scope[T]) GetServeFeature() serve.Feat {
 	runSpawn := spawn.NewRunner(s.GetWait(), s.GetTargetFind(), s.GetExecTarget()).Run
 	runTray := target.Tray(nil)
-	if s.NewTray != nil {
-		runTray = s.NewTray(runSpawn)
+	if s.NewRunTray != nil {
+		runTray = s.NewRunTray(runSpawn)
 	}
 	if s.RpcHandlers == nil {
 		s.RpcHandlers = rpc.Handlers{}
 	}
 	return serve.NewFeat(
 		assert(s.Port),
-		assert(s.NewServe),
+		assert(s.NewRunService),
 		assert(s.RpcHandlers),
 		assert(runSpawn),
 		assert(s.FeatObserve),
@@ -98,7 +98,7 @@ func (s *Scope[T]) GetOpenFeature() target.Dispatch {
 			newApphost.NewAdapter,
 			newApphost.WithTimeout,
 		)
-		s.FeatOpen = open.NewFeat[T](s.GetTargetFind(), s.NewTargetRun(newApi))
+		s.FeatOpen = open.NewFeat[T](s.GetTargetFind(), s.NewRunTarget(newApi))
 	}
 	return s.FeatOpen
 }
