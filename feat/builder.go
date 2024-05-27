@@ -1,4 +1,4 @@
-package builder
+package feat
 
 import (
 	"context"
@@ -72,7 +72,7 @@ func (s *Scope[T]) GetTargetFind() target.Find[T] {
 	return s.TargetFind
 }
 
-func (s *Scope[T]) GetServeFeature() func(context.Context, bool) error {
+func (s *Scope[T]) GetServeFeature() serve.Feat {
 	runSpawn := spawn.NewRunner(s.GetWait(), s.GetTargetFind(), s.GetExecTarget()).Run
 	runTray := target.Tray(nil)
 	if s.NewTray != nil {

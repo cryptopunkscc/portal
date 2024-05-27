@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	manifest "github.com/cryptopunkscc/go-astral-js"
-	"github.com/cryptopunkscc/go-astral-js/builder"
 	"github.com/cryptopunkscc/go-astral-js/clir"
+	feature "github.com/cryptopunkscc/go-astral-js/feat"
 	featApps "github.com/cryptopunkscc/go-astral-js/feat/apps"
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
 	osexec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
@@ -30,7 +30,7 @@ func main() {
 	log.Println("starting portal", os.Args)
 	defer log.Println("closing portal")
 
-	scope := builder.Scope[target.App]{
+	scope := feature.Scope[target.App]{
 		Port:            "portal",
 		WrapApi:         NewAdapter,
 		WaitGroup:       &sync.WaitGroup{},
@@ -54,7 +54,7 @@ func main() {
 
 	cli := clir.NewCli(ctx, manifest.Name, manifest.Description, version.Run)
 	cli.Dispatch(scope.GetDispatchFeature())
-	cli.Serve(scope.GetServeFeature())
+	cli.Serve(scope.GetServeFeature().Run)
 	cli.Open(scope.GetOpenFeature())
 	cli.Install(scope.FeatInstall)
 	cli.Uninstall(scope.FeatUninstall)

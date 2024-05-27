@@ -3,12 +3,11 @@ package main
 import (
 	"context"
 	manifest "github.com/cryptopunkscc/go-astral-js"
-	"github.com/cryptopunkscc/go-astral-js/builder"
 	"github.com/cryptopunkscc/go-astral-js/clir"
+	feature "github.com/cryptopunkscc/go-astral-js/feat"
 	featApps "github.com/cryptopunkscc/go-astral-js/feat/apps"
 	"github.com/cryptopunkscc/go-astral-js/feat/build"
 	"github.com/cryptopunkscc/go-astral-js/feat/create"
-	serve2 "github.com/cryptopunkscc/go-astral-js/feat/serve"
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
 	osExec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
@@ -31,7 +30,7 @@ func main() {
 	log.Println("starting portal development", os.Args)
 	defer log.Println("closing portal development")
 
-	scope := builder.Scope[target.Portal]{
+	scope := feature.Scope[target.Portal]{
 		Port:           "dev.portal",
 		Prefix:         []string{"dev"},
 		WrapApi:        NewAdapter,
@@ -45,16 +44,7 @@ func main() {
 		FeatObserve:    featApps.Observe,
 		DispatchTarget: query.NewRunner[target.App]("dev.portal.open").Run,
 	}
-
-	scope.DispatchService = func(ctx context.Context, _ string, _ ...string) (err error) {
-		srv := scope.GetServeFeature()
-		go func() {
-			if err = srv(ctx, false); err != nil {
-				plog.Get(ctx).Type(serve2.Feat{}).Println(err)
-			}
-		}()
-		return
-	}
+	scope.DispatchService = scope.GetServeFeature().Dispatch
 
 	cli := clir.NewCli(ctx, manifest.NameDev, manifest.DescriptionDev, version.Run)
 	cli.Dev(scope.GetDispatchFeature())
