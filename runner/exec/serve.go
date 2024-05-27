@@ -3,7 +3,7 @@ package exec
 import (
 	"context"
 	"os"
-	osexec "os/exec"
+	"os/exec"
 )
 
 type Service struct {
@@ -16,7 +16,7 @@ func NewService(executable string) *Service {
 
 func (s Service) Run(ctx context.Context, cmd string, args ...string) error {
 	args2 := append([]string{cmd}, args...)
-	c := osexec.CommandContext(ctx, s.executable, args2...)
+	c := exec.CommandContext(ctx, s.executable, args2...)
 	c.Stdout = os.Stdout
 	c.Stderr = os.Stderr
 	return c.Start()
