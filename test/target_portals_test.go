@@ -22,7 +22,9 @@ func Test__portals_Find__embed_launcher(t *testing.T) {
 		resolveEmbed.Path,
 		appstore.Path,
 	)
-	find := target.Cached(portals.NewFind)(findPath, embedFs)
+
+	cache := target.NewCache[target.Portal]()
+	find := portals.Finder.Cached(cache)(findPath, embedFs)
 
 	tests := []Case[string]{
 		{Src: ".", Matchers: []*Target{
