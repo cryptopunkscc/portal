@@ -45,7 +45,7 @@ type Scope[T target.Portal] struct {
 	TargetFind   target.Find[T]
 	FeatDispatch target.Dispatch
 	FeatOpen     target.Dispatch
-	FeatServe    func(context.Context, bool) error
+	FeatServe    *serve.Feat
 	FeatList     func() []target.App
 }
 
@@ -72,23 +72,26 @@ func (s *Scope[T]) GetTargetFind() target.Find[T] {
 	return s.TargetFind
 }
 
-func (s *Scope[T]) GetServeFeature() serve.Feat {
-	runSpawn := spawn.NewRunner(s.GetWait(), s.GetTargetFind(), s.GetExecTarget()).Run
-	runTray := target.Tray(nil)
-	if s.NewRunTray != nil {
-		runTray = s.NewRunTray(runSpawn)
+func (s *Scope[T]) GetServeFeature() *serve.Feat {
+	if s.FeatServe == nil {
+		runSpawn := spawn.NewRunner(s.GetWait(), s.GetTargetFind(), s.GetExecTarget()).Run
+		runTray := target.Tray(nil)
+		if s.NewRunTray != nil {
+			runTray = s.NewRunTray(runSpawn)
+		}
+		if s.RpcHandlers == nil {
+			s.RpcHandlers = rpc.Handlers{}
+		}
+		s.FeatServe = serve.NewFeat(
+			assert(s.Port),
+			assert(s.NewRunService),
+			assert(s.RpcHandlers),
+			assert(runSpawn),
+			assert(s.FeatObserve),
+			runTray,
+		)
 	}
-	if s.RpcHandlers == nil {
-		s.RpcHandlers = rpc.Handlers{}
-	}
-	return serve.NewFeat(
-		assert(s.Port),
-		assert(s.NewRunService),
-		assert(s.RpcHandlers),
-		assert(runSpawn),
-		assert(s.FeatObserve),
-		runTray,
-	)
+	return s.FeatServe
 }
 
 func (s *Scope[T]) GetOpenFeature() target.Dispatch {

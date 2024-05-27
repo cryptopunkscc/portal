@@ -29,11 +29,11 @@ func NewFeat(
 	spawn target.Dispatch,
 	observe Observe,
 	tray target.Tray,
-) Feat {
+) *Feat {
 	handlers["ping"] = func() {}
 	handlers["open"] = spawn
 	handlers["observe"] = observe
-	return Feat{
+	return &Feat{
 		port:  port,
 		tray:  tray,
 		serve: service(handlers),
