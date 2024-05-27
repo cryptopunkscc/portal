@@ -1,9 +1,9 @@
-import {AppHostClient, AppHostConn} from "./client";
+import {ApphostClient, AppHostConn} from "./adapter.js";
 import {bindings} from "../bindings.js";
 
 const {log} = bindings
 
-export * from "./client";
+export * from "./adapter.js";
 
 // ================== RPC extensions ==================
 
@@ -64,7 +64,7 @@ async function astral_rpc_conn_bind_api(conn) {
   }
 }
 
-AppHostClient.prototype.jrpcCall = async function (identity, service, method, ...data) {
+ApphostClient.prototype.jrpcCall = async function (identity, service, method, ...data) {
   let cmd = service
   if (method) {
     cmd += "." + method
@@ -77,12 +77,12 @@ AppHostClient.prototype.jrpcCall = async function (identity, service, method, ..
   return conn
 }
 
-AppHostClient.prototype.bindRpc = async function (identity, service) {
+ApphostClient.prototype.bindRpc = async function (identity, service) {
   await astral_rpc_client_bind_api(this, identity, service)
   return this
 }
 
-AppHostClient.prototype.rpcQuery = function (identity, port) {
+ApphostClient.prototype.rpcQuery = function (identity, port) {
   const client = this
   return async function (...data) {
     const conn = await client.jrpcCall(identity, port, "", ...data)
@@ -118,7 +118,7 @@ async function astral_rpc_client_bind_api(client, identity, service) {
 }
 
 // Bind RPC service to given name
-AppHostClient.prototype.bindRpcService = async function (service) {
+ApphostClient.prototype.bindRpcService = async function (service) {
   return await astral_rpc_bind_srv.call(this, service)
 }
 

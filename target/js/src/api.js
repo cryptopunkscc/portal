@@ -1,6 +1,6 @@
-import {bindings} from "./bindings";
-import {AppHostClient} from "./apphost/client";
-import "./apphost/jrpc";
+import {bindings} from "./bindings.js";
+import {ApphostClient} from "./apphost/adapter.js";
+import "./apphost/rpc.js";
 
 export const {log, sleep, platform} = bindings
-export const apphost = new AppHostClient();
+export const apphost = new ApphostClient();

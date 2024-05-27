@@ -28,9 +28,9 @@ function App() {
     async function connect() {
       try {
         log("rpc connecting...")
-        // const apphost = new AppHostClient()
+        // const apphost = new ApphostClient()
         const conn = await apphost.bindRpc("", "rpc")
-        // const conn = await (new AppHostClient()).bindRpc("", "rpc")
+        // const conn = await (new ApphostClient()).bindRpc("", "rpc")
         // let conn = await apphost.query("", "rpc")
         // await conn.bindRpc()
         setRpc(conn)
