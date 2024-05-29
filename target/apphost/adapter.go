@@ -13,7 +13,6 @@ import (
 	"github.com/google/uuid"
 	"io"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -23,13 +22,8 @@ type Adapter struct {
 	pkg    []string
 	prefix []string
 
-	listeners      map[string]*astral.Listener
-	listenersMutex sync.RWMutex
-
-	connections      map[string]*Conn
-	connectionsMutex sync.RWMutex
-
-	onIdle func(bool)
+	listeners   Registry[*astral.Listener]
+	connections Registry[*Conn]
 }
 
 func (api *Adapter) Port(service ...string) (port string) {
@@ -46,61 +40,13 @@ func (api *Adapter) Close() error {
 }
 
 func (api *Adapter) Interrupt() {
-	api.listenersMutex.Lock()
-	api.connectionsMutex.Lock()
-	defer api.listenersMutex.Unlock()
-	defer api.connectionsMutex.Unlock()
-	for name, closer := range api.listeners {
+	for name, closer := range api.listeners.Release() {
 		api.log.Println("[Interrupt] closing listener:", name)
 		_ = closer.Close()
-		delete(api.listeners, name)
 	}
-	for name := range api.connections {
+	for name, conn := range api.connections.Release() {
 		api.log.Println("[Interrupt] closing connection:", name)
-		api.setConnectionUnsafe(name, nil)
-	}
-	api.connections = map[string]*Conn{}
-	api.listeners = map[string]*astral.Listener{}
-}
-
-func (api *Adapter) getListener(service string) (l *astral.Listener, ok bool) {
-	api.listenersMutex.RLock()
-	defer api.listenersMutex.RUnlock()
-	l, ok = api.listeners[service]
-	return
-}
-
-func (api *Adapter) setListener(service string, listener *astral.Listener) {
-	api.listenersMutex.Lock()
-	defer api.listenersMutex.Unlock()
-	if listener != nil {
-		api.listeners[service] = listener
-	} else {
-		delete(api.listeners, service)
-	}
-}
-
-func (api *Adapter) getConnection(connectionId string) (rw *Conn, ok bool) {
-	api.connectionsMutex.RLock()
-	defer api.connectionsMutex.RUnlock()
-	rw, ok = api.connections[connectionId]
-	return
-}
-
-func (api *Adapter) setConnection(connectionId string, connection *astral.Conn) {
-	api.connectionsMutex.Lock()
-	defer api.connectionsMutex.Unlock()
-	api.setConnectionUnsafe(connectionId, connection)
-}
-
-func (api *Adapter) setConnectionUnsafe(connectionId string, connection *astral.Conn) {
-	if connection != nil {
-		api.connections[connectionId] = newConn(connection)
-	} else {
-		delete(api.connections, connectionId)
-	}
-	if api.onIdle != nil {
-		api.onIdle(len(api.connections) == 0)
+		_ = conn.Close()
 	}
 }
 
@@ -131,25 +77,25 @@ func (api *Adapter) ServiceRegister(service string) (err error) {
 	if err != nil {
 		return
 	}
-	api.setListener(service, listener)
+	api.listeners.Set(service, listener)
 	return
 }
 
 func (api *Adapter) ServiceClose(service string) (err error) {
-	listener, ok := api.getListener(service)
+	listener, ok := api.listeners.Get(service)
 	if !ok {
 		err = errors.New("[ServiceClose] not listening on port: " + service)
 		return
 	}
 	err = listener.Close()
 	if err != nil {
-		api.setListener(service, nil)
+		api.listeners.Set(service, nil)
 	}
 	return
 }
 
 func (api *Adapter) ConnAccept(service string) (data string, err error) {
-	listener, ok := api.getListener(service)
+	listener, ok := api.listeners.Get(service)
 	if !ok {
 		err = fmt.Errorf("[ConnAccept] not listening on port: %v", service)
 		return
@@ -166,7 +112,7 @@ func (api *Adapter) ConnAccept(service string) (data string, err error) {
 
 	connId := uuid.New().String()
 	api.log.Println("accepted connection:", connId)
-	api.setConnection(connId, conn)
+	api.connections.Set(connId, newConn(conn))
 
 	pkg := strings.Join(append(api.Prefix(), api.pkg...), ".")
 	query := strings.TrimPrefix(conn.Query(), pkg)
@@ -188,33 +134,33 @@ type queryData struct {
 }
 
 func (api *Adapter) ConnClose(id string) (err error) {
-	conn, ok := api.getConnection(id)
+	conn, ok := api.connections.Get(id)
 	if !ok {
 		err = errors.New("[ConnClose] not found connection with id: " + id)
 		return
 	}
 	err = conn.Close()
-	api.setConnection(id, nil)
+	api.connections.Set(id, nil)
 	return
 }
 
 func (api *Adapter) ConnWrite(id string, data string) (err error) {
 	api.log.Printf("[%s] write: %s", id, strings.TrimRight(data, "\r\n"))
-	conn, ok := api.getConnection(id)
+	conn, ok := api.connections.Get(id)
 	if !ok {
 		err = errors.New("[ConnWrite] not found connection with id: " + id)
 		return
 	}
 	if _, err = conn.Write([]byte(data)); err != nil {
 		_ = conn.Close()
-		api.setConnection(id, nil)
+		api.connections.Set(id, nil)
 	}
 	return
 }
 
 func (api *Adapter) ConnRead(id string) (data string, err error) {
 	api.log.Printf("[%s] read: %s", id, data)
-	conn, ok := api.getConnection(id)
+	conn, ok := api.connections.Get(id)
 	if !ok {
 		err = errors.New("[ConnRead] not found connection with id: " + id)
 		return
@@ -241,7 +187,7 @@ func (api *Adapter) Query(identity string, query string) (data string, err error
 		return
 	}
 	connId := uuid.New().String()
-	api.setConnection(connId, conn)
+	api.connections.Set(connId, newConn(conn))
 
 	bytes, err := json.Marshal(queryData{
 		Id:    connId,
@@ -260,7 +206,7 @@ func (api *Adapter) QueryName(name string, query string) (data string, err error
 		return
 	}
 	connId := uuid.New().String()
-	api.setConnection(connId, conn)
+	api.connections.Set(connId, newConn(conn))
 
 	bytes, err := json.Marshal(queryData{
 		Id:    connId,
