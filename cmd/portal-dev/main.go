@@ -45,7 +45,8 @@ func main() {
 		ExecTarget:     exec.NewRun[target.Portal]("portal-dev"),
 		GetPath:        featApps.Path,
 		FeatObserve:    featApps.Observe,
-		DispatchTarget: query.NewRunner[target.App]("dev.portal.open").Run,
+		JoinTarget:     query.NewRunner[target.App]("dev.portal.open").Run,
+		DispatchTarget: query.NewRunner[target.App]("dev.portal.open").Start,
 	}
 	scope.DispatchService = scope.GetServeFeature().Dispatch
 

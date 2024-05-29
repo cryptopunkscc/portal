@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/runner/goja"
 	"github.com/cryptopunkscc/go-astral-js/runner/goja_dev"
+	"github.com/cryptopunkscc/go-astral-js/runner/goja_dist"
 	"github.com/cryptopunkscc/go-astral-js/runner/wails"
 	"github.com/cryptopunkscc/go-astral-js/runner/wails_dev"
 	"github.com/cryptopunkscc/go-astral-js/target"
@@ -27,6 +28,8 @@ func (r Runner) Run(ctx context.Context, t target.Portal) (err error) {
 		return goja_dev.NewRun(r.newApi)(ctx, v)
 	case target.ProjectFrontend:
 		return wails_dev.NewRun(r.newApi)(ctx, v)
+	case target.DistBackend:
+		return goja_dist.NewRun(r.newApi)(ctx, v)
 	case target.AppBackend:
 		return goja.NewRun(r.newApi, prefix)(ctx, v)
 	case target.AppFrontend:

@@ -42,8 +42,9 @@ func main() {
 		TargetFinder:    apps.NewFind,
 		GetPath:         featApps.Path,
 		FeatObserve:     featApps.Observe,
-		DispatchTarget:  query.NewRunner[target.App]("portal.open").Run,
-		DispatchService: exec.NewService("portal").Run,
+		JoinTarget:      query.NewRunner[target.App]("portal.open").Run,
+		DispatchTarget:  query.NewRunner[target.App]("portal.open").Start,
+		DispatchService: exec.NewService("portal").Start,
 	}
 	scope.RpcHandlers = rpc.Handlers{
 		"install":   featApps.Install,

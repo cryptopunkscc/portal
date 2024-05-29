@@ -31,8 +31,10 @@ func New() Logger {
 const key = "plog"
 
 func Get(ctx context.Context) Logger {
-	if l, ok := ctx.Value(key).(Logger); ok {
-		return l
+	if ctx != nil {
+		if l, ok := ctx.Value(key).(Logger); ok {
+			return l
+		}
 	}
 	return New().Scope("detached")
 }
@@ -103,14 +105,13 @@ func (l logger) Msg(message string) Logger {
 	return l
 }
 
-func (l logger) Printf(format string, a ...any) {
-	l.Message += fmt.Sprintf(format, a...) + "\n"
-	l.Flush()
+func (l logger) Printf(format string, args ...any) {
+	l.Message += fmt.Sprintf(format, args...) + "\n"
+	l.appendErrors().Flush()
 }
-
 func (l logger) Println(a ...any) {
 	l.Message += fmt.Sprintln(a...)
-	l.Flush()
+	l.appendErrors(a...).Flush()
 }
 
 func (l logger) Flush() {
@@ -122,4 +123,13 @@ func (l logger) Flush() {
 	if l.Level == Panic {
 		os.Exit(1)
 	}
+}
+
+func (l logger) appendErrors(args ...any) logger {
+	for _, arg := range args {
+		if e, ok := arg.(error); ok {
+			l.Errors = append(l.Errors, e)
+		}
+	}
+	return l
 }

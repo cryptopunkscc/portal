@@ -36,6 +36,7 @@ type Scope[T target.Portal] struct {
 	GetPath         target.Path
 	DispatchTarget  target.Dispatch
 	DispatchService target.Dispatch
+	JoinTarget      target.Dispatch
 
 	FeatObserve func(ctx context.Context, conn rpc.Conn) (err error)
 
@@ -51,6 +52,7 @@ func (s *Scope[T]) GetWaitGroup() *sync.WaitGroup       { return assert(s.WaitGr
 func (s *Scope[T]) GetExecTarget() target.Run[T]        { return assert(s.ExecTarget) }
 func (s *Scope[T]) GetTargetFinder() target.Finder[T]   { return assert(s.TargetFinder) }
 func (s *Scope[T]) GetTargetCache() *target.Cache[T]    { return assert(s.TargetCache) }
+func (s *Scope[T]) GetJoinTarget() target.Dispatch      { return assert(s.JoinTarget) }
 func (s *Scope[T]) GetDispatchTarget() target.Dispatch  { return assert(s.DispatchTarget) }
 func (s *Scope[T]) GetDispatchService() target.Dispatch { return assert(s.DispatchService) }
 
@@ -104,7 +106,7 @@ func (s *Scope[T]) GetOpenFeature() target.Dispatch {
 
 func (s *Scope[T]) GetDispatchFeature() target.Dispatch {
 	if s.FeatDispatch == nil {
-		s.FeatDispatch = dispatch.NewFeat(s.GetDispatchTarget(), s.GetDispatchService())
+		s.FeatDispatch = dispatch.NewFeat(s.GetJoinTarget(), s.GetDispatchService())
 	}
 	return s.FeatDispatch
 }

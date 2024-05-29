@@ -1,6 +1,7 @@
 package goja
 
 import (
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/js/embed/common"
 	"github.com/dop251/goja"
@@ -23,23 +24,22 @@ func NewBackend(apphost target.Apphost) *Backend {
 }
 
 func (b *Backend) Run(app string) (err error) {
-	if fs.ValidPath(app) {
-		return b.RunPath(app)
-	} else {
-		return b.RunSource(app)
-	}
+	return b.RunPath(app)
 }
 
 func (b *Backend) RunPath(app string) (err error) {
 	stat, err := os.Stat(app)
 	if err != nil {
-		return err
+		return plog.Err(err)
 	}
 	var src []byte
 	if stat.IsDir() {
 		app = path.Join(app, "main.js")
 	}
 	src, err = os.ReadFile(app)
+	if err != nil {
+		return plog.Err(err)
+	}
 
 	return b.RunSource(string(src))
 }
@@ -47,7 +47,7 @@ func (b *Backend) RunPath(app string) (err error) {
 func (b *Backend) RunFs(files fs.FS) (err error) {
 	var src []byte
 	if src, err = fs.ReadFile(files, "main.js"); err != nil {
-		return err
+		return plog.Err(err)
 	}
 	return b.RunSource(string(src))
 }
@@ -60,17 +60,17 @@ func (b *Backend) RunSource(app string) (err error) {
 	b.vm = goja.New()
 
 	if err = Bind(b.vm, b.apphost); err != nil {
-		return
+		return plog.Err(err)
 	}
 
 	// inject apphost client js lib
 	if _, err = b.vm.RunString(b.apphostJs); err != nil {
-		return
+		return plog.Err(err)
 	}
 
 	// start js application backend
 	if _, err = b.vm.RunString(app); err != nil {
-		return
+		return plog.Err(err)
 	}
 	return
 }

@@ -36,6 +36,7 @@ type Project interface {
 	IsProject()
 	NodeModule
 	Portal
+	Dist() Dist
 }
 
 type App interface {
@@ -70,6 +71,7 @@ type PortalFrontend interface {
 type ProjectFrontend interface {
 	Project
 	Frontend
+	DistFrontend() DistFrontend
 }
 
 type DistFrontend interface {
@@ -89,6 +91,7 @@ type Backend interface {
 type ProjectBackend interface {
 	Project
 	Backend
+	DistBackend() DistBackend
 }
 
 type AppBackend interface {

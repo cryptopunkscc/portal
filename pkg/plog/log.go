@@ -31,6 +31,7 @@ type Log struct {
 	Time    time.Time
 	Message string
 	Stack   []byte
+	Errors  []error
 }
 
 type Level int
