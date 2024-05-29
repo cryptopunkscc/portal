@@ -2,6 +2,7 @@ package project
 
 import (
 	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/go-astral-js/target/dist"
 	"github.com/cryptopunkscc/go-astral-js/target/manifest"
 	"github.com/cryptopunkscc/go-astral-js/target/npm"
 	targetSource "github.com/cryptopunkscc/go-astral-js/target/source"
@@ -34,6 +35,14 @@ func Resolve(nodeModule target.NodeModule) (project target.Project, err error) {
 		project = &frontend{Project: project}
 	case project.Type().Is(target.TypeBackend):
 		project = &backend{Project: project}
+	}
+	return
+}
+
+func Dist[T target.Dist](project target.Project) (t T) {
+	resolve := target.Any[T](target.Try(dist.Resolve))
+	for _, t = range targetSource.List[T](resolve, project) {
+		return
 	}
 	return
 }

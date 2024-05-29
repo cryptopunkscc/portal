@@ -1,6 +1,7 @@
 package plog
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -50,6 +51,12 @@ func (f *Formatter) String(l Log) (line string) {
 	)
 	if l.Level <= Fatal {
 		line += fmt.Sprintf("%s", l.Stack)
+	}
+	for _, err := range l.Errors {
+		var e ErrStack
+		if errors.As(err, &e) {
+			line += fmt.Sprintf("\n%s", e.stack)
+		}
 	}
 	return
 }

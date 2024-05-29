@@ -41,3 +41,16 @@ func (r Runner[T]) Run(ctx context.Context, src string, args ...string) (err err
 	}
 	return
 }
+
+func (r Runner[T]) Start(ctx context.Context, src string, args ...string) (err error) {
+	plog.Get(ctx).Type(r).Println("starting query", src, args)
+	request := rpc.NewRequest(id.Anyone, r.port)
+	typ := target.ParseType(target.TypeAny, args...)
+	sTyp := fmt.Sprintf("%d", typ)
+	err = rpc.Command(request, "", src, sTyp)
+	if err != nil {
+		plog.Get(ctx).Type(r).E().Printf("cannot query %s: %v", src, err)
+		return fmt.Errorf("cannot query %s: %w", src, err)
+	}
+	return
+}

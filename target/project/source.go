@@ -30,3 +30,15 @@ func (m *source) Type() target.Type {
 func (m *source) Manifest() *target.Manifest {
 	return m.manifest
 }
+
+func (m *source) Dist() (t target.Dist) {
+	return Dist[target.Dist](m)
+}
+
+func (m *frontend) DistFrontend() (t target.DistFrontend) {
+	return Dist[target.DistFrontend](m)
+}
+
+func (m *frontend) DistBackend() (t target.DistBackend) {
+	return Dist[target.DistBackend](m)
+}
