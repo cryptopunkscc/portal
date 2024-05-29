@@ -20,10 +20,10 @@ func NewFactory(invoke target.Dispatch, prefix ...string) *Factory {
 
 func newAdapter(ctx context.Context, pkg string, prefix ...string) *Adapter {
 	a := &Adapter{
-		listeners:   map[string]*astral.Listener{},
-		connections: map[string]*Conn{},
-		prefix:      prefix,
+		prefix: prefix,
 	}
+	a.listeners.entries = map[string]*astral.Listener{}
+	a.connections.entries = map[string]*Conn{}
 	if pkg != "" {
 		a.pkg = []string{pkg}
 	}
@@ -41,6 +41,8 @@ func (f Factory) WithTimeout(ctx context.Context, pkg string) target.Apphost {
 		_ = syscall.Kill(syscall.Getpid(), syscall.SIGINT)
 	})
 	flat := newAdapter(ctx, pkg, f.prefix...)
-	flat.onIdle = timeout.Enable
+	flat.connections.onChange = func(m map[string]*Conn, _ string, _ bool) {
+		timeout.Enable(len(m) == 0)
+	}
 	return NewInvoker(ctx, flat, f.invoke)
 }
