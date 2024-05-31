@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
-	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	"github.com/cryptopunkscc/go-astral-js/runner/wails"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/project"
@@ -17,8 +16,8 @@ import (
 	"syscall"
 )
 
-func NewRun(newApi target.NewApi) target.Run[target.ProjectFrontend] {
-	return Runner{NewApi: newApi}.Run
+func NewRunner(newApi target.NewApi) *Runner {
+	return &Runner{NewApi: newApi}
 }
 
 type Runner struct {
@@ -27,48 +26,36 @@ type Runner struct {
 	log plog.Logger
 }
 
-func (f Runner) Run(ctx context.Context, project target.ProjectFrontend) (err error) {
-	f.log = plog.Get(ctx).Type(f).Set(&ctx)
-	f.log.Printf("portal dev open: (%d) %s\n", os.Getpid(), project.Manifest())
-	defer f.log.Printf("portal dev close: (%d) %s\n", os.Getpid(), project.Manifest())
-	opt := wails.AppOptions(f.NewApi(ctx, project))
+func (r *Runner) Run(ctx context.Context, project target.ProjectFrontend) (err error) {
+	r.log = plog.Get(ctx).Type(r).Set(&ctx)
+	r.log.Printf("portal dev open: (%d) %s\n", os.Getpid(), project.Manifest())
+	defer r.log.Printf("portal dev close: (%d) %s\n", os.Getpid(), project.Manifest())
+	opt := wails.AppOptions(r.NewApi(ctx, project))
 	opt.OnStartup = func(ctx context.Context) {
-		f.frontCtx = ctx
-		go f.serve(project)
+		r.frontCtx = ctx
 	}
-	if err = f.run(project.Abs(), opt); err != nil {
-		f.log.F().Printf("dev.Run: %v", err)
+	if err = r.run(project.Abs(), opt); err != nil {
+		r.log.F().Printf("dev.Run: %v", err)
 	}
 	return
 }
 
-func (f Runner) serve(project target.ProjectFrontend) {
-	port := target.DevPort(project)
-	s := rpc.NewApp(port)
-	//s.Logger(f.log.New(f.log.Writer(), port+" ", 0))
-	s.RouteFunc("reload", f.Reload)
-	err := s.Run(f.frontCtx)
-	if err != nil {
-		f.log.Printf("%s: %v", port, err)
-	}
-}
-
-func (f Runner) Reload() (err error) {
-	if f.frontCtx == nil {
+func (r *Runner) Reload() (err error) {
+	if r.frontCtx == nil {
 		return errors.New("nil context")
 	}
-	wailsruntime.WindowReload(f.frontCtx)
+	wailsruntime.WindowReload(r.frontCtx)
 	return
 }
 
-func (f Runner) run(path string, opt *options.App) (err error) {
+func (r *Runner) run(path string, opt *options.App) (err error) {
 	// Start frontend dev watcher
 	viteCommand := "npm run dev"
 	stopDevWatcher, url, _, err := runViteWatcher(viteCommand, path, true)
 	if err != nil {
 		return err
 	}
-	f.log.Println("url: ", url)
+	r.log.Println("url: ", url)
 	go func() {
 		quitChannel := make(chan os.Signal, 1)
 		signal.Notify(quitChannel, os.Interrupt, syscall.SIGTERM)
@@ -100,7 +87,7 @@ func (f Runner) run(path string, opt *options.App) (err error) {
 	_ = os.Setenv("frontenddevserverurl", url)
 
 	// run
-	f.log.Println("running wails")
+	r.log.Println("running wails")
 	app := application.NewWithOptions(opt)
 	err = app.Run()
 	return

@@ -12,18 +12,20 @@ type Runner[T target.Portal] struct {
 	wait      *sync.WaitGroup
 	find      target.Find[T]
 	run       target.Run[T]
-	processes sig.Map[string, any]
+	processes *sig.Map[string, T]
 }
 
 func NewRunner[T target.Portal](
 	wait *sync.WaitGroup,
 	find target.Find[T],
 	run target.Run[T],
+	processes *sig.Map[string, T],
 ) *Runner[T] {
 	return &Runner[T]{
-		wait: wait,
-		find: find,
-		run:  run,
+		wait:      wait,
+		find:      find,
+		run:       run,
+		processes: processes,
 	}
 }
 
@@ -45,7 +47,7 @@ func (r *Runner[T]) Run(ctx context.Context, src string, args ...string) (err er
 
 func (r *Runner[T]) runPortal(ctx context.Context, t T) {
 	id := t.Manifest().Package
-	if _, ok := r.processes.Set(id, 0); !ok {
+	if _, ok := r.processes.Set(id, t); !ok {
 		return
 	}
 	r.wait.Add(1)

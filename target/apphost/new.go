@@ -1,9 +1,11 @@
 package apphost
 
+import "C"
 import (
 	"context"
-	"github.com/cryptopunkscc/astrald/lib/astral"
+	"github.com/cryptopunkscc/astrald/sig"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
+	"github.com/cryptopunkscc/go-astral-js/pkg/registry"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"syscall"
 	"time"
@@ -22,13 +24,41 @@ func newAdapter(ctx context.Context, pkg string, prefix ...string) *Adapter {
 	a := &Adapter{
 		prefix: prefix,
 	}
-	a.listeners.entries = map[string]*astral.Listener{}
-	a.connections.entries = map[string]*Conn{}
 	if pkg != "" {
 		a.pkg = []string{pkg}
 	}
 	a.log = plog.Get(ctx).Type(a).Set(&ctx)
+
+	a.listeners = registry.New[*Listener]()
+	a.connections = registry.New[*Conn]()
+
+	a.listeners.OnChange(eventEmitter[*Listener](a.Events()))
+	a.connections.OnChange(eventEmitter[*Conn](a.Events()))
+
 	return a
+}
+
+func eventEmitter[T any](queue *sig.Queue[target.ApphostEvent]) func(ref string, conn T, added bool) {
+	return func(ref string, conn T, added bool) {
+		event := target.ApphostEvent{Ref: ref}
+		switch v := any(conn).(type) {
+		case *Conn:
+			event.Port = v.conn.Query()
+			event.Type = target.ApphostDisconnect
+			if added {
+				event.Type = target.ApphostConnect
+			}
+		case *Listener:
+			event.Port = v.port
+			event.Type = target.ApphostUnregister
+			if added {
+				event.Type = target.ApphostRegister
+			}
+		default:
+			return
+		}
+		queue.Push(event)
+	}
 }
 
 func (f Factory) NewAdapter(ctx context.Context, pkg string) target.Apphost {
@@ -41,8 +71,12 @@ func (f Factory) WithTimeout(ctx context.Context, pkg string) target.Apphost {
 		_ = syscall.Kill(syscall.Getpid(), syscall.SIGINT)
 	})
 	flat := newAdapter(ctx, pkg, f.prefix...)
-	flat.connections.onChange = func(m map[string]*Conn, _ string, _ bool) {
-		timeout.Enable(len(m) == 0)
-	}
+
+	go func() {
+		for range flat.Events().Subscribe(ctx) {
+			timeout.Enable(flat.connections.Size() == 0)
+		}
+	}()
+
 	return NewInvoker(ctx, flat, f.invoke)
 }

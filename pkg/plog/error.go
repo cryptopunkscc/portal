@@ -5,29 +5,25 @@ import (
 	"runtime/debug"
 )
 
+var ErrorStackTrace = false
+
 type ErrStack struct {
 	error
 	stack []byte
 }
 
-func Err(err error) ErrStack {
+func Err(err error) error {
+	if !ErrorStackTrace {
+		return err
+	}
 	return ErrStack{
 		error: err,
 		stack: debug.Stack(),
 	}
 }
 
-func Errorf(format string, args ...any) ErrStack {
-	return ErrStack{
-		error: fmt.Errorf(format, args...),
-		stack: debug.Stack(),
-	}
-}
-
-func (e ErrStack) Msgf(format string, args ...any) ErrStack {
-	msg := fmt.Sprintf(format, args...)
-	e.error = fmt.Errorf("%s: %v", msg, e.error)
-	return e
+func Errorf(format string, args ...any) (err error) {
+	return Err(fmt.Errorf(format, args...))
 }
 
 func (e ErrStack) Error() string {

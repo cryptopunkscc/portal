@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/cryptopunkscc/astrald/sig"
 	manifest "github.com/cryptopunkscc/go-astral-js"
 	"github.com/cryptopunkscc/go-astral-js/clir"
 	feature "github.com/cryptopunkscc/go-astral-js/feat"
@@ -9,8 +10,10 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/feat/build"
 	"github.com/cryptopunkscc/go-astral-js/feat/create"
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
+	"github.com/cryptopunkscc/go-astral-js/pkg/broadcast"
 	osExec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
+	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	create2 "github.com/cryptopunkscc/go-astral-js/runner/create"
 	"github.com/cryptopunkscc/go-astral-js/runner/dev"
 	"github.com/cryptopunkscc/go-astral-js/runner/dist"
@@ -29,6 +32,7 @@ func main() {
 	go osExec.OnShutdown(cancel)
 
 	println("...")
+	plog.ErrorStackTrace = true
 	log := plog.New().D().Scope("dev").Set(&ctx)
 	log.Println("starting portal development", os.Args)
 	defer log.Println("closing portal development")
@@ -47,6 +51,10 @@ func main() {
 		FeatObserve:    featApps.Observe,
 		JoinTarget:     query.NewRunner[target.App]("dev.portal.open").Run,
 		DispatchTarget: query.NewRunner[target.App]("dev.portal.open").Start,
+		Processes:      &sig.Map[string, target.Portal]{},
+	}
+	scope.RpcHandlers = rpc.Handlers{
+		"ctrl": broadcast.New(scope.GetProcesses(), "ctrl", scope.Prefix...).Signal,
 	}
 	scope.DispatchService = scope.GetServeFeature().Dispatch
 

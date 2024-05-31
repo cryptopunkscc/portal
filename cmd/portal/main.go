@@ -26,6 +26,8 @@ func main() {
 	go osExec.OnShutdown(cancel)
 
 	println("...")
+
+	plog.ErrorStackTrace = true
 	log := plog.New().I().Set(&ctx).Scope("main")
 	log.Println("starting portal", os.Args)
 	defer log.Println("closing portal")

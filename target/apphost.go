@@ -1,5 +1,7 @@
 package target
 
+import "github.com/cryptopunkscc/astrald/sig"
+
 const (
 	Log             = "_log"
 	Sleep           = "_sleep"
@@ -17,6 +19,11 @@ const (
 )
 
 type Apphost interface {
+	ApphostCache
+	ApphostApi
+}
+
+type ApphostApi interface {
 	Prefix() []string
 	Close() error
 	Interrupt()
@@ -35,7 +42,37 @@ type Apphost interface {
 	NodeInfo(identity string) (info NodeInfo, err error)
 }
 
+type ApphostCache interface {
+	Connections() []ApphostConn
+	Listeners() []ApphostListener
+	Events() *sig.Queue[ApphostEvent]
+}
+
+type ApphostEvent struct {
+	Type ApphostEventType
+	Port string
+	Ref  string
+}
+
+type ApphostEventType int
+
+const (
+	ApphostConnect ApphostEventType = iota
+	ApphostDisconnect
+	ApphostRegister
+	ApphostUnregister
+)
+
 type NodeInfo struct {
 	Identity string
 	Name     string
+}
+
+type ApphostConn struct {
+	Query string
+	In    bool
+}
+
+type ApphostListener struct {
+	Port string
 }

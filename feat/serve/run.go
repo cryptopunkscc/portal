@@ -52,10 +52,11 @@ func (f Feat) Run(
 		err = fmt.Errorf("port already registered or astral not running: %v", err)
 		return
 	}
+	err = nil
 	ctx, cancel := context.WithCancel(ctx)
 	go func() {
 		defer cancel()
-		if err = f.serve(ctx, f.port); err != nil {
+		if err := f.serve(ctx, f.port); err != nil {
 			log.Printf("serve exit: %v\n", err)
 		} else {
 			log.Println("serve exit")
