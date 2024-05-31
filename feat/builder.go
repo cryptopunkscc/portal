@@ -2,6 +2,7 @@ package feat
 
 import (
 	"context"
+	"github.com/cryptopunkscc/astrald/sig"
 	embedApps "github.com/cryptopunkscc/go-astral-js/apps"
 	"github.com/cryptopunkscc/go-astral-js/feat/dispatch"
 	"github.com/cryptopunkscc/go-astral-js/feat/open"
@@ -24,6 +25,7 @@ type Scope[T target.Portal] struct {
 	WaitGroup   *sync.WaitGroup
 	TargetCache *target.Cache[T]
 	RpcHandlers rpc.Handlers
+	Processes   *sig.Map[string, T]
 
 	WrapApi       func(target.Api) target.Api
 	NewRunTarget  func(target.NewApi) target.Run[T]
@@ -49,6 +51,7 @@ type Scope[T target.Portal] struct {
 }
 
 func (s *Scope[T]) GetWaitGroup() *sync.WaitGroup       { return assert(s.WaitGroup) }
+func (s *Scope[T]) GetProcesses() *sig.Map[string, T]   { return assert(s.Processes) }
 func (s *Scope[T]) GetExecTarget() target.Run[T]        { return assert(s.ExecTarget) }
 func (s *Scope[T]) GetTargetFinder() target.Finder[T]   { return assert(s.TargetFinder) }
 func (s *Scope[T]) GetTargetCache() *target.Cache[T]    { return assert(s.TargetCache) }
@@ -74,7 +77,12 @@ func (s *Scope[T]) GetTargetFind() target.Find[T] {
 
 func (s *Scope[T]) GetServeFeature() *serve.Feat {
 	if s.FeatServe == nil {
-		runSpawn := spawn.NewRunner(s.GetWaitGroup(), s.GetTargetFind(), s.GetExecTarget()).Run
+		runSpawn := spawn.NewRunner(
+			s.GetWaitGroup(),
+			s.GetTargetFind(),
+			s.GetExecTarget(),
+			s.GetProcesses(),
+		).Run
 		runTray := target.Tray(nil)
 		if s.NewRunTray != nil {
 			runTray = s.NewRunTray(runSpawn)

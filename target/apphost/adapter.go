@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/astrald/lib/astral"
+	"github.com/cryptopunkscc/astrald/sig"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
+	"github.com/cryptopunkscc/go-astral-js/pkg/registry"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/google/uuid"
 	"io"
@@ -22,8 +24,27 @@ type Adapter struct {
 	pkg    []string
 	prefix []string
 
-	listeners   Registry[*astral.Listener]
-	connections Registry[*Conn]
+	listeners   registry.Cache[*Listener]
+	connections registry.Cache[*Conn]
+	events      sig.Queue[target.ApphostEvent]
+}
+
+func (api *Adapter) Connections() (c []target.ApphostConn) {
+	for _, s := range api.connections.Copy() {
+		c = append(c, target.ApphostConn{Query: s.conn.Query(), In: s.in})
+	}
+	return
+}
+
+func (api *Adapter) Listeners() (l []target.ApphostListener) {
+	for _, s := range api.listeners.Copy() {
+		l = append(l, target.ApphostListener{Port: s.port})
+	}
+	return
+}
+
+func (api *Adapter) Events() *sig.Queue[target.ApphostEvent] {
+	return &api.events
 }
 
 func (api *Adapter) Port(service ...string) (port string) {
@@ -73,10 +94,11 @@ func (api *Adapter) ServiceRegister(service string) (err error) {
 		port = api.Port(append(api.pkg, service)...)
 	}
 	api.log.Println("register:", service)
-	listener, err := astral.Register(port)
+	astralListener, err := astral.Register(port)
 	if err != nil {
 		return
 	}
+	listener := newListener(astralListener, port)
 	api.listeners.Set(service, listener)
 	return
 }
@@ -89,7 +111,7 @@ func (api *Adapter) ServiceClose(service string) (err error) {
 	}
 	err = listener.Close()
 	if err != nil {
-		api.listeners.Set(service, nil)
+		api.listeners.Delete(service)
 	}
 	return
 }
@@ -112,7 +134,7 @@ func (api *Adapter) ConnAccept(service string) (data string, err error) {
 
 	connId := uuid.New().String()
 	api.log.Println("accepted connection:", connId)
-	api.connections.Set(connId, newConn(conn))
+	api.connections.Set(connId, newConn(conn, false))
 
 	pkg := strings.Join(append(api.Prefix(), api.pkg...), ".")
 	query := strings.TrimPrefix(conn.Query(), pkg)
@@ -140,7 +162,7 @@ func (api *Adapter) ConnClose(id string) (err error) {
 		return
 	}
 	err = conn.Close()
-	api.connections.Set(id, nil)
+	api.connections.Delete(id)
 	return
 }
 
@@ -153,7 +175,7 @@ func (api *Adapter) ConnWrite(id string, data string) (err error) {
 	}
 	if _, err = conn.Write([]byte(data)); err != nil {
 		_ = conn.Close()
-		api.connections.Set(id, nil)
+		api.connections.Delete(id)
 	}
 	return
 }
@@ -187,7 +209,7 @@ func (api *Adapter) Query(identity string, query string) (data string, err error
 		return
 	}
 	connId := uuid.New().String()
-	api.connections.Set(connId, newConn(conn))
+	api.connections.Set(connId, newConn(conn, false))
 
 	bytes, err := json.Marshal(queryData{
 		Id:    connId,
@@ -206,7 +228,7 @@ func (api *Adapter) QueryName(name string, query string) (data string, err error
 		return
 	}
 	connId := uuid.New().String()
-	api.connections.Set(connId, newConn(conn))
+	api.connections.Set(connId, newConn(conn, false))
 
 	bytes, err := json.Marshal(queryData{
 		Id:    connId,
@@ -248,12 +270,23 @@ type Conn struct {
 	conn *astral.Conn
 	*bufio.Reader
 	io.WriteCloser
+	in bool
 }
 
-func newConn(conn *astral.Conn) *Conn {
+type Listener struct {
+	*astral.Listener
+	port string
+}
+
+func newListener(listener *astral.Listener, port string) *Listener {
+	return &Listener{Listener: listener, port: port}
+}
+
+func newConn(conn *astral.Conn, in bool) *Conn {
 	return &Conn{
 		conn:        conn,
 		Reader:      bufio.NewReader(conn),
 		WriteCloser: conn,
+		in:          in,
 	}
 }

@@ -3,6 +3,7 @@ package rpc
 import (
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/astrald/lib/astral"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"io"
 )
 
@@ -59,7 +60,7 @@ func (r *Request) Call(method string, value any) (err error) {
 		}
 		args, err := r.marshal(value)
 		if err != nil {
-			return err
+			return plog.Err(err)
 		}
 		query += string(args)
 	}
@@ -72,7 +73,7 @@ func (r *Request) Call(method string, value any) (err error) {
 	// query stream
 	var conn io.ReadWriteCloser
 	if conn, err = astral.Query(r.RemoteIdentity(), query); err != nil {
-		return
+		return plog.Err(err)
 	}
 
 	// setup

@@ -1,4 +1,4 @@
-package backend_dev
+package npm
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"os/exec"
 )
 
-func NpmRunWatch(ctx context.Context, src string) *exec.Cmd {
+func RunWatch(ctx context.Context, src string) *exec.Cmd {
 	cmd := exec.CommandContext(ctx, "npm", "run", "watch")
 	cmd.Env = os.Environ()
 	cmd.Dir = src

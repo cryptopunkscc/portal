@@ -17,7 +17,7 @@ func Observe(ctx context.Context, conn rpc.Conn) (err error) {
 	if err != nil {
 		return
 	}
-	watch, err := fs.NotifyWatch(ctx, portalAppsDir)
+	watch, err := fs.NotifyWatch(ctx, portalAppsDir, 0)
 	if err != nil {
 		return
 	}
