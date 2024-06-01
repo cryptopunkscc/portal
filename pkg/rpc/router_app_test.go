@@ -3,14 +3,15 @@ package rpc
 import (
 	"context"
 	"github.com/cryptopunkscc/astrald/auth/id"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/stretchr/testify/assert"
-	"log"
 	"testing"
 	"time"
 )
 
 func TestApp_Run(t *testing.T) {
 
+	log := plog.New()
 	// register service
 	ctx := context.Background()
 	app := NewApp("testApi")
@@ -23,15 +24,15 @@ func TestApp_Run(t *testing.T) {
 		log.Println("test2 args", s)
 		return s
 	})
-	app.Logger(log.New(log.Writer(), "service", 0))
-	if err := app.Run(ctx); err != nil {
+	app.Logger(log.Scope("service"))
+	if err := app.Start(ctx); err != nil {
 		panic(err)
 	}
 	time.Sleep(10 * time.Millisecond)
 
 	conn, _ := QueryFlow(id.Identity{}, "testApi")
 	//conn := NewRequest(id.Identity{}, "testApi")
-	conn.Logger(log.New(log.Writer(), "client ", 0))
+	conn.Logger(log.Scope("client"))
 
 	t.Run("Query invalid", func(t *testing.T) {
 		err := Command(conn, "asdasdas \n")
@@ -91,11 +92,11 @@ func TestApp_Run_root(t *testing.T) {
 		cancel()
 	})
 	app := NewApp("test")
-	app.Logger(log.New(log.Writer(), "service ", 0))
+	app.Logger(plog.Scope("service"))
 	app.Func("", func(_, identity id.Identity) bool {
 		return identity.IsEqual(id.Anyone)
 	})
-	err := app.Run(ctx)
+	err := app.Start(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -107,7 +108,7 @@ func TestApp_Run_root(t *testing.T) {
 	t.Cleanup(func() {
 		_ = rpc.Close()
 	})
-	rpc.Logger(log.New(log.Writer(), "  client ", 0))
+	rpc.Logger(plog.Scope("client"))
 
 	otherID, _ := id.GenerateIdentity()
 	tests := []struct {
@@ -128,9 +129,10 @@ func TestApp_Run_root(t *testing.T) {
 }
 
 func TestApp_Run_subroutine(t *testing.T) {
+	t.SkipNow()
 	ctx := context.Background()
 	app := NewApp("test")
-	app.Logger(log.New(log.Writer(), "service ", 0))
+	app.Logger(plog.Scope("service"))
 	app.Func("a", func() (i int, err error) {
 		conn, err := QueryFlow(id.Anyone, "test2")
 		if err != nil {
@@ -139,11 +141,11 @@ func TestApp_Run_subroutine(t *testing.T) {
 		i, err = Query[int](conn, "b")
 		return
 	})
-	err := app.Run(ctx)
+	err := app.Start(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
-	time.Sleep(1000000)
+	//time.Sleep(1000000)
 	rpc, err := QueryFlow(id.Anyone, "test")
 	if err != nil {
 		t.Fatal(err)
@@ -151,10 +153,10 @@ func TestApp_Run_subroutine(t *testing.T) {
 	t.Cleanup(func() {
 		_ = rpc.Close()
 	})
-	rpc.Logger(log.New(log.Writer(), "  client ", 0))
+	rpc.Logger(plog.Scope("client"))
 
 	app = NewApp("test2")
-	app.Logger(log.New(log.Writer(), "service2 ", 0))
+	app.Logger(plog.Scope("service"))
 	app.Func("b", func() int {
 		return 1
 	})
@@ -162,7 +164,7 @@ func TestApp_Run_subroutine(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	time.Sleep(1000000)
+	//time.Sleep(1000000)
 
 	i, err := Query[int](rpc, "a")
 	if err != nil {

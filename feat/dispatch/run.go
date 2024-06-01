@@ -9,17 +9,17 @@ import (
 )
 
 type Feat struct {
-	runTarget  target.Dispatch
-	runService target.Dispatch
+	dispatchTarget  target.Dispatch
+	dispatchService target.Dispatch
 }
 
 func NewFeat(
-	runTarget target.Dispatch,
-	runService target.Dispatch,
+	dispatchTarget target.Dispatch,
+	dispatchService target.Dispatch,
 ) target.Dispatch {
 	return Feat{
-		runTarget:  runTarget,
-		runService: runService,
+		dispatchTarget:  dispatchTarget,
+		dispatchService: dispatchService,
 	}.Run
 }
 
@@ -30,16 +30,16 @@ func (f Feat) Run(
 ) (err error) {
 	plog.Get(ctx).Type(f).Set(&ctx)
 
-	if err = f.runTarget(ctx, src, args...); err == nil {
+	if err = f.dispatchTarget(ctx, src, args...); err == nil {
 		return
 	}
 
-	if err = f.runService(ctx, "s", "-t"); err != nil {
+	if err = f.dispatchService(ctx, "s", "-t"); err != nil {
 		return
 	}
 
 	if err = exec.Retry(ctx, 8*time.Second, func(i int, n int, duration time.Duration) error {
-		return f.runTarget(ctx, src, args...)
+		return f.dispatchTarget(ctx, src, args...)
 	}); err != nil {
 		return
 	}

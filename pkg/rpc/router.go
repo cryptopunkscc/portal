@@ -85,6 +85,15 @@ func (r *Router) Interface(srv any) *Router {
 	return r
 }
 
+func (r *Router) Start(ctx context.Context) (err error) {
+	go func() {
+		if err = r.Run(ctx); err != nil {
+			plog.Get(ctx).Type(r).E().Println(err)
+		}
+	}()
+	return nil
+}
+
 func (r *Router) Run(ctx context.Context) (err error) {
 	r.registerApi()
 	if len(r.routes) == 0 {
