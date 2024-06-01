@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/cryptopunkscc/astrald/sig"
 	manifest "github.com/cryptopunkscc/go-astral-js"
 	"github.com/cryptopunkscc/go-astral-js/clir"
 	feature "github.com/cryptopunkscc/go-astral-js/feat"
@@ -32,21 +33,25 @@ func main() {
 	log.Println("starting portal", os.Args)
 	defer log.Println("closing portal")
 
+	port := target.Port{Host: "portal"}
+	portOpen := port.Cmd("open")
+	executable := "portal"
 	scope := feature.Scope[target.App]{
-		Port:            "portal",
+		Port:            port,
 		WrapApi:         NewAdapter,
 		WaitGroup:       &sync.WaitGroup{},
 		TargetCache:     target.NewCache[target.App](),
 		NewRunTarget:    app.NewRun,
 		NewRunTray:      tray.NewRun,
 		NewRunService:   service.NewRun,
-		ExecTarget:      exec.NewRun[target.App]("portal"),
+		ExecTarget:      exec.NewRun[target.App](executable),
 		TargetFinder:    apps.NewFind,
 		GetPath:         featApps.Path,
 		FeatObserve:     featApps.Observe,
-		JoinTarget:      query.NewRunner[target.App]("portal.open").Run,
-		DispatchTarget:  query.NewRunner[target.App]("portal.open").Start,
-		DispatchService: exec.NewService("portal").Start,
+		JoinTarget:      query.NewRunner[target.App](portOpen).Run,
+		DispatchTarget:  query.NewRunner[target.App](portOpen).Start,
+		DispatchService: exec.NewDispatch(executable).Start,
+		Processes:       &sig.Map[string, target.App]{},
 	}
 	scope.RpcHandlers = rpc.Handlers{
 		"install":   featApps.Install,

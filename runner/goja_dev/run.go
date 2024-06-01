@@ -13,8 +13,8 @@ type Runner struct {
 	distRunner *goja_dist.Runner
 }
 
-func NewRunner(ctrlPort string, newApi target.NewApi) *Runner {
-	distRunner := goja_dist.NewRunner(ctrlPort, newApi)
+func NewRunner(newApi target.NewApi, send target.MsgSend) *Runner {
+	distRunner := goja_dist.NewRunner(newApi, send)
 	return &Runner{distRunner: distRunner}
 }
 

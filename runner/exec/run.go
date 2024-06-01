@@ -43,8 +43,6 @@ type portal[T target.Portal] struct {
 	src []string
 }
 
-var _ target.Run[target.Portal] = (&portal[target.Portal]{}).run
-
 func newPortal[T target.Portal](src ...string) *portal[T] {
 	return &portal[T]{src: src}
 }

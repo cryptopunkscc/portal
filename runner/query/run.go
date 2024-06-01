@@ -13,8 +13,8 @@ type Runner[T target.Portal] struct {
 	port string
 }
 
-func NewRunner[T target.Portal](port string) *Runner[T] {
-	return &Runner[T]{port: port}
+func NewRunner[T target.Portal](port target.Port) *Runner[T] {
+	return &Runner[T]{port: port.String()}
 }
 
 func (r Runner[T]) Run(ctx context.Context, src string, args ...string) (err error) {

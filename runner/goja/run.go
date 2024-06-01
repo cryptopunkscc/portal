@@ -8,13 +8,12 @@ import (
 
 type Runner struct {
 	newApi  target.NewApi
-	prefix  []string
 	backend *Backend
 	app     target.AppBackend
 }
 
-func NewRunner(newApi target.NewApi, prefix ...string) *Runner {
-	return &Runner{newApi: newApi, prefix: prefix}
+func NewRunner(newApi target.NewApi) *Runner {
+	return &Runner{newApi: newApi}
 }
 
 func (r *Runner) Reload() (err error) {

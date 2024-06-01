@@ -14,13 +14,12 @@ import (
 )
 
 type Runner struct {
-	prefix   []string
 	newApi   target.NewApi
 	frontCtx context.Context
 }
 
-func NewRunner(newApi target.NewApi, prefix ...string) *Runner {
-	return &Runner{newApi: newApi, prefix: prefix}
+func NewRunner(newApi target.NewApi) *Runner {
+	return &Runner{newApi: newApi}
 }
 
 func (r *Runner) Reload() (err error) {
