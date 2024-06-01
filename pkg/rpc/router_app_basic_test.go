@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/astrald/mod/apphost/proto"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/stretchr/testify/assert"
-	"log"
 	"reflect"
 	"slices"
 	"testing"
@@ -29,7 +29,7 @@ func TestApp_Run_basic(t *testing.T) {
 	clients := []func(*testing.T) (Conn, error){
 		func(*testing.T) (c Conn, err error) {
 			c = NewRequest(id.Anyone, port)
-			c.Logger(log.New(log.Writer(), "", 0))
+			c.Logger(plog.New().Type(c))
 			return
 		},
 		func(t *testing.T) (c Conn, err error) {
@@ -37,7 +37,7 @@ func TestApp_Run_basic(t *testing.T) {
 			if err != nil {
 				return
 			}
-			c.Logger(log.New(log.Writer(), "", 0))
+			c.Logger(plog.New().Type(c))
 			return
 		},
 	}
@@ -216,7 +216,7 @@ func TestApp_Run_basic(t *testing.T) {
 func function0() bool { return false }
 
 func function1() {
-	log.Println("function1")
+	plog.Println("function1")
 }
 
 func function2(i int) int {
@@ -287,6 +287,6 @@ func function10(s struct3) struct3 {
 
 func function11(arg string, args ...string) (arr []string) {
 	arr = append(args, arg)
-	log.Println(arr)
+	plog.Println(arr)
 	return
 }
