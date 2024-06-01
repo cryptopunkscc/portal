@@ -10,7 +10,7 @@ import (
 )
 
 type Feat struct {
-	port  string
+	port  target.Port
 	tray  target.Tray
 	serve target.Dispatch
 }
@@ -23,7 +23,7 @@ type (
 )
 
 func NewFeat(
-	port string,
+	port target.Port,
 	service Service,
 	handlers rpc.Handlers,
 	spawn target.Dispatch,
@@ -48,7 +48,8 @@ func (f Feat) Run(
 	tray bool,
 ) (err error) {
 	log := plog.Get(ctx).Type(f).Set(&ctx)
-	if err = rpc.Command(rpc.NewRequest(id.Anyone, f.port), "ping"); err == nil {
+	request := rpc.NewRequest(id.Anyone, f.port.String())
+	if err = rpc.Command(request, "ping"); err == nil {
 		err = fmt.Errorf("port already registered or astral not running: %v", err)
 		return
 	}
@@ -56,7 +57,7 @@ func (f Feat) Run(
 	ctx, cancel := context.WithCancel(ctx)
 	go func() {
 		defer cancel()
-		if err := f.serve(ctx, f.port); err != nil {
+		if err := f.serve(ctx, f.port.String()); err != nil {
 			log.Printf("serve exit: %v\n", err)
 		} else {
 			log.Println("serve exit")

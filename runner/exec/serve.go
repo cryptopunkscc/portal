@@ -6,15 +6,15 @@ import (
 	"os/exec"
 )
 
-type Service struct {
+type Dispatch struct {
 	executable string
 }
 
-func NewService(executable string) *Service {
-	return &Service{executable: executable}
+func NewDispatch(executable string) *Dispatch {
+	return &Dispatch{executable: executable}
 }
 
-func (s Service) Start(ctx context.Context, cmd string, args ...string) error {
+func (s Dispatch) Start(ctx context.Context, cmd string, args ...string) error {
 	args2 := append([]string{cmd}, args...)
 	c := exec.CommandContext(ctx, s.executable, args2...)
 	c.Stdout = os.Stdout

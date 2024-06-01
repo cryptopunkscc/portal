@@ -10,7 +10,6 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/feat/build"
 	"github.com/cryptopunkscc/go-astral-js/feat/create"
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
-	"github.com/cryptopunkscc/go-astral-js/pkg/broadcast"
 	osExec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
@@ -22,6 +21,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/runner/query"
 	"github.com/cryptopunkscc/go-astral-js/runner/service"
 	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/go-astral-js/target/msg"
 	"github.com/cryptopunkscc/go-astral-js/target/portals"
 	"os"
 	"sync"
@@ -37,24 +37,27 @@ func main() {
 	log.Println("starting portal development", os.Args)
 	defer log.Println("closing portal development")
 
+	port := target.Port{Host: "portal", Prefix: []string{"dev"}}
+	portOpen := port.Cmd("open")
+	portMsg := port.Cmd("ctrl")
+	executable := "portal-dev"
 	scope := feature.Scope[target.Portal]{
-		Port:           "dev.portal",
-		Prefix:         []string{"dev"},
+		Port:           port,
 		WrapApi:        NewAdapter,
 		WaitGroup:      &sync.WaitGroup{},
 		TargetCache:    target.NewCache[target.Portal](),
-		NewRunTarget:   dev.NewRun,
+		NewRunTarget:   dev.NewRun(portMsg),
 		NewRunService:  service.NewRun,
 		TargetFinder:   portals.NewFind,
-		ExecTarget:     exec.NewRun[target.Portal]("portal-dev"),
+		ExecTarget:     exec.NewRun[target.Portal](executable),
 		GetPath:        featApps.Path,
 		FeatObserve:    featApps.Observe,
-		JoinTarget:     query.NewRunner[target.App]("dev.portal.open").Run,
-		DispatchTarget: query.NewRunner[target.App]("dev.portal.open").Start,
+		JoinTarget:     query.NewRunner[target.App](portOpen).Run,
+		DispatchTarget: query.NewRunner[target.App](portOpen).Start,
 		Processes:      &sig.Map[string, target.Portal]{},
 	}
 	scope.RpcHandlers = rpc.Handlers{
-		"ctrl": broadcast.New(scope.GetProcesses(), "ctrl", scope.Prefix...).Signal,
+		portMsg.Command: msg.NewBroadcast(portMsg, scope.GetProcesses()).BroadcastMsg,
 	}
 	scope.DispatchService = scope.GetServeFeature().Dispatch
 

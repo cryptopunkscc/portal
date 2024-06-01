@@ -21,7 +21,7 @@ import (
 
 type Scope[T target.Portal] struct {
 	Prefix      []string
-	Port        string
+	Port        target.Port
 	WaitGroup   *sync.WaitGroup
 	TargetCache *target.Cache[T]
 	RpcHandlers rpc.Handlers
@@ -102,7 +102,7 @@ func (s *Scope[T]) GetServeFeature() *serve.Feat {
 
 func (s *Scope[T]) GetOpenFeature() target.Dispatch {
 	if s.FeatOpen == nil {
-		newApphost := apphost.NewFactory(s.GetDispatchTarget(), s.Prefix...)
+		newApphost := apphost.NewFactory(s.GetDispatchTarget(), s.Port.Prefix...)
 		newApi := target.ApiFactory(assert(s.WrapApi),
 			newApphost.NewAdapter,
 			newApphost.WithTimeout,
