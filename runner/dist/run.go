@@ -12,7 +12,7 @@ import (
 	"path"
 )
 
-func NewRun(dependencies []target.NodeModule) target.Run[target.Project] {
+func NewRun(dependencies []target.NodeModule) target.Run[target.ProjectNodeModule] {
 	return NewRunner(dependencies).Run
 }
 
@@ -24,7 +24,7 @@ func NewRunner(dependencies []target.NodeModule) *Runner {
 	return &Runner{dependencies: dependencies}
 }
 
-func (r Runner) Run(ctx context.Context, project target.Project) (err error) {
+func (r Runner) Run(ctx context.Context, project target.ProjectNodeModule) (err error) {
 	if err = r.Prepare(ctx, project); err != nil {
 		return fmt.Errorf("dist.Prepare: %w", err)
 	}
@@ -34,7 +34,7 @@ func (r Runner) Run(ctx context.Context, project target.Project) (err error) {
 	return
 }
 
-func (r Runner) Prepare(ctx context.Context, project target.Project) (err error) {
+func (r Runner) Prepare(ctx context.Context, project target.ProjectNodeModule) (err error) {
 	if err = npm.Install(project); err != nil {
 		return
 	}
@@ -44,7 +44,7 @@ func (r Runner) Prepare(ctx context.Context, project target.Project) (err error)
 	return
 }
 
-func (r Runner) Dist(ctx context.Context, project target.Project) (err error) {
+func (r Runner) Dist(ctx context.Context, project target.ProjectNodeModule) (err error) {
 	if !project.PkgJson().CanBuild() {
 		return errors.New("missing npm build in package.json")
 	}
@@ -60,7 +60,7 @@ func (r Runner) Dist(ctx context.Context, project target.Project) (err error) {
 	return
 }
 
-func (r Runner) CopyIcon(_ context.Context, project target.Project) (err error) {
+func (r Runner) CopyIcon(_ context.Context, project target.ProjectNodeModule) (err error) {
 	if project.Manifest().Icon == "" {
 		return
 	}
@@ -74,7 +74,7 @@ func (r Runner) CopyIcon(_ context.Context, project target.Project) (err error) 
 	return
 }
 
-func (r Runner) CopyManifest(_ context.Context, project target.Project) (err error) {
+func (r Runner) CopyManifest(_ context.Context, project target.ProjectNodeModule) (err error) {
 	bytes, err := json.Marshal(project.Manifest())
 	if err != nil {
 		return err

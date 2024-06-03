@@ -9,7 +9,7 @@ import (
 	"io/fs"
 )
 
-func FromPath(src string) (project target.Project, err error) {
+func FromPath(src string) (project target.ProjectNodeModule, err error) {
 	nodeModule, err := npm.ResolveNodeModule(targetSource.FromPath(src))
 	if err != nil {
 		return
@@ -17,7 +17,7 @@ func FromPath(src string) (project target.Project, err error) {
 	return Resolve(nodeModule)
 }
 
-func Resolve(nodeModule target.NodeModule) (project target.Project, err error) {
+func Resolve(nodeModule target.NodeModule) (project target.ProjectNodeModule, err error) {
 	m := target.Manifest{}
 	sub, err := fs.Sub(nodeModule.Files(), nodeModule.Path())
 	if err != nil {
@@ -32,14 +32,14 @@ func Resolve(nodeModule target.NodeModule) (project target.Project, err error) {
 	project = &source{NodeModule: nodeModule, manifest: &m}
 	switch {
 	case project.Type().Is(target.TypeFrontend):
-		project = &frontend{Project: project}
+		project = &frontend{ProjectNodeModule: project}
 	case project.Type().Is(target.TypeBackend):
-		project = &backend{Project: project}
+		project = &backend{ProjectNodeModule: project}
 	}
 	return
 }
 
-func Dist[T target.Dist](project target.Project) (t T) {
+func Dist[T target.Dist](project target.ProjectNodeModule) (t T) {
 	resolve := target.Any[T](target.Try(dist.Resolve))
 	for _, t = range targetSource.List[T](resolve, project) {
 		return

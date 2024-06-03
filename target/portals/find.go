@@ -33,7 +33,7 @@ func (p finder) find(ctx context.Context, src string) (portals target.Portals[ta
 		}
 	}
 
-	for _, a := range sources.FromPath[target.Project](src) {
+	for _, a := range sources.FromPath[target.ProjectNodeModule](src) {
 		portals[a.Manifest().Package] = a
 	}
 
