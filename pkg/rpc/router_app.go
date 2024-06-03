@@ -11,7 +11,7 @@ type App struct {
 
 func NewApp(port string) (s *App) {
 	s = &App{Router: *NewRouter(port)}
-	s.Router.registerRoute = s.registerRoute
+	s.Router.RegisterRoute = s.registerRoute
 	return
 }
 
@@ -44,7 +44,7 @@ func (s *App) routeQuery(ctx context.Context, query *astral.QueryData) (err erro
 
 	// setup
 	r := s.Query(query.Query())
-	if r.registry.IsEmpty() && query.Query() != r.port {
+	if r.Registry.IsEmpty() && query.Query() != r.Port {
 		return query.Reject()
 	}
 

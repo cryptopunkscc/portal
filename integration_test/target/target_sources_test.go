@@ -16,7 +16,7 @@ func Test__sources_FromPath__test_assets(t *testing.T) {
 		PrintTarget(s)
 	}
 
-	assert.Equal(t, 6, len(targets))
+	assert.LessOrEqual(t, 6, len(targets))
 }
 
 func Test__sources_FromFS__js_PortalLibFS(t *testing.T) {

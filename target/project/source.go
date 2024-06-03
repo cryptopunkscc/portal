@@ -9,15 +9,15 @@ type source struct {
 	manifest *target.Manifest
 }
 
-var _ target.Project = (*source)(nil)
+var _ target.ProjectNodeModule = (*source)(nil)
 
 type frontend struct {
-	target.Project
+	target.ProjectNodeModule
 	target.Frontend
 }
 
 type backend struct {
-	target.Project
+	target.ProjectNodeModule
 	target.Backend
 }
 

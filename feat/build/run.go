@@ -11,13 +11,13 @@ import (
 )
 
 type Feat struct {
-	newRunDist   func([]target.NodeModule) target.Run[target.Project]
+	newRunDist   func([]target.NodeModule) target.Run[target.ProjectNodeModule]
 	runPack      target.Run[target.Dist]
 	dependencies []target.NodeModule
 }
 
 func NewFeat(
-	newRunDist func([]target.NodeModule) target.Run[target.Project],
+	newRunDist func([]target.NodeModule) target.Run[target.ProjectNodeModule],
 	runPack target.Run[target.Dist],
 	dependencies ...target.NodeModule,
 ) *Feat {
@@ -42,7 +42,7 @@ func (r Feat) Run(ctx context.Context, dir string) (err error) {
 }
 
 func (r Feat) Dist(ctx context.Context, dir ...string) (err error) {
-	for _, m := range sources.FromPath[target.Project](path.Join(dir...)) {
+	for _, m := range sources.FromPath[target.ProjectNodeModule](path.Join(dir...)) {
 		if !m.PkgJson().CanBuild() {
 			continue
 		}

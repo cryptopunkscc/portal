@@ -15,15 +15,15 @@ import (
 )
 
 type Router struct {
+	Port          string
+	Registry      *Registry[*Caller]
+	RegisterRoute func(route string) (func(ctx context.Context), error)
 	logger        plog.Logger
-	registry      *Registry[*Caller]
 	routes        []string
 	env           []any
-	port          string
 	query         string
 	args          string
 	rpc           *Flow
-	registerRoute func(route string) (func(ctx context.Context), error)
 }
 
 var ErrMalformedRequest = errors.New("malformed request")
@@ -31,8 +31,8 @@ var ErrUnauthorized = errors.New("unauthorized")
 
 func NewRouter(port string) *Router {
 	return &Router{
-		port:     port,
-		registry: NewRegistry[*Caller](),
+		Port:     port,
+		Registry: NewRegistry[*Caller](),
 	}
 }
 
@@ -54,7 +54,7 @@ func (r *Router) With(env ...any) *Router {
 }
 
 func (r *Router) Caller(caller *Caller) *Router {
-	r.registry.Add(caller.name, caller)
+	r.Registry.Add(caller.name, caller)
 	return r
 }
 
@@ -98,7 +98,7 @@ func (r *Router) Run(ctx context.Context) (err error) {
 	r.registerApi()
 	if len(r.routes) == 0 {
 		var await func(ctx context.Context)
-		if await, err = r.registerRoute(r.port); err == nil {
+		if await, err = r.RegisterRoute(r.Port); err == nil {
 			await(ctx)
 		}
 		return
@@ -114,10 +114,10 @@ func (r *Router) Run(ctx context.Context) (err error) {
 		go func(r Router, route string) {
 			defer wg.Done()
 			var await func(ctx context.Context)
-			if await, err = r.registerRoute(route); err == nil {
+			if await, err = r.RegisterRoute(route); err == nil {
 				await(ctx)
 			}
-		}(rr, fmt.Sprintf(f, r.port, cmd))
+		}(rr, fmt.Sprintf(f, r.Port, cmd))
 	}
 	wg.Wait()
 	return
@@ -125,7 +125,7 @@ func (r *Router) Run(ctx context.Context) (err error) {
 
 func (r *Router) registerApi() *Router {
 	var arr []string
-	for s := range r.registry.All() {
+	for s := range r.Registry.All() {
 		if strings.HasSuffix(s, "!") {
 			continue
 		}
@@ -141,18 +141,18 @@ func (r *Router) Query(query string) *Router { return r.shift(query, false) }
 func (r *Router) shift(query string, force bool) *Router {
 	rr := *r
 	rr.Conn(rr.rpc)
-	rr.query = strings.TrimPrefix(query, r.port)
+	rr.query = strings.TrimPrefix(query, r.Port)
 	rr.query = strings.TrimPrefix(rr.query, ".")
-	rr.registry, rr.args = r.registry.Unfold(rr.query)
-	rr.port = strings.TrimSuffix(rr.query, rr.args)
+	rr.Registry, rr.args = r.Registry.Unfold(rr.query)
+	rr.Port = strings.TrimSuffix(rr.query, rr.args)
 
 	if rr.args == rr.query && rr.query != "" && force {
 		// nothing was unfolded query cannot be handled
-		rr.registry = NewRegistry[*Caller]()
+		rr.Registry = NewRegistry[*Caller]()
 		return &rr
 	}
-	if rr.port == "" {
-		rr.port = r.port
+	if rr.Port == "" {
+		rr.Port = r.Port
 	}
 	if rr.args == "\n" {
 		rr.args = ""
@@ -174,7 +174,7 @@ func (r *Router) Handle(ctx context.Context, query any, remoteId id.Identity, co
 	var result []any
 	for {
 		switch {
-		case !rr.registry.IsEmpty():
+		case !rr.Registry.IsEmpty():
 			// caller found
 			result, err = rr.With(ctx, query, remoteId, rr.rpc).Call()
 			if !rr.respond(ctx, err, result...) {
@@ -195,7 +195,7 @@ func (r *Router) Handle(ctx context.Context, query any, remoteId id.Identity, co
 		rr = *r.Query(scanner.Text())
 
 		//authorize if registry changed
-		if rr.registry.value != r.registry.value && !rr.Authorize(ctx, query) {
+		if rr.Registry.value != r.Registry.value && !rr.Authorize(ctx, query) {
 			if !rr.respond(ctx, ErrUnauthorized) {
 				return
 			}
@@ -213,10 +213,10 @@ func (r *Router) Conn(conn io.ReadWriteCloser) *Router {
 
 func (r *Router) Call() (result []any, err error) {
 	r.loadArgs()
-	if r.registry.IsEmpty() {
-		return nil, fmt.Errorf("route not found for query %s%s ", r.port, r.args)
+	if r.Registry.IsEmpty() {
+		return nil, fmt.Errorf("route not found for query %s%s ", r.Port, r.args)
 	}
-	result, err = r.registry.Get().With(r.env...).Call(r.rpc)
+	result, err = r.Registry.Get().With(r.env...).Call(r.rpc)
 	return
 }
 
