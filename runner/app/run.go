@@ -16,9 +16,9 @@ type Runner struct{ newApi target.NewApi }
 
 func (r Runner) Run(ctx context.Context, app target.App) (err error) {
 	switch v := any(app).(type) {
-	case target.AppFrontend:
+	case target.AppHtml:
 		return wails.NewRunner(r.newApi).Run(ctx, v)
-	case target.AppBackend:
+	case target.AppJs:
 		return goja.NewRunner(r.newApi).Run(ctx, v)
 	default:
 		return fmt.Errorf("invalid app target: %v", app.Path())

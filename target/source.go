@@ -58,86 +58,86 @@ type Dist interface {
 	App
 }
 
-type Frontend interface {
-	IsFrontend()
+type Html interface {
+	IsHtml()
 }
 
-type AppFrontend interface {
+type AppHtml interface {
 	App
-	Frontend
+	Html
 }
 
-type PortalFrontend interface {
+type PortalHtml interface {
 	Portal
-	Frontend
+	Html
 }
 
-type ProjectFrontend interface {
+type ProjectHtml interface {
 	ProjectNodeModule
-	Frontend
-	DistFrontend() DistFrontend
+	Html
+	DistHtml() DistHtml
 }
 
-type DistFrontend interface {
+type DistHtml interface {
 	Dist
-	Frontend
+	Html
 }
 
-type BundleFrontend interface {
+type BundleHtml interface {
 	Bundle
-	Frontend
+	Html
 }
 
-type Backend interface {
-	IsBackend()
+type Js interface {
+	IsJs()
 }
 
-type ProjectBackend interface {
+type ProjectJs interface {
 	ProjectNodeModule
-	Backend
-	DistBackend() DistBackend
+	Js
+	DistJs() DistJs
 }
 
-type AppBackend interface {
+type AppJs interface {
 	App
-	Backend
+	Js
 }
 
-type PortalBackend interface {
+type PortalJs interface {
 	Portal
-	Backend
+	Js
 }
 
-type DistBackend interface {
+type DistJs interface {
 	Dist
-	Backend
+	Js
 }
 
-type BundleBackend interface {
+type BundleJs interface {
 	Bundle
-	Backend
+	Js
 }
 
-type Executable interface {
-	Exec() Source
+type Exec interface {
+	Executable() Source
 }
 
-type AppExecutable interface {
+type AppExec interface {
 	App
-	Executable
+	Exec
 }
 
-type DistExecutable interface {
+type DistExec interface {
 	Dist
-	Executable
+	Exec
 }
 
-type BundleExecutable interface {
+type BundleExec interface {
 	Bundle
-	Executable
+	Exec
 }
 
 type ProjectGolang interface {
 	Project
-	DistGolang() DistExecutable
+	DistGolang() DistExec
 }

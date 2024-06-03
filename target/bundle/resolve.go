@@ -45,7 +45,7 @@ func Resolve(src target.Source) (bundle target.Bundle, err error) {
 		bundle = &backend{Bundle: bundle}
 	default:
 		e := &executable{Bundle: bundle}
-		if e.Executable, err = exec.Resolve(bundle); err != nil {
+		if e.Exec, err = exec.Resolve(bundle); err != nil {
 			return
 		}
 		bundle = e

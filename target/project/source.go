@@ -13,12 +13,12 @@ var _ target.ProjectNodeModule = (*source)(nil)
 
 type frontend struct {
 	target.ProjectNodeModule
-	target.Frontend
+	target.Html
 }
 
 type backend struct {
 	target.ProjectNodeModule
-	target.Backend
+	target.Js
 }
 
 func (m *source) IsProject() {}
@@ -35,10 +35,10 @@ func (m *source) Dist() (t target.Dist) {
 	return Dist[target.Dist](m)
 }
 
-func (m *frontend) DistFrontend() (t target.DistFrontend) {
-	return Dist[target.DistFrontend](m)
+func (m *frontend) DistHtml() (t target.DistHtml) {
+	return Dist[target.DistHtml](m)
 }
 
-func (m *frontend) DistBackend() (t target.DistBackend) {
-	return Dist[target.DistBackend](m)
+func (m *frontend) DistBackend() (t target.DistJs) {
+	return Dist[target.DistJs](m)
 }

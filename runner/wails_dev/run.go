@@ -26,7 +26,7 @@ type Runner struct {
 	log plog.Logger
 }
 
-func (r *Runner) Run(ctx context.Context, project target.ProjectFrontend) (err error) {
+func (r *Runner) Run(ctx context.Context, project target.ProjectHtml) (err error) {
 	r.log = plog.Get(ctx).Type(r).Set(&ctx)
 	r.log.Printf("portal dev open: (%d) %s\n", os.Getpid(), project.Manifest())
 	defer r.log.Printf("portal dev close: (%d) %s\n", os.Getpid(), project.Manifest())

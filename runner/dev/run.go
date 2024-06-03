@@ -44,27 +44,27 @@ func (r Runner) Run(ctx context.Context, t target.Portal) (err error) {
 	}
 	sendMsg := msg.NewSend(r.portMsg)
 	switch v := t.(type) {
-	case target.ProjectBackend:
+	case target.ProjectJs:
 		run := goja_dev.NewRunner(newApi, sendMsg)
 		reloader = run
 		return run.Run(ctx, v)
-	case target.ProjectFrontend:
+	case target.ProjectHtml:
 		run := wails_dev.NewRunner(newApi) // FIXME propagate sendMsg
 		reloader = run
 		return run.Run(ctx, v)
-	case target.DistBackend:
+	case target.DistJs:
 		run := goja_dist.NewRunner(newApi, sendMsg)
 		reloader = run
 		return run.Run(ctx, v)
-	case target.DistFrontend:
+	case target.DistHtml:
 		run := wails_dist.NewRunner(newApi, sendMsg)
 		reloader = run
 		return run.Run(ctx, v)
-	case target.AppBackend:
+	case target.AppJs:
 		run := goja.NewRunner(newApi)
 		reloader = run
 		return run.Run(ctx, v)
-	case target.AppFrontend:
+	case target.AppHtml:
 		run := wails.NewRunner(newApi)
 		reloader = run
 		return run.Run(ctx, v)

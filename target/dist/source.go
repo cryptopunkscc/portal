@@ -12,21 +12,21 @@ type source struct {
 var _ target.Dist = (*source)(nil)
 
 type frontend struct {
-	target.Frontend
+	target.Html
 	target.Dist
 }
 
 type backend struct {
-	target.Backend
+	target.Js
 	target.Dist
 }
 
 type executable struct {
-	target.Executable
+	target.Exec
 	target.Dist
 }
 
-var _ target.DistExecutable = &executable{}
+var _ target.DistExec = &executable{}
 
 func (m *source) IsApp() {}
 

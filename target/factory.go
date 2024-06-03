@@ -14,9 +14,9 @@ func ApiFactory(
 	return func(ctx context.Context, p Portal) (a Api) {
 		var n NewApphost
 		switch any(p).(type) {
-		case Frontend:
+		case Html:
 			n = frontendApphost
-		case Backend:
+		case Js:
 			n = backendApphost
 		default:
 			plog.Get(ctx).P().Println("cannot create target.NewApi unknown type:", reflect.TypeOf(p))

@@ -30,7 +30,7 @@ func Resolve(src target.Source) (dist target.Dist, err error) {
 		dist = &backend{Dist: dist}
 	default:
 		e := &executable{Dist: dist}
-		if e.Executable, err = exec.Resolve(dist); err != nil {
+		if e.Exec, err = exec.Resolve(dist); err != nil {
 			return
 		}
 		dist = e

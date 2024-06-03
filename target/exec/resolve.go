@@ -7,7 +7,7 @@ import (
 	"io/fs"
 )
 
-func Resolve(portal target.Portal) (t target.Executable, err error) {
+func Resolve(portal target.Portal) (t target.Exec, err error) {
 	file := portal.Manifest().Exec
 	stat, err := fs.Stat(portal.Files(), file)
 	if err != nil {

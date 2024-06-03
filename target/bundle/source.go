@@ -10,21 +10,21 @@ type source struct {
 }
 
 type frontend struct {
-	target.Frontend
+	target.Html
 	target.Bundle
 }
 
 type backend struct {
-	target.Backend
+	target.Js
 	target.Bundle
 }
 
 type executable struct {
-	target.Executable
+	target.Exec
 	target.Bundle
 }
 
-var _ target.BundleExecutable = &executable{}
+var _ target.BundleExec = &executable{}
 
 func (b *source) IsApp() {}
 
