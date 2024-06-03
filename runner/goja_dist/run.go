@@ -12,7 +12,7 @@ import (
 type Runner struct {
 	newApi  target.NewApi
 	send    target.MsgSend
-	dist    target.DistBackend
+	dist    target.DistJs
 	backend *goja.Backend
 }
 
@@ -24,7 +24,7 @@ func (r *Runner) Reload() (err error) {
 	return r.backend.RunFs(r.dist.Files())
 }
 
-func (r *Runner) Run(ctx context.Context, dist target.DistBackend) (err error) {
+func (r *Runner) Run(ctx context.Context, dist target.DistJs) (err error) {
 	if !path.IsAbs(dist.Abs()) {
 		return plog.Errorf("Runner needs absolute path: %s", dist.Abs())
 	}
@@ -36,7 +36,7 @@ func (r *Runner) Run(ctx context.Context, dist target.DistBackend) (err error) {
 		return
 	}
 	pkg := dist.Manifest().Package
-	watch := watcher.NewRunner[target.DistBackend](func() (err error) {
+	watch := watcher.NewRunner[target.DistJs](func() (err error) {
 		if err := r.send(target.NewMsg(pkg, target.DevChanged)); err != nil {
 			log.F().Println(err)
 		}

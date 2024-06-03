@@ -8,6 +8,6 @@ type source struct {
 	executable target.Source
 }
 
-func (s *source) Exec() (t target.Source) {
+func (s *source) Executable() (t target.Source) {
 	return s.executable
 }

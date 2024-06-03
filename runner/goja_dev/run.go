@@ -22,11 +22,11 @@ func (r *Runner) Reload() (err error) {
 	return r.distRunner.Reload()
 }
 
-func (r *Runner) Run(ctx context.Context, project target.ProjectBackend) (err error) {
+func (r *Runner) Run(ctx context.Context, project target.ProjectJs) (err error) {
 	r.log = plog.Get(ctx).Type(r).Set(&ctx)
 	r.log.Println("staring dev backend", project.Abs())
 
 	go npm.RunWatch(ctx, project.Path())
 
-	return r.distRunner.Run(ctx, project.DistBackend())
+	return r.distRunner.Run(ctx, project.DistJs())
 }

@@ -37,15 +37,15 @@ func (p *portal[T]) run(ctx context.Context, src T) (err error) {
 	return
 }
 
-func (r *Runner[T]) newRunBundleExecutable(ctx context.Context, v target.BundleExecutable) error {
+func (r *Runner[T]) newRunBundleExecutable(ctx context.Context, v target.BundleExec) error {
 	log := plog.Get(ctx)
-	p := v.Exec().Lift().Path()
+	p := v.Executable().Lift().Path()
 	log.Println("path", p)
 	temp, err := os.CreateTemp(r.cacheDir, p)
 	if err != nil {
 		return plog.Err(err)
 	}
-	e := v.Exec()
+	e := v.Executable()
 	file, err := e.Files().Open(e.Path())
 	if err != nil {
 		return plog.Err(err)

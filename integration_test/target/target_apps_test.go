@@ -33,8 +33,8 @@ func Test__apps_Find__embed_launcher(t *testing.T) {
 		{Matcher: RpcBackend, Src: RpcBackend.Abs},
 
 		// TODO require building
-		//{matcher: ProjectBackend, src: ProjectBackend.Abs},
-		//{matcher: ProjectFrontend, src: ProjectFrontend.Abs},
+		//{matcher: ProjectJs, src: ProjectJs.Abs},
+		//{matcher: ProjectHtml, src: ProjectHtml.Abs},
 	}
 
 	for _, test := range tests {

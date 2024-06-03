@@ -26,7 +26,7 @@ func (r *Runner) Reload() (err error) {
 	return r.inner.Reload()
 }
 
-func (r *Runner) Run(ctx context.Context, dist target.DistFrontend) (err error) {
+func (r *Runner) Run(ctx context.Context, dist target.DistHtml) (err error) {
 	if !path.IsAbs(dist.Abs()) {
 		return plog.Errorf("Runner needs absolute path: %s", dist.Abs())
 	}
@@ -35,7 +35,7 @@ func (r *Runner) Run(ctx context.Context, dist target.DistFrontend) (err error) 
 		return
 	}
 	pkg := dist.Manifest().Package
-	watch := watcher.NewRunner[target.DistFrontend](func() (err error) {
+	watch := watcher.NewRunner[target.DistHtml](func() (err error) {
 		if err := r.send(target.NewMsg(pkg, target.DevChanged)); err != nil {
 			log.F().Println(err)
 		}

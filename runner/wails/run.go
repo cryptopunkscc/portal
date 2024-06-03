@@ -30,14 +30,14 @@ func (r *Runner) Reload() (err error) {
 	return
 }
 
-func (r *Runner) Run(ctx context.Context, frontend target.AppFrontend) (err error) {
+func (r *Runner) Run(ctx context.Context, app target.AppHtml) (err error) {
 	log := plog.Get(ctx).Type(r).Set(&ctx)
-	log.Printf("portal open: (%d) %s", os.Getpid(), frontend.Manifest())
-	defer log.Printf("portal close: (%d) %s", os.Getpid(), frontend.Manifest())
-	api := r.newApi(ctx, frontend)
+	log.Printf("portal open: (%d) %s", os.Getpid(), app.Manifest())
+	defer log.Printf("portal close: (%d) %s", os.Getpid(), app.Manifest())
+	api := r.newApi(ctx, app)
 	opt := AppOptions(api)
 	opt.OnStartup = func(ctx context.Context) { r.frontCtx = ctx }
-	SetupOptions(frontend, opt)
+	SetupOptions(app, opt)
 	if err = application.NewWithOptions(opt).Run(); err != nil {
 		return plog.Err(err)
 	}

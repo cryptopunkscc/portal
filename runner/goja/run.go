@@ -9,7 +9,7 @@ import (
 type Runner struct {
 	newApi  target.NewApi
 	backend *Backend
-	app     target.AppBackend
+	app     target.AppJs
 }
 
 func NewRunner(newApi target.NewApi) *Runner {
@@ -20,7 +20,7 @@ func (r *Runner) Reload() (err error) {
 	return r.backend.RunFs(r.app.Files())
 }
 
-func (r *Runner) Run(ctx context.Context, app target.AppBackend) (err error) {
+func (r *Runner) Run(ctx context.Context, app target.AppJs) (err error) {
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Printf("run %T %s", app, app.Abs())
 	r.app = app
