@@ -31,10 +31,22 @@ var RpcFrontend = &Target{
 	Manifest: &target.Manifest{Name: "test-rpc-front", Title: "test rpc frontend", Description: "", Package: "test.rpc.front", Version: "0.0.0", Icon: ""},
 }
 
+var RpcFrontendBundle = &Target{
+	Path:     "test-rpc-front_0.0.0.portal",
+	Abs:      "test_data/rpc/build",
+	Manifest: &target.Manifest{Name: "test-rpc-front", Title: "test rpc frontend", Description: "", Package: "test.rpc.front", Version: "0.0.0", Icon: ""},
+}
+
 var RpcBackend = &Target{
 	Path:     ".",
 	Abs:      "test_data/rpc/back",
 	Manifest: &target.Manifest{Name: "test-rpc-back", Title: "test rpc backend", Description: "", Package: "test.rpc.back", Version: "0.0.0", Icon: ""},
+}
+
+var RpcBackendBundle = &Target{
+	Path:     "test-rpc-back_0.0.0.portal",
+	Abs:      "test_data/rpc/build",
+	Manifest: &target.Manifest{Name: "test-rpc-back", Title: "test rpc backend", Description: "", Package: "test.rpc.back", Version: "0.0.0", Icon: "", Exec: ""},
 }
 
 var ProjectBackend = &Target{
@@ -47,6 +59,18 @@ var ProjectFrontend = &Target{
 	Path:     ".",
 	Abs:      "test_data/project/svelte",
 	Manifest: &target.Manifest{Name: "test-project-svelte", Title: "test project svelte", Description: "", Package: "test.project.svelte", Version: "0.0.0", Icon: ""},
+}
+
+var DistExecutable = &Target{
+	Path:     ".",
+	Abs:      "test_data/exec/sh",
+	Manifest: &target.Manifest{Name: "test-exec-sh", Title: "test exec sh", Description: "", Package: "test.exec.sh", Version: "0.0.0", Icon: "", Exec: "exec.sh"},
+}
+
+var BundleExecutable = &Target{
+	Path:     "test-exec_0.0.0.portal",
+	Abs:      "test_data/build",
+	Manifest: &target.Manifest{Name: "test-exec", Title: "test exec", Description: "", Package: "test.exec", Version: "0.0.0", Icon: "", Exec: "exec.sh"},
 }
 
 type Case[T any] struct {

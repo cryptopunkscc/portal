@@ -37,6 +37,7 @@ func main() {
 	portOpen := port.Cmd("open")
 	executable := "portal"
 	scope := feature.Scope[target.App]{
+		Executable:      executable,
 		Port:            port,
 		WrapApi:         NewAdapter,
 		WaitGroup:       &sync.WaitGroup{},
@@ -44,7 +45,7 @@ func main() {
 		NewRunTarget:    app.NewRun,
 		NewRunTray:      tray.NewRun,
 		NewRunService:   service.NewRun,
-		ExecTarget:      exec.NewRun[target.App](executable),
+		NewExecTarget:   exec.NewRun[target.App],
 		TargetFinder:    apps.NewFind,
 		GetPath:         featApps.Path,
 		FeatObserve:     featApps.Observe,

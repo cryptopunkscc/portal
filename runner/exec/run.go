@@ -2,66 +2,45 @@ package exec
 
 import (
 	"context"
-	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"os"
-	"os/exec"
+	"path"
 )
 
-func NewRun[T target.Portal](executable string, filter ...target.Type) target.Run[T] {
-	t := target.TypeAny
-	for _, f := range filter {
-		t += f
+func NewRun[T target.Portal](cacheDir, executable string) target.Run[T] {
+	return NewRunner[T](cacheDir, executable).Run
+}
+
+type Runner[T target.Portal] struct {
+	cacheDir   string
+	executable string
+}
+
+func NewRunner[T target.Portal](cacheDir string, executable string) *Runner[T] {
+	cacheDir = path.Join(cacheDir, "apps", "tmp")
+	if err := os.MkdirAll(cacheDir, 0755); err != nil {
+		panic(err)
 	}
-	return func(ctx context.Context, src T) (err error) {
-		log := plog.Get(ctx).Scope("exec.Runner").Set(&ctx)
-		if !src.Type().Is(t) {
-			log.F().Println(src.Abs(), target.ErrNotTarget)
-			return target.ErrNotTarget
-		}
-		log.Println("target:", src.Abs(), src.Manifest().Package)
-		switch any(src).(type) {
-		case target.ProjectFrontend:
-			return newRunByName[target.Portal](executable, "wails_dev")(ctx, src)
-		case target.ProjectBackend:
-			return newRunByName[target.Portal](executable, "goja_dev")(ctx, src)
-		case target.AppFrontend:
-			return newRunByName[target.Portal](executable, "wails")(ctx, src)
-		case target.AppBackend:
-			return newRunByName[target.Portal](executable, "goja")(ctx, src)
-		}
-		return
-	}
+	return &Runner[T]{cacheDir: cacheDir, executable: executable}
 }
 
-func newRunByName[T target.Portal](executable, name string) target.Run[T] {
-	return newPortal[T](executable, "o", name).run
-}
-
-type portal[T target.Portal] struct {
-	src []string
-}
-
-func newPortal[T target.Portal](src ...string) *portal[T] {
-	return &portal[T]{src: src}
-}
-
-func (p *portal[T]) run(ctx context.Context, src T) (err error) {
-	cmd := p.src[0]
-	args := append(p.src[1:], src.Abs())
-	plog.Get(ctx).Type(src).Printf("%s %v", cmd, args)
-	var c *exec.Cmd
-	if ctx != nil {
-		c = exec.CommandContext(ctx, cmd, args...)
-	} else {
-		c = exec.Command(cmd, args...)
-	}
-	c.Stdout = os.Stdout
-	c.Stderr = os.Stderr
-	err = c.Run()
-	if err != nil {
-		err = fmt.Errorf("exec.Portal '%s': %w", p.src, err)
+func (r *Runner[T]) Run(ctx context.Context, src T) (err error) {
+	log := plog.Get(ctx).Scope("exec.Runner").Set(&ctx)
+	log.Printf("target: %T %s %s", src, src.Abs(), src.Manifest().Package)
+	switch v := any(src).(type) {
+	case target.ProjectFrontend:
+		return newPortal[target.Portal](r.executable, "o", "wails_dev").run(ctx, src)
+	case target.ProjectBackend:
+		return newPortal[target.Portal](r.executable, "o", "goja_dev").run(ctx, src)
+	case target.AppFrontend:
+		return newPortal[target.Portal](r.executable, "o", "wails").run(ctx, src)
+	case target.AppBackend:
+		return newPortal[target.Portal](r.executable, "o", "goja").run(ctx, src)
+	case target.DistExecutable:
+		return newPortal[target.Portal](v.Exec().Abs()).run(ctx, v)
+	case target.BundleExecutable:
+		return r.newRunBundleExecutable(ctx, v)
 	}
 	return
 }

@@ -33,8 +33,8 @@ type NodeModule interface {
 }
 
 type Project interface {
-	IsProject()
 	Portal
+	IsProject()
 	Dist() Dist
 }
 
@@ -116,4 +116,28 @@ type DistBackend interface {
 type BundleBackend interface {
 	Bundle
 	Backend
+}
+
+type Executable interface {
+	Exec() Source
+}
+
+type AppExecutable interface {
+	App
+	Executable
+}
+
+type DistExecutable interface {
+	Dist
+	Executable
+}
+
+type BundleExecutable interface {
+	Bundle
+	Executable
+}
+
+type ProjectGolang interface {
+	Project
+	DistGolang() DistExecutable
 }

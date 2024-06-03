@@ -31,12 +31,20 @@ func Pack(src string, dst string) (err error) {
 		if err != nil {
 			return err
 		}
-
+		stat, err := file.Stat()
+		if err != nil {
+			return err
+		}
 		trim, found := strings.CutPrefix(p, src)
 		if !found {
 			return nil
 		}
-		f, err := w.Create(trim)
+		h := &zip.FileHeader{
+			Name:   trim,
+			Method: zip.Deflate,
+		}
+		h.SetMode(stat.Mode())
+		f, err := w.CreateHeader(h)
 		if err != nil {
 			return err
 		}

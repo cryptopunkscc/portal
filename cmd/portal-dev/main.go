@@ -40,8 +40,8 @@ func main() {
 	port := target.Port{Host: "portal", Prefix: []string{"dev"}}
 	portOpen := port.Cmd("open")
 	portMsg := port.Cmd("ctrl")
-	executable := "portal-dev"
 	scope := feature.Scope[target.Portal]{
+		Executable:     "portal-dev",
 		Port:           port,
 		WrapApi:        NewAdapter,
 		WaitGroup:      &sync.WaitGroup{},
@@ -49,7 +49,7 @@ func main() {
 		NewRunTarget:   dev.NewRun(portMsg),
 		NewRunService:  service.NewRun,
 		TargetFinder:   portals.NewFind,
-		ExecTarget:     exec.NewRun[target.Portal](executable),
+		NewExecTarget:  exec.NewRun[target.Portal],
 		GetPath:        featApps.Path,
 		FeatObserve:    featApps.Observe,
 		JoinTarget:     query.NewRunner[target.App](portOpen).Run,

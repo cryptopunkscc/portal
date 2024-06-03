@@ -3,11 +3,11 @@ package target
 import "strconv"
 
 const (
-	TypeAny      = Type(0x0)
-	TypeBackend  = Type(0x1)
-	TypeFrontend = Type(0x2)
-	TypeDev      = Type(0x4)
-	TypeBundle   = Type(0x8)
+	TypeAny     Type = 0
+	TypeBackend Type = 1 << (iota - 1)
+	TypeFrontend
+	TypeDev
+	TypeBundle
 )
 
 type Type int

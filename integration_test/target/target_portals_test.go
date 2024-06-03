@@ -12,6 +12,32 @@ import (
 	"testing"
 )
 
+var portalTestCases = []Case[string]{
+	{Src: ".", Matchers: []*Target{
+		RpcBackend,
+		RpcFrontend,
+		BasicBackend,
+		BasicFrontend,
+		ProjectFrontend,
+		ProjectBackend,
+		Launcher,
+		DistExecutable,
+	}},
+	{Src: "test_data/rpc", Matchers: []*Target{
+		RpcBackend,
+		RpcFrontend,
+	}},
+	{Matcher: Launcher, Src: Launcher.Manifest.Name},
+	{Matcher: Launcher, Src: Launcher.Manifest.Package},
+	{Matcher: Launcher, Src: Launcher.Abs},
+	{Matcher: BasicBackend, Src: BasicBackend.Abs},
+	{Matcher: BasicFrontend, Src: BasicFrontend.Abs},
+	{Matcher: RpcFrontend, Src: RpcFrontend.Abs},
+	{Matcher: RpcBackend, Src: RpcBackend.Abs},
+	{Matcher: ProjectBackend, Src: ProjectBackend.Abs},
+	{Matcher: ProjectFrontend, Src: ProjectFrontend.Abs},
+}
+
 func Test__portals_Find__embed_launcher(t *testing.T) {
 	embedFs := embedApps.LauncherSvelteFS
 	resolveEmbed := portal.NewResolver[target.App](
@@ -26,32 +52,7 @@ func Test__portals_Find__embed_launcher(t *testing.T) {
 	cache := target.NewCache[target.Portal]()
 	find := portals.Finder.Cached(cache)(findPath, embedFs)
 
-	tests := []Case[string]{
-		{Src: ".", Matchers: []*Target{
-			RpcBackend,
-			RpcFrontend,
-			BasicBackend,
-			BasicFrontend,
-			ProjectFrontend,
-			ProjectBackend,
-			Launcher,
-		}},
-		{Src: "test_data/rpc", Matchers: []*Target{
-			RpcBackend,
-			RpcFrontend,
-		}},
-		{Matcher: Launcher, Src: Launcher.Manifest.Name},
-		{Matcher: Launcher, Src: Launcher.Manifest.Package},
-		{Matcher: Launcher, Src: Launcher.Abs},
-		{Matcher: BasicBackend, Src: BasicBackend.Abs},
-		{Matcher: BasicFrontend, Src: BasicFrontend.Abs},
-		{Matcher: RpcFrontend, Src: RpcFrontend.Abs},
-		{Matcher: RpcBackend, Src: RpcBackend.Abs},
-		{Matcher: ProjectBackend, Src: ProjectBackend.Abs},
-		{Matcher: ProjectFrontend, Src: ProjectFrontend.Abs},
-	}
-
-	for _, test := range tests {
+	for _, test := range portalTestCases {
 		test := test
 		t.Run(test.Src, func(t *testing.T) {
 			apps_, err := find(context.TODO(), test.Src)
