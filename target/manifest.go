@@ -9,4 +9,5 @@ type Manifest struct {
 	Package     string `json:"package,omitempty"`
 	Version     string `json:"version,omitempty"`
 	Icon        string `json:"icon,omitempty"`
+	Exec        string `json:"exec,omitempty"`
 }

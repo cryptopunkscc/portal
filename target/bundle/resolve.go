@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"errors"
 	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/go-astral-js/target/exec"
 	"github.com/cryptopunkscc/go-astral-js/target/manifest"
 	targetSource "github.com/cryptopunkscc/go-astral-js/target/source"
 	"io/fs"
@@ -18,29 +19,46 @@ func Resolve(src target.Source) (bundle target.Bundle, err error) {
 		return nil, ErrNotBundle
 	}
 
-	file, err := fs.ReadFile(src.Files(), src.Path())
-	if err != nil {
-		return
-	}
+	var zipFs fs.FS
 
-	reader, err := zip.NewReader(bytes.NewReader(file), int64(len(file)))
+	// FIXME
+	//if path.IsAbs(src.Abs()) {
+	//	if zipFs, err = zip.OpenReader(src.Abs()); err != nil {
+	//		return
+	//	}
+	//} else {
+	if zipFs, err = zipFromSource(src); err != nil {
+		return
+	}
+	//}
+
+	s := targetSource.FromFS(zipFs, src.Path(), src.Abs())
+	m, err := manifest.Read(zipFs)
 	if err != nil {
 		return
 	}
-	s := targetSource.FromFS(reader, src.Path(), src.Abs())
-	m, err := manifest.Read(reader)
-	if err != nil {
-		return
-	}
-	bundle = &source{
-		Source:   s,
-		manifest: &m,
-	}
+	bundle = &source{Source: s, manifest: &m}
 	switch {
 	case bundle.Type().Is(target.TypeFrontend):
 		bundle = &frontend{Bundle: bundle}
 	case bundle.Type().Is(target.TypeBackend):
 		bundle = &backend{Bundle: bundle}
+	default:
+		e := &executable{Bundle: bundle}
+		if e.Executable, err = exec.Resolve(bundle); err != nil {
+			return
+		}
+		bundle = e
 	}
 	return
+}
+
+func zipFromSource(src target.Source) (r *zip.Reader, err error) {
+	var file []byte
+	if file, err = fs.ReadFile(src.Files(), src.Path()); err != nil {
+		return
+	}
+	readerAt := bytes.NewReader(file)
+	size := int64(len(file))
+	return zip.NewReader(readerAt, size)
 }

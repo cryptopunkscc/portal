@@ -3,6 +3,7 @@ package dist
 import (
 	"errors"
 	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/go-astral-js/target/exec"
 	"github.com/cryptopunkscc/go-astral-js/target/manifest"
 )
 
@@ -27,6 +28,12 @@ func Resolve(src target.Source) (dist target.Dist, err error) {
 		dist = &frontend{Dist: dist}
 	case dist.Type().Is(target.TypeBackend):
 		dist = &backend{Dist: dist}
+	default:
+		e := &executable{Dist: dist}
+		if e.Executable, err = exec.Resolve(dist); err != nil {
+			return
+		}
+		dist = e
 	}
 	return
 }

@@ -22,7 +22,7 @@ func Resolve[T target.Source]() func(target.Source) (T, error) {
 	return target.Any[T](
 		target.Skip("node_modules"),
 		target.Try(bundle.Resolve),
-		target.Lift(target.Try(npm.ResolveNodeModule))(
+		target.Try(npm.ResolveNodeModule).Lift(
 			target.Try(project.Resolve)),
 		target.Try(dist.Resolve),
 	)

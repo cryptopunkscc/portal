@@ -1,0 +1,7 @@
+{
+  "name": "test-exec-sh",
+  "package": "test.exec.sh",
+  "title": "test exec sh",
+  "version": "0.0.0",
+  "exec": "exec.sh"
+}

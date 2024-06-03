@@ -15,12 +15,16 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/target/source"
 	"github.com/cryptopunkscc/go-astral-js/target/spawn"
 	"log"
+	"os"
+	"path"
 	"reflect"
 	"sync"
 )
 
 type Scope[T target.Portal] struct {
+	CacheDir    string
 	Prefix      []string
+	Executable  string
 	Port        target.Port
 	WaitGroup   *sync.WaitGroup
 	TargetCache *target.Cache[T]
@@ -31,8 +35,8 @@ type Scope[T target.Portal] struct {
 	NewRunTarget  func(target.NewApi) target.Run[T]
 	NewRunTray    func(target.Dispatch) target.Tray
 	NewRunService func(rpc.Handlers) target.Dispatch
+	NewExecTarget func(string, string) target.Run[T]
 
-	ExecTarget   target.Run[T]
 	TargetFinder target.Finder[T]
 
 	GetPath         target.Path
@@ -50,14 +54,31 @@ type Scope[T target.Portal] struct {
 	FeatList     func() []target.App
 }
 
+func (s *Scope[T]) GetExecutable() string               { return assert(s.Executable) }
 func (s *Scope[T]) GetWaitGroup() *sync.WaitGroup       { return assert(s.WaitGroup) }
 func (s *Scope[T]) GetProcesses() *sig.Map[string, T]   { return assert(s.Processes) }
-func (s *Scope[T]) GetExecTarget() target.Run[T]        { return assert(s.ExecTarget) }
 func (s *Scope[T]) GetTargetFinder() target.Finder[T]   { return assert(s.TargetFinder) }
 func (s *Scope[T]) GetTargetCache() *target.Cache[T]    { return assert(s.TargetCache) }
 func (s *Scope[T]) GetJoinTarget() target.Dispatch      { return assert(s.JoinTarget) }
 func (s *Scope[T]) GetDispatchTarget() target.Dispatch  { return assert(s.DispatchTarget) }
 func (s *Scope[T]) GetDispatchService() target.Dispatch { return assert(s.DispatchService) }
+
+func (s *Scope[T]) GetExecTarget() target.Run[T] {
+	return assert(s.NewExecTarget(
+		s.GetCacheDir(),
+		s.GetExecutable()))
+}
+
+func (s *Scope[T]) GetCacheDir() string {
+	if s.CacheDir == "" {
+		var err error
+		if s.CacheDir, err = os.UserCacheDir(); err != nil {
+			panic(err)
+		}
+		s.CacheDir = path.Join(s.CacheDir, s.Executable)
+	}
+	return s.CacheDir
+}
 
 func (s *Scope[T]) GetTargetFind() target.Find[T] {
 	if s.TargetFind == nil {

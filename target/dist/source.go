@@ -21,6 +21,13 @@ type backend struct {
 	target.Dist
 }
 
+type executable struct {
+	target.Executable
+	target.Dist
+}
+
+var _ target.DistExecutable = &executable{}
+
 func (m *source) IsApp() {}
 
 func (m *source) IsDist() {}

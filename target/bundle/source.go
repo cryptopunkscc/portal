@@ -19,6 +19,13 @@ type backend struct {
 	target.Bundle
 }
 
+type executable struct {
+	target.Executable
+	target.Bundle
+}
+
+var _ target.BundleExecutable = &executable{}
+
 func (b *source) IsApp() {}
 
 func (b *source) IsBundle() {}
