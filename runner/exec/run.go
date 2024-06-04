@@ -25,6 +25,16 @@ func NewRunner[T target.Portal](cacheDir string, executable string) *Runner[T] {
 	return &Runner[T]{cacheDir: cacheDir, executable: executable}
 }
 
+func (r *Runner[T]) Start(ctx context.Context, src T) (err error) {
+	go func() {
+		if err := r.Run(ctx, src); err != nil {
+			plog.Get(ctx).Type(r).P().Println(err)
+			return
+		}
+	}()
+	return
+}
+
 func (r *Runner[T]) Run(ctx context.Context, src T) (err error) {
 	log := plog.Get(ctx).Scope("exec.Runner").Set(&ctx)
 	log.Printf("target: %T %s %s", src, src.Abs(), src.Manifest().Package)
@@ -33,6 +43,8 @@ func (r *Runner[T]) Run(ctx context.Context, src T) (err error) {
 		return newPortal[target.Portal](r.executable, "o", "wails_dev").run(ctx, src)
 	case target.ProjectJs:
 		return newPortal[target.Portal](r.executable, "o", "goja_dev").run(ctx, src)
+	case target.ProjectGo:
+		return newPortal[target.Portal](r.executable, "o", "go_dev").run(ctx, src)
 	case target.AppHtml:
 		return newPortal[target.Portal](r.executable, "o", "wails").run(ctx, src)
 	case target.AppJs:

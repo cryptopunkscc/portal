@@ -3,7 +3,9 @@ package dev
 import (
 	"context"
 	"fmt"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
+	"github.com/cryptopunkscc/go-astral-js/runner/go_dev"
 	"github.com/cryptopunkscc/go-astral-js/runner/goja"
 	"github.com/cryptopunkscc/go-astral-js/runner/goja_dev"
 	"github.com/cryptopunkscc/go-astral-js/runner/goja_dist"
@@ -16,11 +18,15 @@ import (
 	"reflect"
 )
 
-func NewRun(portMsg target.Port) func(newApi target.NewApi) target.Run[target.Portal] {
+func NewRun(
+	portMsg target.Port,
+	runGo *go_dev.Runner,
+) func(newApi target.NewApi) target.Run[target.Portal] {
 	return func(newApi target.NewApi) target.Run[target.Portal] {
 		return Runner{
 			newApi:  newApi,
 			portMsg: portMsg,
+			runGo:   runGo,
 		}.Run
 	}
 }
@@ -29,6 +35,7 @@ type Runner struct {
 	newApi  target.NewApi
 	sendMsg target.MsgSend
 	portMsg target.Port
+	runGo   *go_dev.Runner
 }
 
 func (r Runner) Run(ctx context.Context, t target.Portal) (err error) {
@@ -50,6 +57,11 @@ func (r Runner) Run(ctx context.Context, t target.Portal) (err error) {
 		return run.Run(ctx, v)
 	case target.ProjectHtml:
 		run := wails_dev.NewRunner(newApi) // FIXME propagate sendMsg
+		reloader = run
+		return run.Run(ctx, v)
+	case target.ProjectGo:
+		plog.Get(ctx).Type(r).Println("running project go")
+		run := r.runGo
 		reloader = run
 		return run.Run(ctx, v)
 	case target.DistJs:

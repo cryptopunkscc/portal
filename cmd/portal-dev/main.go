@@ -17,6 +17,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/runner/dev"
 	"github.com/cryptopunkscc/go-astral-js/runner/dist"
 	"github.com/cryptopunkscc/go-astral-js/runner/exec"
+	"github.com/cryptopunkscc/go-astral-js/runner/go_dev"
 	"github.com/cryptopunkscc/go-astral-js/runner/pack"
 	"github.com/cryptopunkscc/go-astral-js/runner/query"
 	"github.com/cryptopunkscc/go-astral-js/runner/service"
@@ -46,7 +47,6 @@ func main() {
 		WrapApi:        NewAdapter,
 		WaitGroup:      &sync.WaitGroup{},
 		TargetCache:    target.NewCache[target.Portal](),
-		NewRunTarget:   dev.NewRun(portMsg),
 		NewRunService:  service.NewRun,
 		TargetFinder:   portals.NewFind,
 		NewExecTarget:  exec.NewRun[target.Portal],
@@ -63,6 +63,15 @@ func main() {
 
 	featBuild := build.NewFeat(dist.NewRun, pack.Run)
 	featCreate := create.NewFeat(create2.NewRun, featBuild.Dist).Run
+
+	goRunner := go_dev.NewRunner(
+		featBuild.Dist,
+		func(ctx context.Context, src target.DistExec) (err error) {
+			return scope.GetExecTarget()(ctx, src)
+		},
+		msg.NewSend(portMsg),
+	)
+	scope.NewRunTarget = dev.NewRun(portMsg, goRunner)
 
 	cli := clir.NewCli(ctx, manifest.NameDev, manifest.DescriptionDev, version.Run)
 	cli.Dev(scope.GetDispatchFeature())

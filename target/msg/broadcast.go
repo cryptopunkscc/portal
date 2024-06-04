@@ -32,7 +32,7 @@ func (b *Broadcast) BroadcastMsg(ctx context.Context, msg target.Msg) {
 		port := b.port.Copy(pkg)
 		send := NewSend(port)
 		if err := send(msg); err != nil {
-			log.E().Println(err)
+			log.E().Println(err.Error())
 		}
 	}
 }
