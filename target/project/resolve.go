@@ -17,9 +17,9 @@ func FromPath(src string) (project target.ProjectNodeModule, err error) {
 	return Resolve(nodeModule)
 }
 
-func Resolve(nodeModule target.NodeModule) (project target.ProjectNodeModule, err error) {
+func Resolve(t target.NodeModule) (project target.ProjectNodeModule, err error) {
 	m := target.Manifest{}
-	sub, err := fs.Sub(nodeModule.Files(), nodeModule.Path())
+	sub, err := fs.Sub(t.Files(), t.Path())
 	if err != nil {
 		return
 	}
@@ -29,17 +29,37 @@ func Resolve(nodeModule target.NodeModule) (project target.ProjectNodeModule, er
 	if err = manifest.Load(&m, sub, target.PortalJsonFilename); err != nil {
 		return
 	}
-	project = &source{NodeModule: nodeModule, manifest: &m}
+	src := source{manifest: &m, Source: t}
+	project = &nodeModule{NodeModule: t, source: src}
 	switch {
 	case project.Type().Is(target.TypeFrontend):
-		project = &frontend{ProjectNodeModule: project}
+		project = &html{ProjectNodeModule: project}
 	case project.Type().Is(target.TypeBackend):
-		project = &backend{ProjectNodeModule: project}
+		project = &js{ProjectNodeModule: project}
 	}
 	return
 }
 
-func Dist[T target.Dist](project target.ProjectNodeModule) (t T) {
+func ResolveGo(t target.Source) (project target.ProjectGo, err error) {
+	sub, err := fs.Sub(t.Files(), t.Path())
+	if err != nil {
+		return
+	}
+	m, err := manifest.Read(sub)
+	if err != nil {
+		return
+	}
+	mainGo, err := sub.Open("main.go")
+	if err != nil {
+		return
+	}
+	_ = mainGo.Close()
+	src := source{manifest: &m, Source: t.Lift()}
+	project = &golang{source: src}
+	return
+}
+
+func Dist[T target.Dist](project target.Project) (t T) {
 	resolve := target.Any[T](target.Try(dist.Resolve))
 	for _, t = range targetSource.List[T](resolve, project) {
 		return

@@ -137,7 +137,7 @@ type BundleExec interface {
 	Exec
 }
 
-type ProjectGolang interface {
+type ProjectGo interface {
 	Project
 	DistGolang() DistExec
 }

@@ -5,27 +5,36 @@ import (
 )
 
 type source struct {
-	target.NodeModule
+	target.Source
 	manifest *target.Manifest
 }
 
-var _ target.ProjectNodeModule = (*source)(nil)
+type nodeModule struct {
+	source
+	target.NodeModule
+}
 
-type frontend struct {
+type html struct {
 	target.ProjectNodeModule
 	target.Html
 }
 
-type backend struct {
+type js struct {
 	target.ProjectNodeModule
 	target.Js
 }
 
-func (m *source) IsProject() {}
-
-func (m *source) Type() target.Type {
-	return m.NodeModule.Type() + target.TypeDev
+type golang struct {
+	source
 }
+
+var _ target.Project = (*source)(nil)
+var _ target.ProjectNodeModule = (*nodeModule)(nil)
+var _ target.ProjectHtml = (*html)(nil)
+var _ target.ProjectJs = (*js)(nil)
+var _ target.ProjectGo = (*golang)(nil)
+
+func (m *source) IsProject() {}
 
 func (m *source) Manifest() *target.Manifest {
 	return m.manifest
@@ -35,10 +44,22 @@ func (m *source) Dist() (t target.Dist) {
 	return Dist[target.Dist](m)
 }
 
-func (m *frontend) DistHtml() (t target.DistHtml) {
+func (m *nodeModule) Type() target.Type {
+	return m.NodeModule.Type() + target.TypeDev
+}
+
+func (m *html) DistHtml() (t target.DistHtml) {
 	return Dist[target.DistHtml](m)
 }
 
-func (m *frontend) DistBackend() (t target.DistJs) {
+func (m *js) DistJs() (t target.DistJs) {
 	return Dist[target.DistJs](m)
+}
+
+func (m *golang) DistGolang() target.DistExec {
+	return Dist[target.DistExec](m)
+}
+
+func (m *golang) Type() target.Type {
+	return target.TypeDev
 }
