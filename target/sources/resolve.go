@@ -7,8 +7,8 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/target/npm"
 	"github.com/cryptopunkscc/go-astral-js/target/project"
 	"github.com/cryptopunkscc/go-astral-js/target/source"
-	"io/fs"
 )
+import "io/fs"
 
 func FromPath[T target.Source](src string) []T {
 	return source.List[T](Resolve[T](), source.FromPath(src))
