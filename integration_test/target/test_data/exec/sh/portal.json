@@ -1,7 +1,7 @@
 {
-  "name": "test-exec-sh",
-  "package": "test.exec.sh",
-  "title": "test exec sh",
+  "name": "test-project-go",
+  "package": "test.project.go",
+  "title": "test project go",
   "version": "0.0.0",
   "exec": "exec.sh"
 }

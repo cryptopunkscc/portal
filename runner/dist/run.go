@@ -3,54 +3,43 @@ package dist
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
-	"github.com/cryptopunkscc/go-astral-js/runner/npm"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"os"
 	"path"
 )
 
-func NewRun(dependencies []target.NodeModule) target.Run[target.ProjectNodeModule] {
-	return NewRunner(dependencies).Run
+func NewRun(dependencies []target.NodeModule) target.Run[target.Project] {
+	return Runner{
+		NpmRunner: NewNpmRunner(dependencies),
+		GoRunner:  NewGoRunner(),
+	}.Run
 }
 
 type Runner struct {
-	dependencies []target.NodeModule
+	NpmRunner
+	GoRunner
 }
 
-func NewRunner(dependencies []target.NodeModule) *Runner {
-	return &Runner{dependencies: dependencies}
-}
-
-func (r Runner) Run(ctx context.Context, project target.ProjectNodeModule) (err error) {
-	if err = r.Prepare(ctx, project); err != nil {
-		return fmt.Errorf("dist.Prepare: %w", err)
+func (r Runner) Run(ctx context.Context, project target.Project) (err error) {
+	switch v := project.(type) {
+	case target.ProjectNodeModule:
+		if err = r.NpmRunner.Run(ctx, v); err != nil {
+			return
+		}
+	case target.ProjectGo:
+		if err = r.GoRunner.Run(ctx, v); err != nil {
+			return
+		}
 	}
 	if err = r.Dist(ctx, project); err != nil {
-		return fmt.Errorf("dist.Dist: %w", err)
-	}
-	return
-}
-
-func (r Runner) Prepare(ctx context.Context, project target.ProjectNodeModule) (err error) {
-	if err = npm.Install(project); err != nil {
-		return
-	}
-	if err = npm.NewInjector(r.dependencies).Run(ctx, project); err != nil {
 		return
 	}
 	return
 }
 
-func (r Runner) Dist(ctx context.Context, project target.ProjectNodeModule) (err error) {
-	if !project.PkgJson().CanBuild() {
-		return errors.New("missing npm build in package.json")
-	}
-	if err = npm.RunBuild(project); err != nil {
-		return
-	}
+func (r Runner) Dist(ctx context.Context, project target.Project) (err error) {
 	if err = r.CopyIcon(ctx, project); err != nil {
 		return
 	}
@@ -60,7 +49,7 @@ func (r Runner) Dist(ctx context.Context, project target.ProjectNodeModule) (err
 	return
 }
 
-func (r Runner) CopyIcon(_ context.Context, project target.ProjectNodeModule) (err error) {
+func (r Runner) CopyIcon(_ context.Context, project target.Project) (err error) {
 	if project.Manifest().Icon == "" {
 		return
 	}
@@ -74,7 +63,7 @@ func (r Runner) CopyIcon(_ context.Context, project target.ProjectNodeModule) (e
 	return
 }
 
-func (r Runner) CopyManifest(_ context.Context, project target.ProjectNodeModule) (err error) {
+func (r Runner) CopyManifest(_ context.Context, project target.Project) (err error) {
 	bytes, err := json.Marshal(project.Manifest())
 	if err != nil {
 		return err

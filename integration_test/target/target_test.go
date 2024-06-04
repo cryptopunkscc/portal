@@ -14,15 +14,16 @@ import (
 )
 
 func Test__target_Any__test_assets(t *testing.T) {
-	var find = target.Any[target.Source](
+	var find = target.Any[target.Project](
 		target.Skip("node_modules"),
 		target.Try(bundle.Resolve),
 		target.Try(npm.ResolveNodeModule).Lift(
 			target.Try(project.Resolve)),
+		target.Try(project.ResolveGo),
 		target.Try(dist.Resolve),
 	)
-	src := source.FromPath("test_assets")
-	for _, s := range source.List[target.Source](find, src) {
+	src := source.FromPath("test_data")
+	for _, s := range source.List[target.Project](find, src) {
 		PrintTarget(s)
 	}
 }
