@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/integration_test/rpc"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
+	"github.com/cryptopunkscc/go-astral-js/test/rpc"
 )
 
 func main() {
