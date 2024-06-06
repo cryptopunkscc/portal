@@ -51,6 +51,10 @@ func (n *Registry[V]) Scan(scanner io.ByteScanner) (rr *Registry[V], err error) 
 	return nn.Scan(scanner)
 }
 
+func (n *Registry[V]) HasNext() bool {
+	return len(n.next) > 0
+}
+
 func (n *Registry[V]) IsEmpty() bool {
 	var value any = n.value
 	var empty any = n.empty

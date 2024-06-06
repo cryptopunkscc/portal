@@ -44,7 +44,7 @@ func (s *App) routeQuery(ctx context.Context, query *astral.QueryData) (err erro
 
 	// setup
 	r := s.Query(query.Query())
-	if r.Registry.IsEmpty() && query.Query() != r.Port {
+	if r.Registry.IsEmpty() && !r.Registry.HasNext() {
 		return query.Reject()
 	}
 

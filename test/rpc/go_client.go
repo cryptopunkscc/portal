@@ -9,15 +9,15 @@ import (
 	"testing"
 )
 
-type TestClientTest struct {
+type TestClient struct {
 	port string
 }
 
-func NewTestClientTest(port string) *TestClientTest {
-	return &TestClientTest{port: port}
+func NewTestClient(port string) *TestClient {
+	return &TestClient{port: port}
 }
 
-func (c TestClientTest) Run(t *testing.T) {
+func (c TestClient) Run(t *testing.T) {
 	t.Log("Starting test client")
 
 	for _, test := range []struct {
@@ -30,12 +30,14 @@ func (c TestClientTest) Run(t *testing.T) {
 			getConn: func() rpc.Conn {
 				return rpc.NewRequest(id.Anyone, c.port, "request")
 			},
-			skip: true,
 		},
 		{
 			name: "flow",
 			getConn: func() (conn rpc.Conn) {
-				conn, _ = rpc.QueryFlow(id.Anyone, c.port)
+				conn, err := rpc.QueryFlow(id.Anyone, c.port, "flow")
+				if err != nil {
+					t.Fatal(err)
+				}
 				return
 			},
 		},
