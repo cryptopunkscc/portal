@@ -27,3 +27,9 @@ func (cfs ArrayFs) Open(name string) (fs.File, error) {
 	}
 	return nil, os.ErrNotExist
 }
+
+type OsFS struct{}
+
+func (s OsFS) Open(name string) (fs.File, error) {
+	return os.Open(name)
+}
