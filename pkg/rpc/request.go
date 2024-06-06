@@ -15,12 +15,13 @@ type Request struct {
 func NewRequest(
 	identity id.Identity,
 	service string,
+	path ...string,
 ) Conn {
 	return &Request{
 		Serializer: &Serializer{
 			remoteID: identity,
 		},
-		service: service,
+		service: port(service, path...),
 	}
 }
 

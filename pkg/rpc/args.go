@@ -46,7 +46,7 @@ func (a *argsDecoders) Decode(scanner ByteScannerReader, args []any) (err error)
 
 	// drop unknown bytes from scanner
 	scanner.Clear()
-	err = errors.New("unknown format")
+	err = errors.New("cannot decode unknown format")
 	return
 }
 
@@ -65,5 +65,5 @@ func (a *argsDecoders) Unmarshal(bytes []byte, args []any) error {
 			return decoder.Unmarshal(bytes, args)
 		}
 	}
-	return errors.New("unknown format")
+	return errors.New("cannot unmarshal unknown format")
 }
