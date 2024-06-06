@@ -7,6 +7,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/feat/dispatch"
 	"github.com/cryptopunkscc/go-astral-js/feat/open"
 	"github.com/cryptopunkscc/go-astral-js/feat/serve"
+	"github.com/cryptopunkscc/go-astral-js/pkg/assets"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/apphost"
@@ -91,7 +92,9 @@ func (s *Scope[T]) GetTargetFind() target.Find[T] {
 			resolveEmbed.Path,
 			assert(s.GetPath),
 		)
-		s.TargetFind = s.GetTargetFinder().Cached(s.GetTargetCache())(findPath, launcherSvelteFs)
+		s.TargetFind = s.GetTargetFinder().Cached(s.GetTargetCache())(findPath,
+			launcherSvelteFs,
+			assets.OsFS{})
 	}
 	return s.TargetFind
 }

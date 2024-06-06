@@ -89,8 +89,15 @@ func (m *source) Lift() target.Source {
 		return m
 	}
 
+	stat, err := fs.Stat(m.Files(), m.Path())
+	if err != nil {
+		log.Printf("[ERROR] cannot lift source %s %s: %v", m.Path(), m.Abs(), err)
+		mm := *m
+		mm.files = nil
+		return &mm
+	}
 	// try lift a dir
-	if path.Ext(m.Path()) == "" {
+	if stat.IsDir() {
 		mm := *m
 		var err error
 		if mm.files, err = fs.Sub(m.files, m.src); err != nil {

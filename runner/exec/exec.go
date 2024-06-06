@@ -64,7 +64,7 @@ func (r *Runner[T]) newRunBundleExecutable(ctx context.Context, v target.BundleE
 	_ = file.Close()
 	err = newPortal[target.Portal](temp.Name()).run(ctx, v)
 	if err != nil {
-		return plog.Err(err)
+		return err
 	}
 	return nil
 }
