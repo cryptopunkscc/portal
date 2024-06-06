@@ -20,12 +20,7 @@ func NewTestGoService(port string) *TestGoService {
 	app.RouteFunc("request.func4", Function4)
 	app.RouteFunc("request.func5", Function5)
 
-	app.Routes("*")
-	app.Func("func1", Function1)
-	app.Func("func2", Function2)
-	app.Func("func3", Function3)
-	app.Func("func4", Function4)
-	app.Func("func5", Function5)
+	app.Routes("flow*")
 	app.Func("flow.func1", Function1)
 	app.Func("flow.func2", Function2)
 	app.Func("flow.func3", Function3)

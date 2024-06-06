@@ -107,17 +107,20 @@ func (r *Router) Run(ctx context.Context) (err error) {
 	wg.Add(len(r.routes))
 	for _, cmd := range r.routes {
 		rr := *r
+
 		f := "%s.%s"
 		if cmd == "*" {
 			f = "%s%s"
 		}
+		route := fmt.Sprintf(f, r.Port, cmd)
+
 		go func(r Router, route string) {
 			defer wg.Done()
 			var await func(ctx context.Context)
 			if await, err = r.RegisterRoute(route); err == nil {
 				await(ctx)
 			}
-		}(rr, fmt.Sprintf(f, r.Port, cmd))
+		}(rr, route)
 	}
 	wg.Wait()
 	return
@@ -143,17 +146,29 @@ func (r *Router) shift(query string, force bool) *Router {
 	rr.Conn(rr.rpc)
 	rr.query = strings.TrimPrefix(query, r.Port)
 	rr.query = strings.TrimPrefix(rr.query, ".")
+	if r.query != "" {
+		rr.query = r.query + "." + rr.query
+	}
 	rr.Registry, rr.args = r.Registry.Unfold(rr.query)
-	rr.Port = strings.TrimSuffix(rr.query, rr.args)
+
+	if rr.Registry.IsEmpty() {
+		if rr.args != "" {
+			// cannot find caller for args
+			rr.Registry = NewRegistry[*Caller]()
+			return &rr
+		} else if rr.Registry.HasNext() {
+			// just a middle node, trim dot if needed
+			rr.Registry, _ = r.Registry.Unfold(".")
+			return &rr
+		}
+	}
 
 	if rr.args == rr.query && rr.query != "" && force {
 		// nothing was unfolded query cannot be handled
 		rr.Registry = NewRegistry[*Caller]()
 		return &rr
 	}
-	if rr.Port == "" {
-		rr.Port = r.Port
-	}
+
 	if rr.args == "\n" {
 		rr.args = ""
 	} else {
