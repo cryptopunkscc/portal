@@ -157,6 +157,7 @@ func TestApp_Run_basic(t *testing.T) {
 	for i1, r := range routes {
 		t.Run(fmt.Sprintf("routes:%d", i1+1), func(t *testing.T) {
 			app := NewApp(port)
+			app.Logger(plog.Type(app))
 			app.Routes(r...)
 			setHandlers(app)
 

@@ -14,8 +14,12 @@ func NewFlow(conn io.ReadWriteCloser) *Flow {
 	return &s
 }
 
-func QueryFlow(identity id.Identity, service string) (s Conn, err error) {
-	query, err := astral.Query(identity, service)
+func QueryFlow(
+	identity id.Identity,
+	service string,
+	path ...string,
+) (s Conn, err error) {
+	query, err := astral.Query(identity, port(service, path...))
 	if err != nil {
 		return
 	}
