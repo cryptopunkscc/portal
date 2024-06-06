@@ -46,7 +46,7 @@ func (c TestClientTest) Run(t *testing.T) {
 			}
 
 			request := test.getConn()
-			request.Logger(plog.New().Type(request))
+			request.Logger(plog.Type(request))
 
 			t.Run("func1", func(t *testing.T) {
 				t.Run("a", func(t *testing.T) {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/integration_test/rpc"
+	"github.com/cryptopunkscc/go-astral-js/test/rpc"
 	"log"
 	"testing"
 	"time"
