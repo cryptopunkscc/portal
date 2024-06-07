@@ -125,6 +125,15 @@ var portal = (function (exports) {
     return json
   };
 
+  AppHostConn.prototype.rpcQuery = function(method) {
+    const conn = this;
+    return async function (...data) {
+      log$1("conn rpc query", method);
+      await conn.jrpcCall(method, ...data);
+      return await conn.readJson(method)
+    }
+  };
+
   AppHostConn.prototype.writeJson = async function (data) {
     const json = JSON.stringify(data);
     log$1(this.id + " conn => " + this.query + ":" + json.trimEnd());
