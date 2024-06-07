@@ -115,23 +115,20 @@ var portal = (function (exports) {
     if (data.length > 0) {
       cmd += "?" + JSON.stringify(data);
     }
-    log$1(this.id + " conn => " + this.query + "." + cmd);
+    // log(this.id + " conn => " + this.query + "." + cmd)
     await this.write(cmd + '\n');
   };
 
   AppHostConn.prototype.readJson = async function (method) {
     const resp = await this.read();
     const json = JSON.parse(resp);
-    if (method !== undefined) {
-      log$1(this.id + " conn <= " + this.query  + ":" + resp.trimEnd());
-    }
     return json
   };
 
   AppHostConn.prototype.rpcQuery = function(method) {
     const conn = this;
     return async function (...data) {
-      log$1("conn rpc query", method);
+      // log("conn rpc query", method)
       await conn.jrpcCall(method, ...data);
       return await conn.readJson(method)
     }
@@ -139,7 +136,7 @@ var portal = (function (exports) {
 
   AppHostConn.prototype.writeJson = async function (data) {
     const json = JSON.stringify(data);
-    log$1(this.id + " conn => " + this.query + ":" + json.trimEnd());
+    // log(this.id + " conn => " + this.query + ":" + json.trimEnd())
     await this.write(json + '\n');
   };
 
@@ -185,7 +182,7 @@ var portal = (function (exports) {
       cmd += "?" + JSON.stringify(data);
     }
     const conn = await this.query(identity, cmd);
-    log$1(conn.id + " client => " + cmd);
+    // log(conn.id + " client => " + cmd)
     return conn
   };
 
@@ -244,7 +241,7 @@ var portal = (function (exports) {
     };
     const srv = new Service();
     const listener = await this.register(srv.name + "*");
-    log$1("listen " + srv.name);
+    // log("listen " + srv.name)
     astral_rpc_listen.call(srv, listener).catch(log$1);
     return listener
   }
@@ -252,7 +249,7 @@ var portal = (function (exports) {
   async function astral_rpc_listen(listener) {
     for (; ;) {
       const conn = await listener.accept();
-      log$1(conn.id + " service <= " + conn.query);
+      // log(conn.id + " service <= " + conn.query)
       astral_rpc_handle.call(this, conn).catch(log$1);
     }
   }
@@ -268,7 +265,7 @@ var portal = (function (exports) {
       for (; ;) {
         if (!single) {
           query = await conn.read();
-          log$1(conn.id + " service <== " + query);
+          // log(conn.id + " service <== " + query)
         }
         [method, args] = parseQuery(query);
 
@@ -282,7 +279,7 @@ var portal = (function (exports) {
         }
       }
     } catch (e) {
-      log$1(conn.id + " service !! " + conn.query + ":" + e);
+      // log(conn.id + " service !! " + conn.query + ":" + e)
       conn.close().catch(log$1);
     }
   }

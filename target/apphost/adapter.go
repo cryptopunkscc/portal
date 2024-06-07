@@ -167,7 +167,7 @@ func (api *Adapter) ConnClose(id string) (err error) {
 }
 
 func (api *Adapter) ConnWrite(id string, data string) (err error) {
-	api.log.Printf("[%s] write: %s", id, strings.TrimRight(data, "\r\n"))
+	api.log.Printf("> %s <%s>", strings.TrimRight(data, "\r\n"), id)
 	conn, ok := api.connections.Get(id)
 	if !ok {
 		err = errors.New("[ConnWrite] not found connection with id: " + id)
@@ -181,7 +181,6 @@ func (api *Adapter) ConnWrite(id string, data string) (err error) {
 }
 
 func (api *Adapter) ConnRead(id string) (data string, err error) {
-	api.log.Printf("[%s] read: %s", id, data)
 	conn, ok := api.connections.Get(id)
 	if !ok {
 		err = errors.New("[ConnRead] not found connection with id: " + id)
@@ -192,11 +191,12 @@ func (api *Adapter) ConnRead(id string) (data string, err error) {
 		return
 	}
 	data = strings.TrimSuffix(data, "\n")
+	api.log.Printf("< %s <%s>", data, id)
 	return
 }
 
 func (api *Adapter) Query(identity string, query string) (data string, err error) {
-	api.log.Printf("[%s] query: %s", identity, query)
+	api.log.Println("~>", query)
 	nid := id.Identity{}
 	if len(identity) > 0 {
 		nid, err = id.ParsePublicKeyHex(identity)

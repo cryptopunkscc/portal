@@ -68,7 +68,7 @@ func (r *Request) Call(method string, value any) (err error) {
 
 	// log query
 	if r.logger != nil {
-		r.logger.Println("> " + query)
+		r.logger.Println("~>", query)
 	}
 
 	// query stream

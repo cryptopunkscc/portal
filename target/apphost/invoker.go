@@ -32,7 +32,6 @@ func (inv *Invoker) Close() error {
 
 func (inv *Invoker) Query(identity string, query string) (data string, err error) {
 	log := inv.log.Type(inv)
-	log.Println("query:", identity, query)
 	data, err = inv.Adapter.Query(identity, query)
 	if err != nil && identity == "" {
 		if inv.invoke != nil {

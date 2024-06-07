@@ -31,31 +31,27 @@ func NewHandler(
 }
 
 func (s *Handler) HandleMsg(ctx context.Context, msg target.Msg) {
-	log := plog.Get(ctx)
+	log := plog.Get(ctx).D()
 	log.Println("received ctrl message:", msg)
 	switch msg.Event {
 	case target.DevChanged:
-		log.Println(s.apphost.Connections())
 		for _, c := range s.apphost.Connections() {
 			if c.In {
 				continue
 			}
 			query := strings.TrimPrefix(c.Query, "dev.")
-			log.Println(query, msg.Pkg, strings.HasPrefix(query, msg.Pkg))
 			if strings.HasPrefix(query, msg.Pkg) {
 				s.changes.Set(msg.Pkg, msg.Time)
 			}
 		}
 	case target.DevRefreshed:
-		log.Println(s.changes.Copy(), s.apphost.Connections(), s.changes.Size(), s.changes.Copy())
-
 		if ok := s.changes.Delete(msg.Pkg); !ok || s.changes.Size() > 0 {
 			log.Println("cannot reload", ok, s.changes.Size())
 			return
 		}
 		log.Println("reloading")
 		if err := s.reloader.Reload(); err != nil {
-			plog.Get(ctx).F().Println(err)
+			log.F().Println(err)
 		}
 	}
 }
