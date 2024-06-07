@@ -181,9 +181,9 @@ func TestApp_Run_basic(t *testing.T) {
 								continue
 							}
 							t.Run(fmt.Sprintf("%d.%s", i3+1, tt.query), func(t *testing.T) {
+								skip(t, i1, i2, 0, nil)
 								client, err := c(t)
 								if err != nil {
-									skip(t, i1, i2, 0, err)
 									t.Fatal(err)
 								}
 								t.Cleanup(client.Flush)
@@ -191,8 +191,8 @@ func TestApp_Run_basic(t *testing.T) {
 								if tt.arg != nil {
 									args = append([]any{tt.arg}, args...)
 								}
+								skip(t, i1, i2, i3, err)
 								if err := Call(client, tt.query, args...); err != nil {
-									skip(t, i1, i2, i3, err)
 									assert.Equal(t, tt.expected, err)
 									return
 								}
