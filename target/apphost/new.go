@@ -61,22 +61,28 @@ func eventEmitter[T any](queue *sig.Queue[target.ApphostEvent]) func(ref string,
 	}
 }
 
-func (f Factory) NewAdapter(ctx context.Context, pkg string) target.Apphost {
-	flat := newAdapter(ctx, pkg, f.prefix...)
+func (f Factory) NewAdapter(ctx context.Context, portal target.Portal) target.Apphost {
+	flat := newAdapter(ctx, portal.Manifest().Package, f.prefix...)
 	return NewInvoker(ctx, flat, f.invoke)
 }
 
-func (f Factory) WithTimeout(ctx context.Context, pkg string) target.Apphost {
-	timeout := NewTimout(5*time.Second, func() {
-		_ = syscall.Kill(syscall.Getpid(), syscall.SIGINT)
-	})
-	flat := newAdapter(ctx, pkg, f.prefix...)
+func (f Factory) WithTimeout(ctx context.Context, portal target.Portal) target.Apphost {
+	manifest := portal.Manifest()
+	flat := newAdapter(ctx, manifest.Package, f.prefix...)
 
-	go func() {
-		for range flat.Events().Subscribe(ctx) {
-			timeout.Enable(flat.connections.Size() == 0)
-		}
-	}()
-
+	if manifest.Env.Timeout > -1 {
+		go func() {
+			duration := 5 * time.Second
+			if manifest.Env.Timeout > 0 {
+				duration = time.Duration(manifest.Env.Timeout) * time.Millisecond
+			}
+			timeout := NewTimout(duration, func() {
+				_ = syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+			})
+			for range flat.Events().Subscribe(ctx) {
+				timeout.Enable(flat.connections.Size() == 0)
+			}
+		}()
+	}
 	return NewInvoker(ctx, flat, f.invoke)
 }

@@ -9,8 +9,8 @@ import (
 func main() {
 	ctx := context.Background()
 	log := plog.New().Set(&ctx)
-	srv := rpc.NewTestGoService("test.go.service")
-	log.Type(srv).Println("start")
+	srv := rpc.NewTestGoService("dev.test.go")
+	log.Type(srv).Println("start dev.test.go")
 	err := srv.Run(ctx)
 	if err != nil {
 		log.P().Println()

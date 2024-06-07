@@ -11,4 +11,9 @@ type Manifest struct {
 	Icon        string `json:"icon,omitempty"`
 	Exec        string `json:"exec,omitempty"`
 	Build       string `json:"build,omitempty"`
+	Env         Env    `json:"env,omitempty"`
+}
+
+type Env struct {
+	Timeout int64 `json:"timeout,omitempty"`
 }

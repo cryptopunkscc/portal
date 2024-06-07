@@ -21,10 +21,9 @@ func ApiFactory(
 		default:
 			plog.Get(ctx).P().Println("cannot create target.NewApi unknown type:", reflect.TypeOf(p))
 		}
-		pkg := p.Manifest().Package
-		a = wrap(n(ctx, pkg))
+		a = wrap(n(ctx, p))
 		return
 	}
 }
 
-type NewApphost func(ctx context.Context, pkg string) Apphost
+type NewApphost func(ctx context.Context, portal Portal) Apphost
