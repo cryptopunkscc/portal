@@ -21,7 +21,7 @@ func NewConnLogger(conn io.ReadWriteCloser, logger plog.Logger) *ConnLogger {
 func (cl *ConnLogger) Read(b []byte) (n int, err error) {
 	n, err = cl.ReadWriteCloser.Read(b)
 	if n > 0 {
-		cl.Println("< ", strings.Trim(string(b[:n]), "\n"))
+		cl.Println("<", strings.Trim(string(b[:n]), "\n"))
 	}
 	return
 }
@@ -29,7 +29,7 @@ func (cl *ConnLogger) Read(b []byte) (n int, err error) {
 func (cl *ConnLogger) Write(b []byte) (n int, err error) {
 	n, err = cl.ReadWriteCloser.Write(b)
 	if n > 0 {
-		cl.Println("> ", strings.Trim(string(b[:n]), "\n"))
+		cl.Println(">", strings.Trim(string(b[:n]), "\n"))
 	}
 	return
 }

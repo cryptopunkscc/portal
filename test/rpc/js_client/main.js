@@ -73,15 +73,15 @@ async function test_func4() {
   assertEqual(this, expected, actual)
 }
 
-const error = (...args) => portal.log("[FAILED]:", JSON.stringify(args))
+const error = (...args) => portal.log("FAILED", ...args)
 
 function assertEqual(f, l, r) {
   l = JSON.stringify(l)
   r = JSON.stringify(r)
   if (l !== r) {
-    throw f.name + ": " + l + " != " + r
+    throw f.name + " " + l + " != " + r
   } else {
-    log("[ASSERT]", f.name, "=====>", l, "equal", r)
+    // log(`TEST_ASSERT`, `${f.name}(${l}==${r})`)
   }
 }
 
@@ -90,7 +90,12 @@ async function main() {
   for (let connection of connections) {
     const conn = await connection()
     for (let test of tests) {
-      await test.call(Object.assign(test, conn))
+      try {
+        await test.call(Object.assign(test, conn))
+        log(`PASSED ${test.name}`)
+      } catch (e) {
+        error(e)
+      }
     }
   }
 }
