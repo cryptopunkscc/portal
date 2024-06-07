@@ -25,6 +25,15 @@ AppHostConn.prototype.readJson = async function (method) {
   return json
 }
 
+AppHostConn.prototype.rpcQuery = function(method) {
+  const conn = this
+  return async function (...data) {
+    log("conn rpc query", method)
+    await conn.jrpcCall(method, ...data)
+    return await conn.readJson(method)
+  }
+}
+
 AppHostConn.prototype.writeJson = async function (data) {
   const json = JSON.stringify(data)
   log(this.id + " conn => " + this.query + ":" + json.trimEnd())
