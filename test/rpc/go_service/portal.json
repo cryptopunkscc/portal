@@ -1,6 +1,6 @@
 {
   "name": "test-go-service",
-  "package": "test.go.service",
+  "package": "dev.test.go",
   "title": "test go service",
   "version": "0.0.0"
 }
