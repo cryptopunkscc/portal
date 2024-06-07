@@ -28,6 +28,7 @@ func (r *byteScannerReader) IsEmpty() bool {
 func (r *byteScannerReader) Clear() {
 	r.offset = 0
 	r.end = 0
+	r.buff = []byte{}
 }
 
 func (r *byteScannerReader) Buffer() []byte {

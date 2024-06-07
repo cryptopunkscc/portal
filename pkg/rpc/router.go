@@ -138,10 +138,21 @@ func (r *Router) registerApi() *Router {
 	return r
 }
 
-func (r *Router) Command(cmd string) *Router { return r.shift(cmd, true) }
-func (r *Router) Query(query string) *Router { return r.shift(query, false) }
+func (r *Router) Command(cmd string) *Router {
+	if cmd == "" {
+		return r
+	}
+	rr := *r
+	rr.query = cmd
+	if rr.Registry, rr.args = r.Registry.Unfold(rr.query); rr.args == rr.query {
+		// nothing was unfolded query cannot be handled
+		rr.Registry = NewRegistry[*Caller]()
+		return &rr
+	}
+	return &rr
+}
 
-func (r *Router) shift(query string, force bool) *Router {
+func (r *Router) Query(query string) *Router {
 	rr := *r
 	rr.Conn(rr.rpc)
 	rr.query = strings.TrimPrefix(query, r.Port)
@@ -151,29 +162,25 @@ func (r *Router) shift(query string, force bool) *Router {
 	}
 	rr.Registry, rr.args = r.Registry.Unfold(rr.query)
 
-	if rr.Registry.IsEmpty() {
-		if rr.args != "" {
-			// cannot find caller for args
-			rr.Registry = NewRegistry[*Caller]()
-			return &rr
-		} else if rr.Registry.HasNext() {
-			// just a middle node, trim dot if needed
-			rr.Registry, _ = r.Registry.Unfold(".")
-			return &rr
+	switch {
+	case !rr.Registry.IsEmpty():
+
+		// caller found, so trim args if needed
+		if rr.args == "\n" {
+			rr.args = ""
+		} else {
+			rr.args, _ = strings.CutPrefix(rr.args, "?")
 		}
-	}
+	case rr.args != "":
 
-	if rr.args == rr.query && rr.query != "" && force {
-		// nothing was unfolded query cannot be handled
+		// cannot find caller for args
 		rr.Registry = NewRegistry[*Caller]()
-		return &rr
+	case rr.Registry.HasNext():
+
+		// just a middle node, trim dot if needed
+		rr.Registry, _ = r.Registry.Unfold(".")
 	}
 
-	if rr.args == "\n" {
-		rr.args = ""
-	} else {
-		rr.args, _ = strings.CutPrefix(rr.args, "?")
-	}
 	return &rr
 }
 
@@ -227,6 +234,7 @@ func (r *Router) Conn(conn io.ReadWriteCloser) *Router {
 }
 
 func (r *Router) Call() (result []any, err error) {
+	defer r.rpc.Clear()
 	r.loadArgs()
 	if r.Registry.IsEmpty() {
 		return nil, fmt.Errorf("route not found for query %s%s ", r.Port, r.args)
