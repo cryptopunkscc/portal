@@ -1,0 +1,9 @@
+{
+  "name": "test-js-service",
+  "package": "test.go",
+  "title": "test js service",
+  "version": "0.0.0",
+  "env": {
+    "timeout": -1
+  }
+}

@@ -1,5 +1,6 @@
 const {apphost, log, sleep} = portal
 
+log("start backend")
 class Service {
 
     constructor() {

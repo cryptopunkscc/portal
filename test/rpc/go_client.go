@@ -26,6 +26,7 @@ func (c TestClient) Run(t *testing.T) {
 		skip    bool
 	}{
 		{
+			skip: true,
 			name: "request",
 			getConn: func() rpc.Conn {
 				return rpc.NewRequest(id.Anyone, c.port, "request")

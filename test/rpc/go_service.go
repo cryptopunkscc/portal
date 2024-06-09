@@ -18,14 +18,12 @@ func NewTestGoService(port string) *TestGoService {
 	app.RouteFunc("request.func2", Function2)
 	app.RouteFunc("request.func3", Function3)
 	app.RouteFunc("request.func4", Function4)
-	app.RouteFunc("request.func5", Function5)
 
 	app.Routes("flow*")
 	app.Func("flow.func1", Function1)
 	app.Func("flow.func2", Function2)
 	app.Func("flow.func3", Function3)
 	app.Func("flow.func4", Function4)
-	app.Func("flow.func5", Function5)
 
 	return &TestGoService{App: app}
 }
@@ -63,10 +61,6 @@ func Function4(
 	s string,
 ) TestStruct1 {
 	return TestStruct1{b, i, f, s}
-}
-
-func Function5(arg any, err error) (any, error) {
-	return arg, err
 }
 
 type TestStruct1 struct {
