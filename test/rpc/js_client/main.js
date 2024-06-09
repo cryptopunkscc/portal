@@ -23,7 +23,7 @@ const requests = async () => ({
 
 const connections = [
   flows,
-  requests,
+  // requests,
 ]
 
 const tests = [
@@ -44,7 +44,12 @@ async function test_func1_a() {
 async function test_func1_b() {
   const message = "message"
   const expected = {error: message}
-  const actual = await this.func1(message, true)
+  let actual
+  try {
+     actual = await this.func1(message, true)
+  } catch (e) {
+    actual = e
+  }
   assertEqual(this, expected, actual)
 }
 

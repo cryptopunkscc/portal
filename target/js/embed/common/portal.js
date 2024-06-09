@@ -122,7 +122,7 @@ var portal = (function (exports) {
     return json
   };
 
-  AppHostConn.prototype.rpcQuery = function(method) {
+  AppHostConn.prototype.rpcQuery = function (method) {
     const conn = this;
     return async function (...data) {
       // log("conn rpc query", method)
@@ -266,7 +266,12 @@ var portal = (function (exports) {
         }
         [method, args] = parseQuery(query);
 
-        let result = await this[method](...args, write, read);
+        let result;
+        try {
+          result = await this[method](...args, write, read);
+        } catch (e) {
+          result = {error: e};
+        }
         if (result !== undefined) {
           await conn.writeJson(result);
         }
@@ -285,7 +290,12 @@ var portal = (function (exports) {
     if (query[0] === '.') {
       query = query.slice(1);
     }
-    let [method, payload] = query.split('?', 2);
+    const match = /[?\[{]/.exec(query);
+    const method = query.slice(0, match.index);
+    let payload = query.slice(match.index);
+    if (payload[0] === '?') {
+      payload = payload.slice(1);
+    }
     let args = [];
     if (payload) {
       args = JSON.parse(payload);
