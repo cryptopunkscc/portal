@@ -33,8 +33,8 @@ func main() {
 	log.Println("starting portal", os.Args)
 	defer log.Println("closing portal")
 
-	port := target.Port{Host: "portal"}
-	portOpen := port.Cmd("open")
+	port := target.Port{Base: "portal"}
+	portOpen := port.Route("open")
 	executable := "portal"
 	scope := feature.Scope[target.App]{
 		Executable:      executable,

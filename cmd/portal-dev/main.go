@@ -40,9 +40,9 @@ func main() {
 	defer log.Println("closing portal development")
 
 	portalPort.InitPrefix("dev")
-	port := target.Port{Host: "portal"}
-	portOpen := port.Cmd("open")
-	portMsg := port.Cmd("ctrl")
+	port := target.Port{Base: "portal"}
+	portOpen := port.Route("open")
+	portMsg := port.Route("ctrl")
 	scope := feature.Scope[target.Portal]{
 		Executable:     "portal-dev",
 		Port:           port,
@@ -59,7 +59,7 @@ func main() {
 		Processes:      &sig.Map[string, target.Portal]{},
 	}
 	scope.RpcHandlers = rpc.Handlers{
-		portMsg.Command: msg.NewBroadcast(portMsg, scope.GetProcesses()).BroadcastMsg,
+		portMsg.Name: msg.NewBroadcast(portMsg, scope.GetProcesses()).BroadcastMsg,
 	}
 	scope.DispatchService = scope.GetServeFeature().Dispatch
 

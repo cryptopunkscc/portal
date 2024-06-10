@@ -43,9 +43,9 @@ func (r Runner) Run(ctx context.Context, t target.Portal) (err error) {
 	newApi := func(ctx context.Context, portal target.Portal) target.Api {
 		api := r.newApi(ctx, portal)
 		handlers := rpc.Handlers{
-			r.portMsg.Command: msg.NewHandler(reloader, api).HandleMsg,
+			r.portMsg.Name: msg.NewHandler(reloader, api).HandleMsg,
 		}
-		port := r.portMsg.Target(portal).Cmd("")
+		port := r.portMsg.Target(portal).Route("")
 		service.NewRunner(handlers).Start(ctx, port.String())
 		return api
 	}

@@ -5,33 +5,32 @@ import (
 )
 
 type Port struct {
-	Prefix  []string
-	Host    string
-	Command string
+	Base string
+	Name string
 }
 
-func (p Port) Copy(host string) Port {
-	p.Host = host
+func (p Port) Copy(base string) Port {
+	p.Base = base
 	return p
 }
 
-func (p Port) Cmd(command string) Port {
-	p.Command = command
+func (p Port) Route(name string) Port {
+	p.Name = name
 	return p
 }
 
 func (p Port) Target(portal Portal) Port {
-	p.Host = portal.Manifest().Package
+	p.Base = portal.Manifest().Package
 	return p
 }
 
 func (p Port) String() string {
-	chunks := p.Prefix
-	if p.Host != "" {
-		chunks = append(chunks, p.Host)
+	var chunks []string
+	if p.Base != "" {
+		chunks = append(chunks, p.Base)
 	}
-	if p.Command != "" {
-		chunks = append(chunks, p.Command)
+	if p.Name != "" {
+		chunks = append(chunks, p.Name)
 	}
 	return strings.Join(chunks, ".")
 }
