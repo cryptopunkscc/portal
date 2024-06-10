@@ -4,6 +4,7 @@ import (
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/astrald/lib/astral"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
+	"github.com/cryptopunkscc/go-astral-js/pkg/port"
 	"io"
 )
 
@@ -12,21 +13,19 @@ type Request struct {
 	service string
 }
 
-func NewRequest(
-	identity id.Identity,
-	service string,
-	path ...string,
-) Conn {
+func newRequest(identity id.Identity, service string) Conn {
 	return &Request{
-		Serializer: &Serializer{
-			remoteID: identity,
-		},
-		service: port(service, path...),
+		Serializer: &Serializer{remoteID: identity},
+		service:    service,
 	}
 }
 
+func NewRequest(identity id.Identity, service string, path ...string) Conn {
+	return newRequest(identity, port.Format(service, path...))
+}
+
 func (r *Request) Copy() Conn {
-	rr := NewRequest(r.remoteID, r.service)
+	rr := newRequest(r.remoteID, r.service)
 	if r.logger != nil {
 		rr.Logger(r.logger.Logger)
 	}

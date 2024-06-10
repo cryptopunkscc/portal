@@ -12,6 +12,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
 	osExec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
+	portalPort "github.com/cryptopunkscc/go-astral-js/pkg/port"
 	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	create2 "github.com/cryptopunkscc/go-astral-js/runner/create"
 	"github.com/cryptopunkscc/go-astral-js/runner/dev"
@@ -38,7 +39,8 @@ func main() {
 	log.Println("starting portal development", os.Args)
 	defer log.Println("closing portal development")
 
-	port := target.Port{Host: "portal", Prefix: []string{"dev"}}
+	portalPort.InitPrefix("dev")
+	port := target.Port{Host: "portal"}
 	portOpen := port.Cmd("open")
 	portMsg := port.Cmd("ctrl")
 	scope := feature.Scope[target.Portal]{

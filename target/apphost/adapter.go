@@ -10,6 +10,7 @@ import (
 	"github.com/cryptopunkscc/astrald/lib/astral"
 	"github.com/cryptopunkscc/astrald/sig"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
+	"github.com/cryptopunkscc/go-astral-js/pkg/port"
 	"github.com/cryptopunkscc/go-astral-js/pkg/registry"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/google/uuid"
@@ -21,8 +22,7 @@ import (
 type Adapter struct {
 	log plog.Logger
 
-	pkg    []string
-	prefix []string
+	port port.Port
 
 	listeners   registry.Cache[*Listener]
 	connections registry.Cache[*Conn]
@@ -47,12 +47,8 @@ func (api *Adapter) Events() *sig.Queue[target.ApphostEvent] {
 	return &api.events
 }
 
-func (api *Adapter) Port(service ...string) (port string) {
-	return strings.Join(append(api.Prefix(), service...), ".")
-}
-
-func (api *Adapter) Prefix() []string {
-	return api.prefix
+func (api *Adapter) Port(service ...string) string {
+	return port.New(service...).String()
 }
 
 func (api *Adapter) Close() error {
@@ -87,11 +83,11 @@ func (api *Adapter) ServiceRegister(service string) (err error) {
 	port := service
 	switch service {
 	case "*":
-		port = api.Port(api.pkg...) + service
+		port = api.port.String() + service
 	case "":
-		port = api.Port(api.pkg...)
+		port = api.port.String()
 	default:
-		port = api.Port(append(api.pkg, service)...)
+		port = api.port.Add(service).String()
 	}
 	api.log.Println("register:", service)
 	astralListener, err := astral.Register(port)
@@ -136,8 +132,8 @@ func (api *Adapter) ConnAccept(service string) (data string, err error) {
 	api.log.Println("accepted connection:", connId)
 	api.connections.Set(connId, newConn(conn, false))
 
-	pkg := strings.Join(append(api.Prefix(), api.pkg...), ".")
-	query := strings.TrimPrefix(conn.Query(), pkg)
+	base := api.port.String()
+	query := strings.TrimPrefix(conn.Query(), base)
 	query = strings.TrimPrefix(query, ".")
 	bytes, err := json.Marshal(queryData{
 		Id:    connId,

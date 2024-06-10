@@ -3,6 +3,7 @@ package rpc
 import (
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/astrald/lib/astral"
+	"github.com/cryptopunkscc/go-astral-js/pkg/port"
 	"io"
 )
 
@@ -19,7 +20,7 @@ func QueryFlow(
 	service string,
 	path ...string,
 ) (s Conn, err error) {
-	query, err := astral.Query(identity, port(service, path...))
+	query, err := astral.Query(identity, port.Format(service, path...))
 	if err != nil {
 		return
 	}
