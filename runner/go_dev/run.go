@@ -6,12 +6,13 @@ import (
 	golang "github.com/cryptopunkscc/go-astral-js/pkg/go"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/go-astral-js/target/msg"
 	"time"
 )
 
 type Runner struct {
 	watcher *golang.Watcher
-	send    target.MsgSend
+	sender  *msg.Client
 	build   Build
 	run     target.Run[target.DistExec]
 
@@ -24,15 +25,16 @@ type Build func(context.Context, ...string) error
 
 func NewRunner(
 	build Build,
+	port target.Port,
 	run target.Run[target.DistExec],
-	send target.MsgSend,
-) *Runner {
-	return &Runner{
+) (runner *Runner) {
+	runner = &Runner{
 		watcher: golang.NewWatcher(),
 		run:     run,
 		build:   build,
-		send:    send,
 	}
+	runner.sender = msg.NewClient(port)
+	return
 }
 
 func (r *Runner) Reload() (err error) {
@@ -56,6 +58,9 @@ func (r *Runner) Run(ctx context.Context, project target.ProjectGo) (err error) 
 	if err = r.build(ctx, project.Abs()); err != nil {
 		return
 	}
+	if err = r.sender.Connect(ctx, project); err != nil {
+		return
+	}
 	r.dist = project.DistGolang()
 
 	if err = r.Reload(); err != nil {
@@ -69,7 +74,7 @@ func (r *Runner) Run(ctx context.Context, project target.ProjectGo) (err error) 
 
 	pkg := project.Manifest().Package
 	for range flow.From(events).Debounce(200 * time.Millisecond) {
-		if err := r.send(target.NewMsg(pkg, target.DevChanged)); err != nil {
+		if err := r.sender.Send(target.NewMsg(pkg, target.DevChanged)); err != nil {
 			log.E().Println(err)
 		}
 		if err = r.build(ctx, project.Abs()); err == nil {
@@ -77,7 +82,7 @@ func (r *Runner) Run(ctx context.Context, project target.ProjectGo) (err error) 
 				log.E().Println(err)
 			}
 		}
-		if err := r.send(target.NewMsg(pkg, target.DevRefreshed)); err != nil {
+		if err := r.sender.Send(target.NewMsg(pkg, target.DevRefreshed)); err != nil {
 			log.E().Println(err)
 		}
 	}
