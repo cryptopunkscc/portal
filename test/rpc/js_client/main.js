@@ -3,9 +3,13 @@ const log = portal.log
 const apphost = portal.apphost
 const sleep = portal.sleep
 
+const services = [
+  "go",
+  "js",
+]
 
-const flows = async function () {
-  const flow = await apphost.query("", "test.go.flow")
+const flows = async function (service) {
+  const flow = await apphost.query("", `test.${service}.flow`)
   return {
     func1: flow.rpcQuery("func1"),
     func2: flow.rpcQuery("func2"),
@@ -14,16 +18,16 @@ const flows = async function () {
   }
 }
 
-const requests = async () => ({
-  func1: apphost.rpcQuery("", "test.go.request.func1"),
-  func2: apphost.rpcQuery("", "test.go.request.func2"),
-  func3: apphost.rpcQuery("", "test.go.request.func3"),
-  func4: apphost.rpcQuery("", "test.go.request.func4"),
+const requests = async (service) => ({
+  func1: apphost.rpcQuery("", `test.${service}.request.func1`),
+  func2: apphost.rpcQuery("", `test.${service}.request.func2`),
+  func3: apphost.rpcQuery("", `test.${service}.request.func3`),
+  func4: apphost.rpcQuery("", `test.${service}.request.func4`),
 })
 
 const connections = [
   flows,
-  // requests,
+  requests,
 ]
 
 const tests = [
@@ -46,7 +50,7 @@ async function test_func1_b() {
   const expected = {error: message}
   let actual
   try {
-     actual = await this.func1(message, true)
+    actual = await this.func1(message, true)
   } catch (e) {
     actual = e
   }
@@ -92,14 +96,16 @@ function assertEqual(f, l, r) {
 
 async function main() {
   await sleep(200)
-  for (let connection of connections) {
-    const conn = await connection()
-    for (let test of tests) {
-      try {
-        await test.call(Object.assign(test, conn))
-        log(`PASSED ${test.name}`)
-      } catch (e) {
-        error(e)
+  for (let service of services) {
+    for (let connection of connections) {
+      const conn = await connection(service)
+      for (let test of tests) {
+        try {
+          await test.call(Object.assign(test, conn))
+          log(`PASSED ${test.name}`)
+        } catch (e) {
+          error(e)
+        }
       }
     }
   }
