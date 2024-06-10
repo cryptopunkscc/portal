@@ -171,10 +171,6 @@ class AppHostConn {
   }
 }
 
-const {log: log$1} = bindings;
-
-// ================== RPC extensions ==================
-
 AppHostConn.prototype.jrpcCall = async function (method, ...data) {
   let cmd = method;
   if (data.length > 0) {
@@ -213,10 +209,7 @@ AppHostConn.prototype.jsonReader = async function (method) {
 
 // Bind RPC api of service associated to this connection
 AppHostConn.prototype.bindRpc = async function () {
-  await astral_rpc_conn_bind_api(this);
-};
-
-async function astral_rpc_conn_bind_api(conn) {
+  const conn = this;
   // request api methods
   await conn.jrpcCall("api");
 
@@ -236,7 +229,9 @@ async function astral_rpc_conn_bind_api(conn) {
     await conn.jrpcCall(method, ...data);
     return conn.jsonReader(method)
   };
-}
+};
+
+const {log: log$2} = bindings;
 
 ApphostClient.prototype.jrpcCall = async function (identity, service, method, ...data) {
   let cmd = service;
@@ -251,35 +246,31 @@ ApphostClient.prototype.jrpcCall = async function (identity, service, method, ..
   return conn
 };
 
-ApphostClient.prototype.bindRpc = async function (identity, service) {
-  await astral_rpc_client_bind_api(this, identity, service);
-  return this
-};
-
 ApphostClient.prototype.rpcQuery = function (identity, port) {
   const client = this;
   return async function (...data) {
     const conn = await client.jrpcCall(identity, port, "", ...data);
     const json = await conn.readJson(port);
-    conn.close().catch(log$1);
+    conn.close().catch(log$2);
     return json
   }
 };
 
-async function astral_rpc_client_bind_api(client, identity, service) {
+ApphostClient.prototype.bindRpc = async function (identity, service) {
+  const client = this;
   // request api methods
   const conn = await client.jrpcCall(identity, service, "api");
 
   // read api methods
   const methods = await conn.readJson("api");
-  conn.close().catch(log$1);
+  conn.close().catch(log$2);
 
   // bind methods
   for (let method of methods) {
     client[method] = async (...data) => {
       const conn = await client.jrpcCall(identity, service, method, ...data);
       const json = await conn.readJson(method);
-      conn.close().catch(log$1);
+      conn.close().catch(log$2);
       return json
     };
   }
@@ -289,14 +280,14 @@ async function astral_rpc_client_bind_api(client, identity, service) {
     const conn = await client.jrpcCall(identity, service, method, ...data);
     return await conn.jsonReader(method)
   };
-}
-
-// Bind RPC service to given name
-ApphostClient.prototype.bindRpcService = async function (service) {
-  return await astral_rpc_bind_srv.call(this, service)
+  return client
 };
 
-async function astral_rpc_bind_srv(Service) {
+const {log: log$1} = bindings;
+
+
+// Bind RPC service to given name
+ApphostClient.prototype.bindRpcService = async function (Service) {
   const props = Object.getOwnPropertyNames(Service.prototype);
   if (props[0] !== "constructor") throw new Error("Service must have a constructor")
   const methods = props.slice(1, props.length);
@@ -307,21 +298,21 @@ async function astral_rpc_bind_srv(Service) {
   const srv = new Service();
   const listener = await this.register(srv.name + "*");
   // log("listen " + srv.name)
-  astral_rpc_listen.call(srv, listener).catch(log$1);
+  astral_rpc_listen(srv, listener).catch(log$1);
   return listener
-}
+};
 
-async function astral_rpc_listen(listener) {
+async function astral_rpc_listen(srv, listener) {
   for (; ;) {
     const conn = await listener.accept();
     // log(conn.id + " service <= " + conn.query)
-    astral_rpc_handle.call(this, conn).catch(log$1);
+    astral_rpc_handle(srv, conn).catch(log$1);
   }
 }
 
-async function astral_rpc_handle(conn) {
+async function astral_rpc_handle(srv, conn) {
   try {
-    let query = conn.query.slice(this.name.length);
+    let query = conn.query.slice(srv.name.length);
     let method = query, args = [];
     const single = query !== '';
     const write = async (data) => await conn.writeJson(data);
@@ -336,7 +327,7 @@ async function astral_rpc_handle(conn) {
 
       let result;
       try {
-        result = await this[method](...args, write, read);
+        result = await srv[method](...args, write, read);
       } catch (e) {
         result = {error: e};
       }
