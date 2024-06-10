@@ -32,7 +32,7 @@ func NewHandler(
 
 func (s *Handler) HandleMsg(ctx context.Context, msg target.Msg) {
 	log := plog.Get(ctx).D()
-	log.Println("received ctrl message:", msg)
+	log.Println("received broadcast message:", msg)
 	switch msg.Event {
 	case target.DevChanged:
 		for _, c := range s.apphost.Connections() {

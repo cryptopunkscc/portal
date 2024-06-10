@@ -42,7 +42,7 @@ func main() {
 	portalPort.InitPrefix("dev")
 	port := target.Port{Base: "portal"}
 	portOpen := port.Route("open")
-	portMsg := port.Route("ctrl")
+	portMsg := port.Route("broadcast")
 	scope := feature.Scope[target.Portal]{
 		Executable:     "portal-dev",
 		Port:           port,
@@ -68,10 +68,8 @@ func main() {
 
 	goRunner := go_dev.NewRunner(
 		featBuild.Dist,
-		func(ctx context.Context, src target.DistExec) (err error) {
-			return scope.GetExecTarget()(ctx, src)
-		},
-		msg.NewSend(portMsg),
+		portMsg,
+		func(ctx context.Context, src target.DistExec) (err error) { return scope.GetExecTarget()(ctx, src) },
 	)
 	scope.NewRunTarget = dev.NewRun(portMsg, goRunner)
 

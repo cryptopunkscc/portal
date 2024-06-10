@@ -4,12 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
-	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	"github.com/cryptopunkscc/go-astral-js/runner/go_dev"
 	"github.com/cryptopunkscc/go-astral-js/runner/goja"
 	"github.com/cryptopunkscc/go-astral-js/runner/goja_dev"
 	"github.com/cryptopunkscc/go-astral-js/runner/goja_dist"
-	"github.com/cryptopunkscc/go-astral-js/runner/service"
 	"github.com/cryptopunkscc/go-astral-js/runner/wails"
 	"github.com/cryptopunkscc/go-astral-js/runner/wails_dev"
 	"github.com/cryptopunkscc/go-astral-js/runner/wails_dist"
@@ -33,23 +31,22 @@ func NewRun(
 
 type Runner struct {
 	newApi  target.NewApi
-	sendMsg target.MsgSend
 	portMsg target.Port
 	runGo   *go_dev.Runner
 }
 
 func (r Runner) Run(ctx context.Context, t target.Portal) (err error) {
 	var reloader msg.Reloader
+	client := msg.NewClient(r.portMsg)
 	newApi := func(ctx context.Context, portal target.Portal) target.Api {
 		api := r.newApi(ctx, portal)
-		handlers := rpc.Handlers{
-			r.portMsg.Name: msg.NewHandler(reloader, api).HandleMsg,
+		client.Init(reloader, api)
+		if err = client.Connect(ctx, t); err != nil {
+			plog.Get(ctx).Type(r).P().Println(err)
 		}
-		port := r.portMsg.Target(portal).Route("")
-		service.NewRunner(handlers).Start(ctx, port.String())
 		return api
 	}
-	sendMsg := msg.NewSend(r.portMsg)
+	sendMsg := client.Send
 	switch v := t.(type) {
 	case target.ProjectJs:
 		run := goja_dev.NewRunner(newApi, sendMsg)
