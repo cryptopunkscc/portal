@@ -74,7 +74,7 @@ func (r *Request) Call(method string, value any) (err error) {
 	// query stream
 	var conn io.ReadWriteCloser
 	if conn, err = astral.Query(r.RemoteIdentity(), query); err != nil {
-		return plog.Err(err)
+		return err
 	}
 
 	// setup

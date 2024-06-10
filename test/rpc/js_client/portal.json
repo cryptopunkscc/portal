@@ -1,7 +1,7 @@
 {
-  "name": "test-js-service",
-  "package": "test.js.service",
-  "title": "test js service",
+  "name": "test-js-client",
+  "package": "test.js.client",
+  "title": "test js client",
   "version": "0.0.0",
   "env": {
     "timeout": -1

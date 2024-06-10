@@ -70,7 +70,7 @@ func (r *Runner) Run(ctx context.Context, project target.ProjectGo) (err error) 
 	pkg := project.Manifest().Package
 	for range flow.From(events).Debounce(200 * time.Millisecond) {
 		if err := r.send(target.NewMsg(pkg, target.DevChanged)); err != nil {
-			log.F().Println(err)
+			log.E().Println(err)
 		}
 		if err = r.build(ctx, project.Abs()); err == nil {
 			if err = r.Reload(); err != nil {
@@ -78,7 +78,7 @@ func (r *Runner) Run(ctx context.Context, project target.ProjectGo) (err error) 
 			}
 		}
 		if err := r.send(target.NewMsg(pkg, target.DevRefreshed)); err != nil {
-			log.F().Println(err)
+			log.E().Println(err)
 		}
 	}
 	return
