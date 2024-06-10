@@ -38,11 +38,11 @@ func (r *Runner) Run(ctx context.Context, dist target.DistJs) (err error) {
 	pkg := dist.Manifest().Package
 	watch := watcher.NewRunner[target.DistJs](func() (err error) {
 		if err := r.send(target.NewMsg(pkg, target.DevChanged)); err != nil {
-			log.F().Println(err)
+			log.E().Println(err)
 		}
 		err = r.Reload()
 		if err := r.send(target.NewMsg(pkg, target.DevRefreshed)); err != nil {
-			log.F().Println(err)
+			log.E().Println(err)
 		}
 		return err
 	})

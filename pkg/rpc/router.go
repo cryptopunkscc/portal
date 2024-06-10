@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
+	port2 "github.com/cryptopunkscc/go-astral-js/pkg/port"
 	"io"
 	"reflect"
 	"strings"
@@ -31,7 +32,7 @@ var ErrUnauthorized = errors.New("unauthorized")
 
 func NewRouter(port string) *Router {
 	return &Router{
-		Port:     port,
+		Port:     port2.Format(port),
 		Registry: NewRegistry[*Caller](),
 	}
 }
@@ -41,7 +42,6 @@ func (r *Router) Routes(routes ...string) *Router {
 	return r
 }
 
-// TODO deprecated
 func (r *Router) Logger(logger plog.Logger) *Router {
 	r.logger = logger
 	return r

@@ -18,6 +18,7 @@ func NewRunner[T target.Portal](port target.Port) *Runner[T] {
 }
 
 func (r Runner[T]) Run(ctx context.Context, src string, args ...string) (err error) {
+	plog.Get(ctx).Type(r).Println("Running query", r.port, src, args)
 	flow, err := rpc.QueryFlow(id.Anyone, r.port)
 	if err != nil {
 		return err
@@ -43,7 +44,7 @@ func (r Runner[T]) Run(ctx context.Context, src string, args ...string) (err err
 }
 
 func (r Runner[T]) Start(ctx context.Context, src string, args ...string) (err error) {
-	plog.Get(ctx).Type(r).Println("starting query", src, args)
+	plog.Get(ctx).Type(r).Println("starting query", r.port, src, args)
 	request := rpc.NewRequest(id.Anyone, r.port)
 	typ := target.ParseType(target.TypeAny, args...)
 	sTyp := fmt.Sprintf("%d", typ)

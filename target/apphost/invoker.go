@@ -55,6 +55,5 @@ func (inv *Invoker) Query(identity string, query string) (data string, err error
 
 func (inv *Invoker) invokeApp(query string) error {
 	src := strings.Split(query, "?")[0]
-	src = strings.Join(append(inv.Prefix(), src), ".")
 	return inv.invoke(inv.ctx, src)
 }

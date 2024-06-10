@@ -5,6 +5,7 @@ import (
 	"context"
 	"github.com/cryptopunkscc/astrald/sig"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
+	"github.com/cryptopunkscc/go-astral-js/pkg/port"
 	"github.com/cryptopunkscc/go-astral-js/pkg/registry"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"syscall"
@@ -13,20 +14,18 @@ import (
 
 type Factory struct {
 	invoke target.Dispatch
-	prefix []string
 }
 
-func NewFactory(invoke target.Dispatch, prefix ...string) *Factory {
-	return &Factory{invoke: invoke, prefix: prefix}
+func NewFactory(invoke target.Dispatch) *Factory {
+	return &Factory{invoke: invoke}
 }
 
-func newAdapter(ctx context.Context, pkg string, prefix ...string) *Adapter {
-	a := &Adapter{
-		prefix: prefix,
+func newAdapter(ctx context.Context, pkg string) *Adapter {
+	if pkg == "" {
+		panic("package is empty")
 	}
-	if pkg != "" {
-		a.pkg = []string{pkg}
-	}
+	a := &Adapter{}
+	a.port = port.New(pkg)
 	a.log = plog.Get(ctx).Type(a).Set(&ctx)
 
 	a.listeners = registry.New[*Listener]()
@@ -62,13 +61,13 @@ func eventEmitter[T any](queue *sig.Queue[target.ApphostEvent]) func(ref string,
 }
 
 func (f Factory) NewAdapter(ctx context.Context, portal target.Portal) target.Apphost {
-	flat := newAdapter(ctx, portal.Manifest().Package, f.prefix...)
+	flat := newAdapter(ctx, portal.Manifest().Package)
 	return NewInvoker(ctx, flat, f.invoke)
 }
 
 func (f Factory) WithTimeout(ctx context.Context, portal target.Portal) target.Apphost {
 	manifest := portal.Manifest()
-	flat := newAdapter(ctx, manifest.Package, f.prefix...)
+	flat := newAdapter(ctx, manifest.Package)
 
 	if manifest.Env.Timeout > -1 {
 		go func() {

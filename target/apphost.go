@@ -24,7 +24,6 @@ type Apphost interface {
 }
 
 type ApphostApi interface {
-	Prefix() []string
 	Close() error
 	Interrupt()
 	Log(arg ...any)
