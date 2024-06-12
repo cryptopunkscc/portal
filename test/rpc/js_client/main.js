@@ -1,6 +1,6 @@
 // const apphost = portal.apphost
 const log = portal.log
-const apphost = portal.apphost
+const rpc = portal.rpc
 const sleep = portal.sleep
 
 const services = [
@@ -8,22 +8,22 @@ const services = [
   "js",
 ]
 
-const flows = async function (service) {
-  const flow = await apphost.query(`test.${service}.flow`)
-  return {
-    func1: flow.rpcQuery("func1"),
-    func2: flow.rpcQuery("func2"),
-    func3: flow.rpcQuery("func3"),
-    func4: flow.rpcQuery("func4"),
-  }
+const flows = async service => {
+  const conn = await rpc.query(`test.${service}.flow`)
+  return conn.bind(
+    "func1",
+    "func2",
+    "func3",
+    "func4",
+  )
 }
 
-const requests = async (service) => ({
-  func1: apphost.rpcQuery("", `test.${service}.request.func1`),
-  func2: apphost.rpcQuery("", `test.${service}.request.func2`),
-  func3: apphost.rpcQuery("", `test.${service}.request.func3`),
-  func4: apphost.rpcQuery("", `test.${service}.request.func4`),
-})
+const requests = async service => await rpc.bind(
+  `test.${service}.request.func1`,
+  `test.${service}.request.func2`,
+  `test.${service}.request.func3`,
+  `test.${service}.request.func4`,
+)
 
 const connections = [
   flows,
