@@ -207,7 +207,7 @@ class RpcConn extends ApphostConn {
     return async (...params) => await this.request(method, ...params)
   }
 
-  bind(methods) {
+  bind(...methods) {
     this.boundMethods = methods;
     for (let method of methods) {
       this[method] = this.requester(method);
@@ -369,6 +369,12 @@ class RpcClient extends ApphostClient {
     this.boundMethods = methods;
   }
 
+  async query(query){
+    let conn = await super.query(query, this.targetId);
+    conn = new RpcConn(conn);
+    return conn
+  }
+
   async serve(ctx) {
     await serve(this, ctx);
   }
@@ -400,7 +406,7 @@ class RpcClient extends ApphostClient {
     return new RpcClient(id)
   }
 
-  bind(methods) {
+  bind(...methods) {
     const copy = new RpcClient(this.targetId, methods);
     for (let method of methods) {
       this[method] = copy.requester(method);

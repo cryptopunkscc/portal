@@ -1,4 +1,4 @@
-const apphost = portal.apphost
+const rpc = portal.rpc
 const log = portal.log
 
 class Service {
@@ -25,7 +25,7 @@ class Service {
 
 const service = new Service();
 
-apphost.registerRpc({
+rpc.serve({
   routes: [
     "flow*",
     "request:",

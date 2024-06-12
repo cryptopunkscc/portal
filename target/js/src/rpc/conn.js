@@ -36,7 +36,7 @@ export class RpcConn extends ApphostConn {
     return async (...params) => await this.request(method, ...params)
   }
 
-  bind(methods) {
+  bind(...methods) {
     this.boundMethods = methods
     for (let method of methods) {
       this[method] = this.requester(method)
