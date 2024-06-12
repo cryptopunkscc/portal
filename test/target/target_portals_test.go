@@ -20,6 +20,7 @@ var portalTestCases = []Case[string]{
 		BasicFrontend,
 		ProjectFrontend,
 		ProjectBackend,
+		ProjectGo,
 		Launcher,
 		DistExecutable,
 	}},
