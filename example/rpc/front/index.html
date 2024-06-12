@@ -3,16 +3,16 @@
 <script src="portal.js"></script>
 <script>
     async function rpc() {
-        let srv = await portal.apphost.query("", "example.rpc")
-        await srv.bindRpc()
+        let conn = await portal.rpc.query("example.rpc")
+        conn.bind("get", "sum")
 
-        let result = await srv.get("Hello from front")
+        let result = await conn.get("Hello from front")
         alert(JSON.stringify(result))
 
-        result = await srv.sum(1, 2)
+        result = await conn.sum(1, 2)
         alert(result)
 
-        await srv.close()
+        await conn.close()
     }
 
     rpc()
