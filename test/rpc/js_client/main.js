@@ -9,7 +9,7 @@ const services = [
 ]
 
 const flows = async function (service) {
-  const flow = await apphost.query("", `test.${service}.flow`)
+  const flow = await apphost.query(`test.${service}.flow`)
   return {
     func1: flow.rpcQuery("func1"),
     func2: flow.rpcQuery("func2"),
