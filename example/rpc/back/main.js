@@ -24,3 +24,8 @@ async function bind() {
 }
 
 bind().catch(log)
+
+portal.rpc.serve({
+    handlers: new Service(),
+    routes: ["*"]
+}).catch(log)
