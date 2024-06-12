@@ -196,6 +196,9 @@ AppHostConn.prototype.rpcQuery = function (method) {
 };
 
 AppHostConn.prototype.writeJson = async function (data) {
+  // if (Array.isArray(data) && data.length === 1) {
+  //   data = data[0]
+  // }
   const json = JSON.stringify(data);
   // log(this.id + " conn => " + this.query + ":" + json.trimEnd())
   await this.write(json + '\n');
@@ -231,7 +234,7 @@ AppHostConn.prototype.bindRpc = async function () {
   };
 };
 
-const {log: log$2} = bindings;
+const {log: log$3} = bindings;
 
 ApphostClient.prototype.jrpcCall = async function (identity, service, method, ...data) {
   let cmd = service;
@@ -251,7 +254,7 @@ ApphostClient.prototype.rpcQuery = function (identity, port) {
   return async function (...data) {
     const conn = await client.jrpcCall(identity, port, "", ...data);
     const json = await conn.readJson(port);
-    conn.close().catch(log$2);
+    conn.close().catch(log$3);
     return json
   }
 };
@@ -263,14 +266,14 @@ ApphostClient.prototype.bindRpc = async function (identity, service) {
 
   // read api methods
   const methods = await conn.readJson("api");
-  conn.close().catch(log$2);
+  conn.close().catch(log$3);
 
   // bind methods
   for (let method of methods) {
     client[method] = async (...data) => {
       const conn = await client.jrpcCall(identity, service, method, ...data);
       const json = await conn.readJson(method);
-      conn.close().catch(log$2);
+      conn.close().catch(log$3);
       return json
     };
   }
@@ -283,7 +286,7 @@ ApphostClient.prototype.bindRpc = async function (identity, service) {
   return client
 };
 
-const {log: log$1} = bindings;
+const {log: log$2} = bindings;
 
 
 // Bind RPC service to given name
@@ -298,7 +301,7 @@ ApphostClient.prototype.bindRpcService = async function (Service) {
   const srv = new Service();
   const listener = await this.register(srv.name + "*");
   // log("listen " + srv.name)
-  astral_rpc_listen(srv, listener).catch(log$1);
+  astral_rpc_listen(srv, listener).catch(log$2);
   return listener
 };
 
@@ -306,42 +309,42 @@ async function astral_rpc_listen(srv, listener) {
   for (; ;) {
     const conn = await listener.accept();
     // log(conn.id + " service <= " + conn.query)
-    astral_rpc_handle(srv, conn).catch(log$1);
+    try {
+      astral_rpc_handle(srv, conn).catch(log$2);
+    } catch (e) {
+      // log(conn.id + " service !! " + conn.query + ":" + e)
+      conn.close().catch(log$2);
+    }
   }
 }
 
 async function astral_rpc_handle(srv, conn) {
-  try {
-    let query = conn.query.slice(srv.name.length);
-    let method = query, args = [];
-    const single = query !== '';
-    const write = async (data) => await conn.writeJson(data);
-    const read = async (method) => await conn.readJson(method);
+  let query = conn.query.slice(srv.name.length);
+  let method = query, args = [];
+  const single = query !== '';
+  const write = async (data) => await conn.writeJson(data);
+  const read = async (method) => await conn.readJson(method);
 
-    for (; ;) {
-      if (!single) {
-        query = await conn.read();
-        // log(conn.id + " service <== " + query)
-      }
-      [method, args] = parseQuery(query);
-
-      let result;
-      try {
-        result = await srv[method](...args, write, read);
-      } catch (e) {
-        result = {error: e};
-      }
-      if (result !== undefined) {
-        await conn.writeJson(result);
-      }
-      if (single) {
-        conn.close().catch(log$1);
-        break
-      }
+  for (; ;) {
+    if (!single) {
+      query = await conn.read();
+      // log(conn.id + " service <== " + query)
     }
-  } catch (e) {
-    // log(conn.id + " service !! " + conn.query + ":" + e)
-    conn.close().catch(log$1);
+    [method, args] = parseQuery(query);
+
+    let result;
+    try {
+      result = await srv[method](...args, write, read);
+    } catch (e) {
+      result = {error: e};
+    }
+    if (result !== undefined) {
+      await conn.writeJson(result);
+    }
+    if (single) {
+      conn.close().catch(log$2);
+      break
+    }
   }
 }
 
@@ -360,6 +363,153 @@ function parseQuery(query) {
     args = JSON.parse(payload);
   }
   return [method, args]
+}
+
+const log$1 = bindings.log;
+
+
+ApphostClient.prototype.registerRpc = async function (ctx) {
+  const routes = prepareRoutes(ctx);
+  for (let route of routes) {
+    const listener = await this.register(route);
+    listen(ctx, listener).catch(log$1);
+  }
+};
+
+function prepareRoutes(ctx) {
+  let routes = collectRoutes(ctx.handlers);
+  routes = formatRoutes(routes);
+  routes = maskRoutes(routes, ctx.routes);
+  return routes
+}
+
+function collectRoutes(handlers, ...name) {
+  if (typeof handlers !== "object") {
+    return name
+  }
+
+  const props = Object.getOwnPropertyNames(handlers);
+  if (props.length === 0) {
+    return name
+  }
+  const routes = [];
+  for (let prop of props) {
+    const next = handlers[prop];
+    const nested = collectRoutes(next, ...[...name, prop]);
+    if (typeof nested[0] === "string") {
+      routes.push(nested);
+    } else {
+      routes.push(...nested);
+    }
+  }
+  return routes
+}
+
+function formatRoutes(routes) {
+  const formatted = [];
+  for (let route of routes) {
+    formatted.push(route.join("."));
+  }
+  return formatted
+}
+
+function maskRoutes(routes, masks) {
+  masks = masks ? masks : [];
+  let arr = [...routes];
+  for (let mask of masks) {
+    const last = mask.length - 1;
+    if (/[*:]/.test(mask.slice(last))) {
+      mask = mask.slice(0, last);
+    }
+    arr = arr.filter(val => !val.startsWith(mask));
+  }
+  masks = masks.filter(mask => !mask.endsWith(":"));
+  arr.push(...masks);
+  return arr
+}
+
+async function listen(ctx, listener) {
+  for (; ;) {
+    const conn = await listener.accept();
+    try {
+      handle(ctx, conn).catch(log$1);
+    } catch (e) {
+      conn.close().catch(log$1);
+    }
+  }
+}
+
+async function handle(ctx, conn) {
+  const inject = {...ctx.handlers, ...ctx.inject, conn: conn};
+  let [handlers, params] = unfold(ctx.handlers, conn.query);
+  let handle = handlers;
+  let result;
+  let canInvoke;
+  for (; ;) {
+    canInvoke = typeof handle === "function";
+    if (params && !canInvoke) {
+      await conn.writeJson({error: `no handler for query ${params} ${typeof handle}`});
+      return
+    }
+    if (params || canInvoke) {
+      try {
+        result = await invoke(inject, handle, params);
+      } catch (e) {
+        result = {error: e};
+      }
+      await conn.writeJson(result);
+      handle = handlers;
+    }
+    params = await conn.read();
+    if (typeof handle === "object") {
+      [handle, params] = unfold(handle, params);
+    }
+  }
+}
+
+async function invoke(ctx, handle, params) {
+  if (handle === undefined) {
+    throw "undefined handler"
+  }
+  switch (typeof handle) {
+    case "function":
+      const args = JSON.parse(params);
+      if (Array.isArray(args)) {
+        return await handle(...args, ctx)
+      } else {
+        return await handle(args, ctx)
+      }
+    case "object":
+      return
+  }
+}
+
+function unfold(handlers, query) {
+  const [next, rest] = split(query);
+  const nested = handlers[next];
+  if (rest === undefined) {
+    return [nested]
+  }
+  if (typeof nested !== "undefined") {
+    return unfold(nested, rest)
+  }
+  if (typeof handlers === "function") {
+    return [handlers, rest]
+  }
+  throw "cannot unfold"
+}
+
+function split(query) {
+  const index = query.search(/[?.{\[]/);
+  if (index === -1) {
+    return [query]
+  }
+  const left = query.slice(0, index);
+  let right = query.slice(index, query.length);
+  if (/^[.?]/.test(right)) {
+    right = right.slice(1);
+  }
+  return [left, right]
 }
 
 const {log, sleep, platform} = bindings;

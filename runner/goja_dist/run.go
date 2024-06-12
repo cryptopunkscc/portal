@@ -33,18 +33,20 @@ func (r *Runner) Run(ctx context.Context, dist target.DistJs) (err error) {
 	r.dist = dist
 	r.backend = goja.NewBackend(r.newApi(ctx, dist))
 	if err = r.Reload(); err != nil {
-		return
+		log.E().Println(err.Error())
 	}
 	pkg := dist.Manifest().Package
-	watch := watcher.NewRunner[target.DistJs](func() (err error) {
+	watch := watcher.NewRunner[target.DistJs](func() error {
 		if err := r.send(target.NewMsg(pkg, target.DevChanged)); err != nil {
 			log.E().Println(err)
 		}
-		err = r.Reload()
+		if err := r.Reload(); err != nil {
+			log.E().Println(err.Error())
+		}
 		if err := r.send(target.NewMsg(pkg, target.DevRefreshed)); err != nil {
 			log.E().Println(err)
 		}
-		return err
+		return nil
 	})
 	return watch.Run(ctx, dist)
 }

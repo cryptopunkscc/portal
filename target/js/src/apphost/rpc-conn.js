@@ -32,6 +32,9 @@ AppHostConn.prototype.rpcQuery = function (method) {
 }
 
 AppHostConn.prototype.writeJson = async function (data) {
+  // if (Array.isArray(data) && data.length === 1) {
+  //   data = data[0]
+  // }
   const json = JSON.stringify(data)
   // log(this.id + " conn => " + this.query + ":" + json.trimEnd())
   await this.write(json + '\n')

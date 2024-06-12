@@ -27,7 +27,7 @@ type Router struct {
 	rpc           *Flow
 }
 
-var ErrMalformedRequest = errors.New("malformed request")
+var ErrNoHandler = errors.New("no handler for query")
 var ErrUnauthorized = errors.New("unauthorized")
 
 func NewRouter(port string) *Router {
@@ -205,7 +205,7 @@ func (r *Router) Handle(ctx context.Context, query any, remoteId id.Identity, co
 
 		case rr.args != "":
 			// caller not found and there are unhandled data in rpc buffer
-			if !rr.respond(ctx, ErrMalformedRequest) {
+			if !rr.respond(ctx, ErrNoHandler) {
 				return
 			}
 		}
