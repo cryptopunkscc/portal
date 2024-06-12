@@ -15,15 +15,20 @@
 * [x] Portal launcher tray icon.
   * [x] Bind portal serve on launch.
 * [x] Implement portal installer.
-* Upgrade JavaScript RPC:
+* [x] Upgrade JavaScript RPC:
   * [x] Register methods automatically under the service name specified in manifest.
-  * Ensure or redesign. 
+  * [x] Ensure or redesign. 
 * [x] Migrate go-apphost-jrpc into portal repository.
 * [x] Install JavaScript runtime dependencies in local node modules.
 * [x] Use injected prefixed logger. Review & unify existing logs.
 * [x] Close nested apps gracefully.
-* Add cross integration rpc tests for js - golang.
+* [x] Add cross integration rpc tests for js - golang.
+* [x] Add golang runner support.
 * Design runtime API for JavaScript apps:
   * backend
   * wails
   * android
+
+* Fix goja_dev runner watcher.
+* Fix backend timeout.
+* Fix go runners reload on change.

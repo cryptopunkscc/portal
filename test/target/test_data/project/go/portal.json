@@ -1,6 +1,6 @@
 {
-  "name": "test-go-service",
-  "package": "test.go.service",
-  "title": "test go service",
+  "name": "test-project-go",
+  "package": "test.project.go",
+  "title": "test project go",
   "version": "0.0.0"
 }

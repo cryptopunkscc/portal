@@ -61,10 +61,16 @@ var ProjectFrontend = &Target{
 	Manifest: &target.Manifest{Name: "test-project-svelte", Title: "test project svelte", Description: "", Package: "test.project.svelte", Version: "0.0.0", Icon: ""},
 }
 
+var ProjectGo = &Target{
+	Path:     ".",
+	Abs:      "test_data/project/go",
+	Manifest: &target.Manifest{Name: "test-project-go", Title: "test project go", Description: "", Package: "test.project.go", Version: "0.0.0", Icon: ""},
+}
+
 var DistExecutable = &Target{
 	Path:     ".",
 	Abs:      "test_data/exec/sh",
-	Manifest: &target.Manifest{Name: "test-exec-sh", Title: "test exec sh", Description: "", Package: "test.exec.sh", Version: "0.0.0", Icon: "", Exec: "exec.sh"},
+	Manifest: &target.Manifest{Name: "test-dist-sh", Title: "test dist sh", Description: "", Package: "test.dist.sh", Version: "0.0.0", Icon: "", Exec: "exec.sh", Build: "", Env: target.Env{Timeout: 0}},
 }
 
 var BundleExecutable = &Target{
