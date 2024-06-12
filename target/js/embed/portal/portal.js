@@ -171,7 +171,7 @@ class AppHostConn {
   }
 }
 
-AppHostConn.prototype.jrpcCall = async function (method, ...data) {
+AppHostConn.prototype.rpcCall = async function (method, ...data) {
   let cmd = method;
   if (data.length > 0) {
     cmd += "?" + JSON.stringify(data);
@@ -190,7 +190,7 @@ AppHostConn.prototype.rpcQuery = function (method) {
   const conn = this;
   return async function (...data) {
     // log("conn rpc query", method)
-    await conn.jrpcCall(method, ...data);
+    await conn.rpcCall(method, ...data);
     return await conn.readJson(method)
   }
 };
@@ -214,7 +214,7 @@ AppHostConn.prototype.jsonReader = async function (method) {
 AppHostConn.prototype.bindRpc = async function () {
   const conn = this;
   // request api methods
-  await conn.jrpcCall("api");
+  await conn.rpcCall("api");
 
   // read api methods
   const methods = await conn.readJson("api");
@@ -222,21 +222,21 @@ AppHostConn.prototype.bindRpc = async function () {
   // bind methods
   for (let method of methods) {
     conn[method] = async (...data) => {
-      await conn.jrpcCall(method, ...data);
+      await conn.rpcCall(method, ...data);
       return await conn.readJson(method)
     };
   }
 
   // bind subscribe
   conn.subscribe = async (method, ...data) => {
-    await conn.jrpcCall(method, ...data);
+    await conn.rpcCall(method, ...data);
     return conn.jsonReader(method)
   };
 };
 
 const {log: log$3} = bindings;
 
-ApphostClient.prototype.jrpcCall = async function (identity, service, method, ...data) {
+ApphostClient.prototype.rpcCall = async function (identity, service, method, ...data) {
   let cmd = service;
   if (method) {
     cmd += "." + method;
@@ -252,7 +252,7 @@ ApphostClient.prototype.jrpcCall = async function (identity, service, method, ..
 ApphostClient.prototype.rpcQuery = function (identity, port) {
   const client = this;
   return async function (...data) {
-    const conn = await client.jrpcCall(identity, port, "", ...data);
+    const conn = await client.rpcCall(identity, port, "", ...data);
     const json = await conn.readJson(port);
     conn.close().catch(log$3);
     return json
@@ -262,7 +262,7 @@ ApphostClient.prototype.rpcQuery = function (identity, port) {
 ApphostClient.prototype.bindRpc = async function (identity, service) {
   const client = this;
   // request api methods
-  const conn = await client.jrpcCall(identity, service, "api");
+  const conn = await client.rpcCall(identity, service, "api");
 
   // read api methods
   const methods = await conn.readJson("api");
@@ -271,7 +271,7 @@ ApphostClient.prototype.bindRpc = async function (identity, service) {
   // bind methods
   for (let method of methods) {
     client[method] = async (...data) => {
-      const conn = await client.jrpcCall(identity, service, method, ...data);
+      const conn = await client.rpcCall(identity, service, method, ...data);
       const json = await conn.readJson(method);
       conn.close().catch(log$3);
       return json
@@ -280,7 +280,7 @@ ApphostClient.prototype.bindRpc = async function (identity, service) {
 
   // bind subscribe
   client.subscribe = async (method, ...data) => {
-    const conn = await client.jrpcCall(identity, service, method, ...data);
+    const conn = await client.rpcCall(identity, service, method, ...data);
     return await conn.jsonReader(method)
   };
   return client

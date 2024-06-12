@@ -4,7 +4,7 @@ import "./rpc-conn.js"
 
 const {log} = bindings
 
-ApphostClient.prototype.jrpcCall = async function (identity, service, method, ...data) {
+ApphostClient.prototype.rpcCall = async function (identity, service, method, ...data) {
   let cmd = service
   if (method) {
     cmd += "." + method
@@ -20,7 +20,7 @@ ApphostClient.prototype.jrpcCall = async function (identity, service, method, ..
 ApphostClient.prototype.rpcQuery = function (identity, port) {
   const client = this
   return async function (...data) {
-    const conn = await client.jrpcCall(identity, port, "", ...data)
+    const conn = await client.rpcCall(identity, port, "", ...data)
     const json = await conn.readJson(port)
     conn.close().catch(log)
     return json
@@ -30,7 +30,7 @@ ApphostClient.prototype.rpcQuery = function (identity, port) {
 ApphostClient.prototype.bindRpc = async function (identity, service) {
   const client = this
   // request api methods
-  const conn = await client.jrpcCall(identity, service, "api")
+  const conn = await client.rpcCall(identity, service, "api")
 
   // read api methods
   const methods = await conn.readJson("api")
@@ -39,7 +39,7 @@ ApphostClient.prototype.bindRpc = async function (identity, service) {
   // bind methods
   for (let method of methods) {
     client[method] = async (...data) => {
-      const conn = await client.jrpcCall(identity, service, method, ...data)
+      const conn = await client.rpcCall(identity, service, method, ...data)
       const json = await conn.readJson(method)
       conn.close().catch(log)
       return json
@@ -48,7 +48,7 @@ ApphostClient.prototype.bindRpc = async function (identity, service) {
 
   // bind subscribe
   client.subscribe = async (method, ...data) => {
-    const conn = await client.jrpcCall(identity, service, method, ...data)
+    const conn = await client.rpcCall(identity, service, method, ...data)
     return await conn.jsonReader(method)
   }
   return client
