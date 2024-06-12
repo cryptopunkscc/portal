@@ -1,4 +1,4 @@
-import {ApphostClient, AppHostConn} from "./adapter.js";
+import {ApphostClient} from "./adapter.js";
 import {bindings} from "../bindings.js";
 import "./rpc-conn.js"
 
@@ -12,7 +12,7 @@ ApphostClient.prototype.rpcCall = async function (identity, service, method, ...
   if (data.length > 0) {
     cmd += "?" + JSON.stringify(data)
   }
-  const conn = await this.query(identity, cmd)
+  const conn = await this.query(cmd, identity)
   // log(conn.id + " client => " + cmd)
   return conn
 }
