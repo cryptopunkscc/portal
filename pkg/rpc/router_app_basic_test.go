@@ -93,7 +93,7 @@ func TestApp_Run_basic(t *testing.T) {
 		client   int
 	}{
 		{query: "asd", expected: proto.ErrRejected, client: 1},
-		{query: "asd", expected: ErrMalformedRequest, client: 2},
+		{query: "asd", expected: ErrNoHandler, client: 2},
 		{query: "func0", expected: proto.ErrRejected, client: 1},
 		{query: "func0", expected: ErrUnauthorized, client: 2},
 		{query: "func1", expected: map[string]any{}},

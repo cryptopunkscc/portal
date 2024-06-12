@@ -32,7 +32,7 @@ func (c TestClient) Run(t *testing.T) {
 		skip    bool
 	}{
 		{
-			skip: true,
+			//skip: true,
 			name: "request",
 			getConn: func(srv string, t *testing.T) rpc.Conn {
 				return rpc.NewRequest(id.Anyone, fmt.Sprintf(c.port, srv), "request")

@@ -24,42 +24,42 @@ async function astral_rpc_listen(srv, listener) {
   for (; ;) {
     const conn = await listener.accept()
     // log(conn.id + " service <= " + conn.query)
-    astral_rpc_handle(srv, conn).catch(log)
+    try {
+      astral_rpc_handle(srv, conn).catch(log)
+    } catch (e) {
+      // log(conn.id + " service !! " + conn.query + ":" + e)
+      conn.close().catch(log)
+    }
   }
 }
 
 async function astral_rpc_handle(srv, conn) {
-  try {
-    let query = conn.query.slice(srv.name.length)
-    let method = query, args = []
-    const single = query !== ''
-    const write = async (data) => await conn.writeJson(data)
-    const read = async (method) => await conn.readJson(method)
+  let query = conn.query.slice(srv.name.length)
+  let method = query, args = []
+  const single = query !== ''
+  const write = async (data) => await conn.writeJson(data)
+  const read = async (method) => await conn.readJson(method)
 
-    for (; ;) {
-      if (!single) {
-        query = await conn.read();
-        // log(conn.id + " service <== " + query)
-      }
-      [method, args] = parseQuery(query)
-
-      let result
-      try {
-        result = await srv[method](...args, write, read)
-      } catch (e) {
-        result = {error: e}
-      }
-      if (result !== undefined) {
-        await conn.writeJson(result)
-      }
-      if (single) {
-        conn.close().catch(log)
-        break
-      }
+  for (; ;) {
+    if (!single) {
+      query = await conn.read();
+      // log(conn.id + " service <== " + query)
     }
-  } catch (e) {
-    // log(conn.id + " service !! " + conn.query + ":" + e)
-    conn.close().catch(log)
+    [method, args] = parseQuery(query)
+
+    let result
+    try {
+      result = await srv[method](...args, write, read)
+    } catch (e) {
+      result = {error: e}
+    }
+    if (result !== undefined) {
+      await conn.writeJson(result)
+    }
+    if (single) {
+      conn.close().catch(log)
+      break
+    }
   }
 }
 
