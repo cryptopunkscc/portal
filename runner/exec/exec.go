@@ -30,6 +30,7 @@ func (p *portal[T]) run(ctx context.Context, src T) (err error) {
 	}
 	c.Stdout = os.Stdout
 	c.Stderr = os.Stderr
+	c.Stdin = os.Stdin
 	err = c.Run()
 	if err != nil {
 		err = fmt.Errorf("exec.Portal '%s': %w", p.src, err)

@@ -26,7 +26,9 @@ func (r *Runner) Run(ctx context.Context, project target.ProjectJs) (err error) 
 	r.log = plog.Get(ctx).Type(r).Set(&ctx)
 	r.log.Println("staring dev backend", project.Abs())
 
-	go npm.RunWatch(ctx, project.Path())
+	if err = npm.RunWatch(ctx, project.Abs()).Start(); err != nil {
+		return
+	}
 
 	return r.distRunner.Run(ctx, project.DistJs())
 }
