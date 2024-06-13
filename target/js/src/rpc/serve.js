@@ -16,17 +16,15 @@ async function listen(ctx, listener) {
   for (; ;) {
     let conn = await listener.accept()
     conn = new RpcConn(conn)
-    try {
-      handle(ctx, conn).catch(log)
-    } catch (e) {
-      conn.close().catch(log)
-    }
+    handle(ctx, conn).catch(log).finally(() =>
+      conn.close().catch(log))
   }
 }
 
 async function handle(ctx, conn) {
   const inject = {...ctx.handlers, ...ctx.inject, conn: conn}
-  let [handlers, params] = unfold(ctx.handlers, conn.query)
+  const query = conn.query
+  let [handlers, params] = unfold(ctx.handlers, query)
   let handle = handlers
   let result
   let canInvoke
@@ -69,6 +67,9 @@ async function invoke(ctx, handle, params) {
 }
 
 function unfold(handlers, query) {
+  if (query === "") {
+    return [handlers]
+  }
   const [next, rest] = split(query)
   const nested = handlers[next]
   if (rest === undefined) {

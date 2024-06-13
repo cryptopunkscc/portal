@@ -38,6 +38,9 @@ function maskRoutes(routes, masks) {
   masks = masks ? masks : []
   let arr = [...routes]
   for (let mask of masks) {
+    if (mask === '*') {
+      return [masks]
+    }
     const last = mask.length - 1;
     if (/[*:]/.test(mask.slice(last))) {
       mask = mask.slice(0, last)

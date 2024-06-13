@@ -256,6 +256,9 @@ function maskRoutes$1(routes, masks) {
   masks = masks ? masks : [];
   let arr = [...routes];
   for (let mask of masks) {
+    if (mask === '*') {
+      return [masks]
+    }
     const last = mask.length - 1;
     if (/[*:]/.test(mask.slice(last))) {
       mask = mask.slice(0, last);
@@ -281,17 +284,15 @@ async function listen$1(ctx, listener) {
   for (; ;) {
     let conn = await listener.accept();
     conn = new RpcConn(conn);
-    try {
-      handle$1(ctx, conn).catch(log$5);
-    } catch (e) {
-      conn.close().catch(log$5);
-    }
+    handle$1(ctx, conn).catch(log$5).finally(() =>
+      conn.close().catch(log$5));
   }
 }
 
 async function handle$1(ctx, conn) {
   const inject = {...ctx.handlers, ...ctx.inject, conn: conn};
-  let [handlers, params] = unfold$1(ctx.handlers, conn.query);
+  const query = conn.query;
+  let [handlers, params] = unfold$1(ctx.handlers, query);
   let handle = handlers;
   let result;
   let canInvoke;
@@ -334,6 +335,9 @@ async function invoke$1(ctx, handle, params) {
 }
 
 function unfold$1(handlers, query) {
+  if (query === "") {
+    return [handlers]
+  }
   const [next, rest] = split$1(query);
   const nested = handlers[next];
   if (rest === undefined) {

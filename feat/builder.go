@@ -125,6 +125,7 @@ func (s *Scope[T]) GetServeFeature() *serve.Feat {
 
 func (s *Scope[T]) GetOpenFeature() target.Dispatch {
 	if s.FeatOpen == nil {
+		apphost.ConnectionsThreshold = 0
 		newApphost := apphost.NewFactory(s.GetDispatchTarget())
 		newApi := target.ApiFactory(assert(s.WrapApi),
 			newApphost.NewAdapter,
