@@ -62,14 +62,21 @@ func eventEmitter[T any](queue *sig.Queue[target.ApphostEvent]) func(ref string,
 
 func (f Factory) NewAdapter(ctx context.Context, portal target.Portal) target.Apphost {
 	flat := newAdapter(ctx, portal.Manifest().Package)
+	go func() {
+		sleep := time.Duration(3) * time.Millisecond
+		time.Sleep(sleep)
+		flat.events.Push(target.ApphostEvent{Type: target.ApphostDisconnect})
+	}()
 	return NewInvoker(ctx, flat, f.invoke)
 }
+
+var ConnectionsThreshold = -1
 
 func (f Factory) WithTimeout(ctx context.Context, portal target.Portal) target.Apphost {
 	manifest := portal.Manifest()
 	flat := newAdapter(ctx, manifest.Package)
 
-	if manifest.Env.Timeout > -1 {
+	if manifest.Env.Timeout > -1 && ConnectionsThreshold >= 0 {
 		go func() {
 			duration := 5 * time.Second
 			if manifest.Env.Timeout > 0 {
@@ -78,8 +85,10 @@ func (f Factory) WithTimeout(ctx context.Context, portal target.Portal) target.A
 			timeout := NewTimout(duration, func() {
 				_ = syscall.Kill(syscall.Getpid(), syscall.SIGINT)
 			})
+			timeout.Enable(true)
 			for range flat.Events().Subscribe(ctx) {
-				timeout.Enable(flat.connections.Size() == 0)
+				activeConnections := flat.connections.Size()
+				timeout.Enable(activeConnections <= ConnectionsThreshold)
 			}
 		}()
 	}

@@ -1,11 +1,4 @@
-const {apphost, log, sleep} = portal
-
-log("start backend")
 class Service {
-
-    constructor() {
-        this.name = ""
-    }
 
     async get(arg) {
         return {
@@ -19,13 +12,8 @@ class Service {
     }
 }
 
-async function bind() {
-    apphost.bindRpcService(Service).catch(log)
-}
-
-bind().catch(log)
-
+portal.log("start backend")
 portal.rpc.serve({
     handlers: new Service(),
-    routes: ["*"]
-}).catch(log)
+    routes: ["*"],
+}).catch(portal.log)
