@@ -30,7 +30,7 @@ const adapter$2 = () => ({
   astral_interrupt: window['go']['main']['Adapter']['Interrupt'],
   // runtime
   sleep: window['go']['main']['Adapter']['Sleep'],
-  log: (...arg) => window['go']['main']['Adapter']['LogArr'](arg),
+  log: async (...arg) => await window['go']['main']['Adapter']['LogArr'](arg),
 });
 
 inject(platform$3, adapter$2);
@@ -112,6 +112,8 @@ class ApphostClient {
   }
 
   async query(query, identity) {
+    await bindings.log("query", query);
+    identity = identity ? identity : "";
     const json = await bindings.astral_query(identity, query);
     const data = JSON.parse(json);
     return new ApphostConn(data, query)
@@ -365,6 +367,8 @@ function split$1(query) {
   return [left, right]
 }
 
+const log$4 = bindings.log;
+
 class RpcClient extends ApphostClient {
 
   constructor(targetId, methods) {
@@ -394,7 +398,7 @@ class RpcClient extends ApphostClient {
   async request(query, ...params) {
     const conn = await this.call(query, ...params);
     const response = await conn.decode();
-    conn.close().catch(log);
+    conn.close().catch(log$4);
     return response
   }
 
@@ -482,7 +486,7 @@ ApphostConn.prototype.bindRpc = async function () {
   };
 };
 
-const {log: log$4} = bindings;
+const {log: log$3} = bindings;
 
 ApphostClient.prototype.rpcCall = async function (identity, service, method, ...data) {
   let cmd = service;
@@ -497,12 +501,12 @@ ApphostClient.prototype.rpcCall = async function (identity, service, method, ...
   return conn
 };
 
-ApphostClient.prototype.rpcQuery = function (identity, port) {
+ApphostClient.prototype.rpcQuery = function (port, identity) {
   const client = this;
   return async function (...data) {
     const conn = await client.rpcCall(identity, port, "", ...data);
     const json = await conn.readJson(port);
-    conn.close().catch(log$4);
+    conn.close().catch(log$3);
     return json
   }
 };
@@ -514,14 +518,14 @@ ApphostClient.prototype.bindRpc = async function (identity, service) {
 
   // read api methods
   const methods = await conn.readJson("api");
-  conn.close().catch(log$4);
+  conn.close().catch(log$3);
 
   // bind methods
   for (let method of methods) {
     client[method] = async (...data) => {
       const conn = await client.rpcCall(identity, service, method, ...data);
       const json = await conn.readJson(method);
-      conn.close().catch(log$4);
+      conn.close().catch(log$3);
       return json
     };
   }
@@ -534,7 +538,7 @@ ApphostClient.prototype.bindRpc = async function (identity, service) {
   return client
 };
 
-const {log: log$3} = bindings;
+const {log: log$2} = bindings;
 
 
 // Bind RPC service to given name
@@ -549,7 +553,7 @@ ApphostClient.prototype.bindRpcService = async function (Service) {
   const srv = new Service();
   const listener = await this.register(srv.name + "*");
   // log("listen " + srv.name)
-  astral_rpc_listen(srv, listener).catch(log$3);
+  astral_rpc_listen(srv, listener).catch(log$2);
   return listener
 };
 
@@ -558,10 +562,10 @@ async function astral_rpc_listen(srv, listener) {
     const conn = await listener.accept();
     // log(conn.id + " service <= " + conn.query)
     try {
-      astral_rpc_handle(srv, conn).catch(log$3);
+      astral_rpc_handle(srv, conn).catch(log$2);
     } catch (e) {
       // log(conn.id + " service !! " + conn.query + ":" + e)
-      conn.close().catch(log$3);
+      conn.close().catch(log$2);
     }
   }
 }
@@ -590,7 +594,7 @@ async function astral_rpc_handle(srv, conn) {
       await conn.writeJson(result);
     }
     if (single) {
-      conn.close().catch(log$3);
+      conn.close().catch(log$2);
       break
     }
   }
@@ -613,14 +617,14 @@ function parseQuery(query) {
   return [method, args]
 }
 
-const log$2 = bindings.log;
+const log$1 = bindings.log;
 
 
 ApphostClient.prototype.registerRpc = async function (ctx) {
   const routes = prepareRoutes(ctx);
   for (let route of routes) {
     const listener = await this.register(route);
-    listen(ctx, listener).catch(log$2);
+    listen(ctx, listener).catch(log$1);
   }
 };
 
@@ -680,9 +684,9 @@ async function listen(ctx, listener) {
   for (; ;) {
     const conn = await listener.accept();
     try {
-      handle(ctx, conn).catch(log$2);
+      handle(ctx, conn).catch(log$1);
     } catch (e) {
-      conn.close().catch(log$2);
+      conn.close().catch(log$1);
     }
   }
 }
@@ -760,8 +764,9 @@ function split(query) {
   return [left, right]
 }
 
-const {log: log$1, sleep, platform} = bindings;
-const apphost = new ApphostClient();
+const {log, sleep, platform} = bindings;
+// export const apphost = new RpcClient();
 const rpc = new RpcClient();
+const apphost = new RpcClient();
 
-export { apphost, log$1 as log, platform, rpc, sleep };
+export { apphost, log, platform, rpc, sleep };

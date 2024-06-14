@@ -17,7 +17,7 @@ ApphostClient.prototype.rpcCall = async function (identity, service, method, ...
   return conn
 }
 
-ApphostClient.prototype.rpcQuery = function (identity, port) {
+ApphostClient.prototype.rpcQuery = function (port, identity) {
   const client = this
   return async function (...data) {
     const conn = await client.rpcCall(identity, port, "", ...data)

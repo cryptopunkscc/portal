@@ -44,6 +44,8 @@ var portal = (function (exports) {
     }
 
     async query(query, identity) {
+      await bindings.log("query", query);
+      identity = identity ? identity : "";
       const json = await bindings.astral_query(identity, query);
       const data = JSON.parse(json);
       return new ApphostConn(data, query)
@@ -297,6 +299,8 @@ var portal = (function (exports) {
     return [left, right]
   }
 
+  const log$4 = bindings.log;
+
   class RpcClient extends ApphostClient {
 
     constructor(targetId, methods) {
@@ -326,7 +330,7 @@ var portal = (function (exports) {
     async request(query, ...params) {
       const conn = await this.call(query, ...params);
       const response = await conn.decode();
-      conn.close().catch(log);
+      conn.close().catch(log$4);
       return response
     }
 
@@ -414,7 +418,7 @@ var portal = (function (exports) {
     };
   };
 
-  const {log: log$4} = bindings;
+  const {log: log$3} = bindings;
 
   ApphostClient.prototype.rpcCall = async function (identity, service, method, ...data) {
     let cmd = service;
@@ -429,12 +433,12 @@ var portal = (function (exports) {
     return conn
   };
 
-  ApphostClient.prototype.rpcQuery = function (identity, port) {
+  ApphostClient.prototype.rpcQuery = function (port, identity) {
     const client = this;
     return async function (...data) {
       const conn = await client.rpcCall(identity, port, "", ...data);
       const json = await conn.readJson(port);
-      conn.close().catch(log$4);
+      conn.close().catch(log$3);
       return json
     }
   };
@@ -446,14 +450,14 @@ var portal = (function (exports) {
 
     // read api methods
     const methods = await conn.readJson("api");
-    conn.close().catch(log$4);
+    conn.close().catch(log$3);
 
     // bind methods
     for (let method of methods) {
       client[method] = async (...data) => {
         const conn = await client.rpcCall(identity, service, method, ...data);
         const json = await conn.readJson(method);
-        conn.close().catch(log$4);
+        conn.close().catch(log$3);
         return json
       };
     }
@@ -466,7 +470,7 @@ var portal = (function (exports) {
     return client
   };
 
-  const {log: log$3} = bindings;
+  const {log: log$2} = bindings;
 
 
   // Bind RPC service to given name
@@ -481,7 +485,7 @@ var portal = (function (exports) {
     const srv = new Service();
     const listener = await this.register(srv.name + "*");
     // log("listen " + srv.name)
-    astral_rpc_listen(srv, listener).catch(log$3);
+    astral_rpc_listen(srv, listener).catch(log$2);
     return listener
   };
 
@@ -490,10 +494,10 @@ var portal = (function (exports) {
       const conn = await listener.accept();
       // log(conn.id + " service <= " + conn.query)
       try {
-        astral_rpc_handle(srv, conn).catch(log$3);
+        astral_rpc_handle(srv, conn).catch(log$2);
       } catch (e) {
         // log(conn.id + " service !! " + conn.query + ":" + e)
-        conn.close().catch(log$3);
+        conn.close().catch(log$2);
       }
     }
   }
@@ -522,7 +526,7 @@ var portal = (function (exports) {
         await conn.writeJson(result);
       }
       if (single) {
-        conn.close().catch(log$3);
+        conn.close().catch(log$2);
         break
       }
     }
@@ -545,14 +549,14 @@ var portal = (function (exports) {
     return [method, args]
   }
 
-  const log$2 = bindings.log;
+  const log$1 = bindings.log;
 
 
   ApphostClient.prototype.registerRpc = async function (ctx) {
     const routes = prepareRoutes(ctx);
     for (let route of routes) {
       const listener = await this.register(route);
-      listen(ctx, listener).catch(log$2);
+      listen(ctx, listener).catch(log$1);
     }
   };
 
@@ -612,9 +616,9 @@ var portal = (function (exports) {
     for (; ;) {
       const conn = await listener.accept();
       try {
-        handle(ctx, conn).catch(log$2);
+        handle(ctx, conn).catch(log$1);
       } catch (e) {
-        conn.close().catch(log$2);
+        conn.close().catch(log$1);
       }
     }
   }
@@ -692,12 +696,13 @@ var portal = (function (exports) {
     return [left, right]
   }
 
-  const {log: log$1, sleep, platform} = bindings;
-  const apphost = new ApphostClient();
+  const {log, sleep, platform} = bindings;
+  // export const apphost = new RpcClient();
   const rpc = new RpcClient();
+  const apphost = new RpcClient();
 
   exports.apphost = apphost;
-  exports.log = log$1;
+  exports.log = log;
   exports.platform = platform;
   exports.rpc = rpc;
   exports.sleep = sleep;

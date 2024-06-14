@@ -1,6 +1,9 @@
 import {ApphostClient} from "../apphost/adapter.js";
 import {RpcConn} from "./conn.js";
 import {serve} from "./serve.js";
+import {bindings} from "../bindings"
+
+const log = bindings.log
 
 export class RpcClient extends ApphostClient {
 

@@ -9,7 +9,6 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"github.com/cryptopunkscc/go-astral-js/target/project"
 	"github.com/wailsapp/wails/v2/pkg/application"
-	"github.com/wailsapp/wails/v2/pkg/options"
 	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 	"os"
 	"os/signal"
@@ -26,29 +25,15 @@ type Runner struct {
 	log plog.Logger
 }
 
-func (r *Runner) Run(ctx context.Context, project target.ProjectHtml) (err error) {
+func (r *Runner) Run(ctx context.Context, portal target.ProjectHtml) (err error) {
 	r.log = plog.Get(ctx).Type(r).Set(&ctx)
-	r.log.Printf("portal dev open: (%d) %s\n", os.Getpid(), project.Manifest())
-	defer r.log.Printf("portal dev close: (%d) %s\n", os.Getpid(), project.Manifest())
-	opt := wails.AppOptions(r.NewApi(ctx, project))
-	opt.OnStartup = func(ctx context.Context) {
-		r.frontCtx = ctx
-	}
-	if err = r.run(project.Abs(), opt); err != nil {
-		r.log.F().Printf("dev.Run: %v", err)
-	}
-	return
-}
+	r.log.Printf("portal dev open: (%d) %s\n", os.Getpid(), portal.Manifest())
+	defer r.log.Printf("portal dev close: (%d) %s\n", os.Getpid(), portal.Manifest())
+	api := r.NewApi(ctx, portal)
+	opt := wails.AppOptions(api)
+	opt.OnStartup = func(ctx context.Context) { r.frontCtx = ctx }
+	path := portal.Abs()
 
-func (r *Runner) Reload() (err error) {
-	if r.frontCtx == nil {
-		return errors.New("nil context")
-	}
-	wailsruntime.WindowReload(r.frontCtx)
-	return
-}
-
-func (r *Runner) run(path string, opt *options.App) (err error) {
 	// Start frontend dev watcher
 	viteCommand := "npm run dev"
 	stopDevWatcher, url, _, err := runViteWatcher(viteCommand, path, true)
@@ -90,5 +75,17 @@ func (r *Runner) run(path string, opt *options.App) (err error) {
 	r.log.Println("running wails")
 	app := application.NewWithOptions(opt)
 	err = app.Run()
+
+	if err != nil {
+		r.log.F().Printf("dev.Run: %v", err)
+	}
+	return
+}
+
+func (r *Runner) Reload() (err error) {
+	if r.frontCtx == nil {
+		return errors.New("nil context")
+	}
+	wailsruntime.WindowReload(r.frontCtx)
 	return
 }

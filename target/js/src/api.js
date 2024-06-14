@@ -7,5 +7,5 @@ import "./apphost/rpc-conn.js";
 import "./apphost/rpc-handler.js"
 
 export const {log, sleep, platform} = bindings
-export const apphost = new ApphostClient();
+export const apphost = new RpcClient();
 export const rpc = new RpcClient();
