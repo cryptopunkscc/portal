@@ -1,0 +1,11 @@
+{
+  "name": "js-test",
+  "package": "portal.js.test",
+  "version": "0.0.0",
+  "title": "Portal JS test",
+  "author": "yang",
+  "email": "cryptopunkyang@pm.me",
+  "env": {
+    "timeout": -1
+  }
+}

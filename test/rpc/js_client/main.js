@@ -8,22 +8,20 @@ const services = [
   "js",
 ]
 
+const api = [
+  "func1",
+  "func2",
+  "func3",
+  "func4",
+]
+
 const flows = async service => {
   const conn = await rpc.query(`test.${service}.flow`)
-  return conn.bind(
-    "func1",
-    "func2",
-    "func3",
-    "func4",
-  )
+  return conn.bind(...api)
 }
 
-const requests = async service => await rpc.bind(
-  `test.${service}.request.func1`,
-  `test.${service}.request.func2`,
-  `test.${service}.request.func3`,
-  `test.${service}.request.func4`,
-)
+const requests = async service =>
+  await rpc.bind(`test.${service}.request`, ...api)
 
 const connections = [
   flows,

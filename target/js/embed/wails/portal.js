@@ -47,7 +47,6 @@ var portal = (function (exports) {
     }
 
     async query(query, identity) {
-      await bindings.log("query", query);
       identity = identity ? identity : "";
       const json = await bindings.astral_query(identity, query);
       const data = JSON.parse(json);
@@ -310,6 +309,7 @@ var portal = (function (exports) {
       super();
       this.targetId = targetId;
       this.boundMethods = methods;
+      this.port = "";
     }
 
     async query(query){
@@ -345,14 +345,19 @@ var portal = (function (exports) {
       return async (...params) => await this.request(query, ...params)
     }
 
-    target(id) {
-      return new RpcClient(id)
+    copy(data) {
+      return Object.assign(new RpcClient(), {...this, ...data})
     }
 
-    bind(...methods) {
-      const copy = new RpcClient(this.targetId, methods);
+    target(id) {
+      return this.copy({targetId: id})
+    }
+
+    bind(route, ...methods) {
+      const copy = this.copy();
       for (let method of methods) {
-        this[method] = copy.requester(method);
+        const port = [route, method].join('.');
+        copy[method] = copy.requester(port);
       }
       return copy
     }
@@ -700,9 +705,8 @@ var portal = (function (exports) {
   }
 
   const {log, sleep, platform} = bindings;
-  // export const apphost = new RpcClient();
-  const rpc = new RpcClient();
   const apphost = new RpcClient();
+  const rpc = new RpcClient();
 
   exports.apphost = apphost;
   exports.log = log;

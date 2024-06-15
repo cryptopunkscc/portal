@@ -11,6 +11,7 @@ export class RpcClient extends ApphostClient {
     super();
     this.targetId = targetId
     this.boundMethods = methods
+    this.port = ""
   }
 
   async query(query){
@@ -46,14 +47,19 @@ export class RpcClient extends ApphostClient {
     return async (...params) => await this.request(query, ...params)
   }
 
-  target(id) {
-    return new RpcClient(id)
+  copy(data) {
+    return Object.assign(new RpcClient(), {...this, ...data})
   }
 
-  bind(...methods) {
-    const copy = new RpcClient(this.targetId, methods)
+  target(id) {
+    return this.copy({targetId: id})
+  }
+
+  bind(route, ...methods) {
+    const copy = this.copy()
     for (let method of methods) {
-      this[method] = copy.requester(method)
+      const port = [route, method].join('.')
+      copy[method] = copy.requester(port)
     }
     return copy
   }
