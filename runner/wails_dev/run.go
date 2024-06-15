@@ -5,9 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
+	"github.com/cryptopunkscc/go-astral-js/runner/dist"
 	"github.com/cryptopunkscc/go-astral-js/runner/wails"
 	"github.com/cryptopunkscc/go-astral-js/target"
+	js "github.com/cryptopunkscc/go-astral-js/target/js/embed"
 	"github.com/cryptopunkscc/go-astral-js/target/project"
+	"github.com/cryptopunkscc/go-astral-js/target/sources"
 	"github.com/wailsapp/wails/v2/pkg/application"
 	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 	"os"
@@ -22,17 +25,22 @@ func NewRunner(newApi target.NewApi) *Runner {
 type Runner struct {
 	frontCtx context.Context
 	target.NewApi
-	log plog.Logger
 }
 
-func (r *Runner) Run(ctx context.Context, portal target.ProjectHtml) (err error) {
-	r.log = plog.Get(ctx).Type(r).Set(&ctx)
-	r.log.Printf("portal dev open: (%d) %s\n", os.Getpid(), portal.Manifest())
-	defer r.log.Printf("portal dev close: (%d) %s\n", os.Getpid(), portal.Manifest())
-	api := r.NewApi(ctx, portal)
+func (r *Runner) Run(ctx context.Context, projectHtml target.ProjectHtml) (err error) {
+	log := plog.Get(ctx).Type(r).Set(&ctx)
+	log.Println("start", projectHtml.Manifest().Package, projectHtml.Abs())
+	defer log.Println("exit", projectHtml.Manifest().Package, projectHtml.Abs())
+
+	dependencies := sources.FromFS[target.NodeModule](js.PortalLibFS)
+	if err = dist.NewRun(dependencies)(ctx, projectHtml); err != nil {
+		return
+	}
+
+	api := r.NewApi(ctx, projectHtml)
 	opt := wails.AppOptions(api)
 	opt.OnStartup = func(ctx context.Context) { r.frontCtx = ctx }
-	path := portal.Abs()
+	path := projectHtml.Abs()
 
 	// Start frontend dev watcher
 	viteCommand := "npm run dev"
@@ -40,7 +48,7 @@ func (r *Runner) Run(ctx context.Context, portal target.ProjectHtml) (err error)
 	if err != nil {
 		return err
 	}
-	r.log.Println("url: ", url)
+	log.Println("url: ", url)
 	go func() {
 		quitChannel := make(chan os.Signal, 1)
 		signal.Notify(quitChannel, os.Interrupt, syscall.SIGTERM)
@@ -72,12 +80,12 @@ func (r *Runner) Run(ctx context.Context, portal target.ProjectHtml) (err error)
 	_ = os.Setenv("frontenddevserverurl", url)
 
 	// run
-	r.log.Println("running wails")
+	log.Println("running wails")
 	app := application.NewWithOptions(opt)
 	err = app.Run()
 
 	if err != nil {
-		r.log.F().Printf("dev.Run: %v", err)
+		log.F().Printf("dev.Run: %v", err)
 	}
 	return
 }
