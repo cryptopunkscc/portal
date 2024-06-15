@@ -39,26 +39,26 @@ func (r *Runner[T]) Run(ctx context.Context, src string, args ...string) (err er
 	log.D().Printf("found %d portals for %s", len(portals), src)
 	for _, t := range portals {
 		if t.Type().Is(typ) {
-			r.runPortal(ctx, t)
+			r.start(ctx, log, t)
 		}
 	}
 	return
 }
 
-func (r *Runner[T]) runPortal(ctx context.Context, t T) {
-	id := t.Manifest().Package
-	if _, ok := r.processes.Set(id, t); !ok {
+func (r *Runner[T]) start(ctx context.Context, log plog.Logger, portal T) {
+	id := portal.Manifest().Package
+	if _, ok := r.processes.Set(id, portal); !ok {
 		return
 	}
 	r.wait.Add(1)
 	go func(t T) {
+		log.Printf("start %T %s %s", portal, portal.Manifest().Package, portal.Abs())
+		defer log.Printf("exit %T %s %s", portal, portal.Manifest().Package, portal.Abs())
 		defer r.wait.Done()
 		defer r.processes.Delete(id)
-		log := plog.Get(ctx)
 		if err := r.run(ctx, t); err != nil {
 			log.Println(err)
 		}
-		log.Printf("exit %T %s", t, t.Abs())
-	}(t)
+	}(portal)
 	return
 }

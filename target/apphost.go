@@ -1,6 +1,9 @@
 package target
 
-import "github.com/cryptopunkscc/astrald/sig"
+import (
+	"context"
+	"github.com/cryptopunkscc/astrald/sig"
+)
 
 const (
 	Log             = "_log"
@@ -22,6 +25,8 @@ type Apphost interface {
 	ApphostCache
 	ApphostApi
 }
+
+type NewApphost func(ctx context.Context, portal Portal) Apphost
 
 type ApphostApi interface {
 	Close() error

@@ -31,7 +31,7 @@ type Finder struct {
 }
 
 func (a Finder) Find(ctx context.Context, src string) (apps target.Portals[target.App], err error) {
-	log := plog.Get(ctx).Type(a).Set(&ctx)
+	log := plog.Get(ctx).Type(a)
 	apps = make(target.Portals[target.App])
 	if p, _ := a.GetPath(src); p != "" {
 		src = p
@@ -47,7 +47,7 @@ func (a Finder) Find(ctx context.Context, src string) (apps target.Portals[targe
 }
 
 func (a Finder) ByPath(ctx context.Context, src string) (apps target.Portals[target.App], err error) {
-	log := plog.Get(ctx)
+	log := plog.Get(ctx).Type(a)
 
 	apps = map[string]target.App{}
 	if s := source.FromFS(a.Files, src).Lift(); s.Files() != nil {

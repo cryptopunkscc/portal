@@ -9,15 +9,15 @@ import (
 	"io/fs"
 )
 
-func FromPath(src string) (project target.ProjectNodeModule, err error) {
+func FromPath(src string) (project target.ProjectNpm, err error) {
 	nodeModule, err := npm.ResolveNodeModule(targetSource.FromPath(src))
 	if err != nil {
 		return
 	}
-	return Resolve(nodeModule)
+	return ResolveNpm(nodeModule)
 }
 
-func Resolve(t target.NodeModule) (project target.ProjectNodeModule, err error) {
+func ResolveNpm(t target.NodeModule) (project target.ProjectNpm, err error) {
 	m := target.Manifest{}
 	sub, err := fs.Sub(t.Files(), t.Path())
 	if err != nil {
@@ -29,13 +29,13 @@ func Resolve(t target.NodeModule) (project target.ProjectNodeModule, err error) 
 	if err = manifest.Load(&m, sub, target.PortalJsonFilename); err != nil {
 		return
 	}
-	src := source{manifest: &m, Source: t}
-	project = &nodeModule{NodeModule: t, source: src}
+	src := portal{manifest: &m, Source: t}
+	project = &nodeModule{NodeModule: t, portal: src}
 	switch {
 	case project.Type().Is(target.TypeFrontend):
-		project = &html{ProjectNodeModule: project}
+		project = &html{ProjectNpm: project}
 	case project.Type().Is(target.TypeBackend):
-		project = &js{ProjectNodeModule: project}
+		project = &js{ProjectNpm: project}
 	}
 	return
 }
@@ -54,8 +54,8 @@ func ResolveGo(t target.Source) (project target.ProjectGo, err error) {
 		return
 	}
 	_ = mainGo.Close()
-	src := source{manifest: &m, Source: t.Lift()}
-	project = &golang{source: src}
+	src := portal{manifest: &m, Source: t.Lift()}
+	project = &golang{portal: src}
 	return
 }
 

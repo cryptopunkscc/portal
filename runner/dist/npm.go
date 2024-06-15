@@ -14,7 +14,7 @@ func NewNpmRunner(dependencies []target.NodeModule) NpmRunner {
 	return NpmRunner{dependencies: dependencies}
 }
 
-func (r NpmRunner) Run(ctx context.Context, project target.ProjectNodeModule) (err error) {
+func (r NpmRunner) Run(ctx context.Context, project target.ProjectNpm) (err error) {
 	if err = r.Prepare(ctx, project); err != nil {
 		return
 	}
@@ -24,7 +24,7 @@ func (r NpmRunner) Run(ctx context.Context, project target.ProjectNodeModule) (e
 	return
 }
 
-func (r NpmRunner) Prepare(ctx context.Context, project target.ProjectNodeModule) (err error) {
+func (r NpmRunner) Prepare(ctx context.Context, project target.ProjectNpm) (err error) {
 	if err = npm.Install(project); err != nil {
 		return
 	}
@@ -34,7 +34,7 @@ func (r NpmRunner) Prepare(ctx context.Context, project target.ProjectNodeModule
 	return
 }
 
-func (r NpmRunner) Build(ctx context.Context, project target.ProjectNodeModule) (err error) {
+func (r NpmRunner) Build(ctx context.Context, project target.ProjectNpm) (err error) {
 	if err = npm.RunBuild(project); err != nil {
 		return
 	}

@@ -23,7 +23,7 @@ func Resolve[T target.Source]() func(target.Source) (T, error) {
 		target.Skip("node_modules"),
 		target.Try(bundle.Resolve),
 		target.Try(npm.ResolveNodeModule).Lift(
-			target.Try(project.Resolve)),
+			target.Try(project.ResolveNpm)),
 		target.Try(project.ResolveGo),
 		target.Try(dist.Resolve),
 	)

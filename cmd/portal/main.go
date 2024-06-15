@@ -51,7 +51,7 @@ func main() {
 		FeatObserve:     featApps.Observe,
 		JoinTarget:      query.NewRunner[target.App](portOpen).Run,
 		DispatchTarget:  query.NewRunner[target.App](portOpen).Start,
-		DispatchService: exec.NewDispatch(executable).Start,
+		DispatchService: exec.NewDispatcher(executable).Dispatch,
 		Processes:       &sig.Map[string, target.App]{},
 	}
 	scope.RpcHandlers = rpc.Handlers{

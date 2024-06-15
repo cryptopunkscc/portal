@@ -47,6 +47,7 @@ func (r Runner) Run(ctx context.Context, t target.Portal) (err error) {
 		return api
 	}
 	sendMsg := client.Send
+	// TODO replace switch with injected factory
 	switch v := t.(type) {
 	case target.ProjectJs:
 		run := goja_dev.NewRunner(newApi, sendMsg)
@@ -57,6 +58,7 @@ func (r Runner) Run(ctx context.Context, t target.Portal) (err error) {
 		reloader = run
 		return run.Run(ctx, v)
 	case target.ProjectGo:
+		// TODO implement sendMsg support
 		plog.Get(ctx).Type(r).Println("running project go")
 		run := r.runGo
 		reloader = run
