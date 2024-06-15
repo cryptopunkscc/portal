@@ -1,15 +1,17 @@
-import {apphost} from "portal/portal.js";
+import {log, rpc} from "portal/portal";
 
-export default {
-  launch: apphost.rpcQuery("portal.open"),
-  install: apphost.rpcQuery("portal.install"),
-  uninstall: apphost.rpcQuery("postal.uninstall"),
-  observe: async (num) => {
-    const conn = await apphost.query("portal.observe")
-    return {
-      next: async () => await conn.readJson("observe"),
-      more: async (num) => await conn.writeJson(num),
-      close: conn.close,
-    }
+log("launcher start")
+// log(JSON.stringify(rpc), rpc)
+const client = rpc.bind("portal", "open", "install", "uninstall")
+client.observe = async () => {
+  await log("launcher observe")
+  const conn = await rpc.query("portal.observe", log)
+  await log("launcher observe2")
+  return {
+    next: async () => await conn.readJson("observe"),
+    more: async (num) => await conn.writeJson(num),
+    close: conn.close,
   }
 }
+
+export default client

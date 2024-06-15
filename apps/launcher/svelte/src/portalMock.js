@@ -1,4 +1,4 @@
-import {log, sleep} from "../../lib/portal.js";
+import {log, sleep} from "portal/portal";
 
 export default {
   launch: async (id) => log("PortalMock.launch: " + id),
