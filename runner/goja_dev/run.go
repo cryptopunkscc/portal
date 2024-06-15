@@ -3,13 +3,15 @@ package goja_dev
 import (
 	"context"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
+	"github.com/cryptopunkscc/go-astral-js/runner/dist"
 	"github.com/cryptopunkscc/go-astral-js/runner/goja_dist"
 	"github.com/cryptopunkscc/go-astral-js/runner/npm"
 	"github.com/cryptopunkscc/go-astral-js/target"
+	jsEmbed "github.com/cryptopunkscc/go-astral-js/target/js/embed"
+	"github.com/cryptopunkscc/go-astral-js/target/sources"
 )
 
 type Runner struct {
-	log        plog.Logger
 	distRunner *goja_dist.Runner
 }
 
@@ -22,13 +24,19 @@ func (r *Runner) Reload() (err error) {
 	return r.distRunner.Reload()
 }
 
-func (r *Runner) Run(ctx context.Context, project target.ProjectJs) (err error) {
-	r.log = plog.Get(ctx).Type(r).Set(&ctx)
-	r.log.Println("staring dev backend", project.Abs())
+func (r *Runner) Run(ctx context.Context, projectJs target.ProjectJs) (err error) {
+	log := plog.Get(ctx).Type(r).Set(&ctx)
+	log.Println("start", projectJs.Manifest().Package, projectJs.Abs())
+	defer log.Println("exit", projectJs.Manifest().Package, projectJs.Abs())
 
-	if err = npm.RunWatch(ctx, project.Abs()).Start(); err != nil {
+	dependencies := sources.FromFS[target.NodeModule](jsEmbed.PortalLibFS)
+	if err = dist.NewRun(dependencies)(ctx, projectJs); err != nil {
 		return
 	}
 
-	return r.distRunner.Run(ctx, project.DistJs())
+	if err = npm.RunWatch(ctx, projectJs.Abs()).Start(); err != nil {
+		return
+	}
+
+	return r.distRunner.Run(ctx, projectJs.DistJs())
 }
