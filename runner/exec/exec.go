@@ -21,7 +21,6 @@ func newPortal[T target.Portal](src ...string) *portal[T] {
 func (p *portal[T]) run(ctx context.Context, src T) (err error) {
 	cmd := p.src[0]
 	args := append(p.src[1:], src.Abs())
-	plog.Get(ctx).Type(src).Printf("%s %v", cmd, args)
 	var c *exec.Cmd
 	if ctx != nil {
 		c = exec.CommandContext(ctx, cmd, args...)
@@ -39,9 +38,7 @@ func (p *portal[T]) run(ctx context.Context, src T) (err error) {
 }
 
 func (r *Runner[T]) newRunBundleExecutable(ctx context.Context, v target.BundleExec) error {
-	log := plog.Get(ctx)
 	p := v.Executable().Lift().Path()
-	log.Println("path", p)
 	temp, err := os.CreateTemp(r.cacheDir, p)
 	if err != nil {
 		return plog.Err(err)

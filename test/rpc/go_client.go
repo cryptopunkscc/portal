@@ -64,8 +64,8 @@ func (c TestClient) Run(t *testing.T) {
 				t.Run("func1", func(t *testing.T) {
 					t.Run("a", func(t *testing.T) {
 						str, err := rpc.Query[string](request, "func1", "text", false)
-						assert.Equal(t, "text", str)
 						assert.Nil(t, err)
+						assert.Equal(t, "text", str)
 					})
 					t.Run("b", func(t *testing.T) {
 						str, err := rpc.Query[string](request, "func1", "text", true)

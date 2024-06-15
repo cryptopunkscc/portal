@@ -10,7 +10,6 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
-	"os"
 )
 
 type Runner struct {
@@ -32,8 +31,8 @@ func (r *Runner) Reload() (err error) {
 
 func (r *Runner) Run(ctx context.Context, app target.AppHtml) (err error) {
 	log := plog.Get(ctx).Type(r).Set(&ctx)
-	log.Printf("portal open: (%d) %s", os.Getpid(), app.Manifest())
-	defer log.Printf("portal close: (%d) %s", os.Getpid(), app.Manifest())
+	log.Println("start", app.Manifest().Package, app.Abs())
+	defer log.Println("exit", app.Manifest().Package, app.Abs())
 	api := r.newApi(ctx, app)
 	opt := AppOptions(api)
 	opt.OnStartup = func(ctx context.Context) { r.frontCtx = ctx }

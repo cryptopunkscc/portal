@@ -19,16 +19,10 @@ func NewRunner(handlers rpc.Handlers) *Runner {
 	return &Runner{handlers: handlers}
 }
 
-func (r Runner) Start(ctx context.Context, port string, args ...string) {
-	go func() {
-		if err := r.Run(ctx, port, args...); err != nil {
-			plog.Get(ctx).Type(r).F().Printf("%s: %v", port, err)
-		}
-	}()
-}
-
 func (r Runner) Run(ctx context.Context, port string, _ ...string) (err error) {
-	plog.Get(ctx).Type(r).Set(&ctx)
+	log := plog.Get(ctx).Type(r).Set(&ctx)
+	log.Printf("start port:%s", port)
+	defer log.Printf("exit port:%s", port)
 	app := rpc.NewApp(port)
 	for name, h := range r.handlers {
 		app.RouteFunc(name, h)

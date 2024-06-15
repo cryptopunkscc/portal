@@ -25,19 +25,10 @@ func NewRunner[T target.Portal](cacheDir string, executable string) *Runner[T] {
 	return &Runner[T]{cacheDir: cacheDir, executable: executable}
 }
 
-func (r *Runner[T]) Start(ctx context.Context, src T) (err error) {
-	go func() {
-		if err := r.Run(ctx, src); err != nil {
-			plog.Get(ctx).Type(r).P().Println(err)
-			return
-		}
-	}()
-	return
-}
-
 func (r *Runner[T]) Run(ctx context.Context, src T) (err error) {
-	log := plog.Get(ctx).Scope("exec.Runner").Set(&ctx)
-	log.Printf("target: %T %s %s", src, src.Abs(), src.Manifest().Package)
+	log := plog.Get(ctx).Type(r).Set(&ctx)
+	log.Printf("start %T %s %s", src, src.Manifest().Package, src.Abs())
+	defer log.Printf("exit %T %s %s", src, src.Manifest().Package, src.Abs())
 	switch v := any(src).(type) {
 	case target.ProjectHtml:
 		return newPortal[target.Portal](r.executable, "o", "wails_dev").run(ctx, src)

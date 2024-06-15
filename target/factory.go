@@ -25,5 +25,3 @@ func ApiFactory(
 		return
 	}
 }
-
-type NewApphost func(ctx context.Context, portal Portal) Apphost

@@ -38,7 +38,7 @@ type Project interface {
 	Dist() Dist
 }
 
-type ProjectNodeModule interface {
+type ProjectNpm interface {
 	Project
 	NodeModule
 }
@@ -73,7 +73,7 @@ type PortalHtml interface {
 }
 
 type ProjectHtml interface {
-	ProjectNodeModule
+	ProjectNpm
 	Html
 	DistHtml() DistHtml
 }
@@ -93,7 +93,7 @@ type Js interface {
 }
 
 type ProjectJs interface {
-	ProjectNodeModule
+	ProjectNpm
 	Js
 	DistJs() DistJs
 }

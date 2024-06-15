@@ -18,7 +18,7 @@ func Test__target_Any__test_assets(t *testing.T) {
 		target.Skip("node_modules"),
 		target.Try(bundle.Resolve),
 		target.Try(npm.ResolveNodeModule).Lift(
-			target.Try(project.Resolve)),
+			target.Try(project.ResolveNpm)),
 		target.Try(project.ResolveGo),
 		target.Try(dist.Resolve),
 	)

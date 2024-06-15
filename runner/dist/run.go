@@ -23,8 +23,9 @@ type Runner struct {
 }
 
 func (r Runner) Run(ctx context.Context, project target.Project) (err error) {
+	// TODO replace switch with injected factory
 	switch v := project.(type) {
-	case target.ProjectNodeModule:
+	case target.ProjectNpm:
 		if err = r.NpmRunner.Run(ctx, v); err != nil {
 			return
 		}

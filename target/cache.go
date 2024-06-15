@@ -2,6 +2,7 @@ package target
 
 import (
 	"context"
+	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"io/fs"
 	"log"
 	"sync"
@@ -25,6 +26,7 @@ func (finder Finder[T]) Cached(c *Cache[T]) Finder[T] {
 			portals, err = find(ctx, src)
 			if err == nil {
 				c.Add(portals)
+				plog.Get(ctx).Println("added to cache:", c.portals)
 			}
 			return
 		}
@@ -46,7 +48,6 @@ func (c *Cache[T]) Add(portals Portals[T]) {
 	for s, portal := range portals {
 		c.portals[s] = portal
 	}
-	log.Println("added to cache:", c.portals)
 }
 
 func (c *Cache[T]) Get(src string) (portal Portal, ok bool) {
