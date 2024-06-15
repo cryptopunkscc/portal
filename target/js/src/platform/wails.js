@@ -21,7 +21,7 @@ const adapter = () => ({
   astral_interrupt: window['go']['main']['Adapter']['Interrupt'],
   // runtime
   sleep: window['go']['main']['Adapter']['Sleep'],
-  log: (...arg) => window['go']['main']['Adapter']['LogArr'](arg),
+  log: async (...arg) => await window['go']['main']['Adapter']['LogArr'](arg),
 })
 
 inject(platform, adapter)
