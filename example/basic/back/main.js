@@ -7,7 +7,7 @@ listenHello().catch(err => {
 })
 
 async function listenHello() {
-  this.port = await apphost.register("")
+  this.port = await apphost.register()
   log("new port " + this.port.port)
   for (; ;) {
     let conn = await this.port.accept()
