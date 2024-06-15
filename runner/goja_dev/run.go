@@ -9,6 +9,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/target"
 	jsEmbed "github.com/cryptopunkscc/go-astral-js/target/js/embed"
 	"github.com/cryptopunkscc/go-astral-js/target/sources"
+	"time"
 )
 
 type Runner struct {
@@ -37,6 +38,9 @@ func (r *Runner) Run(ctx context.Context, projectJs target.ProjectJs) (err error
 	if err = npm.RunWatch(ctx, projectJs.Abs()).Start(); err != nil {
 		return
 	}
+
+	// Wait 1 for npm.RunWatch finish initial build otherwise runner can restart on first launch.
+	time.Sleep(1 * time.Second)
 
 	return r.distRunner.Run(ctx, projectJs.DistJs())
 }

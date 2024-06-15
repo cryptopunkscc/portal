@@ -5,6 +5,7 @@ import (
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"io/fs"
 	"log"
+	"strings"
 	"sync"
 )
 
@@ -58,7 +59,7 @@ func (c *Cache[T]) Get(src string) (portal Portal, ok bool) {
 	defer c.mu.Unlock()
 	for _, p := range c.portals {
 		m := p.Manifest()
-		if m.Name == src || m.Package == src {
+		if m.Name == src || strings.HasPrefix(src, m.Package) {
 			ok = true
 			portal = p
 			return
