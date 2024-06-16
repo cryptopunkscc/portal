@@ -23,6 +23,7 @@ func (f Feat[T]) Run(ctx context.Context, path string, _ ...string) (err error) 
 		return errors.New("cannot resolve portal: " + err.Error())
 	}
 	for _, t := range portal {
+		plog.Get(ctx).Scope(t.Manifest().Package).Set(&ctx)
 		return f.run(ctx, t)
 	}
 	return errors.New("no target found")
