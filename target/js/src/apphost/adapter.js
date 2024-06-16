@@ -57,14 +57,25 @@ export class ApphostConn {
   }
 
   async read() {
-    return await bindings.astral_conn_read(this.id)
+    try {
+      return await bindings.astral_conn_read(this.id)
+    } catch (e) {
+      this.done = true
+      throw e
+    }
   }
 
   async write(data) {
-    return await bindings.astral_conn_write(this.id, data)
+    try {
+      return await bindings.astral_conn_write(this.id, data)
+    } catch (e) {
+      this.done = true
+      throw e
+    }
   }
 
   async close() {
+    this.done = true
     await bindings.astral_conn_close(this.id)
   }
 }

@@ -21,15 +21,12 @@
 * [x] Migrate go-apphost-jrpc into portal repository.
 * [x] Install JavaScript runtime dependencies in local node modules.
 * [x] Use injected prefixed logger. Review & unify existing logs.
-* [x] Close nested apps gracefully.
 * [x] Cross integration rpc tests for js - golang.
 * [x] Golang runner support.
+* Close nested apps gracefully.
 * Design runtime API for JavaScript apps:
     * backend
     * wails
     * android
-
-## Bugs
-
-* Fix backend timeout.
-* Fix go runners reload on change.
+* Target search recursion depth limit. Consider 2 or 3 as default value. 
+  * Display result info with summary when no targets found in given path.

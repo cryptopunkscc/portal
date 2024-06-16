@@ -95,14 +95,25 @@ var portal = (function (exports) {
     }
 
     async read() {
-      return await bindings.astral_conn_read(this.id)
+      try {
+        return await bindings.astral_conn_read(this.id)
+      } catch (e) {
+        this.done = true;
+        throw e
+      }
     }
 
     async write(data) {
-      return await bindings.astral_conn_write(this.id, data)
+      try {
+        return await bindings.astral_conn_write(this.id, data)
+      } catch (e) {
+        this.done = true;
+        throw e
+      }
     }
 
     async close() {
+      this.done = true;
       await bindings.astral_conn_close(this.id);
     }
   }
@@ -135,6 +146,17 @@ var portal = (function (exports) {
       return await this.decode()
     }
 
+    async observe(consume) {
+      for (;;) {
+        const next = await this.decode();
+        const last = await consume(next);
+        this.value = next;
+        if (last) {
+          return last
+        }
+      }
+    }
+
     caller(method) {
       return async (...params) => await this.call(method, ...params)
     }
@@ -143,14 +165,87 @@ var portal = (function (exports) {
       return async (...params) => await this.request(method, ...params)
     }
 
+    observer(method) {
+      return (...params) => ({
+        observe: async (consume) => {
+          await this.call(method, ...params);
+          return await this.observe(consume)
+            .finally(() => this.close()) // TODO consider if it's ok to close conn automatically.
+        }
+      })
+    }
+
     bind(...methods) {
-      this.boundMethods = methods;
       for (let method of methods) {
-        this[method] = this.requester(method);
+        const collect = method[0] === '*';
+        if (collect) {
+          method = method.split(1);
+        }
+        if (this[method]) {
+          throw `method '${method}' already exist`
+        }
+        if (collect) {
+          this[method] = this.observer(method);
+        } else {
+          this[method] = this.requester(method);
+        }
       }
       return this
     }
   }
+
+  // TODO add support async iterators for es5 (goja), most likely using rollup + babel.
+
+  const encode = RpcConn.prototype.encode;
+
+  RpcConn.prototype.encode = async function (data) {
+    bindings.log("encode async gen");
+    if (isAsyncGenerator(data)) {
+      for await (let next of data) {
+        await encode.call(this, next);
+      }
+      return
+    }
+    await encode.call(this, data);
+  };
+
+  function isAsyncGenerator(any) {
+    return "function" === typeof any.next
+      && "function" === typeof any[Symbol.asyncIterator]
+      && any === any[Symbol.asyncIterator]()
+  }
+
+
+  RpcConn.prototype.next = async function () {
+    if (!this.done) {
+      try {
+        this.value = await this.decode();
+      } catch (e) {
+        this.error = e;
+        this.done = true;
+      }
+    }
+    return this
+  };
+
+  RpcConn.prototype.return = async function (value) {
+    if (!this.done) {
+      if (value) {
+        this.value = value;
+      }
+      this.done = true;
+      this.close().catch();
+    }
+    return this
+  };
+
+  RpcConn.prototype.throw = async function () {
+    if (!this.done) {
+      this.done = true;
+      this.close().catch();
+    }
+    return this
+  };
 
   function prepareRoutes$1(ctx) {
     let routes = resolveRoutes(ctx.handlers);
@@ -206,13 +301,11 @@ var portal = (function (exports) {
     return arr
   }
 
-  const log$5 = bindings.log;
-
   async function serve(client, ctx) {
     const routes = prepareRoutes$1(ctx);
     for (let route of routes) {
       const listener = await client.register(route);
-      listen$1(ctx, listener).catch(log$5);
+      listen$1(ctx, listener).catch(bindings.log);
     }
   }
 
@@ -220,8 +313,8 @@ var portal = (function (exports) {
     for (; ;) {
       let conn = await listener.accept();
       conn = new RpcConn(conn);
-      handle$1(ctx, conn).catch(log$5).finally(() =>
-        conn.close().catch(log$5));
+      handle$1(ctx, conn).catch(bindings.log).finally(() =>
+        conn.close().catch(bindings.log));
     }
   }
 
@@ -235,7 +328,7 @@ var portal = (function (exports) {
     for (; ;) {
       canInvoke = typeof handle === "function";
       if (params && !canInvoke) {
-        await conn.writeJson({error: `no handler for query ${params} ${typeof handle}`});
+        await conn.encode({error: `no handler for query ${params} ${typeof handle}`});
         return
       }
       if (params || canInvoke) {
@@ -244,7 +337,7 @@ var portal = (function (exports) {
         } catch (e) {
           result = {error: e};
         }
-        await conn.writeJson(result);
+        await conn.encode(result);
         handle = handlers;
       }
       params = await conn.read();
@@ -255,11 +348,15 @@ var portal = (function (exports) {
   }
 
   async function invoke$1(ctx, handle, params) {
-    if (handle === undefined) {
+    if (!handle) {
       throw "undefined handler"
     }
     switch (typeof handle) {
       case "function":
+        if (!params) {
+          return await handle(ctx)
+        }
+
         const args = JSON.parse(params);
         if (Array.isArray(args)) {
           return await handle(...args, ctx)
@@ -301,18 +398,15 @@ var portal = (function (exports) {
     return [left, right]
   }
 
-  const log$4 = bindings.log;
-
   class RpcClient extends ApphostClient {
 
-    constructor(targetId, methods) {
+    constructor() {
       super();
-      this.targetId = targetId;
-      this.boundMethods = methods;
       this.port = "";
     }
 
-    async query(query){
+    // TODO deprecated use call instead
+    async query(query) {
       let conn = await super.query(query, this.targetId);
       conn = new RpcConn(conn);
       return conn
@@ -323,7 +417,7 @@ var portal = (function (exports) {
     }
 
     async call(query, ...params) {
-      if (params) {
+      if (params.length > 0) {
         query += '?' + JSON.stringify(params);
       }
       const conn = await super.query(query, this.targetId);
@@ -333,7 +427,7 @@ var portal = (function (exports) {
     async request(query, ...params) {
       const conn = await this.call(query, ...params);
       const response = await conn.decode();
-      conn.close().catch(log$4);
+      conn.close().catch(bindings.log);
       return response
     }
 
@@ -343,6 +437,29 @@ var portal = (function (exports) {
 
     requester(query) {
       return async (...params) => await this.request(query, ...params)
+    }
+
+    observer(query) {
+      return async (...params) => {
+        if (typeof params[params.length - 1] !== "function") {
+          return await this.request(query, ...params)
+        }
+        const consume = params.pop();
+        const conn = await this.call(query, ...params);
+        let last;
+        try {
+          last = await conn.observe(consume);
+        } catch (e) {
+          if ('{}' === JSON.stringify(e)) {
+            last = conn.value;
+          } else {
+            throw e
+          }
+        } finally {
+          conn.close().finally();
+        }
+        return last
+      }
     }
 
     copy(data) {
@@ -356,8 +473,19 @@ var portal = (function (exports) {
     bind(route, ...methods) {
       const copy = this.copy();
       for (let method of methods) {
+        const collect = method[0] === '*';
+        if (collect) {
+          method = method.substring(1); // drop * prefix
+        }
+        if (this[method]) {
+          throw `method '${method}' already exist`
+        }
         const port = [route, method].join('.');
-        copy[method] = copy.requester(port);
+        if (collect) {
+          copy[method] = copy.observer(port);
+        } else {
+          copy[method] = copy.requester(port);
+        }
       }
       return copy
     }
@@ -705,7 +833,7 @@ var portal = (function (exports) {
   }
 
   const {log, sleep, platform} = bindings;
-  const apphost = new RpcClient();
+  const apphost = new ApphostClient();
   const rpc = new RpcClient();
 
   exports.apphost = apphost;
