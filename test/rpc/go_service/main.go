@@ -13,6 +13,6 @@ func main() {
 	log.Type(srv).Println("start test.go")
 	err := srv.Run(ctx)
 	if err != nil {
-		log.P().Println()
+		log.P().Println(err)
 	}
 }

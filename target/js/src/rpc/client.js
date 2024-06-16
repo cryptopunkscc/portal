@@ -3,18 +3,15 @@ import {RpcConn} from "./conn.js";
 import {serve} from "./serve.js";
 import {bindings} from "../bindings"
 
-const log = bindings.log
-
 export class RpcClient extends ApphostClient {
 
-  constructor(targetId, methods) {
+  constructor() {
     super();
-    this.targetId = targetId
-    this.boundMethods = methods
     this.port = ""
   }
 
-  async query(query){
+  // TODO deprecated use call instead
+  async query(query) {
     let conn = await super.query(query, this.targetId)
     conn = new RpcConn(conn)
     return conn
@@ -25,7 +22,7 @@ export class RpcClient extends ApphostClient {
   }
 
   async call(query, ...params) {
-    if (params) {
+    if (params.length > 0) {
       query += '?' + JSON.stringify(params)
     }
     const conn = await super.query(query, this.targetId)
@@ -35,7 +32,7 @@ export class RpcClient extends ApphostClient {
   async request(query, ...params) {
     const conn = await this.call(query, ...params)
     const response = await conn.decode()
-    conn.close().catch(log)
+    conn.close().catch(bindings.log)
     return response
   }
 
@@ -45,6 +42,29 @@ export class RpcClient extends ApphostClient {
 
   requester(query) {
     return async (...params) => await this.request(query, ...params)
+  }
+
+  observer(query) {
+    return async (...params) => {
+      if (typeof params[params.length - 1] !== "function") {
+        return await this.request(query, ...params)
+      }
+      const consume = params.pop()
+      const conn = await this.call(query, ...params)
+      let last
+      try {
+        last = await conn.observe(consume)
+      } catch (e) {
+        if ('{}' === JSON.stringify(e)) {
+          last = conn.value
+        } else {
+          throw e
+        }
+      } finally {
+        conn.close().finally()
+      }
+      return last
+    }
   }
 
   copy(data) {
@@ -58,8 +78,19 @@ export class RpcClient extends ApphostClient {
   bind(route, ...methods) {
     const copy = this.copy()
     for (let method of methods) {
+      const collect = method[0] === '*'
+      if (collect) {
+        method = method.substring(1) // drop * prefix
+      }
+      if (this[method]) {
+        throw `method '${method}' already exist`
+      }
       const port = [route, method].join('.')
-      copy[method] = copy.requester(port)
+      if (collect) {
+        copy[method] = copy.observer(port)
+      } else {
+        copy[method] = copy.requester(port)
+      }
     }
     return copy
   }
