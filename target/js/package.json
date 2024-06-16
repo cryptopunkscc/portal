@@ -2,7 +2,9 @@
   "name": "portal",
   "version": "0.0.1",
   "description": "Portal bindings for js",
-  "type": "module",
+  "portal": "lib",
+  "main": "index.js",
+  "module": "index.js",
   "scripts": {
     "build": "npm run module && npm run backend && npm run wails",
     "module": "rollup -c",

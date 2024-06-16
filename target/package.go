@@ -3,14 +3,14 @@ package target
 const PackageJsonFilename = "package.json"
 
 type PackageJson struct {
-	Module  string `json:"module,omitempty"`
+	Portal  string `json:"portal,omitempty"`
 	Scripts struct {
 		Build string `json:"build"`
 	} `json:"scripts,omitempty"`
 }
 
 func (p PackageJson) IsPortalLib() bool {
-	return p.Module == "portal"
+	return p.Portal == "lib"
 }
 
 func (p PackageJson) CanBuild() bool {
