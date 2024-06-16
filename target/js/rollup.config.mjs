@@ -3,7 +3,7 @@ import generatePackageJson from "rollup-plugin-generate-package-json";
 export default {
   input: "all.js",
   output: {
-    file: "embed/portal/portal.js",
+    file: "embed/portal/index.js",
     format: "es",
   },
   plugins: [generatePackageJson(
@@ -11,7 +11,7 @@ export default {
       baseContents: (pkg) => {
         pkg["scripts"] = undefined
         pkg["devDependencies"] = {}
-        pkg["module"] = "portal"
+        pkg["module"] = "index.js"
         return pkg
       }
     }

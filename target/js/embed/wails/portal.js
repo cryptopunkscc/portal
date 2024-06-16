@@ -15,11 +15,11 @@ var portal = (function (exports) {
   // ================== Wails bindings adapter ==================
 
 
-  let wails = {};
+  let wails;
   try {
     wails = window;
   } catch (e) {
-
+    wails = {};
   }
 
   /* eslint-disable */
