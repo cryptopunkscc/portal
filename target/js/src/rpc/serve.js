@@ -57,12 +57,12 @@ async function invoke(ctx, handle, params) {
       if (!params) {
         return await handle(ctx)
       }
-
       const args = JSON.parse(params)
       if (Array.isArray(args)) {
         return await handle(...args, ctx)
       }
       return await handle(args, ctx)
+
     case "object":
       return
   }

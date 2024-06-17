@@ -7,6 +7,9 @@ export class RpcConn extends ApphostConn {
 
   async encode(data) {
     let json = JSON.stringify(data)
+    if (json === undefined) {
+      json = '{}'
+    }
     return await super.write(json + '\n')
   }
 

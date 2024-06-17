@@ -133,6 +133,9 @@ var portal = (function (exports) {
 
     async encode(data) {
       let json = JSON.stringify(data);
+      if (json === undefined) {
+        json = '{}';
+      }
       return await super.write(json + '\n')
     }
 
@@ -368,12 +371,12 @@ var portal = (function (exports) {
         if (!params) {
           return await handle(ctx)
         }
-
         const args = JSON.parse(params);
         if (Array.isArray(args)) {
           return await handle(...args, ctx)
         }
         return await handle(args, ctx)
+
       case "object":
         return
     }
@@ -417,13 +420,6 @@ var portal = (function (exports) {
       this.port = "";
     }
 
-    // TODO deprecated use call instead
-    async query(query) {
-      let conn = await super.query(query, this.targetId);
-      conn = new RpcConn(conn);
-      return conn
-    }
-
     async serve(ctx) {
       await serve(this, ctx);
     }
@@ -461,15 +457,11 @@ var portal = (function (exports) {
         let last;
         try {
           last = await conn.observe(consume);
-        } catch (e) {
-          if ('{}' === JSON.stringify(e)) {
-            last = conn.value;
-          } else {
-            throw e
-          }
-        } finally {
+        }
+        finally {
           conn.close().finally();
         }
+        bindings.log("observer last", last);
         return last
       }
     }
