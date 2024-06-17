@@ -1,4 +1,4 @@
-import {rpc, log, sleep} from "../common";
+import {log, rpc, sleep} from "../common";
 
 rpc.serve({
   inject: {
@@ -20,20 +20,36 @@ rpc.serve({
     },
     func3: (msg) => {
       throw msg
-    }
+    },
+    func4: (msg) => {
+      throw msg
+    },
+    func5: () => undefined
   },
 }).catch(log)
 
 test().catch(log)
 
-const client = rpc.bind("portal.js.test", "func0", "func1", "*func2", "func3")
+const client = rpc.bind("portal.js.test",
+  "func0",
+  "func1",
+  "*func2",
+  "func3",
+  "*func4",
+  "func5",
+)
 
 async function test() {
   await sleep(200)
+  log("\n\n\n")
+  log("====================== TEST BEGIN ======================\n")
   await test0()
   await test1()
   await test2()
   await test3()
+  await test4()
+  await test5()
+  log("====================== TEST END ======================\n\n\n")
   await rpc.interrupt()
 }
 
@@ -67,20 +83,35 @@ async function test3() {
   let actual
   try {
     actual = await client.func3(expected)
-    await log("test3 success", actual)
   } catch (e) {
-    await log("test3 error", e)
     actual = e
   }
   await assert("test3", expected, actual)
 }
 
+async function test4() {
+  const expected = "test error"
+  let actual
+  try {
+    actual = await client.func4(expected, () => undefined)
+  } catch (e) {
+    actual = e
+  }
+  await assert("test4", expected, actual)
+}
+
+async function test5() {
+  const expected = {}
+  const actual = await client.func5()
+  await assert("test5", expected, actual)
+}
+
 async function assert(test, expected, actual) {
   expected = JSON.stringify(expected)
   actual = JSON.stringify(actual)
-  let result = `${test} PASSED`
+  let result = `[PASSED] ${test}\n`
   if (expected !== actual) {
-    result = `${test} actual !== expected:\n${actual}\n${expected}\n`
+    result = `[FAILED] ${test}\nactual:\t\t${actual}\nexpected:\t${expected}\n`
   }
   await log(result)
 }

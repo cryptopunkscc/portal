@@ -10,13 +10,6 @@ export class RpcClient extends ApphostClient {
     this.port = ""
   }
 
-  // TODO deprecated use call instead
-  async query(query) {
-    let conn = await super.query(query, this.targetId)
-    conn = new RpcConn(conn)
-    return conn
-  }
-
   async serve(ctx) {
     await serve(this, ctx)
   }
@@ -54,15 +47,11 @@ export class RpcClient extends ApphostClient {
       let last
       try {
         last = await conn.observe(consume)
-      } catch (e) {
-        if ('{}' === JSON.stringify(e)) {
-          last = conn.value
-        } else {
-          throw e
-        }
-      } finally {
+      }
+      finally {
         conn.close().finally()
       }
+      bindings.log("observer last", last)
       return last
     }
   }
