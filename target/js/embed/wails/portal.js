@@ -138,7 +138,11 @@ var portal = (function (exports) {
 
     async decode() {
       const resp = await this.read();
-      return JSON.parse(resp)
+      const parsed = JSON.parse(resp);
+      if (parsed.error) {
+        throw parsed.error
+      }
+      return parsed
     }
 
     async call(method, ...params) {

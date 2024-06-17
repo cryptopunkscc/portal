@@ -18,18 +18,22 @@ rpc.serve({
         await sleep(1)
       }
     },
+    func3: (msg) => {
+      throw msg
+    }
   },
 }).catch(log)
 
 test().catch(log)
 
-const client = rpc.bind("portal.js.test", "func0", "func1", "*func2")
+const client = rpc.bind("portal.js.test", "func0", "func1", "*func2", "func3")
 
 async function test() {
   await sleep(200)
   await test0()
   await test1()
   await test2()
+  await test3()
   await rpc.interrupt()
 }
 
@@ -56,6 +60,19 @@ async function test2() {
     return next === expected ? next : null
   })
   await assert("test2", expected, actual)
+}
+
+async function test3() {
+  const expected = "test error"
+  let actual
+  try {
+    actual = await client.func3(expected)
+    await log("test3 success", actual)
+  } catch (e) {
+    await log("test3 error", e)
+    actual = e
+  }
+  await assert("test3", expected, actual)
 }
 
 async function assert(test, expected, actual) {
