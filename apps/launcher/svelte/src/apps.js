@@ -1,4 +1,4 @@
-import {log} from "portal/portal";
+import {log} from "portal";
 import portal from "./portal.js";
 import {writable} from "svelte/store";
 
@@ -7,11 +7,12 @@ export class AppsRepository {
     this.apps = []
     this.store = writable([])
     this.channel = null
-    portal.observe().catch(log).then(channel => {
+    portal.observe().catch(console.log).then(channel => {
       this.channel = channel
-      this.run().catch(log)
+      this.run().catch(console.log)
       this.loadMore()
     })
+    console.log(this)
   }
 
   async run() {
@@ -37,12 +38,12 @@ export class AppsRepository {
   loadMore(num) {
     // log("loadMore")
     num = num || 10
-    this.channel?.more(num)?.catch(log)
+    this.channel?.more(num)?.catch(console.log)
   }
 
   cancel() {
     log("cancel")
-    this.channel?.close()?.catch(log)
+    this.channel?.close()?.catch(console.log)
     this.channel = null
   }
 }
