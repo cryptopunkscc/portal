@@ -1,6 +1,7 @@
 import {bindings} from "../bindings.js";
 import {RpcConn} from "./conn.js";
 import {prepareRoutes} from "./route.js";
+import {splitQuery} from "./query";
 
 export async function serve(client, ctx) {
   const routes = prepareRoutes(ctx)
@@ -72,7 +73,7 @@ function unfold(handlers, query) {
   if (query === "") {
     return [handlers]
   }
-  const [next, rest] = split(query)
+  const [next, rest] = splitQuery(query)
   const nested = handlers[next]
   if (rest === undefined) {
     return [nested]
@@ -84,17 +85,4 @@ function unfold(handlers, query) {
     return [handlers, rest]
   }
   throw "cannot unfold"
-}
-
-function split(query) {
-  const index = query.search(/[?.{\[]/)
-  if (index === -1) {
-    return [query]
-  }
-  const left = query.slice(0, index)
-  let right = query.slice(index, query.length)
-  if (/^[.?]/.test(right)) {
-    right = right.slice(1)
-  }
-  return [left, right]
 }

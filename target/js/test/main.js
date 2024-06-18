@@ -1,4 +1,5 @@
 import {log, rpc, sleep} from "../common";
+import bindings from "../src/bindings";
 
 rpc.serve({
   inject: {
@@ -18,26 +19,28 @@ rpc.serve({
         await sleep(1)
       }
     },
-    func3: (msg) => {
+    func3: msg => {
       throw msg
     },
-    func4: (msg) => {
+    func4: msg => {
       throw msg
     },
     func5: () => undefined
   },
 }).catch(log)
 
-test().catch(log)
+const client = rpc.bind({
+  "portal.js.test": [
+    "func0",
+    "func1",
+    "*func2",
+    "func3",
+    "*func4",
+    "func5",
+  ]
+})
 
-const client = rpc.bind("portal.js.test",
-  "func0",
-  "func1",
-  "*func2",
-  "func3",
-  "*func4",
-  "func5",
-)
+test().catch(log)
 
 async function test() {
   await sleep(200)
@@ -72,9 +75,9 @@ async function test2() {
   const initial = 3
   const max = 10
   const expected = 5
-  const actual = await client.func2(initial, max, next => {
-    return next === expected ? next : null
-  })
+
+  await bindings.log("test2 start", client.func2.request)
+  const actual = await client.func2.filter(next => next === expected).request(initial, max)
   await assert("test2", expected, actual)
 }
 
