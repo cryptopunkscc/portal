@@ -1,0 +1,11 @@
+{
+  "name": "example-project-js",
+  "package": "example.project.js",
+  "version": "0.0.0",
+  "title": "Example Project JS",
+  "author": "yang",
+  "email": "cryptopunkyang@pm.me",
+  "env": {
+    "timeout": -1
+  }
+}
