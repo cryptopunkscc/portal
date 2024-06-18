@@ -126,86 +126,231 @@ var portal = (function (exports) {
     }
   }
 
+  function bind(caller, routes) {
+    const r = prepare(routes);
+    const copy = caller.copy();
+    for (let [method, port] of r) {
+      if (caller[method]) {
+        throw `method '${method}' already exist`
+      }
+      copy[method] = caller.call(port);
+    }
+    return copy
+  }
+
+  const prefix = /^\*/;
+
+  function prepare(routes) {
+    if (!Array.isArray(routes)) throw `cannot prepare routes of type ${typeof routes}`
+    const prepared = [];
+    for (let key in routes) {
+      const route = routes[key];
+      switch (typeof route) {
+        case "string":
+          const method = route.replace(prefix, '');
+          prepared.push([method, method]);
+          continue
+        case "object":
+          for (let port in route) {
+            for (let method of route[port]) {
+              method = method.replace(prefix, '');
+              const route = [port, method].join('.');
+              prepared.push([method, route]);
+            }
+          }
+      }
+    }
+    return prepared
+  }
+
+  /**
+   * @param {RpcClient | RpcConn} client
+   * @param {string} port
+   * @param {any[]} params
+   */
+  function call(client, port, ...params) {
+    const call = new RpcCall(client, port, params);
+    let f = async (...params) => {
+      return await call.request(...params);
+    };
+    return Object.assign(f, {
+      inner: call,
+      map: (...args) => call.map(...args),
+      filter: (...args) => call.filter(...args),
+      request: async (...args) => await call.request(...args),
+      collect: async (...args) => await call.collect(...args),
+      conn: async (...args) => await call.conn(...args),
+    })
+  }
+
+  class RpcCall {
+
+    mapper = arg => arg
+    params = []
+    single = true
+
+    /**
+     * @param {RpcClient | RpcConn} client
+     * @param {string} port
+     * @param {any[]} params
+     */
+    constructor(client, port, params) {
+      this.client = client;
+      this.port = port;
+      this.params = !Array.isArray(params) ? params : [];
+    }
+
+    map(f) {
+      const map = this.mapper;
+      this.mapper = arg => f(map(arg));
+      return this
+    }
+
+    filter(f) {
+      return this.map(arg => {
+        if (f(arg)) return arg
+      })
+    }
+
+    async request(...params) {
+      if (params.length > 0) this.params = params;
+      return await this.#consume(async conn => await conn.request(...params));
+    }
+
+    async collect(...params) {
+      if (params.length > 0) this.params = params;
+      return await this.#consume(async conn => await conn.collect(...params));
+    }
+
+    async #consume(f) {
+      const conn = await this.conn();
+      conn.mapper = this.mapper;
+      this.result = await f(conn);
+      this.mapper = a => a; // reset mapper between requests
+      if (this.single) await conn.close().catch(bindings.log);
+      return this.result
+    }
+
+    async conn(...params) {
+      const args = params.length > 0 ? params : this.params;
+      return this.client.conn(this.port, ...args);
+    }
+  }
+
+  function splitQuery(query) {
+    const index = query.search(/[?.{\[]/);
+    if (index === -1) {
+      return [query]
+    }
+    const left = query.slice(0, index);
+    let right = query.slice(index, query.length);
+    if (/^[.?]/.test(right)) {
+      right = right.slice(1);
+    }
+    return [left, right]
+  }
+
+
+  function hasParams(query) {
+    return query.search(/[?{\[]/) > -1
+  }
+
   class RpcConn extends ApphostConn {
+
     constructor(data) {
       super(data);
     }
 
+    #sub(port) {
+      if (hasParams(this.query)) throw `cannot nest connection for complete query ${chunks}`
+      return port
+    }
+
+    bind(...routes) {
+      return bind(this, routes);
+    }
+
+    copy() {
+      return this;
+    }
+
+    call(port, ...params) {
+      const c = call(this, this.#sub(port), ...params);
+      c.inner.single = false;
+      return c
+    }
+
+    map(f) {
+      if (this.mapper) {
+        const map = this.mapper;
+        this.mapper = arg => f(map(arg));
+      } else {
+        this.mapper = f;
+      }
+      return this
+    }
+
+    async conn(method, ...params) {
+      let cmd = method ? method : "";
+      if (params.length > 0) {
+        if (cmd) cmd += '?';
+        cmd += JSON.stringify(params);
+      }
+      if (cmd) await this.write(cmd + '\n');
+      return this
+    }
+
     async encode(data) {
       let json = JSON.stringify(data);
-      if (json === undefined) {
-        json = '{}';
-      }
+      if (json === undefined) json = '{}';
       return await super.write(json + '\n')
     }
 
     async decode() {
       const resp = await this.read();
       const parsed = JSON.parse(resp);
-      if (parsed.error) {
-        throw parsed.error
-      }
+      if (parsed === null) return null
+      if (parsed.error) throw parsed.error
       return parsed
     }
 
-    async call(method, ...params) {
-      let cmd = method;
-      if (params) {
-        cmd += '?' + JSON.stringify(params);
-      }
-      await this.write(cmd + '\n');
-    }
-
-    async request(query, ...params) {
-      await this.call(query, ...params);
-      return await this.decode()
-    }
-
-    async observe(consume) {
-      for (;;) {
+    async request(...params) {
+      const map = this.mapper;
+      this.result = null;
+      for (; ;) {
         const next = await this.decode();
-        const last = await consume(next);
-        this.value = next;
-        if (last) {
-          return last
-        }
+        if (next === undefined) continue
+        if (next === null) return this.result
+        this.result = next;
+        if (!map) return next
+        const last = await map(next);
+        if (last === undefined) continue
+        if (last === null) return this.result
+        return last
       }
     }
 
-    caller(method) {
-      return async (...params) => await this.call(method, ...params)
-    }
-
-    requester(method) {
-      return async (...params) => await this.request(method, ...params)
-    }
-
-    observer(method) {
-      return (...params) => ({
-        observe: async (consume) => {
-          await this.call(method, ...params);
-          return await this.observe(consume)
-            .finally(() => this.close()) // TODO consider if it's ok to close conn automatically.
-        }
-      })
-    }
-
-    bind(...methods) {
-      for (let method of methods) {
-        const collect = method[0] === '*';
-        if (collect) {
-          method = method.split(1);
-        }
-        if (this[method]) {
-          throw `method '${method}' already exist`
-        }
-        if (collect) {
-          this[method] = this.observer(method);
-        } else {
-          this[method] = this.requester(method);
-        }
+    /**
+     * Collects all decoded values mapped as not null until decodes null or maps into undefined.
+     *
+     * @param {...any} params
+     * @returns {Promise<any[]>}
+     */
+    async collect(...params) {
+      const map = this.mapper ? this.mapper : null;
+      let push;
+      if (!map) push = next => this.result.push(next);
+      else push = async (next) => {
+        next = await map.call(this, next);
+        if (next === null) return this.result
+        if (next) this.result.push(next);
+      };
+      this.result = [];
+      for (; ;) {
+        let next = await this.decode();
+        if (next === null) return this.result
+        push(next);
       }
-      return this
     }
   }
 
@@ -262,10 +407,10 @@ var portal = (function (exports) {
     return this
   };
 
-  function prepareRoutes$1(ctx) {
+  function prepareRoutes(ctx) {
     let routes = resolveRoutes(ctx.handlers);
-    routes = formatRoutes$1(routes);
-    routes = maskRoutes$1(routes, ctx.routes);
+    routes = formatRoutes(routes);
+    routes = maskRoutes(routes, ctx.routes);
     return routes
   }
 
@@ -290,7 +435,7 @@ var portal = (function (exports) {
     return routes
   }
 
-  function formatRoutes$1(routes) {
+  function formatRoutes(routes) {
     const formatted = [];
     for (let route of routes) {
       formatted.push(route.join("."));
@@ -298,7 +443,7 @@ var portal = (function (exports) {
     return formatted
   }
 
-  function maskRoutes$1(routes, masks) {
+  function maskRoutes(routes, masks) {
     masks = masks ? masks : [];
     let arr = [...routes];
     for (let mask of masks) {
@@ -317,26 +462,26 @@ var portal = (function (exports) {
   }
 
   async function serve(client, ctx) {
-    const routes = prepareRoutes$1(ctx);
+    const routes = prepareRoutes(ctx);
     for (let route of routes) {
       const listener = await client.register(route);
-      listen$1(ctx, listener).catch(bindings.log);
+      listen(ctx, listener).catch(bindings.log);
     }
   }
 
-  async function listen$1(ctx, listener) {
+  async function listen(ctx, listener) {
     for (; ;) {
       let conn = await listener.accept();
       conn = new RpcConn(conn);
-      handle$1(ctx, conn).catch(bindings.log).finally(() =>
+      handle(ctx, conn).catch(bindings.log).finally(() =>
         conn.close().catch(bindings.log));
     }
   }
 
-  async function handle$1(ctx, conn) {
+  async function handle(ctx, conn) {
     const inject = {...ctx.handlers, ...ctx.inject, conn: conn};
     const query = conn.query;
-    let [handlers, params] = unfold$1(ctx.handlers, query);
+    let [handlers, params] = unfold(ctx.handlers, query);
     let handle = handlers;
     let result;
     let canInvoke;
@@ -348,7 +493,7 @@ var portal = (function (exports) {
       }
       if (params || canInvoke) {
         try {
-          result = await invoke$1(inject, handle, params);
+          result = await invoke(inject, handle, params);
         } catch (e) {
           result = {error: e};
         }
@@ -357,12 +502,12 @@ var portal = (function (exports) {
       }
       params = await conn.read();
       if (typeof handle === "object") {
-        [handle, params] = unfold$1(handle, params);
+        [handle, params] = unfold(handle, params);
       }
     }
   }
 
-  async function invoke$1(ctx, handle, params) {
+  async function invoke(ctx, handle, params) {
     if (!handle) {
       throw "undefined handler"
     }
@@ -382,434 +527,11 @@ var portal = (function (exports) {
     }
   }
 
-  function unfold$1(handlers, query) {
+  function unfold(handlers, query) {
     if (query === "") {
       return [handlers]
     }
-    const [next, rest] = split$1(query);
-    const nested = handlers[next];
-    if (rest === undefined) {
-      return [nested]
-    }
-    if (typeof nested !== "undefined") {
-      return unfold$1(nested, rest)
-    }
-    if (typeof handlers === "function") {
-      return [handlers, rest]
-    }
-    throw "cannot unfold"
-  }
-
-  function split$1(query) {
-    const index = query.search(/[?.{\[]/);
-    if (index === -1) {
-      return [query]
-    }
-    const left = query.slice(0, index);
-    let right = query.slice(index, query.length);
-    if (/^[.?]/.test(right)) {
-      right = right.slice(1);
-    }
-    return [left, right]
-  }
-
-  class RpcClient extends ApphostClient {
-
-    constructor() {
-      super();
-      this.port = "";
-    }
-
-    async serve(ctx) {
-      await serve(this, ctx);
-    }
-
-    async call(query, ...params) {
-      if (params.length > 0) {
-        query += '?' + JSON.stringify(params);
-      }
-      const conn = await super.query(query, this.targetId);
-      return new RpcConn(conn)
-    }
-
-    async request(query, ...params) {
-      const conn = await this.call(query, ...params);
-      const response = await conn.decode();
-      conn.close().catch(bindings.log);
-      return response
-    }
-
-    caller(query) {
-      return async (...params) => await this.call(query, ...params)
-    }
-
-    requester(query) {
-      return async (...params) => await this.request(query, ...params)
-    }
-
-    observer(query) {
-      return async (...params) => {
-        if (typeof params[params.length - 1] !== "function") {
-          return await this.request(query, ...params)
-        }
-        const consume = params.pop();
-        const conn = await this.call(query, ...params);
-        let last;
-        try {
-          last = await conn.observe(consume);
-        }
-        finally {
-          conn.close().finally();
-        }
-        bindings.log("observer last", last);
-        return last
-      }
-    }
-
-    copy(data) {
-      return Object.assign(new RpcClient(), {...this, ...data})
-    }
-
-    target(id) {
-      return this.copy({targetId: id})
-    }
-
-    bind(route, ...methods) {
-      const copy = this.copy();
-      for (let method of methods) {
-        const collect = method[0] === '*';
-        if (collect) {
-          method = method.substring(1); // drop * prefix
-        }
-        if (this[method]) {
-          throw `method '${method}' already exist`
-        }
-        const port = [route, method].join('.');
-        if (collect) {
-          copy[method] = copy.observer(port);
-        } else {
-          copy[method] = copy.requester(port);
-        }
-      }
-      return copy
-    }
-  }
-
-  ApphostConn.prototype.readJson = async function (method) {
-    const resp = await this.read();
-    const json = JSON.parse(resp);
-    return json
-  };
-
-  ApphostConn.prototype.jsonReader = async function (method) {
-    const read = async () => await this.readJson(method);
-    read.cancel = async () => await this.close();
-    return read
-  };
-
-  ApphostConn.prototype.writeJson = async function (data) {
-    // if (Array.isArray(data) && data.length === 1) {
-    //   data = data[0]
-    // }
-    const json = JSON.stringify(data);
-    // log(this.id + " conn => " + this.query + ":" + json.trimEnd())
-    await this.write(json + '\n');
-  };
-
-  ApphostConn.prototype.rpcCall = async function (method, ...data) {
-    let cmd = method;
-    if (data.length > 0) {
-      cmd += "?" + JSON.stringify(data);
-    }
-    // log(this.id + " conn => " + this.query + "." + cmd)
-    await this.write(cmd + '\n');
-  };
-
-  ApphostConn.prototype.rpcQuery = function (method) {
-    const conn = this;
-    return async function (...data) {
-      // log("conn rpc query", method)
-      await conn.rpcCall(method, ...data);
-      return await conn.readJson(method)
-    }
-  };
-
-  // Bind RPC api of service associated to this connection
-  ApphostConn.prototype.bindRpc = async function () {
-    const conn = this;
-    // request api methods
-    await conn.rpcCall("api");
-
-    // read api methods
-    const methods = await conn.readJson("api");
-
-    // bind methods
-    for (let method of methods) {
-      conn[method] = async (...data) => {
-        await conn.rpcCall(method, ...data);
-        return await conn.readJson(method)
-      };
-    }
-
-    // bind subscribe
-    conn.subscribe = async (method, ...data) => {
-      await conn.rpcCall(method, ...data);
-      return conn.jsonReader(method)
-    };
-  };
-
-  const {log: log$3} = bindings;
-
-  ApphostClient.prototype.rpcCall = async function (identity, service, method, ...data) {
-    let cmd = service;
-    if (method) {
-      cmd += "." + method;
-    }
-    if (data.length > 0) {
-      cmd += "?" + JSON.stringify(data);
-    }
-    const conn = await this.query(cmd, identity);
-    // log(conn.id + " client => " + cmd)
-    return conn
-  };
-
-  ApphostClient.prototype.rpcQuery = function (port, identity) {
-    const client = this;
-    return async function (...data) {
-      const conn = await client.rpcCall(identity, port, "", ...data);
-      const json = await conn.readJson(port);
-      conn.close().catch(log$3);
-      return json
-    }
-  };
-
-  ApphostClient.prototype.bindRpc = async function (identity, service) {
-    const client = this;
-    // request api methods
-    const conn = await client.rpcCall(identity, service, "api");
-
-    // read api methods
-    const methods = await conn.readJson("api");
-    conn.close().catch(log$3);
-
-    // bind methods
-    for (let method of methods) {
-      client[method] = async (...data) => {
-        const conn = await client.rpcCall(identity, service, method, ...data);
-        const json = await conn.readJson(method);
-        conn.close().catch(log$3);
-        return json
-      };
-    }
-
-    // bind subscribe
-    client.subscribe = async (method, ...data) => {
-      const conn = await client.rpcCall(identity, service, method, ...data);
-      return await conn.jsonReader(method)
-    };
-    return client
-  };
-
-  const {log: log$2} = bindings;
-
-
-  // Bind RPC service to given name
-  ApphostClient.prototype.bindRpcService = async function (Service) {
-    const props = Object.getOwnPropertyNames(Service.prototype);
-    if (props[0] !== "constructor") throw new Error("Service must have a constructor")
-    const methods = props.slice(1, props.length);
-    methods.push("api");
-    Service.prototype.api = async () => {
-      return methods
-    };
-    const srv = new Service();
-    const listener = await this.register(srv.name + "*");
-    // log("listen " + srv.name)
-    astral_rpc_listen(srv, listener).catch(log$2);
-    return listener
-  };
-
-  async function astral_rpc_listen(srv, listener) {
-    for (; ;) {
-      const conn = await listener.accept();
-      // log(conn.id + " service <= " + conn.query)
-      try {
-        astral_rpc_handle(srv, conn).catch(log$2);
-      } catch (e) {
-        // log(conn.id + " service !! " + conn.query + ":" + e)
-        conn.close().catch(log$2);
-      }
-    }
-  }
-
-  async function astral_rpc_handle(srv, conn) {
-    let query = conn.query.slice(srv.name.length);
-    let method = query, args = [];
-    const single = query !== '';
-    const write = async (data) => await conn.writeJson(data);
-    const read = async (method) => await conn.readJson(method);
-
-    for (; ;) {
-      if (!single) {
-        query = await conn.read();
-        // log(conn.id + " service <== " + query)
-      }
-      [method, args] = parseQuery(query);
-
-      let result;
-      try {
-        result = await srv[method](...args, write, read);
-      } catch (e) {
-        result = {error: e};
-      }
-      if (result !== undefined) {
-        await conn.writeJson(result);
-      }
-      if (single) {
-        conn.close().catch(log$2);
-        break
-      }
-    }
-  }
-
-  function parseQuery(query) {
-    if (query[0] === '.') {
-      query = query.slice(1);
-    }
-    const match = /[?\[{]/.exec(query);
-    const method = query.slice(0, match.index);
-    let payload = query.slice(match.index);
-    if (payload[0] === '?') {
-      payload = payload.slice(1);
-    }
-    let args = [];
-    if (payload) {
-      args = JSON.parse(payload);
-    }
-    return [method, args]
-  }
-
-  const log$1 = bindings.log;
-
-
-  ApphostClient.prototype.registerRpc = async function (ctx) {
-    const routes = prepareRoutes(ctx);
-    for (let route of routes) {
-      const listener = await this.register(route);
-      listen(ctx, listener).catch(log$1);
-    }
-  };
-
-  function prepareRoutes(ctx) {
-    let routes = collectRoutes(ctx.handlers);
-    routes = formatRoutes(routes);
-    routes = maskRoutes(routes, ctx.routes);
-    return routes
-  }
-
-  function collectRoutes(handlers, ...name) {
-    if (typeof handlers !== "object") {
-      return name
-    }
-
-    const props = Object.getOwnPropertyNames(handlers);
-    if (props.length === 0) {
-      return name
-    }
-    const routes = [];
-    for (let prop of props) {
-      const next = handlers[prop];
-      const nested = collectRoutes(next, ...[...name, prop]);
-      if (typeof nested[0] === "string") {
-        routes.push(nested);
-      } else {
-        routes.push(...nested);
-      }
-    }
-    return routes
-  }
-
-  function formatRoutes(routes) {
-    const formatted = [];
-    for (let route of routes) {
-      formatted.push(route.join("."));
-    }
-    return formatted
-  }
-
-  function maskRoutes(routes, masks) {
-    masks = masks ? masks : [];
-    let arr = [...routes];
-    for (let mask of masks) {
-      const last = mask.length - 1;
-      if (/[*:]/.test(mask.slice(last))) {
-        mask = mask.slice(0, last);
-      }
-      arr = arr.filter(val => !val.startsWith(mask));
-    }
-    masks = masks.filter(mask => !mask.endsWith(":"));
-    arr.push(...masks);
-    return arr
-  }
-
-  async function listen(ctx, listener) {
-    for (; ;) {
-      const conn = await listener.accept();
-      try {
-        handle(ctx, conn).catch(log$1);
-      } catch (e) {
-        conn.close().catch(log$1);
-      }
-    }
-  }
-
-  async function handle(ctx, conn) {
-    const inject = {...ctx.handlers, ...ctx.inject, conn: conn};
-    let [handlers, params] = unfold(ctx.handlers, conn.query);
-    let handle = handlers;
-    let result;
-    let canInvoke;
-    for (; ;) {
-      canInvoke = typeof handle === "function";
-      if (params && !canInvoke) {
-        await conn.writeJson({error: `no handler for query ${params} ${typeof handle}`});
-        return
-      }
-      if (params || canInvoke) {
-        try {
-          result = await invoke(inject, handle, params);
-        } catch (e) {
-          result = {error: e};
-        }
-        await conn.writeJson(result);
-        handle = handlers;
-      }
-      params = await conn.read();
-      if (typeof handle === "object") {
-        [handle, params] = unfold(handle, params);
-      }
-    }
-  }
-
-  async function invoke(ctx, handle, params) {
-    if (handle === undefined) {
-      throw "undefined handler"
-    }
-    switch (typeof handle) {
-      case "function":
-        const args = JSON.parse(params);
-        if (Array.isArray(args)) {
-          return await handle(...args, ctx)
-        } else {
-          return await handle(args, ctx)
-        }
-      case "object":
-        return
-    }
-  }
-
-  function unfold(handlers, query) {
-    const [next, rest] = split(query);
+    const [next, rest] = splitQuery(query);
     const nested = handlers[next];
     if (rest === undefined) {
       return [nested]
@@ -823,17 +545,41 @@ var portal = (function (exports) {
     throw "cannot unfold"
   }
 
-  function split(query) {
-    const index = query.search(/[?.{\[]/);
-    if (index === -1) {
-      return [query]
+  class RpcClient extends ApphostClient {
+
+    bind(...routes) {
+      return bind(this, routes);
     }
-    const left = query.slice(0, index);
-    let right = query.slice(index, query.length);
-    if (/^[.?]/.test(right)) {
-      right = right.slice(1);
+
+    copy(data) {
+      return Object.assign(new RpcClient(), {...this, ...data});
     }
-    return [left, right]
+
+    target(id) {
+      return this.copy({targetId: id});
+    }
+
+    call(port, ...params) {
+      return call(this, port, ...params);
+    }
+
+    async conn(port, ...params) {
+      const query = formatQuery(port, params);
+      const conn = await super.query(query, this.targetId);
+      return  new RpcConn(conn)
+    }
+
+    async serve(ctx) {
+      return await serve(this, ctx);
+    }
+  }
+
+  function formatQuery(port, params) {
+    let query = port;
+    if (params.length > 0) {
+      query += '?' + JSON.stringify(params);
+    }
+    return query
   }
 
   const {log, sleep, platform} = bindings;

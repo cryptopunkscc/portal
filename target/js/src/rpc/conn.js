@@ -1,84 +1,103 @@
 import {ApphostConn} from "../apphost/adapter.js";
+import {bind} from "./bind";
+import {call} from "./call";
+import {hasParams} from "./query";
 
 export class RpcConn extends ApphostConn {
+
   constructor(data) {
     super(data);
   }
 
+  #sub(port) {
+    if (hasParams(this.query)) throw `cannot nest connection for complete query ${chunks}`
+    return port
+  }
+
+  bind(...routes) {
+    return bind(this, routes);
+  }
+
+  copy() {
+    return this;
+  }
+
+  call(port, ...params) {
+    const c = call(this, this.#sub(port), ...params);
+    c.inner.single = false
+    return c
+  }
+
+  map(f) {
+    if (this.mapper) {
+      const map = this.mapper
+      this.mapper = arg => f(map(arg))
+    } else {
+      this.mapper = f
+    }
+    return this
+  }
+
+  async conn(method, ...params) {
+    let cmd = method ? method : ""
+    if (params.length > 0) {
+      if (cmd) cmd += '?'
+      cmd += JSON.stringify(params)
+    }
+    if (cmd) await this.write(cmd + '\n')
+    return this
+  }
+
   async encode(data) {
     let json = JSON.stringify(data)
-    if (json === undefined) {
-      json = '{}'
-    }
+    if (json === undefined) json = '{}'
     return await super.write(json + '\n')
   }
 
   async decode() {
     const resp = await this.read()
     const parsed = JSON.parse(resp)
-    if (parsed.error) {
-      throw parsed.error
-    }
+    if (parsed === null) return null
+    if (parsed.error) throw parsed.error
     return parsed
   }
 
-  async call(method, ...params) {
-    let cmd = method
-    if (params) {
-      cmd += '?' + JSON.stringify(params)
-    }
-    await this.write(cmd + '\n')
-  }
-
-  async request(query, ...params) {
-    await this.call(query, ...params)
-    return await this.decode()
-  }
-
-  async observe(consume) {
-    for (;;) {
+  async request(...params) {
+    const map = this.mapper
+    this.result = null
+    for (; ;) {
       const next = await this.decode()
-      const last = await consume(next)
-      this.value = next
-      if (last) {
-        return last
-      }
+      if (next === undefined) continue
+      if (next === null) return this.result
+      this.result = next
+      if (!map) return next
+      const last = await map(next)
+      if (last === undefined) continue
+      if (last === null) return this.result
+      return last
     }
   }
 
-  caller(method) {
-    return async (...params) => await this.call(method, ...params)
-  }
-
-  requester(method) {
-    return async (...params) => await this.request(method, ...params)
-  }
-
-  observer(method) {
-    return (...params) => ({
-      observe: async (consume) => {
-        await this.call(method, ...params)
-        return await this.observe(consume)
-          .finally(() => this.close()) // TODO consider if it's ok to close conn automatically.
-      }
-    })
-  }
-
-  bind(...methods) {
-    for (let method of methods) {
-      const collect = method[0] === '*'
-      if (collect) {
-        method = method.split(1)
-      }
-      if (this[method]) {
-        throw `method '${method}' already exist`
-      }
-      if (collect) {
-        this[method] = this.observer(method)
-      } else {
-        this[method] = this.requester(method)
-      }
+  /**
+   * Collects all decoded values mapped as not null until decodes null or maps into undefined.
+   *
+   * @param {...any} params
+   * @returns {Promise<any[]>}
+   */
+  async collect(...params) {
+    const map = this.mapper ? this.mapper : null
+    let push
+    if (!map) push = next => this.result.push(next)
+    else push = async (next) => {
+      next = await map.call(this, next)
+      if (next === null) return this.result
+      if (next) this.result.push(next)
     }
-    return this
+    this.result = []
+    for (; ;) {
+      let next = await this.decode()
+      if (next === null) return this.result
+      push(next)
+    }
   }
 }
