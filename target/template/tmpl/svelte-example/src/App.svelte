@@ -1,6 +1,6 @@
 <script>
   import logo from './assets/images/logo-universal.png'
-  import {apphost, log, platform} from "portal/portal.js";
+  import {apphost, log, platform} from "portal";
 
   init()
 

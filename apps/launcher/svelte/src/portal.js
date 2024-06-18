@@ -1,15 +1,12 @@
-import {log, rpc} from "portal/portal";
+import {log, rpc} from "portal";
 
 log("launcher start")
-// log(JSON.stringify(rpc), rpc)
-const client = rpc.bind("portal", "open", "install", "uninstall")
+const client = rpc.bind({"portal": ["open", "install", "uninstall"]})
 client.observe = async () => {
-  await log("launcher observe")
-  const conn = await rpc.query("portal.observe", log)
-  await log("launcher observe2")
+  const conn = await rpc.conn("portal.observe")
   return {
-    next: async () => await conn.readJson("observe"),
-    more: async (num) => await conn.writeJson(num),
+    next: async () => await conn.decode(),
+    more: async (num) => await conn.encode(num),
     close: conn.close,
   }
 }

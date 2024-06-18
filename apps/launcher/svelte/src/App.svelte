@@ -1,6 +1,6 @@
 <script>
   import {AppRepository} from "./app.js";
-  import {log} from "portal/portal.js";
+  import {log} from "portal";
 
   const repo = new AppRepository()
   export let app = {
