@@ -508,22 +508,20 @@ var portal = (function (exports) {
   }
 
   async function invoke(ctx, handle, params) {
-    if (!handle) {
-      throw "undefined handler"
-    }
-    switch (typeof handle) {
+    const type = typeof handle;
+    switch (type) {
       case "function":
-        if (!params) {
-          return await handle(ctx)
-        }
+        if (!params) return await handle(ctx)
         const args = JSON.parse(params);
-        if (Array.isArray(args)) {
-          return await handle(...args, ctx)
-        }
+        if (Array.isArray(args)) return await handle(...args, ctx)
         return await handle(args, ctx)
 
       case "object":
-        return
+        return // skip nested router
+
+      default:
+        throw `invalid handler type ${type}`
+
     }
   }
 
