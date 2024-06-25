@@ -2,11 +2,11 @@ package go_dev
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/pkg/flow"
-	golang "github.com/cryptopunkscc/go-astral-js/pkg/go"
-	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
-	"github.com/cryptopunkscc/go-astral-js/target"
-	"github.com/cryptopunkscc/go-astral-js/target/msg"
+	"github.com/cryptopunkscc/portal/pkg/flow"
+	golang "github.com/cryptopunkscc/portal/pkg/go"
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/target/msg"
 	"time"
 )
 

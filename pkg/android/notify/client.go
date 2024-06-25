@@ -2,8 +2,8 @@ package notify
 
 import (
 	"github.com/cryptopunkscc/astrald/auth/id"
-	"github.com/cryptopunkscc/go-astral-js/pkg/android"
-	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
+	"github.com/cryptopunkscc/portal/pkg/android"
+	"github.com/cryptopunkscc/portal/pkg/rpc"
 )
 
 type Client struct {

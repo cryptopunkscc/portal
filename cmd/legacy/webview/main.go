@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
-	"github.com/cryptopunkscc/go-astral-js/runner/webview"
+	"github.com/cryptopunkscc/portal/pkg/exec"
+	"github.com/cryptopunkscc/portal/runner/webview"
 	"log"
 	"os"
 	"path"

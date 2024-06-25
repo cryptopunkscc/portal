@@ -1,7 +1,7 @@
 package clir
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/portal/target"
 	"log"
 	"os"
 	"reflect"

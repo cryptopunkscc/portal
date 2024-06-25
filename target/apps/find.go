@@ -3,10 +3,10 @@ package apps
 import (
 	"context"
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/assets"
-	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
-	"github.com/cryptopunkscc/go-astral-js/target"
-	"github.com/cryptopunkscc/go-astral-js/target/source"
+	"github.com/cryptopunkscc/portal/pkg/assets"
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/target/source"
 	"io/fs"
 )
 

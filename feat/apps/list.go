@@ -1,8 +1,8 @@
 package apps
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/mock/appstore"
-	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/portal/mock/appstore"
+	"github.com/cryptopunkscc/portal/target"
 )
 
 func List() []target.App {

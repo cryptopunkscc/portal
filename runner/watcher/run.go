@@ -2,9 +2,9 @@ package watcher
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/pkg/flow"
-	"github.com/cryptopunkscc/go-astral-js/pkg/fs"
-	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/portal/pkg/flow"
+	"github.com/cryptopunkscc/portal/pkg/fs"
+	"github.com/cryptopunkscc/portal/target"
 	"github.com/fsnotify/fsnotify"
 	"time"
 )

@@ -1,7 +1,7 @@
 package exec
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/portal/target"
 )
 
 type source struct {

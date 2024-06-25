@@ -3,8 +3,8 @@ package open
 import (
 	"context"
 	"errors"
-	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
-	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/target"
 )
 
 type Feat[T target.Portal] struct {

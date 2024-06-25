@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
+	"github.com/cryptopunkscc/portal/pkg/rpc"
 )
 
 type apiClient struct {

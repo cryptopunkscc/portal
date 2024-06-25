@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/astrald/auth/id"
-	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
-	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

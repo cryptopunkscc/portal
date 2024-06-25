@@ -3,8 +3,8 @@ package spawn
 import (
 	"context"
 	"github.com/cryptopunkscc/astrald/sig"
-	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
-	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/target"
 	"sync"
 )
 

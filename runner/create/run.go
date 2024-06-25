@@ -2,9 +2,9 @@ package create
 
 import (
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/git"
-	"github.com/cryptopunkscc/go-astral-js/target"
-	"github.com/cryptopunkscc/go-astral-js/target/template"
+	"github.com/cryptopunkscc/portal/pkg/git"
+	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/target/template"
 	"os"
 	"path/filepath"
 )

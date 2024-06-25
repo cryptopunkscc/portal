@@ -3,8 +3,8 @@ package notify
 import (
 	"context"
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/android"
-	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
+	"github.com/cryptopunkscc/portal/pkg/android"
+	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"testing"

@@ -2,7 +2,7 @@ package notify
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/pkg/android"
+	"github.com/cryptopunkscc/portal/pkg/android"
 	"testing"
 	"time"
 )

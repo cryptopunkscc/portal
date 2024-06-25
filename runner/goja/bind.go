@@ -1,7 +1,7 @@
 package goja
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/portal/target"
 	"github.com/dop251/goja"
 )
 

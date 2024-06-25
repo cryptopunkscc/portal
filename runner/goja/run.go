@@ -2,8 +2,8 @@ package goja
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
-	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/target"
 )
 
 type Runner struct {

@@ -4,10 +4,10 @@ import (
 	"archive/zip"
 	"bytes"
 	"errors"
-	"github.com/cryptopunkscc/go-astral-js/target"
-	"github.com/cryptopunkscc/go-astral-js/target/exec"
-	"github.com/cryptopunkscc/go-astral-js/target/manifest"
-	targetSource "github.com/cryptopunkscc/go-astral-js/target/source"
+	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/target/exec"
+	"github.com/cryptopunkscc/portal/target/manifest"
+	targetSource "github.com/cryptopunkscc/portal/target/source"
 	"io/fs"
 )
 

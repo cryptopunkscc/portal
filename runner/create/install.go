@@ -2,7 +2,7 @@ package create
 
 import (
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/target/template"
+	"github.com/cryptopunkscc/portal/target/template"
 	"github.com/leaanthony/gosod"
 	"io/fs"
 )

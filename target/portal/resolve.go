@@ -2,9 +2,9 @@ package portal
 
 import (
 	"errors"
-	"github.com/cryptopunkscc/go-astral-js/pkg/port"
-	"github.com/cryptopunkscc/go-astral-js/target"
-	"github.com/cryptopunkscc/go-astral-js/target/source"
+	"github.com/cryptopunkscc/portal/pkg/port"
+	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/target/source"
 	"strings"
 )
 

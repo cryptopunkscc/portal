@@ -3,9 +3,9 @@ package portals
 import (
 	"context"
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/target"
-	"github.com/cryptopunkscc/go-astral-js/target/apps"
-	"github.com/cryptopunkscc/go-astral-js/target/sources"
+	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/target/apps"
+	"github.com/cryptopunkscc/portal/target/sources"
 	"io/fs"
 	"strings"
 )

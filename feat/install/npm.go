@@ -1,7 +1,7 @@
 package install
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
+	"github.com/cryptopunkscc/portal/pkg/exec"
 	"log"
 )
 

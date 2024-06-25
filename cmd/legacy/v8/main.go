@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
-	"github.com/cryptopunkscc/go-astral-js/runner/v8"
+	"github.com/cryptopunkscc/portal/pkg/exec"
+	"github.com/cryptopunkscc/portal/runner/v8"
 	"log"
 	"os"
 )

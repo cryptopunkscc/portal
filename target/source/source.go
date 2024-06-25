@@ -2,7 +2,7 @@ package source
 
 import (
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/portal/target"
 	"io/fs"
 	"log"
 	"path"

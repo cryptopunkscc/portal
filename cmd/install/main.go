@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/feat/install"
+	"github.com/cryptopunkscc/portal/feat/install"
 	"log"
 	"os"
 	"strconv"

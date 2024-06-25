@@ -2,7 +2,7 @@ package template
 
 import (
 	"embed"
-	targetSource "github.com/cryptopunkscc/go-astral-js/target/source"
+	targetSource "github.com/cryptopunkscc/portal/target/source"
 	"io/fs"
 )
 

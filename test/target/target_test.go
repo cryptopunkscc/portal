@@ -1,12 +1,12 @@
 package test
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/target"
-	"github.com/cryptopunkscc/go-astral-js/target/bundle"
-	"github.com/cryptopunkscc/go-astral-js/target/dist"
-	"github.com/cryptopunkscc/go-astral-js/target/npm"
-	"github.com/cryptopunkscc/go-astral-js/target/project"
-	"github.com/cryptopunkscc/go-astral-js/target/source"
+	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/target/bundle"
+	"github.com/cryptopunkscc/portal/target/dist"
+	"github.com/cryptopunkscc/portal/target/npm"
+	"github.com/cryptopunkscc/portal/target/project"
+	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"reflect"

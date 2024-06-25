@@ -3,7 +3,7 @@ package rpc
 import (
 	"errors"
 	"github.com/cryptopunkscc/astrald/auth/id"
-	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 	"reflect"
 )

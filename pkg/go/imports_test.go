@@ -1,7 +1,7 @@
 package golang
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"
 	"path"
 	"testing"

@@ -1,7 +1,7 @@
 package template
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/portal/target"
 	"path"
 )
 
