@@ -53,7 +53,6 @@ func (r Feat) Dist(ctx context.Context, dir ...string) (err error) {
 func (r Feat) Pack(ctx context.Context, base, sub string) (err error) {
 	err = errors.New("no targets found")
 	for _, app := range sources.FromPath[target.Dist](path.Join(base, sub)) {
-		//if err = pack.Run(ctx, app); err != nil {
 		if err = r.runPack(ctx, app); err != nil {
 			return fmt.Errorf("bundle target %v: %v", app.Path(), err)
 		}

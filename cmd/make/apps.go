@@ -1,4 +1,4 @@
-package install
+package main
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"path"
 )
 
-func (d *PortalDev) buildJsApps() {
+func (d *Install) buildJsApps() {
 	dir := path.Join(d.root, "target/js/embed/portal")
 	libs := sources.FromPath[target.NodeModule](dir)
 
