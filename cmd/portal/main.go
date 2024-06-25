@@ -37,6 +37,7 @@ func main() {
 	portOpen := port.Route("open")
 	executable := "portal"
 	scope := feature.Scope[target.App]{
+		Astral:          exec.Astral,
 		Executable:      executable,
 		Port:            port,
 		WrapApi:         NewAdapter,

@@ -9,6 +9,7 @@ import (
 	featApps "github.com/cryptopunkscc/go-astral-js/feat/apps"
 	"github.com/cryptopunkscc/go-astral-js/feat/build"
 	"github.com/cryptopunkscc/go-astral-js/feat/create"
+	"github.com/cryptopunkscc/go-astral-js/feat/serve"
 	"github.com/cryptopunkscc/go-astral-js/feat/version"
 	osExec "github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
@@ -44,6 +45,7 @@ func main() {
 	portOpen := port.Route("open")
 	portMsg := port.Route("broadcast")
 	scope := feature.Scope[target.Portal]{
+		Astral:         serve.CheckAstral,
 		Executable:     "portal-dev",
 		Port:           port,
 		WrapApi:        NewAdapter,
