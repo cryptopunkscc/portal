@@ -2,6 +2,7 @@ package dispatch
 
 import (
 	"context"
+	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
 	"github.com/cryptopunkscc/go-astral-js/target"
@@ -38,7 +39,10 @@ func (f Feat) Run(
 		return
 	}
 
-	if err = exec.Retry(ctx, 8*time.Second, func(i int, n int, duration time.Duration) error {
+	if err = exec.Retry(ctx, 8*time.Second, func(i int, n int, duration time.Duration) (err error) {
+		if err = apphost.Init(); err != nil {
+			return
+		}
 		return f.dispatchTarget(ctx, src, args...)
 	}); err != nil {
 		return

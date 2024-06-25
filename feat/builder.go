@@ -23,6 +23,8 @@ import (
 )
 
 type Scope[T target.Portal] struct {
+	Astral serve.Astral
+
 	CacheDir    string
 	Executable  string
 	Port        target.Port
@@ -112,6 +114,7 @@ func (s *Scope[T]) GetServeFeature() *serve.Feat {
 		}
 
 		s.FeatServe = serve.NewFeat(
+			assert(s.Astral),
 			assert(s.Port),
 			assert(s.NewRunService),
 			s.RpcHandlers,
