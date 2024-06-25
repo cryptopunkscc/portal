@@ -6,17 +6,25 @@ import (
 	"time"
 )
 
-func Retry(ctx context.Context, duration time.Duration, fn func(int, int, time.Duration) error) (err error) {
-	_, err = RetryT[any](ctx, duration, func(i int, i2 int, duration time.Duration) (_ any, err error) {
-		err = fn(i2, i, duration)
-		return
-	})
+func Retry(
+	ctx context.Context,
+	duration time.Duration,
+	retry func(i int, n int, d time.Duration) (err error),
+) (err error) {
+	retryT := func(i int, n int, d time.Duration) (_ any, err error) {
+		return nil, retry(i, n, d)
+	}
+	_, err = RetryT[any](ctx, duration, retryT)
 	return
 }
 
-func RetryT[T any](ctx context.Context, duration time.Duration, fn func(int, int, time.Duration) (T, error)) (t T, err error) {
+func RetryT[T any](
+	ctx context.Context,
+	duration time.Duration,
+	retry func(i int, n int, d time.Duration) (t T, err error),
+) (t T, err error) {
 	log := plog.Get(ctx)
-	if t, err = fn(0, 0, 0); err == nil {
+	if t, err = retry(0, 0, 0); err == nil {
 		return
 	}
 	retries := AwaitExp(duration)
@@ -27,7 +35,7 @@ func RetryT[T any](ctx context.Context, duration time.Duration, fn func(int, int
 		if ctx.Err() != nil {
 			return
 		}
-		t, err = fn(i+1, n, d)
+		t, err = retry(i+1, n, d)
 		if err == nil {
 			return
 		}
