@@ -1,14 +1,16 @@
-package main
+package webview
+
+//package main
 
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/pkg/exec"
-	"github.com/cryptopunkscc/portal/runner/webview"
 	"log"
 	"os"
 	"path"
 )
 
+// legacy main function
 func main() {
 	file := os.Args[1]
 	srcBytes, err := os.ReadFile(file)
@@ -21,5 +23,5 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	go exec.OnShutdown(cancel)
 
-	webview.Run(ctx, src, title)
+	Run(ctx, src, title)
 }

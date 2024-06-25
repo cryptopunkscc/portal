@@ -1,13 +1,15 @@
-package main
+package v8
+
+//package main
 
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/pkg/exec"
-	"github.com/cryptopunkscc/portal/runner/v8"
 	"log"
 	"os"
 )
 
+// legacy main function
 func main() {
 	file := os.Args[1]
 
@@ -21,7 +23,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	exec.OnShutdown(cancel)
 
-	if err = v8.Run(ctx, file, src); err != nil {
+	if err = Run(ctx, file, src); err != nil {
 		log.Fatalln(err)
 	}
 	<-ctx.Done()

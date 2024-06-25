@@ -82,26 +82,6 @@ Run application bundle
 portal open ./example/project
 ```
 
-### Legacy runners
-
-v8 backend
-
-```shell
-go run ./cmd/legacy/v8 ./example/basic/main.js 
-```
-
-goja backend
-
-```shell
-go run ./cmd/legacy/goja ./example/basic/main.js 
-```
-
-WebView frontend
-
-```shell
-go run ./cmd/legacy/webview ./example/basic/index.html 
-```
-
 ## Compatibility
 
 Supported platforms for specific implementation.
