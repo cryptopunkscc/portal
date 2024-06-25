@@ -1,6 +1,6 @@
 package notify
 
-import "github.com/cryptopunkscc/go-astral-js/pkg/android"
+import "github.com/cryptopunkscc/portal/pkg/android"
 
 type ApiClient interface {
 	Api

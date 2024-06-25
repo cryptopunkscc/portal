@@ -1,7 +1,7 @@
 package source
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/portal/target"
 	"io/fs"
 	"reflect"
 )

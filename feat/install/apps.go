@@ -2,11 +2,11 @@ package install
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/feat/build"
-	"github.com/cryptopunkscc/go-astral-js/runner/dist"
-	"github.com/cryptopunkscc/go-astral-js/runner/pack"
-	"github.com/cryptopunkscc/go-astral-js/target"
-	"github.com/cryptopunkscc/go-astral-js/target/sources"
+	"github.com/cryptopunkscc/portal/feat/build"
+	"github.com/cryptopunkscc/portal/runner/dist"
+	"github.com/cryptopunkscc/portal/runner/pack"
+	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/target/sources"
 	"log"
 	"path"
 )

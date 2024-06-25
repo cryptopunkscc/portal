@@ -2,10 +2,10 @@ package goja_dist
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
-	"github.com/cryptopunkscc/go-astral-js/runner/goja"
-	"github.com/cryptopunkscc/go-astral-js/runner/watcher"
-	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/runner/goja"
+	"github.com/cryptopunkscc/portal/runner/watcher"
+	"github.com/cryptopunkscc/portal/target"
 	"path"
 )
 

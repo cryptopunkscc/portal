@@ -1,4 +1,4 @@
-module github.com/cryptopunkscc/go-astral-js
+module github.com/cryptopunkscc/portal
 
 go 1.21
 

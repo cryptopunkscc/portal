@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/target"
-	js "github.com/cryptopunkscc/go-astral-js/target/js/embed"
-	"github.com/cryptopunkscc/go-astral-js/target/sources"
+	"github.com/cryptopunkscc/portal/target"
+	js "github.com/cryptopunkscc/portal/target/js/embed"
+	"github.com/cryptopunkscc/portal/target/sources"
 	"path"
 )
 

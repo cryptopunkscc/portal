@@ -2,8 +2,8 @@ package dist
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/runner/npm"
-	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/portal/runner/npm"
+	"github.com/cryptopunkscc/portal/target"
 )
 
 type NpmRunner struct {

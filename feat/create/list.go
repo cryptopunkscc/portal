@@ -1,9 +1,9 @@
 package create
 
 import (
-	. "github.com/cryptopunkscc/go-astral-js/target"
-	"github.com/cryptopunkscc/go-astral-js/target/source"
-	"github.com/cryptopunkscc/go-astral-js/target/template"
+	. "github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/target/source"
+	"github.com/cryptopunkscc/portal/target/template"
 	"github.com/pterm/pterm"
 )
 

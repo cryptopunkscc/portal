@@ -1,7 +1,7 @@
 package test
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/portal/target"
 	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"

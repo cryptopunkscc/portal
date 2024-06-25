@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/astrald/mod/apphost/proto"
-	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"slices"

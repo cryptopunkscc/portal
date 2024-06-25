@@ -3,7 +3,7 @@ package plog
 import (
 	"context"
 	"fmt"
-	portal "github.com/cryptopunkscc/go-astral-js"
+	"github.com/cryptopunkscc/portal"
 	"os"
 	"reflect"
 	"runtime/debug"

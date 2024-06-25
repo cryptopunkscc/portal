@@ -2,9 +2,9 @@ package dist
 
 import (
 	"errors"
-	"github.com/cryptopunkscc/go-astral-js/target"
-	"github.com/cryptopunkscc/go-astral-js/target/exec"
-	"github.com/cryptopunkscc/go-astral-js/target/manifest"
+	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/target/exec"
+	"github.com/cryptopunkscc/portal/target/manifest"
 )
 
 var ErrNotDist = errors.New("not a dist target")

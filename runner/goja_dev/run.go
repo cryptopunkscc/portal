@@ -2,13 +2,13 @@ package goja_dev
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
-	"github.com/cryptopunkscc/go-astral-js/runner/dist"
-	"github.com/cryptopunkscc/go-astral-js/runner/goja_dist"
-	"github.com/cryptopunkscc/go-astral-js/runner/npm"
-	"github.com/cryptopunkscc/go-astral-js/target"
-	jsEmbed "github.com/cryptopunkscc/go-astral-js/target/js/embed"
-	"github.com/cryptopunkscc/go-astral-js/target/sources"
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/runner/dist"
+	"github.com/cryptopunkscc/portal/runner/goja_dist"
+	"github.com/cryptopunkscc/portal/runner/npm"
+	"github.com/cryptopunkscc/portal/target"
+	jsEmbed "github.com/cryptopunkscc/portal/target/js/embed"
+	"github.com/cryptopunkscc/portal/target/sources"
 	"time"
 )
 

@@ -2,8 +2,8 @@ package webview
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/target/apphost"
-	"github.com/cryptopunkscc/go-astral-js/target/js/embed/common"
+	"github.com/cryptopunkscc/portal/target/apphost"
+	"github.com/cryptopunkscc/portal/target/js/embed/common"
 	"github.com/webview/webview"
 )
 

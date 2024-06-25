@@ -1,9 +1,9 @@
 package appstore
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/target"
-	"github.com/cryptopunkscc/go-astral-js/target/apps"
-	"github.com/cryptopunkscc/go-astral-js/target/manifest"
+	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/target/apps"
+	"github.com/cryptopunkscc/portal/target/manifest"
 	"io/fs"
 	"path"
 )

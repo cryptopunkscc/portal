@@ -1,9 +1,9 @@
 package install
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/runner/npm"
-	"github.com/cryptopunkscc/go-astral-js/target"
-	"github.com/cryptopunkscc/go-astral-js/target/sources"
+	"github.com/cryptopunkscc/portal/runner/npm"
+	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/target/sources"
 	"log"
 	"path"
 )

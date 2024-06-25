@@ -3,8 +3,8 @@ package pack
 import (
 	"context"
 	"fmt"
-	"github.com/cryptopunkscc/go-astral-js/pkg/zip"
-	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/portal/pkg/zip"
+	"github.com/cryptopunkscc/portal/target"
 	"os"
 	"path"
 )

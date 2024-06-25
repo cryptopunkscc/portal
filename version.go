@@ -1,7 +1,7 @@
 package portal
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/git"
+	"github.com/cryptopunkscc/portal/pkg/git"
 )
 
 func GoModuleVersion() (version string) {

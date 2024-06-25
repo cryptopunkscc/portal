@@ -1,11 +1,11 @@
 package test
 
 import (
-	embedApps "github.com/cryptopunkscc/go-astral-js/apps"
-	"github.com/cryptopunkscc/go-astral-js/target"
-	"github.com/cryptopunkscc/go-astral-js/target/apps"
-	"github.com/cryptopunkscc/go-astral-js/target/portal"
-	"github.com/cryptopunkscc/go-astral-js/target/source"
+	embedApps "github.com/cryptopunkscc/portal/apps"
+	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/target/apps"
+	"github.com/cryptopunkscc/portal/target/portal"
+	"github.com/cryptopunkscc/portal/target/source"
 	"testing"
 )
 

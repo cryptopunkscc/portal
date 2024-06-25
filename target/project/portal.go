@@ -1,7 +1,7 @@
 package project
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/portal/target"
 )
 
 var _ target.Project = (*portal)(nil)

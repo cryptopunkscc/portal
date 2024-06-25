@@ -1,11 +1,11 @@
 package project
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/target"
-	"github.com/cryptopunkscc/go-astral-js/target/dist"
-	"github.com/cryptopunkscc/go-astral-js/target/manifest"
-	"github.com/cryptopunkscc/go-astral-js/target/npm"
-	targetSource "github.com/cryptopunkscc/go-astral-js/target/source"
+	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/target/dist"
+	"github.com/cryptopunkscc/portal/target/manifest"
+	"github.com/cryptopunkscc/portal/target/npm"
+	targetSource "github.com/cryptopunkscc/portal/target/source"
 	"io/fs"
 )
 

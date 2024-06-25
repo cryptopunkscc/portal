@@ -2,7 +2,7 @@ package manifest
 
 import (
 	"encoding/json"
-	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/portal/target"
 	"io/fs"
 )
 

@@ -3,7 +3,7 @@ package npm
 import (
 	"encoding/json"
 	"errors"
-	"github.com/cryptopunkscc/go-astral-js/target"
+	"github.com/cryptopunkscc/portal/target"
 	"io/fs"
 )
 

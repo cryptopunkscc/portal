@@ -2,8 +2,8 @@ package exec
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
-	exec2 "github.com/cryptopunkscc/go-astral-js/pkg/exec"
+	"github.com/cryptopunkscc/portal/pkg/apphost"
+	exec2 "github.com/cryptopunkscc/portal/pkg/exec"
 	"os"
 	"os/exec"
 	"time"

@@ -2,10 +2,10 @@ package test
 
 import (
 	"context"
-	"github.com/cryptopunkscc/go-astral-js/feat"
-	"github.com/cryptopunkscc/go-astral-js/feat/apps"
-	"github.com/cryptopunkscc/go-astral-js/target"
-	"github.com/cryptopunkscc/go-astral-js/target/portals"
+	"github.com/cryptopunkscc/portal/feat"
+	"github.com/cryptopunkscc/portal/feat/apps"
+	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/target/portals"
 	"testing"
 )
 

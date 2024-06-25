@@ -1,8 +1,8 @@
 package version
 
 import (
-	portal "github.com/cryptopunkscc/go-astral-js"
-	"github.com/cryptopunkscc/go-astral-js/pkg/vcs"
+	"github.com/cryptopunkscc/portal"
+	"github.com/cryptopunkscc/portal/pkg/vcs"
 )
 
 func Run() (version string) {

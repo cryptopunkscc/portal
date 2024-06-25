@@ -1,9 +1,9 @@
 package test
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/target"
-	js "github.com/cryptopunkscc/go-astral-js/target/js/embed"
-	"github.com/cryptopunkscc/go-astral-js/target/sources"
+	"github.com/cryptopunkscc/portal/target"
+	js "github.com/cryptopunkscc/portal/target/js/embed"
+	"github.com/cryptopunkscc/portal/target/sources"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

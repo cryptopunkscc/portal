@@ -38,12 +38,12 @@ sudo apt-get install gcc libgtk-3-dev libayatana-appindicator3-dev
 
 Install production runtime: 
 ```shell
-go install -tags "desktop,wv2runtime.download,production" github.com/cryptopunkscc/go-astral-js/cmd/portal
+go install -tags "desktop,wv2runtime.download,production" github.com/cryptopunkscc/portal/cmd/portal
 ```
 
 Install development runtime:
 ```shell
-go install -tags dev github.com/cryptopunkscc/go-astral-js/cmd/portal
+go install -tags dev github.com/cryptopunkscc/portal/cmd/portal
 ```
 
 ## How to use

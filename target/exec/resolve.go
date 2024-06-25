@@ -1,9 +1,9 @@
 package exec
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
-	"github.com/cryptopunkscc/go-astral-js/target"
-	targetSource "github.com/cryptopunkscc/go-astral-js/target/source"
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/target"
+	targetSource "github.com/cryptopunkscc/portal/target/source"
 	"io/fs"
 )
 
