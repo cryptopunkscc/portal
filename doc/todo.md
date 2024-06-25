@@ -23,10 +23,14 @@
 * [x] Use injected prefixed logger. Review & unify existing logs.
 * [x] Cross integration rpc tests for js - golang.
 * [x] Golang runner support.
-* Close nested apps gracefully.
+* [x] Start astral daemon if needed.
+* Close nested processes gracefully.
 * Design runtime API for JavaScript apps:
     * backend
     * wails
     * android
+
+# Optional
+
 * Target search recursion depth limit. Consider 2 or 3 as default value. 
   * Display result info with summary when no targets found in given path.
