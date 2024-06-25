@@ -6,7 +6,7 @@ import (
 
 func (c Cli) Dev(handle target.Dispatch) {
 	flags := &struct {
-		Src  string `pos:"1" default:"" description:"Application source. The source can be a app name, package name, app bundle path or app dir."`
+		Src  string `pos:"1" default:"." description:"Application source. The source can be a app name, package name, app bundle path or app dir."`
 		Type string `pos:"2" default:"2"`
 	}{}
 	f := func() error {

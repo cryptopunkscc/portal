@@ -56,6 +56,7 @@ type Scope[T target.Portal] struct {
 	FeatList     func() []target.App
 }
 
+func (s *Scope[T]) GetPort() target.Port                { return assert(s.Port) }
 func (s *Scope[T]) GetExecutable() string               { return assert(s.Executable) }
 func (s *Scope[T]) GetWaitGroup() *sync.WaitGroup       { return assert(s.WaitGroup) }
 func (s *Scope[T]) GetProcesses() *sig.Map[string, T]   { return assert(s.Processes) }
@@ -115,7 +116,7 @@ func (s *Scope[T]) GetServeFeature() *serve.Feat {
 
 		s.FeatServe = serve.NewFeat(
 			assert(s.Astral),
-			assert(s.Port),
+			s.GetPort(),
 			assert(s.NewRunService),
 			s.RpcHandlers,
 			assert(runSpawn),
@@ -141,7 +142,7 @@ func (s *Scope[T]) GetOpenFeature() target.Dispatch {
 
 func (s *Scope[T]) GetDispatchFeature() target.Dispatch {
 	if s.FeatDispatch == nil {
-		s.FeatDispatch = dispatch.NewFeat(s.GetJoinTarget(), s.GetDispatchService())
+		s.FeatDispatch = dispatch.NewFeat(s.GetPort(), s.GetJoinTarget(), s.GetDispatchService())
 	}
 	return s.FeatDispatch
 }
