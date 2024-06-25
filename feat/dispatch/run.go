@@ -2,25 +2,30 @@ package dispatch
 
 import (
 	"context"
+	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/go-astral-js/pkg/apphost"
 	"github.com/cryptopunkscc/go-astral-js/pkg/exec"
 	"github.com/cryptopunkscc/go-astral-js/pkg/plog"
+	"github.com/cryptopunkscc/go-astral-js/pkg/rpc"
 	"github.com/cryptopunkscc/go-astral-js/target"
 	"time"
 )
 
 type Feat struct {
-	dispatchTarget  target.Dispatch
-	dispatchService target.Dispatch
+	port         target.Port
+	runTarget    target.Dispatch
+	startService target.Dispatch
 }
 
 func NewFeat(
-	dispatchTarget target.Dispatch,
-	dispatchService target.Dispatch,
+	port target.Port,
+	runTarget target.Dispatch,
+	startService target.Dispatch,
 ) target.Dispatch {
 	return Feat{
-		dispatchTarget:  dispatchTarget,
-		dispatchService: dispatchService,
+		port:         port,
+		runTarget:    runTarget,
+		startService: startService,
 	}.Run
 }
 
@@ -31,11 +36,21 @@ func (f Feat) Run(
 ) (err error) {
 	plog.Get(ctx).Type(f).Set(&ctx)
 
-	if err = f.dispatchTarget(ctx, src, args...); err == nil {
+	if src == "" {
+		err = f.checkService()
+	} else {
+		err = f.runTarget(ctx, src, args...)
+	}
+
+	if err == nil || ctx.Err() != nil {
 		return
 	}
 
-	if err = f.dispatchService(ctx, "s", "-t"); err != nil {
+	if err = f.startService(ctx, "s", "-t"); err != nil {
+		return
+	}
+
+	if src == "" {
 		return
 	}
 
@@ -43,10 +58,18 @@ func (f Feat) Run(
 		if err = apphost.Init(); err != nil {
 			return
 		}
-		return f.dispatchTarget(ctx, src, args...)
+		return f.runTarget(ctx, src, args...)
 	}); err != nil {
 		return
 	}
 
+	return
+}
+
+func (f Feat) checkService() (err error) {
+	request := rpc.NewRequest(id.Anyone, f.port.String())
+	if err = rpc.Command(request, "ping"); err == nil {
+		return
+	}
 	return
 }
