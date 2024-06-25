@@ -1,4 +1,4 @@
-package install
+package main
 
 import (
 	"github.com/cryptopunkscc/portal"

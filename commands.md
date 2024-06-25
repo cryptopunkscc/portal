@@ -3,7 +3,7 @@
 Install portal, portal-dev, and required dependencies.
 
 ```shell
-go run ./cmd/install
+go run ./cmd/make
 ```
 
 Run portal 
@@ -29,11 +29,11 @@ go test ./pkg/rpc
 RPC
 
 ```shell
-go run ./cmd/install 8 && portal-dev -type 0 ./test/rpc
+go run ./cmd/make 8 && portal-dev -type 0 ./test/rpc
 ```
 
 JS runtime lib
 
 ```shell
-go run ./cmd/install 8 && portal-dev -type 0 ./target/js/test
+go run ./cmd/make 8 && portal-dev -type 0 ./target/js/test
 ```

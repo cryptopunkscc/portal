@@ -1,4 +1,4 @@
-package install
+package main
 
 import (
 	"github.com/cryptopunkscc/portal/runner/npm"
@@ -8,7 +8,7 @@ import (
 	"path"
 )
 
-func (d *PortalDev) buildJsLibs() {
+func (d *Install) buildJsLibs() {
 	dir := path.Join(d.root, "target/js")
 	libs := sources.FromPath[target.NodeModule](dir)
 	for _, p := range libs {
