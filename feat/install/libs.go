@@ -9,10 +9,9 @@ import (
 )
 
 func (d *PortalDev) buildJsLibs() {
-	for _, p := range d.streamLibs() {
-		if p.PkgJson().IsPortalLib() {
-			d.modules = append(d.modules, p)
-		}
+	dir := path.Join(d.root, "target/js")
+	libs := sources.FromPath[target.NodeModule](dir)
+	for _, p := range libs {
 		if !p.PkgJson().CanBuild() {
 			continue
 		}
@@ -23,18 +22,4 @@ func (d *PortalDev) buildJsLibs() {
 			log.Fatalln(err)
 		}
 	}
-}
-
-func (d *PortalDev) collectPortalLibs() {
-	for _, p := range d.streamLibs() {
-		if p.PkgJson().IsPortalLib() {
-			d.modules = append(d.modules, p)
-		}
-	}
-}
-
-const libsPath = "target/js"
-
-func (d *PortalDev) streamLibs() []target.NodeModule {
-	return sources.FromPath[target.NodeModule](path.Join(d.root, libsPath))
 }

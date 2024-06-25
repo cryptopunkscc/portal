@@ -1,13 +1,11 @@
 package install
 
 import (
-	"github.com/cryptopunkscc/go-astral-js/target"
 	"log"
 )
 
 type PortalDev struct {
-	root    string
-	modules []target.NodeModule
+	root string
 }
 
 func NewPortalDev(root string) *PortalDev {
