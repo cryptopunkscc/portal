@@ -33,7 +33,6 @@ func (d *Install) Run(jobs ...Make) {
 	if job == None {
 		job = All
 	}
-	log.Println("Portal make")
 	resolveVersion()
 	defer clearVersion()
 	if job&System == System {
