@@ -33,7 +33,7 @@ func installPortalDev() {
 func buildPortal() {
 	if err := exec.Run(
 		".", "go", "build",
-		"-tags", "desktop,wv2runtime.download,production",
+		"-tags", "desktop,wv2runtime.download,production,webkit2_41",
 		"-ldflags", "-w -s",
 		"-o", "./cmd/portal-installer/bin/",
 		"./cmd/portal",
@@ -46,7 +46,7 @@ func buildPortal() {
 func buildPortalDev() {
 	if err := exec.Run(
 		".", "go", "build",
-		"-tags", "dev",
+		"-tags", "dev,webkit2_41",
 		"-o", "./cmd/portal-installer/bin/",
 		"./cmd/portal-dev",
 	); err != nil {

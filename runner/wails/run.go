@@ -47,7 +47,7 @@ func AppOptions(app target.Api) *options.App {
 	return &options.App{
 		Width:            1024,
 		Height:           768,
-		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
+		BackgroundColour: options.NewRGB(27, 38, 54),
 		Bind:             []interface{}{app},
 		OnDomReady: func(ctx context.Context) {
 			app.Interrupt()
