@@ -1,3 +1,5 @@
+# [OUTDATED]
+
 ```mermaid
 flowchart
     cli.Open --> open.Run
