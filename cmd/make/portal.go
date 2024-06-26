@@ -12,7 +12,7 @@ func installPortal() {
 		"-ldflags", "-w -s",
 		"./cmd/portal",
 	); err != nil {
-		log.Fatalln("portal dev install failed: ", err)
+		log.Fatalln("portal install failed: ", err)
 	}
 	log.Println()
 	log.Println("portal installed successfully")
@@ -24,10 +24,10 @@ func installPortalDev() {
 		"-tags", "dev",
 		"./cmd/portal-dev",
 	); err != nil {
-		log.Fatalln("portal dev install failed: ", err)
+		log.Fatalln("portal-dev install failed: ", err)
 	}
 	log.Println()
-	log.Println("portal dev installed successfully")
+	log.Println("portal-dev installed successfully")
 }
 
 func buildPortal() {
@@ -38,9 +38,9 @@ func buildPortal() {
 		"-o", "./cmd/portal-installer/bin/",
 		"./cmd/portal",
 	); err != nil {
-		log.Fatalln("portal dev install failed: ", err)
+		log.Fatalln("portal install failed: ", err)
 	}
-	log.Println("Portal build succeed")
+	log.Println("portal build succeed.")
 }
 
 func buildPortalDev() {
@@ -50,9 +50,9 @@ func buildPortalDev() {
 		"-o", "./cmd/portal-installer/bin/",
 		"./cmd/portal-dev",
 	); err != nil {
-		log.Fatalln("portal dev build failed: ", err)
+		log.Fatalln("portal-dev build failed: ", err)
 	}
-	log.Println("Portal dev build succeed")
+	log.Println("portal-dev build succeed.")
 }
 
 func buildPortalInstaller() {
@@ -61,7 +61,7 @@ func buildPortalInstaller() {
 		"-o", "./bin/",
 		"./cmd/portal-installer",
 	); err != nil {
-		log.Fatalln("portal installer build failed: ", err)
+		log.Fatalln("portal-installer build failed: ", err)
 	}
-	log.Println("Portal installer build succeed")
+	log.Println("portal-installer build succeed.")
 }

@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	log.Println("Starting install...")
+	log.Println("Portal make...")
 	jobs := All
 	if len(os.Args) > 1 {
 		arg, err := strconv.Atoi(os.Args[1])
