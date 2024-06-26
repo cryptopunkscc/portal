@@ -12,10 +12,14 @@ func main() {
 	println("Installing portal...\n")
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return
+		panic(err)
 	}
 
 	bin := filepath.Join(home, ".local/bin")
+
+	if err = os.MkdirAll(bin, 0755); err != nil {
+		panic(err)
+	}
 
 	err = fs.WalkDir(binFs, "bin", func(srcPath string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
