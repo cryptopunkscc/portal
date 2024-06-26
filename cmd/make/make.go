@@ -13,7 +13,8 @@ const (
 	Apps
 	Dev
 	Portal
-	All = System | Libs | Apps | Dev | Portal
+	Installer
+	All = System | Libs | Apps | Dev | Portal | Installer
 )
 
 type Install struct {
@@ -32,7 +33,9 @@ func (d *Install) Run(jobs ...Make) {
 	if job == None {
 		job = All
 	}
-	log.Println("Portal dev installer")
+	log.Println("Portal make")
+	resolveVersion()
+	defer clearVersion()
 	if job&System == System {
 		log.Println(" * native")
 		checkGo()
@@ -51,10 +54,14 @@ func (d *Install) Run(jobs ...Make) {
 	}
 	if job&Dev == Dev {
 		log.Println(" * portal dev")
-		buildPortalDev()
+		installPortalDev()
 	}
 	if job&Portal == Portal {
 		log.Println(" * portal")
-		buildPortal()
+		installPortal()
+	}
+	if job&Installer == Installer {
+		log.Println(" * installer")
+		d.buildInstaller()
 	}
 }
