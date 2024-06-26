@@ -1,5 +1,6 @@
 node_modules
 build
+bin
 dist
 !target/dist
 .idea/

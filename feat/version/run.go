@@ -1,12 +1,23 @@
 package version
 
 import (
-	"github.com/cryptopunkscc/portal"
+	_ "embed"
 	"github.com/cryptopunkscc/portal/pkg/vcs"
+	"strings"
 )
 
-func Run() (version string) {
-	version = portal.GoModuleVersion()
+//go:embed name
+var version string
+
+func Run() string {
+	if version = strings.TrimSpace(version); version == "" {
+		version = Resolve()
+	}
+	return version
+}
+
+func Resolve() (version string) {
+	version = GoModuleVersion()
 	if vcs.ReadBuildInfo().Modified != "" {
 		version += " [MODIFIED]"
 	}
