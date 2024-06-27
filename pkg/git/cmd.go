@@ -1,11 +1,8 @@
 package git
 
 import (
-	"bufio"
-	"io"
 	"os"
 	"os/exec"
-	"strings"
 )
 
 func TimestampHash() (out string, err error) {
@@ -16,7 +13,12 @@ func TimestampHash() (out string, err error) {
 		`--format="%cd-%h"`,
 	)
 	cmd.Env = append(os.Environ(), "TZ=UTC")
-	return ReadString(cmd)
+	output, err := cmd.Output()
+	if err != nil {
+		return
+	}
+	out = string(output)
+	return
 }
 
 func UserName(global bool) (str string) {
@@ -24,8 +26,8 @@ func UserName(global bool) (str string) {
 	if global {
 		cmd = exec.Command("git", "config", "--global", "user.name")
 	}
-	str, _ = ReadString(cmd)
-	return
+	output, _ := cmd.Output()
+	return string(output)
 }
 
 func UserEmail(global bool) (str string) {
@@ -33,24 +35,6 @@ func UserEmail(global bool) (str string) {
 	if global {
 		cmd = exec.Command("git", "config", "--global", "user.email")
 	}
-	str, _ = ReadString(cmd)
-	return
-}
-
-func ReadString(cmd *exec.Cmd) (str string, err error) {
-	cmd.Stderr = os.Stderr
-
-	reader, writer := io.Pipe()
-	cmd.Stdout = writer
-	scanner := bufio.NewScanner(reader)
-	if err = cmd.Start(); err != nil {
-		return
-	}
-	if !scanner.Scan() {
-		err = scanner.Err()
-		return
-	}
-	str = strings.Trim(scanner.Text(), `"`)
-	err = cmd.Wait()
-	return
+	output, _ := cmd.Output()
+	return string(output)
 }
