@@ -1,0 +1,9 @@
+{
+  "name": "simple-html-chat",
+  "package": "simple.html.chat",
+  "version": "0.0.1",
+  "title": "Simple HTML Chat",
+  "description": "Simple HTML Chat example.",
+  "author": "yang",
+  "email": "cryptopunkyang@pm.me"
+}

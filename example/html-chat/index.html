@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple HTML chat</title>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+
+        .chat {
+            width: calc(100vw - 20px);
+            height: calc(100vh - 120px);
+            margin: 0 auto;
+        }
+
+        .chat-messages {
+            height: 100%;
+            overflow-y: scroll;
+            padding: 10px;
+            color: #e2ebf0;
+            border: 1px solid #ccc;
+        }
+
+        .chat-message {
+            margin-bottom: 20px;
+            display: inline-list-item;
+        }
+
+        .chat-message-sender {
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .chat-message-content {
+            font-size: 18px;
+        }
+
+        .chat-recipient {
+            display: flex;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .chat-recipient-id {
+            flex: 1;
+            padding: 5px;
+        }
+
+        .chat-input {
+            margin-top: 10px;
+            display: flex;
+        }
+
+        .chat-input-message {
+            flex: 1;
+            padding: 5px;
+        }
+
+        .chat-input-button {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="chat">
+    <div class="chat-recipient">
+        <input type="text" class="chat-recipient-id" placeholder="Recipient node id">
+    </div>
+
+    <div class="chat-messages"></div>
+
+    <div class="chat-input">
+        <input type="text" class="chat-input-message" placeholder="Type message...">
+        <button class="chat-input-button">Send</button>
+    </div>
+</div>
+<script src="portal.js"></script>
+<script>
+  const messages = document.querySelector('.chat-messages');
+  const recipient = document.querySelector('.chat-recipient-id');
+  const input = document.querySelector('.chat-input-message');
+  const button = document.querySelector('.chat-input-button');
+  const client = portal.rpc.bind({"simple.html.chat": ["message"]})
+
+  function displayMessage(sender, content) {
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('chat-message');
+
+    const senderElement = document.createElement('div');
+    senderElement.classList.add('chat-message-sender');
+    senderElement.textContent = new Date().toLocaleTimeString() + ' ' + sender + ':';
+    senderElement.addEventListener("click", () => recipient.value = sender)
+
+    const contentElement = document.createElement('div');
+    contentElement.classList.add('chat-message-content');
+    contentElement.textContent = content;
+
+    messageElement.appendChild(senderElement);
+    messageElement.appendChild(contentElement);
+
+    messages.appendChild(messageElement);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function sendMessage() {
+    if (!input.value) return
+    client.target(recipient.value).message(input.value).catch(console.log);
+    displayMessage("me", input.value);
+    input.value = '';
+  }
+
+  button.addEventListener('click', sendMessage);
+
+  input.addEventListener("keypress", event => {
+    if (event.key === "Enter") sendMessage();
+  });
+
+  setTimeout(() => portal.rpc.serve({
+    handlers: {
+      message: (message, ctx) => displayMessage(ctx.conn.remoteId, message)
+    },
+  }).catch(portal.log), 300)
+</script>
+</body>
+</html>
