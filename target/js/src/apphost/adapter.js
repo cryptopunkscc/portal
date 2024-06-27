@@ -54,6 +54,7 @@ export class ApphostConn {
   constructor(data) {
     this.id = data.id
     this.query = data.query
+    this.remoteId = data.remoteId
   }
 
   async read() {

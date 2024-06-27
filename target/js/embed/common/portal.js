@@ -89,6 +89,7 @@ var portal = (function (exports) {
     constructor(data) {
       this.id = data.id;
       this.query = data.query;
+      this.remoteId = data.remoteId;
     }
 
     async read() {
@@ -119,10 +120,10 @@ var portal = (function (exports) {
     const r = prepare(routes);
     const copy = caller.copy();
     for (let [method, port] of r) {
-      if (caller[method]) {
+      if (copy[method]) {
         throw `method '${method}' already exist`
       }
-      copy[method] = caller.call(port);
+      copy[method] = copy.call(port);
     }
     return copy
   }
@@ -490,7 +491,8 @@ var portal = (function (exports) {
     }
 
     target(id) {
-      return this.copy({targetId: id});
+      this.targetId = id;
+      return this
     }
 
     call(port, ...params) {
@@ -500,7 +502,7 @@ var portal = (function (exports) {
     async conn(port, ...params) {
       const query = formatQuery(port, params);
       const conn = await super.query(query, this.targetId);
-      return  new RpcConn(conn)
+      return new RpcConn(conn)
     }
 
     async serve(ctx) {

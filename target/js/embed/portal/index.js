@@ -165,6 +165,7 @@ class ApphostConn {
   constructor(data) {
     this.id = data.id;
     this.query = data.query;
+    this.remoteId = data.remoteId;
   }
 
   async read() {
@@ -195,10 +196,10 @@ function bind(caller, routes) {
   const r = prepare(routes);
   const copy = caller.copy();
   for (let [method, port] of r) {
-    if (caller[method]) {
+    if (copy[method]) {
       throw `method '${method}' already exist`
     }
-    copy[method] = caller.call(port);
+    copy[method] = copy.call(port);
   }
   return copy
 }
@@ -566,7 +567,8 @@ class RpcClient extends ApphostClient {
   }
 
   target(id) {
-    return this.copy({targetId: id});
+    this.targetId = id;
+    return this
   }
 
   call(port, ...params) {
@@ -576,7 +578,7 @@ class RpcClient extends ApphostClient {
   async conn(port, ...params) {
     const query = formatQuery(port, params);
     const conn = await super.query(query, this.targetId);
-    return  new RpcConn(conn)
+    return new RpcConn(conn)
   }
 
   async serve(ctx) {
