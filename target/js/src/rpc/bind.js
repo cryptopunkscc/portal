@@ -2,10 +2,10 @@ export function bind(caller, routes) {
   const r = prepare(routes)
   const copy = caller.copy()
   for (let [method, port] of r) {
-    if (caller[method]) {
+    if (copy[method]) {
       throw `method '${method}' already exist`
     }
-    copy[method] = caller.call(port)
+    copy[method] = copy.call(port)
   }
   return copy
 }

@@ -136,8 +136,9 @@ func (api *Adapter) ConnAccept(service string) (data string, err error) {
 	query := strings.TrimPrefix(conn.Query(), base)
 	query = strings.TrimPrefix(query, ".")
 	bytes, err := json.Marshal(queryData{
-		Id:    connId,
-		Query: query,
+		Id:       connId,
+		Query:    query,
+		RemoteId: conn.RemoteIdentity().String(),
 	})
 	if err != nil {
 		return
@@ -147,8 +148,9 @@ func (api *Adapter) ConnAccept(service string) (data string, err error) {
 }
 
 type queryData struct {
-	Id    string `json:"id"`
-	Query string `json:"query"`
+	Id       string `json:"id"`
+	Query    string `json:"query"`
+	RemoteId string `json:"remoteId"`
 }
 
 func (api *Adapter) ConnClose(id string) (err error) {

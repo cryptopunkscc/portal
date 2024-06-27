@@ -100,6 +100,7 @@ var portal = (function (exports) {
     constructor(data) {
       this.id = data.id;
       this.query = data.query;
+      this.remoteId = data.remoteId;
     }
 
     async read() {
@@ -130,10 +131,10 @@ var portal = (function (exports) {
     const r = prepare(routes);
     const copy = caller.copy();
     for (let [method, port] of r) {
-      if (caller[method]) {
+      if (copy[method]) {
         throw `method '${method}' already exist`
       }
-      copy[method] = caller.call(port);
+      copy[method] = copy.call(port);
     }
     return copy
   }
@@ -354,59 +355,6 @@ var portal = (function (exports) {
     }
   }
 
-  // TODO add support async iterators for es5 (goja), most likely using rollup + babel.
-
-  const encode = RpcConn.prototype.encode;
-
-  RpcConn.prototype.encode = async function (data) {
-    bindings.log("encode async gen");
-    if (isAsyncGenerator(data)) {
-      for await (let next of data) {
-        await encode.call(this, next);
-      }
-      return
-    }
-    await encode.call(this, data);
-  };
-
-  function isAsyncGenerator(any) {
-    return "function" === typeof any.next
-      && "function" === typeof any[Symbol.asyncIterator]
-      && any === any[Symbol.asyncIterator]()
-  }
-
-
-  RpcConn.prototype.next = async function () {
-    if (!this.done) {
-      try {
-        this.value = await this.decode();
-      } catch (e) {
-        this.error = e;
-        this.done = true;
-      }
-    }
-    return this
-  };
-
-  RpcConn.prototype.return = async function (value) {
-    if (!this.done) {
-      if (value) {
-        this.value = value;
-      }
-      this.done = true;
-      this.close().catch();
-    }
-    return this
-  };
-
-  RpcConn.prototype.throw = async function () {
-    if (!this.done) {
-      this.done = true;
-      this.close().catch();
-    }
-    return this
-  };
-
   function prepareRoutes(ctx) {
     let routes = resolveRoutes(ctx.handlers);
     routes = formatRoutes(routes);
@@ -554,7 +502,8 @@ var portal = (function (exports) {
     }
 
     target(id) {
-      return this.copy({targetId: id});
+      this.targetId = id;
+      return this
     }
 
     call(port, ...params) {
@@ -564,7 +513,7 @@ var portal = (function (exports) {
     async conn(port, ...params) {
       const query = formatQuery(port, params);
       const conn = await super.query(query, this.targetId);
-      return  new RpcConn(conn)
+      return new RpcConn(conn)
     }
 
     async serve(ctx) {
