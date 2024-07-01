@@ -40,4 +40,4 @@ class Service {
 export const serve = async () => rpc.serve({
   handlers: new Service(),
   routes: ["link", "ticker"],
-})
+}).catch(log)

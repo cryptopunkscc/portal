@@ -6,6 +6,6 @@
   "author": "yang",
   "email": "cryptopunkyang@pm.me",
   "env": {
-    "timeout": -1
+    "timeout": 3000
   }
 }
