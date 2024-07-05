@@ -3,6 +3,7 @@ package git
 import (
 	"os"
 	"os/exec"
+	"strings"
 )
 
 func TimestampHash() (out string, err error) {
@@ -17,7 +18,7 @@ func TimestampHash() (out string, err error) {
 	if err != nil {
 		return
 	}
-	out = string(output)
+	out = strings.TrimSpace(string(output))
 	return
 }
 
@@ -27,7 +28,7 @@ func UserName(global bool) (str string) {
 		cmd = exec.Command("git", "config", "--global", "user.name")
 	}
 	output, _ := cmd.Output()
-	return string(output)
+	return strings.TrimSpace(string(output))
 }
 
 func UserEmail(global bool) (str string) {
@@ -36,5 +37,5 @@ func UserEmail(global bool) (str string) {
 		cmd = exec.Command("git", "config", "--global", "user.email")
 	}
 	output, _ := cmd.Output()
-	return string(output)
+	return strings.TrimSpace(string(output))
 }
