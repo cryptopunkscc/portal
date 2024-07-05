@@ -1,6 +1,10 @@
 package main
 
-import "os"
+import (
+	"errors"
+	"io/fs"
+	"os"
+)
 
 func (d *Install) buildInstaller() {
 	mkdirBin()
@@ -12,7 +16,8 @@ func (d *Install) buildInstaller() {
 }
 
 func mkdirBin() {
-	if err := os.Mkdir("./cmd/portal-installer/bin/", 0755); err != nil {
+	err := os.Mkdir("./cmd/portal-installer/bin/", 0755)
+	if err != nil && !errors.Is(err, fs.ErrExist) {
 		panic(err)
 	}
 }
