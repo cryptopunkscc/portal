@@ -45,7 +45,7 @@ func Test__portals_Find__embed_launcher(t *testing.T) {
 		apps.Resolve[target.App](),
 		source.FromFS(embedFs),
 	)
-	findPath := target.Mapper[string, string](
+	findPath := target.Selector[string, string](
 		resolveEmbed.Path,
 		appstore.Path,
 	)

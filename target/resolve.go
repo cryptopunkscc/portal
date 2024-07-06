@@ -7,10 +7,10 @@ import (
 )
 
 func Any[T Source](of ...func(Source) (Source, error)) Resolve[T] {
-	return Mapper[Source, T](of...)
+	return Selector[Source, T](of...)
 }
 
-func Mapper[A any, T any](of ...func(A) (A, error)) func(A) (T, error) {
+func Selector[A any, T any](of ...func(A) (A, error)) func(A) (T, error) {
 	return func(entry A) (s T, err error) {
 		for _, f := range of {
 			var v A

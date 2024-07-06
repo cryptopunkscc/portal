@@ -86,17 +86,19 @@ func (s *Scope[T]) GetCacheDir() string {
 func (s *Scope[T]) GetTargetFind() target.Find[T] {
 	if s.TargetFind == nil {
 		launcherSvelteFs := embedApps.LauncherSvelteFS
-		resolveEmbed := portal.NewResolver[target.App](
+		resolveEmbedApp := portal.NewResolver[target.App](
 			apps.Resolve[target.App](),
 			source.FromFS(launcherSvelteFs),
 		)
-		findPath := target.Mapper[string, string](
-			resolveEmbed.Path,
+		findPath := target.Selector[string, string](
+			resolveEmbedApp.Path,
 			assert(s.GetPath),
 		)
-		s.TargetFind = s.GetTargetFinder().Cached(s.GetTargetCache())(findPath,
+		s.TargetFind = s.GetTargetFinder().Cached(s.GetTargetCache())(
+			findPath,
 			launcherSvelteFs,
-			assets.OsFS{})
+			assets.OsFS{},
+		)
 	}
 	return s.TargetFind
 }
