@@ -15,13 +15,13 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	portalPort "github.com/cryptopunkscc/portal/pkg/port"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
-	"github.com/cryptopunkscc/portal/runner/dev"
 	"github.com/cryptopunkscc/portal/runner/dist"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/go_dev"
 	"github.com/cryptopunkscc/portal/runner/goja"
 	"github.com/cryptopunkscc/portal/runner/goja_dev"
 	"github.com/cryptopunkscc/portal/runner/goja_dist"
+	"github.com/cryptopunkscc/portal/runner/multi"
 	"github.com/cryptopunkscc/portal/runner/pack"
 	"github.com/cryptopunkscc/portal/runner/query"
 	"github.com/cryptopunkscc/portal/runner/reload"
@@ -74,7 +74,7 @@ func main() {
 		portMsg.Name: msg.NewBroadcast(portMsg, scope.GetProcesses()).BroadcastMsg,
 	}
 	scope.NewRunTarget = func(newApi target.NewApi) target.Run[target.Portal] {
-		return dev.NewRunner(
+		return multi.NewRunner(
 			reload.Mutable(newApi, portMsg, goja_dev.NewRunner),
 			reload.Immutable(newApi, portMsg, wails_dev.NewRunner), // FIXME propagate sendMsg
 			reload.Mutable(newApi, portMsg, go_dev.NewAdapter(scope.GetExecTarget())),

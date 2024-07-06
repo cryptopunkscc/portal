@@ -1,4 +1,4 @@
-package dev
+package multi
 
 import (
 	"context"
@@ -8,17 +8,17 @@ import (
 	"reflect"
 )
 
-type Runner struct {
-	runners []target.Run[target.Portal]
+type Runner[T target.Portal] struct {
+	runners []target.Run[T]
 }
 
-func NewRunner(
-	runners ...target.Run[target.Portal],
-) *Runner {
-	return &Runner{runners: runners}
+func NewRunner[T target.Portal](
+	runners ...target.Run[T],
+) *Runner[T] {
+	return &Runner[T]{runners: runners}
 }
 
-func (r Runner) Run(ctx context.Context, portal target.Portal) (err error) {
+func (r Runner[T]) Run(ctx context.Context, portal T) (err error) {
 	for _, runner := range r.runners {
 		err = runner(ctx, portal)
 		if !errors.Is(err, target.ErrNotTarget) {

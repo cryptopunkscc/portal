@@ -13,9 +13,12 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"github.com/cryptopunkscc/portal/runner/app"
 	"github.com/cryptopunkscc/portal/runner/exec"
+	"github.com/cryptopunkscc/portal/runner/goja"
+	"github.com/cryptopunkscc/portal/runner/multi"
 	"github.com/cryptopunkscc/portal/runner/query"
 	"github.com/cryptopunkscc/portal/runner/service"
 	"github.com/cryptopunkscc/portal/runner/tray"
+	"github.com/cryptopunkscc/portal/runner/wails"
 	"github.com/cryptopunkscc/portal/target"
 	"github.com/cryptopunkscc/portal/target/apps"
 	"os"
@@ -43,7 +46,6 @@ func main() {
 		WrapApi:         NewAdapter,
 		WaitGroup:       &sync.WaitGroup{},
 		TargetCache:     target.NewCache[target.App](),
-		NewRunTarget:    app.NewRun,
 		NewRunTray:      tray.NewRun,
 		NewRunService:   service.NewRun,
 		NewExecTarget:   exec.NewRun[target.App],
@@ -58,6 +60,12 @@ func main() {
 	scope.RpcHandlers = rpc.Handlers{
 		"install":   featApps.Install,
 		"uninstall": featApps.Uninstall,
+	}
+	scope.NewRunTarget = func(api target.NewApi) target.Run[target.App] {
+		return multi.NewRunner[target.App](
+			app.Run(goja.NewRunner(api).Run),
+			app.Run(wails.NewRunner(api).Run),
+		).Run
 	}
 
 	cli := clir.NewCli(ctx, manifest.Name, manifest.Description, version.Run)
