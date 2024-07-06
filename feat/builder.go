@@ -104,7 +104,7 @@ func (s *Scope[T]) GetTargetFind() target.Find[T] {
 			apps.Resolve[target.App](),
 			source.FromFS(launcherSvelteFs),
 		)
-		findPath := target.Selector[string, string](
+		findPath := target.Mapper[string, string](
 			resolveEmbedApp.Path,
 			require(s.GetPath),
 		)

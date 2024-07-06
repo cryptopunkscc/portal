@@ -17,7 +17,7 @@ func Test__apps_Find__embed_launcher(t *testing.T) {
 		apps.Resolve[target.App](),
 		source.FromFS(embedApps.LauncherSvelteFS),
 	)
-	findPath := target.Selector[string, string](
+	findPath := target.Mapper[string, string](
 		resolveEmbed.Path,
 		appstore.Path,
 	)
