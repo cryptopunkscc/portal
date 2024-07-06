@@ -22,3 +22,5 @@ type Find[T Portal] func(ctx context.Context, src string) (portals Portals[T], e
 type Dispatch func(context.Context, string, ...string) (err error)
 
 type Run[T Portal] func(ctx context.Context, src T) (err error)
+
+type CreateProject func(Template) error

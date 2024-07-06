@@ -1,4 +1,4 @@
-package create
+package template
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 )
 
-func NewRun(dir string, templates map[string]string) func(target.Template) error {
+func NewRun(dir string, templates map[string]string) target.CreateProject {
 	return NewRunner(dir, templates).Run
 }
 

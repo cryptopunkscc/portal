@@ -15,7 +15,6 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	portalPort "github.com/cryptopunkscc/portal/pkg/port"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
-	create2 "github.com/cryptopunkscc/portal/runner/create"
 	"github.com/cryptopunkscc/portal/runner/dev"
 	"github.com/cryptopunkscc/portal/runner/dist"
 	"github.com/cryptopunkscc/portal/runner/exec"
@@ -23,9 +22,12 @@ import (
 	"github.com/cryptopunkscc/portal/runner/pack"
 	"github.com/cryptopunkscc/portal/runner/query"
 	"github.com/cryptopunkscc/portal/runner/service"
+	"github.com/cryptopunkscc/portal/runner/template"
 	"github.com/cryptopunkscc/portal/target"
+	js "github.com/cryptopunkscc/portal/target/js/embed"
 	"github.com/cryptopunkscc/portal/target/msg"
 	"github.com/cryptopunkscc/portal/target/portals"
+	"github.com/cryptopunkscc/portal/target/sources"
 	"os"
 	"sync"
 )
@@ -65,12 +67,14 @@ func main() {
 	}
 	scope.DispatchService = scope.GetServeFeature().Dispatch
 
-	featBuild := build.NewFeat(dist.NewRun, pack.Run)
-	featCreate := create.NewFeat(create2.NewRun, featBuild.Dist).Run
+	featBuild := build.NewFeat(
+		dist.NewRun, pack.Run,
+		sources.FromFS[target.NodeModule](js.PortalLibFS),
+	)
+	featCreate := create.NewFeat(template.NewRun, featBuild.Dist)
 
 	goRunner := go_dev.NewRunner(
-		featBuild.Dist,
-		portMsg,
+		featBuild.Dist, portMsg,
 		func(ctx context.Context, src target.DistExec) (err error) { return scope.GetExecTarget()(ctx, src) },
 	)
 	scope.NewRunTarget = dev.NewRun(portMsg, goRunner)
@@ -78,7 +82,7 @@ func main() {
 	cli := clir.NewCli(ctx, manifest.NameDev, manifest.DescriptionDev, version.Run)
 	cli.Dev(scope.GetDispatchFeature())
 	cli.Open(scope.GetOpenFeature())
-	cli.Create(create.List, featCreate)
+	cli.Create(template.List, featCreate.Run)
 	cli.Build(featBuild.Run)
 	cli.Portals(scope.GetTargetFind())
 

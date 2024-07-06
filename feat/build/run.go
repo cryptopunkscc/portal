@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/portal/target"
-	js "github.com/cryptopunkscc/portal/target/js/embed"
 	"github.com/cryptopunkscc/portal/target/sources"
 	"path"
 )
@@ -19,11 +18,8 @@ type Feat struct {
 func NewFeat(
 	newRunDist func([]target.NodeModule) target.Run[target.Project],
 	runPack target.Run[target.Dist],
-	dependencies ...target.NodeModule,
+	dependencies []target.NodeModule,
 ) *Feat {
-	if len(dependencies) == 0 {
-		dependencies = sources.FromFS[target.NodeModule](js.PortalLibFS)
-	}
 	return &Feat{
 		newRunDist:   newRunDist,
 		runPack:      runPack,

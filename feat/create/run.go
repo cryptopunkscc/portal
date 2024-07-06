@@ -3,23 +3,28 @@ package create
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	. "github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/target"
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/cryptopunkscc/portal/target/template"
 )
 
+type (
+	Dist    func(context.Context, ...string) error
+	Factory func(dir string, templates map[string]string) target.CreateProject
+)
+
 type Feat struct {
-	newCreate func(dir string, templates map[string]string) func(Template) error
-	dist      func(context.Context, ...string) error
+	factory Factory
+	dist    Dist
 }
 
 func NewFeat(
-	newCreate func(dir string, templates map[string]string) func(Template) error,
-	dist func(context.Context, ...string) error,
+	factory Factory,
+	dist Dist,
 ) *Feat {
 	return &Feat{
-		newCreate: newCreate,
-		dist:      dist,
+		factory: factory,
+		dist:    dist,
 	}
 }
 
@@ -29,8 +34,8 @@ func (f Feat) Run(
 	targets map[string]string,
 ) (err error) {
 	log := plog.Get(ctx).Type(f).Set(&ctx)
-	create := f.newCreate(dir, targets)
-	resolve := Any[Template](Try(template.Resolve))
+	create := f.factory(dir, targets)
+	resolve := target.Any[target.Template](target.Try(template.Resolve))
 	src := source.FromFS(template.TemplatesFs)
 
 	for _, t := range source.List(resolve, src) {
