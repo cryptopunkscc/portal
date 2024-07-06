@@ -23,7 +23,7 @@ func Test__portal_Resolve_ById__embed_apps(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Src, func(t *testing.T) {
-			app, err := resolveEmbed.ById(test.Src)
+			app, err := resolveEmbed.Portal(test.Src)
 			if err != nil {
 				t.Fatal(err)
 			}

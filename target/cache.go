@@ -5,7 +5,6 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io/fs"
 	"log"
-	"strings"
 	"sync"
 )
 
@@ -58,8 +57,7 @@ func (c *Cache[T]) Get(src string) (portal Portal, ok bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	for _, p := range c.portals {
-		m := p.Manifest()
-		if m.Name == src || strings.HasPrefix(src, m.Package) {
+		if p.Manifest().Match(src) {
 			ok = true
 			portal = p
 			return

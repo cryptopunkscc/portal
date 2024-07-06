@@ -1,5 +1,7 @@
 package target
 
+import "strings"
+
 const PortalJsonFilename = "portal.json"
 
 type Manifest struct {
@@ -12,6 +14,10 @@ type Manifest struct {
 	Exec        string `json:"exec,omitempty"`
 	Build       string `json:"build,omitempty"`
 	Env         Env    `json:"env,omitempty"`
+}
+
+func (m Manifest) Match(port string) bool {
+	return port == m.Name || strings.HasPrefix(port, m.Package)
 }
 
 type Env struct {

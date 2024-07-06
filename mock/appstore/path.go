@@ -14,7 +14,7 @@ func Path(app string) (src string, err error) {
 		if m, err = manifest.Read(t.Files()); err != nil {
 			return
 		}
-		if m.Name == app || m.Package == app {
+		if m.Match(app) {
 			src = path.Join(portalAppsDir, t.Path())
 			return
 		}

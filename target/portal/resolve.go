@@ -25,12 +25,11 @@ func NewResolver[T target.Portal](
 	}
 }
 
-func (f Resolver[T]) ById(id string) (t T, err error) {
-	id = strings.TrimPrefix(id, f.prefix)
-	id = strings.TrimPrefix(id, ".")
+func (f Resolver[T]) Portal(port string) (t T, err error) {
+	port = strings.TrimPrefix(port, f.prefix)
+	port = strings.TrimPrefix(port, ".")
 	for _, t = range source.List[T](f.resolve, f.source) {
-		m := t.Manifest()
-		if id == m.Name || id == m.Package {
+		if t.Manifest().Match(port) {
 			return
 		}
 	}
@@ -38,8 +37,8 @@ func (f Resolver[T]) ById(id string) (t T, err error) {
 	return
 }
 
-func (f Resolver[T]) Path(path string) (p string, err error) {
-	t, err := f.ById(path)
+func (f Resolver[T]) Path(port string) (p string, err error) {
+	t, err := f.Portal(port)
 	if err != nil {
 		return
 	}
