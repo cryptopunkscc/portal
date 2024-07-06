@@ -4,9 +4,9 @@ import "C"
 import (
 	"context"
 	"github.com/cryptopunkscc/astrald/sig"
+	"github.com/cryptopunkscc/portal/pkg/mem"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/port"
-	"github.com/cryptopunkscc/portal/pkg/registry"
 	"github.com/cryptopunkscc/portal/target"
 	"syscall"
 	"time"
@@ -28,8 +28,8 @@ func newAdapter(ctx context.Context, pkg string) *Adapter {
 	a.port = port.New(pkg)
 	a.log = plog.Get(ctx).Type(a).Set(&ctx)
 
-	a.listeners = registry.New[*Listener]()
-	a.connections = registry.New[*Conn]()
+	a.listeners = mem.NewCache[*Listener]()
+	a.connections = mem.NewCache[*Conn]()
 
 	a.listeners.OnChange(eventEmitter[*Listener](a.Events()))
 	a.connections.OnChange(eventEmitter[*Conn](a.Events()))

@@ -9,9 +9,9 @@ import (
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/astrald/lib/astral"
 	"github.com/cryptopunkscc/astrald/sig"
+	"github.com/cryptopunkscc/portal/pkg/mem"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/port"
-	"github.com/cryptopunkscc/portal/pkg/registry"
 	"github.com/cryptopunkscc/portal/target"
 	"github.com/google/uuid"
 	"io"
@@ -24,8 +24,8 @@ type Adapter struct {
 
 	port port.Port
 
-	listeners   registry.Cache[*Listener]
-	connections registry.Cache[*Conn]
+	listeners   mem.Cache[*Listener]
+	connections mem.Cache[*Conn]
 	events      sig.Queue[target.ApphostEvent]
 }
 

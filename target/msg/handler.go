@@ -2,8 +2,8 @@ package msg
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/pkg/mem"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/pkg/registry"
 	"github.com/cryptopunkscc/portal/target"
 	"strings"
 	"time"
@@ -12,7 +12,7 @@ import (
 type Handler struct {
 	reloader Reloader
 	apphost  target.ApphostCache
-	changes  registry.Cache[time.Time]
+	changes  mem.Cache[time.Time]
 }
 
 type Reloader interface {
@@ -26,7 +26,7 @@ func NewHandler(
 	return &Handler{
 		reloader: reloader,
 		apphost:  apphost,
-		changes:  registry.New[time.Time](),
+		changes:  mem.NewCache[time.Time](),
 	}
 }
 

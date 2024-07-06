@@ -1,4 +1,4 @@
-package registry
+package mem
 
 import (
 	"maps"
@@ -16,7 +16,7 @@ func (c *Cache[T]) Size() int {
 	return len(c.entries)
 }
 
-func New[T any]() Cache[T] {
+func NewCache[T any]() Cache[T] {
 	return Cache[T]{entries: make(map[string]T)}
 }
 
