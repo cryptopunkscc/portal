@@ -1,7 +1,7 @@
 package portal
 
 const (
-	Version        = "v0.0.1"
+	Version        = "v0.0.1-alpha"
 	Name           = "Portal"
 	NameDev        = "Portal Development"
 	Description    = "Runtime environment for Astral apps."

@@ -1,16 +1,6 @@
-## Install
+# Test commands
 
-Install portal, portal-dev, and required dependencies.
-
-```shell
-go run ./cmd/make
-```
-
-Run portal 
-
-## Tests
-
-### Golang
+## Golang
 
 Targets
 
@@ -24,7 +14,7 @@ RPC
 go test ./pkg/rpc
 ```
 
-### Cross integration
+## Cross integration
 
 RPC
 

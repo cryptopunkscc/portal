@@ -1,54 +1,28 @@
 # Portal
 
-Desktop runtime & development environment for JavaScript decentralized applications driven by [Astral](https://github.com/cryptopunkscc/astrald/blob/master/docs/quickstart.md) network.
+Runtime & development environment for decentralized applications driven by [Astral](https://github.com/cryptopunkscc/astrald/blob/master/docs/quickstart.md) network.
 
-## Prerequisites
+## Installation
 
-Before you can install & use Portal u need manually prepare the following dependencies:
+To build portal executables run:
 
-### Astral
-
-[Astral](https://github.com/cryptopunkscc/astrald/blob/master/docs/quickstart.md) is a core & mandatory networking dependency for Portal. It provides a plenty of features like p2p, encryption, identity, storage, and unified API for services and apps.
-
-### Wails
-
-Portal GUI runner uses Wails source code as a base, also it requires same dependencies for production and development purpose. For Installing them follow official Wails [installation](https://wails.io/docs/gettingstarted/installation) guideline.
-
-## Install
-
-Portal sources can produce production or development executable. Generally speaking, the development runtime is an extended version of the production runtime.
-
-* Install production runtime if you want to:
-  * Run frontend application.
-  * Run backend application.
-* Install developer runtime if you want to:
-  * Create new application.
-  * Run development server.
-  * Build application.
-  * Generate application bundle.
-
-### Linux
-
-Systray:
 ```shell
-sudo apt-get install gcc libgtk-3-dev libayatana-appindicator3-dev
+./make <number?>
 ```
 
-### Linux & MacOS (Windows?)
+Where optional <number?> can be concatenation of the following options :
 
-Install production runtime: 
-```shell
-go install -tags "desktop,wv2runtime.download,production" github.com/cryptopunkscc/portal/cmd/portal
+```
+<empty> - Select all options.
+<1> - Install dependencies.
+<2> - Build JS libraries.
+<4> - Build embed JS applications.
+<8> - Install portal for developer into "$HOME/go/bin/portal-dev".
+<16> - Install portal for user into "$HOME/go/bin/portal". 
+<32> - Build portal installer.
 ```
 
-Install development runtime:
-```shell
-go install -tags dev github.com/cryptopunkscc/portal/cmd/portal
-```
-
-## How to use
-
-Portal provides command line interface created using [clir](https://clir.leaanthony.com/) library.
+See examples: [commands.md](./test.md)
 
 ### Example commands
 
@@ -58,50 +32,50 @@ Print help.
 portal -help
 ```
 
-Run development server.
+Run applications from directory.
 
 ```shell
-portal dev ./example/project
+portal ./example/rpc
 ```
 
-Create base application project from template.
+Run applications in development server supporting hot reload and node module based projects.
 
 ```shell
-portal create -n my_react_app -t react
+portal-dev ./example/project
 ```
 
-Generate application bundle
+Build & generate application bundles.
 
 ```shell
-portal bundle ./example/project
+portal-dev b ./example/project
 ```
 
-Run application bundle
+Install applications from generated bundles.
 
 ```shell
-portal open ./example/project
+portal i ./example/project
 ```
 
-## Compatibility
+Run application by name.
 
-Supported platforms for specific implementation.
+```shell
+portal launcher
+```
 
-* Frontend
-    * wails - ES6
-        * Linux
-        * MacOS
-        * Windows ?
-    * WebView - ES6
-        * Linux
-        * MacOS ❌
-        * Windows ?
-* Backend
-    * goja - ES6 (partial?)
-        * Linux
-        * MacOS
-        * Windows ?
-        * Android ?
-    * V8 - ES6
-        * Linux
-        * MacOS ?
-        * ~~Windows~~
+Run application by package name.
+
+```shell
+portal example.project.svelte
+```
+
+Create new project from template.
+
+```shell
+portal-dev c "html:frontend js:backend" ./my_project
+```
+
+List available templates.
+
+```shell
+portal-dev c -l
+```
