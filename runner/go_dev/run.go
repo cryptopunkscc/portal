@@ -5,36 +5,42 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	golang "github.com/cryptopunkscc/portal/pkg/go"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/runner/dist"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target/msg"
 	"time"
 )
 
 type Runner struct {
 	watcher *golang.Watcher
-	sender  *msg.Client
-	build   Build
 	run     target.Run[target.DistExec]
-
-	dist   target.DistExec
-	ctx    context.Context
-	cancel context.CancelFunc
+	send    target.MsgSend
+	dist    target.DistExec
+	ctx     context.Context
+	cancel  context.CancelFunc
 }
 
-type Build func(context.Context, ...string) error
-
 func NewRunner(
-	build Build,
-	port target.Port,
 	run target.Run[target.DistExec],
-) (runner *Runner) {
-	runner = &Runner{
+	send target.MsgSend,
+) target.Runner[target.ProjectGo] {
+	return &Runner{
 		watcher: golang.NewWatcher(),
+		send:    send,
 		run:     run,
-		build:   build,
 	}
-	runner.sender = msg.NewClient(port)
-	return
+}
+
+func NewAdapter(run target.Run[target.Portal]) func(
+	_ target.NewApi,
+	send target.MsgSend,
+) target.Runner[target.ProjectGo] {
+	return func(newApi target.NewApi, send target.MsgSend) target.Runner[target.ProjectGo] {
+		run := func(ctx context.Context, src target.DistExec) (err error) {
+			newApi(ctx, src) // initiate connection
+			return run(ctx, src)
+		}
+		return NewRunner(run, send)
+	}
 }
 
 func (r *Runner) Reload() (err error) {
@@ -55,10 +61,8 @@ func (r *Runner) Run(ctx context.Context, project target.ProjectGo) (err error) 
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Println("Running project Go")
 	r.ctx = ctx
-	if err = r.build(ctx, project.Abs()); err != nil {
-		return
-	}
-	if err = r.sender.Connect(ctx, project); err != nil {
+	build := dist.NewGoRunner().Run
+	if err = build(ctx, project); err != nil {
 		return
 	}
 	r.dist = project.DistGolang()
@@ -74,15 +78,16 @@ func (r *Runner) Run(ctx context.Context, project target.ProjectGo) (err error) 
 
 	pkg := project.Manifest().Package
 	for range flow.From(events).Debounce(200 * time.Millisecond) {
-		if err := r.sender.Send(target.NewMsg(pkg, target.DevChanged)); err != nil {
+		if err := r.send(target.NewMsg(pkg, target.DevChanged)); err != nil {
 			log.E().Println(err)
 		}
-		if err = r.build(ctx, project.Abs()); err == nil {
+		if err = build(ctx, project); err == nil {
 			if err = r.Reload(); err != nil {
 				log.E().Println(err)
 			}
 		}
-		if err := r.sender.Send(target.NewMsg(pkg, target.DevRefreshed)); err != nil {
+		time.Sleep(2 * time.Second)
+		if err := r.send(target.NewMsg(pkg, target.DevRefreshed)); err != nil {
 			log.E().Println(err)
 		}
 	}

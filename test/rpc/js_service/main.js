@@ -28,7 +28,6 @@ const service = new Service();
 rpc.serve({
   routes: [
     "flow*",
-    "request:",
     "request.func1",
     "request.func2",
     "request.func3",

@@ -13,10 +13,10 @@ import (
 )
 
 type Runner struct {
-	distRunner *goja_dist.Runner
+	distRunner target.Runner[target.DistJs]
 }
 
-func NewRunner(newApi target.NewApi, send target.MsgSend) *Runner {
+func NewRunner(newApi target.NewApi, send target.MsgSend) target.Runner[target.ProjectJs] {
 	distRunner := goja_dist.NewRunner(newApi, send)
 	return &Runner{distRunner: distRunner}
 }

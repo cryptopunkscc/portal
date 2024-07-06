@@ -18,7 +18,7 @@ import (
 	"syscall"
 )
 
-func NewRunner(newApi target.NewApi) *Runner {
+func NewRunner(newApi target.NewApi) target.Runner[target.ProjectHtml] {
 	return &Runner{NewApi: newApi}
 }
 

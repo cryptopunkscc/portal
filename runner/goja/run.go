@@ -12,7 +12,7 @@ type Runner struct {
 	app     target.AppJs
 }
 
-func NewRunner(newApi target.NewApi) *Runner {
+func NewRunner(newApi target.NewApi) target.Runner[target.AppJs] {
 	return &Runner{newApi: newApi}
 }
 

@@ -32,8 +32,8 @@ type Scope[T target.Portal] struct {
 	TargetCache *target.Cache[T]
 	RpcHandlers rpc.Handlers
 	Processes   *sig.Map[string, T]
-	NewApi      target.NewApi
 
+	NewApi        target.NewApi
 	WrapApi       func(target.Api) target.Api
 	NewRunTarget  func(target.NewApi) target.Run[T]
 	NewRunTray    func(target.Dispatch) target.Tray

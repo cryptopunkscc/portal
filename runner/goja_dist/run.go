@@ -17,7 +17,7 @@ type Runner struct {
 	backend *goja.Backend
 }
 
-func NewRunner(newApi target.NewApi, send target.MsgSend) *Runner {
+func NewRunner(newApi target.NewApi, send target.MsgSend) target.Runner[target.DistJs] {
 	return &Runner{newApi: newApi, send: send}
 }
 

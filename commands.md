@@ -29,11 +29,11 @@ go test ./pkg/rpc
 RPC
 
 ```shell
-go run ./cmd/make 8 && portal-dev -type 0 ./test/rpc
+./make 8 && portal-dev -type 0 ./test/rpc
 ```
 
 JS runtime lib
 
 ```shell
-go run ./cmd/make 8 && portal-dev -type 0 ./target/js/test
+./make 8 && portal-dev -type 0 ./target/js/test
 ```

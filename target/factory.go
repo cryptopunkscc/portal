@@ -2,8 +2,6 @@ package target
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/pkg/plog"
-	"reflect"
 )
 
 func ApiFactory(
@@ -19,7 +17,7 @@ func ApiFactory(
 		case Js:
 			n = backendApphost
 		default:
-			plog.Get(ctx).P().Println("cannot create target.NewApi unknown type:", reflect.TypeOf(p))
+			return
 		}
 		a = wrap(n(ctx, p))
 		return

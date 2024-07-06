@@ -11,15 +11,14 @@ import (
 
 type Runner struct {
 	send  target.MsgSend
-	inner *wails.Runner
+	inner target.Runner[target.AppHtml]
 }
 
-func NewRunner(newApi target.NewApi, send target.MsgSend) (runner *Runner) {
-	runner = &Runner{
+func NewRunner(newApi target.NewApi, send target.MsgSend) target.Runner[target.DistHtml] {
+	return &Runner{
 		send:  send,
 		inner: wails.NewRunner(newApi),
 	}
-	return
 }
 
 func (r *Runner) Reload() (err error) {

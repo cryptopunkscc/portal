@@ -17,7 +17,7 @@ type Runner struct {
 	frontCtx context.Context
 }
 
-func NewRunner(newApi target.NewApi) *Runner {
+func NewRunner(newApi target.NewApi) target.Runner[target.AppHtml] {
 	return &Runner{newApi: newApi}
 }
 

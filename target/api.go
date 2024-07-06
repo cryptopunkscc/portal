@@ -23,4 +23,9 @@ type Dispatch func(context.Context, string, ...string) (err error)
 
 type Run[T Portal] func(ctx context.Context, src T) (err error)
 
+type Runner[T Portal] interface {
+	Run(ctx context.Context, src T) (err error)
+	Reload() error
+}
+
 type CreateProject func(Template) error

@@ -19,10 +19,17 @@ import (
 	"github.com/cryptopunkscc/portal/runner/dist"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/go_dev"
+	"github.com/cryptopunkscc/portal/runner/goja"
+	"github.com/cryptopunkscc/portal/runner/goja_dev"
+	"github.com/cryptopunkscc/portal/runner/goja_dist"
 	"github.com/cryptopunkscc/portal/runner/pack"
 	"github.com/cryptopunkscc/portal/runner/query"
+	"github.com/cryptopunkscc/portal/runner/reload"
 	"github.com/cryptopunkscc/portal/runner/service"
 	"github.com/cryptopunkscc/portal/runner/template"
+	"github.com/cryptopunkscc/portal/runner/wails"
+	"github.com/cryptopunkscc/portal/runner/wails_dev"
+	"github.com/cryptopunkscc/portal/runner/wails_dist"
 	"github.com/cryptopunkscc/portal/target"
 	js "github.com/cryptopunkscc/portal/target/js/embed"
 	"github.com/cryptopunkscc/portal/target/msg"
@@ -46,6 +53,7 @@ func main() {
 	port := target.Port{Base: "portal"}
 	portOpen := port.Route("open")
 	portMsg := port.Route("broadcast")
+
 	scope := feature.Scope[target.Portal]{
 		Astral:         serve.CheckAstral,
 		Executable:     "portal-dev",
@@ -65,6 +73,17 @@ func main() {
 	scope.RpcHandlers = rpc.Handlers{
 		portMsg.Name: msg.NewBroadcast(portMsg, scope.GetProcesses()).BroadcastMsg,
 	}
+	scope.NewRunTarget = func(newApi target.NewApi) target.Run[target.Portal] {
+		return dev.NewRunner(
+			reload.Mutable(newApi, portMsg, goja_dev.NewRunner),
+			reload.Immutable(newApi, portMsg, wails_dev.NewRunner), // FIXME propagate sendMsg
+			reload.Mutable(newApi, portMsg, go_dev.NewAdapter(scope.GetExecTarget())),
+			reload.Mutable(newApi, portMsg, goja_dist.NewRunner),
+			reload.Mutable(newApi, portMsg, wails_dist.NewRunner),
+			reload.Immutable(newApi, portMsg, goja.NewRunner),
+			reload.Immutable(newApi, portMsg, wails.NewRunner),
+		).Run
+	}
 	scope.DispatchService = scope.GetServeFeature().Dispatch
 
 	featBuild := build.NewFeat(
@@ -72,12 +91,6 @@ func main() {
 		sources.FromFS[target.NodeModule](js.PortalLibFS),
 	)
 	featCreate := create.NewFeat(template.NewRun, featBuild.Dist)
-
-	goRunner := go_dev.NewRunner(
-		featBuild.Dist, portMsg,
-		func(ctx context.Context, src target.DistExec) (err error) { return scope.GetExecTarget()(ctx, src) },
-	)
-	scope.NewRunTarget = dev.NewRun(portMsg, goRunner)
 
 	cli := clir.NewCli(ctx, manifest.NameDev, manifest.DescriptionDev, version.Run)
 	cli.Dev(scope.GetDispatchFeature())

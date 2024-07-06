@@ -8,7 +8,7 @@ const services = [
   "js",
 ]
 
-const api = [
+const methods = [
   "func1",
   "func2",
   "func3",
@@ -16,12 +16,15 @@ const api = [
 ]
 
 const flows = async service => {
-  const conn = await rpc.query(`test.${service}.flow`)
-  return conn.bind(...api)
+  const conn = await rpc.conn(`test.${service}.flow`)
+  return conn.bind(...methods)
 }
 
-const requests = async service =>
-  await rpc.bind(`test.${service}.request`, ...api)
+const requests = async service => {
+  const api = {}
+  api[`test.${service}.request`] = methods
+  return await rpc.bind(api);
+}
 
 const connections = [
   flows,
@@ -44,11 +47,10 @@ async function test_func1_a() {
 }
 
 async function test_func1_b() {
-  const message = "message"
-  const expected = {error: message}
+  const expected = "message"
   let actual
   try {
-    actual = await this.func1(message, true)
+    await this.func1(expected, true)
   } catch (e) {
     actual = e
   }
@@ -80,7 +82,7 @@ async function test_func4() {
   assertEqual(this, expected, actual)
 }
 
-const error = (...args) => portal.log("FAILED", ...args)
+const error = (e) => portal.log(`FAILED ${e}`)
 
 function assertEqual(f, l, r) {
   l = JSON.stringify(l)

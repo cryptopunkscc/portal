@@ -21,6 +21,9 @@ func (r NpmRunner) Run(ctx context.Context, project target.ProjectNpm) (err erro
 	if err = r.Build(ctx, project); err != nil {
 		return
 	}
+	if err = Dist(ctx, project); err != nil {
+		return
+	}
 	return
 }
 

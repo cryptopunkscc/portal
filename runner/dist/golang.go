@@ -24,5 +24,8 @@ func (g GoRunner) Run(ctx context.Context, project target.ProjectGo) (err error)
 		return fmt.Errorf("cannot install node_modules in %s: %s", project.Abs(), err)
 	}
 	project.Manifest().Exec = "main"
+	if err = Dist(ctx, project); err != nil {
+		return
+	}
 	return
 }
