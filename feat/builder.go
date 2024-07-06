@@ -32,6 +32,7 @@ type Scope[T target.Portal] struct {
 	TargetCache *target.Cache[T]
 	RpcHandlers rpc.Handlers
 	Processes   *sig.Map[string, T]
+	NewApi      target.NewApi
 
 	WrapApi       func(target.Api) target.Api
 	NewRunTarget  func(target.NewApi) target.Run[T]
@@ -56,20 +57,21 @@ type Scope[T target.Portal] struct {
 	FeatList     func() []target.App
 }
 
-func (s *Scope[T]) GetPort() target.Port                { return assert(s.Port) }
-func (s *Scope[T]) GetExecutable() string               { return assert(s.Executable) }
-func (s *Scope[T]) GetWaitGroup() *sync.WaitGroup       { return assert(s.WaitGroup) }
-func (s *Scope[T]) GetProcesses() *sig.Map[string, T]   { return assert(s.Processes) }
-func (s *Scope[T]) GetTargetFinder() target.Finder[T]   { return assert(s.TargetFinder) }
-func (s *Scope[T]) GetTargetCache() *target.Cache[T]    { return assert(s.TargetCache) }
-func (s *Scope[T]) GetJoinTarget() target.Dispatch      { return assert(s.JoinTarget) }
-func (s *Scope[T]) GetDispatchTarget() target.Dispatch  { return assert(s.DispatchTarget) }
-func (s *Scope[T]) GetDispatchService() target.Dispatch { return assert(s.DispatchService) }
+func (s *Scope[T]) GetPort() target.Port                { return require(s.Port) }
+func (s *Scope[T]) GetExecutable() string               { return require(s.Executable) }
+func (s *Scope[T]) GetWaitGroup() *sync.WaitGroup       { return require(s.WaitGroup) }
+func (s *Scope[T]) GetProcesses() *sig.Map[string, T]   { return require(s.Processes) }
+func (s *Scope[T]) GetTargetFinder() target.Finder[T]   { return require(s.TargetFinder) }
+func (s *Scope[T]) GetTargetCache() *target.Cache[T]    { return require(s.TargetCache) }
+func (s *Scope[T]) GetJoinTarget() target.Dispatch      { return require(s.JoinTarget) }
+func (s *Scope[T]) GetDispatchTarget() target.Dispatch  { return require(s.DispatchTarget) }
+func (s *Scope[T]) GetDispatchService() target.Dispatch { return require(s.DispatchService) }
 
 func (s *Scope[T]) GetExecTarget() target.Run[T] {
-	return assert(s.NewExecTarget(
+	return require(s.NewExecTarget)(
 		s.GetCacheDir(),
-		s.GetExecutable()))
+		s.GetExecutable(),
+	)
 }
 
 func (s *Scope[T]) GetCacheDir() string {
@@ -83,6 +85,18 @@ func (s *Scope[T]) GetCacheDir() string {
 	return s.CacheDir
 }
 
+func (s *Scope[T]) GetNewApi() target.NewApi {
+	if s.NewApi == nil {
+		apphost.ConnectionsThreshold = 0
+		newApphost := apphost.NewFactory(s.GetDispatchTarget())
+		s.NewApi = target.ApiFactory(require(s.WrapApi),
+			newApphost.NewAdapter,
+			newApphost.WithTimeout,
+		)
+	}
+	return s.NewApi
+}
+
 func (s *Scope[T]) GetTargetFind() target.Find[T] {
 	if s.TargetFind == nil {
 		launcherSvelteFs := embedApps.LauncherSvelteFS
@@ -92,7 +106,7 @@ func (s *Scope[T]) GetTargetFind() target.Find[T] {
 		)
 		findPath := target.Selector[string, string](
 			resolveEmbedApp.Path,
-			assert(s.GetPath),
+			require(s.GetPath),
 		)
 		s.TargetFind = s.GetTargetFinder().Cached(s.GetTargetCache())(
 			findPath,
@@ -111,18 +125,19 @@ func (s *Scope[T]) GetServeFeature() *serve.Feat {
 			s.GetExecTarget(),
 			s.GetProcesses(),
 		).Run
+
 		runTray := target.Tray(nil)
 		if s.NewRunTray != nil {
 			runTray = s.NewRunTray(runSpawn)
 		}
 
 		s.FeatServe = serve.NewFeat(
-			assert(s.Astral),
+			require(s.Astral),
 			s.GetPort(),
-			assert(s.NewRunService),
+			require(s.NewRunService),
 			s.RpcHandlers,
-			assert(runSpawn),
-			assert(s.FeatObserve),
+			require(runSpawn),
+			require(s.FeatObserve),
 			runTray,
 		)
 	}
@@ -131,25 +146,26 @@ func (s *Scope[T]) GetServeFeature() *serve.Feat {
 
 func (s *Scope[T]) GetOpenFeature() target.Dispatch {
 	if s.FeatOpen == nil {
-		apphost.ConnectionsThreshold = 0
-		newApphost := apphost.NewFactory(s.GetDispatchTarget())
-		newApi := target.ApiFactory(assert(s.WrapApi),
-			newApphost.NewAdapter,
-			newApphost.WithTimeout,
+		s.FeatOpen = open.NewFeat[T](
+			s.GetTargetFind(),
+			s.NewRunTarget(s.GetNewApi()),
 		)
-		s.FeatOpen = open.NewFeat[T](s.GetTargetFind(), s.NewRunTarget(newApi))
 	}
 	return s.FeatOpen
 }
 
 func (s *Scope[T]) GetDispatchFeature() target.Dispatch {
 	if s.FeatDispatch == nil {
-		s.FeatDispatch = dispatch.NewFeat(s.GetPort(), s.GetJoinTarget(), s.GetDispatchService())
+		s.FeatDispatch = dispatch.NewFeat(
+			s.GetPort(),
+			s.GetJoinTarget(),
+			s.GetDispatchService(),
+		)
 	}
 	return s.FeatDispatch
 }
 
-func assert[T any](arg T) T {
+func require[T any](arg T) T {
 	check(arg)
 	return arg
 }
