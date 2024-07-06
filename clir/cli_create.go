@@ -18,10 +18,9 @@ func (c Cli) Create(
 	create Create,
 ) {
 	emptyFlags := struct {
-		Dir string `pos:"1" description:"Project directory."`
-		//Name    string `name:"n" description:"Name of project. If not specified, is taken from project directory."`
-		Targets string `name:"t" description:"List of templates with optional module names like: 'svelte backend' or 'svelte:front backend:back'."`
-		List    bool   `name:"l" description:"List available templates"`
+		Targets string `pos:"1" description:"List of templates with optional module names like: 'svelte backend' or 'svelte:front backend:back'."`
+		Dir     string `pos:"2" description:"Project directory."`
+		List    bool   `name:"l" description:"List available templates."`
 	}{}
 	flags := emptyFlags
 	cmd := c.clir.NewSubCommand("c", "Create new project from template.")
