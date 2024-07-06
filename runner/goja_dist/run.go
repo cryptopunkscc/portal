@@ -7,6 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/watcher"
 	"github.com/cryptopunkscc/portal/target"
 	"path"
+	"time"
 )
 
 type Runner struct {
@@ -43,6 +44,9 @@ func (r *Runner) Run(ctx context.Context, dist target.DistJs) (err error) {
 		if err := r.Reload(); err != nil {
 			log.E().Println(err.Error())
 		}
+		// TODO find better solution then sleep
+		// target.DevRefreshed msg must be delayed until backend is fully refreshed (all ports registered).
+		time.Sleep(2 * time.Second)
 		if err := r.send(target.NewMsg(pkg, target.DevRefreshed)); err != nil {
 			log.E().Println(err)
 		}
