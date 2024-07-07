@@ -86,7 +86,6 @@
   const recipient = document.querySelector('.chat-recipient-id');
   const input = document.querySelector('.chat-input-message');
   const button = document.querySelector('.chat-input-button');
-  const client = portal.rpc.bind({"simple.html.chat": ["message"]})
 
   function displayMessage(sender, content) {
     const messageElement = document.createElement('div');
@@ -108,18 +107,20 @@
     messages.scrollTop = messages.scrollHeight;
   }
 
+  button.addEventListener('click', sendMessage);
+
+  input.addEventListener("keypress", event => {
+    if (event.key === "Enter") sendMessage();
+  });
+
+  const client = portal.rpc.bind({"simple.html.chat": ["message"]})
+
   function sendMessage() {
     if (!input.value) return
     client.target(recipient.value).message(input.value).catch(console.log);
     displayMessage("me", input.value);
     input.value = '';
   }
-
-  button.addEventListener('click', sendMessage);
-
-  input.addEventListener("keypress", event => {
-    if (event.key === "Enter") sendMessage();
-  });
 
   setTimeout(() => portal.rpc.serve({
     handlers: {
