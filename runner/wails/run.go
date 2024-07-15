@@ -21,6 +21,10 @@ func NewRunner(newApi target.NewApi) target.Runner[target.AppHtml] {
 	return &Runner{newApi: newApi}
 }
 
+func NewRun(newApi target.NewApi) target.Run[target.AppHtml] {
+	return NewRunner(newApi).Run
+}
+
 func (r *Runner) Reload() (err error) {
 	if r.frontCtx == nil {
 		return plog.Errorf("nil context")

@@ -12,7 +12,7 @@ import (
 func Test__Builder_find(t *testing.T) {
 	scope := feat.Scope[target.Portal]{
 		GetPath:      apps.Path,
-		TargetFinder: portals.NewFind,
+		TargetFinder: portals.NewFind[target.Portal],
 		TargetCache:  target.NewCache[target.Portal](),
 	}
 	find := scope.GetTargetFind()

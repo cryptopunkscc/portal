@@ -16,6 +16,10 @@ func NewRunner(newApi target.NewApi) target.Runner[target.AppJs] {
 	return &Runner{newApi: newApi}
 }
 
+func NewRun(newApi target.NewApi) target.Run[target.AppJs] {
+	return NewRunner(newApi).Run
+}
+
 func (r *Runner) Reload() (err error) {
 	return r.backend.RunFs(r.app.Files())
 }

@@ -1,67 +1,77 @@
 package main
 
 import (
+	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	"log"
+	"strings"
 )
 
-func installPortal() {
-	if err := exec.Run(
-		".", "go", "install",
-		"-tags", "desktop,wv2runtime.download,production",
-		"-ldflags", "-w -s",
-		"./cmd/portal",
-	); err != nil {
-		log.Fatalln("portal install failed: ", err)
-	}
-	log.Println()
-	log.Println("portal installed successfully")
+var GoWails = GoPortal{
+	Tags:    "desktop,wv2runtime.download,production,webkit2_41",
+	LdFlags: "-w -s",
 }
 
-func installPortalDev() {
-	if err := exec.Run(
-		".", "go", "install",
-		"-tags", "dev",
-		"./cmd/portal-dev",
-	); err != nil {
-		log.Fatalln("portal-dev install failed: ", err)
-	}
-	log.Println()
-	log.Println("portal-dev installed successfully")
+var GoWailsDev = GoPortal{
+	Tags: "dev,webkit2_41",
 }
 
-func buildPortal() {
-	if err := exec.Run(
-		".", "go", "build",
-		"-tags", "desktop,wv2runtime.download,production,webkit2_41",
-		"-ldflags", "-w -s",
-		"-o", "./cmd/portal-installer/bin/",
-		"./cmd/portal",
-	); err != nil {
-		log.Fatalln("portal install failed: ", err)
-	}
-	log.Println("portal build succeed.")
+func goPortal() GoPortal         { return GoPortal{}.target("portal") }
+func goPortalApp() GoPortal      { return GoPortal{}.target("portal-app") }
+func goPortalAppWails() GoPortal { return GoWails.target("portal-app-wails") }
+func goPortalAppGoja() GoPortal  { return GoPortal{}.target("portal-app-goja") }
+func goPortalDev() GoPortal      { return GoPortal{}.target("portal-dev") }
+func goPortalDevExec() GoPortal  { return GoPortal{}.target("portal-dev-exec") }
+func goPortalDevWails() GoPortal { return GoWailsDev.target("portal-dev-wails") }
+func goPortalDevGoja() GoPortal  { return GoPortal{}.target("portal-dev-goja") }
+func goPortalDevGo() GoPortal    { return GoPortal{}.target("portal-dev-go") }
+
+func buildPortalInstaller() { GoPortal{Out: "./bin/"}.target("portal-installer").Build() }
+
+type GoPortal struct {
+	Cmd     string
+	Tags    string
+	LdFlags string
+	Out     string
+	Target  string
+	Args    []string
 }
 
-func buildPortalDev() {
-	if err := exec.Run(
-		".", "go", "build",
-		"-tags", "dev,webkit2_41",
-		"-o", "./cmd/portal-installer/bin/",
-		"./cmd/portal-dev",
-	); err != nil {
-		log.Fatalln("portal-dev build failed: ", err)
-	}
-	log.Println("portal-dev build succeed.")
+func (g GoPortal) Install() {
+	g.Cmd = "install"
+	g.run()
 }
 
-func buildPortalInstaller() {
-	if err := exec.Run(
-		".", "go", "build",
-		"-o", "./bin/",
-		"./cmd/portal-installer",
-	); err != nil {
-		log.Fatalln("portal-installer build failed: ", err)
+func (g GoPortal) Build() {
+	g.Cmd = "build"
+	if g.Out == "" {
+		g.Out = "./cmd/portal-installer/bin/"
 	}
-	log.Println("portal-installer build succeed.")
+	g.Args = g.arg("-o", g.Out)
+	g.run()
+}
+
+func (g GoPortal) target(target string) GoPortal {
+	g.Target = target
+	return g
+}
+
+func (g GoPortal) run() {
+	target := fmt.Sprintf("./cmd/%s", g.Target)
+	g.Args = append([]string{"go", g.Cmd}, g.Args...)
+	g.Args = g.arg("-tags", g.Tags)
+	g.Args = g.arg("-ldflags", g.LdFlags)
+	g.Args = append(g.Args, target)
+	log.Printf("$ %s", strings.Join(g.Args, " "))
+	if err := exec.Run(".", g.Args...); err != nil {
+		log.Fatalf("%s %s failed: %v", g.Target, g.Cmd, err)
+	}
+	log.Printf("%s %s succeed.", g.Target, g.Cmd)
+}
+
+func (g GoPortal) arg(key string, value string) []string {
+	if value != "" {
+		return append(g.Args, key, value)
+	}
+	return g.Args
 }

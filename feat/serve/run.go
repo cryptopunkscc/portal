@@ -86,7 +86,7 @@ func (f Feat) Run(
 			log.Println("serve exit")
 		}
 	}()
-	if tray {
+	if tray && f.tray != nil {
 		go func() {
 			defer cancel()
 			f.tray(ctx)

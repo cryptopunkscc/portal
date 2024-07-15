@@ -21,7 +21,7 @@ func Test__apps_Find__embed_launcher(t *testing.T) {
 		resolveEmbed.Path,
 		appstore.Path,
 	)
-	find := apps.NewFinder(findPath, embedApps.LauncherSvelteFS).Find
+	find := apps.NewFinder[target.App](findPath, embedApps.LauncherSvelteFS).Find
 
 	tests := []Case[string]{
 		{Matcher: Launcher, Src: Launcher.Manifest.Name},

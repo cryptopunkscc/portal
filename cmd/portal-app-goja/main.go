@@ -6,7 +6,6 @@ import (
 	featApps "github.com/cryptopunkscc/portal/feat/apps"
 	"github.com/cryptopunkscc/portal/feat/version"
 	osExec "github.com/cryptopunkscc/portal/pkg/exec"
-	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/goja"
 	"github.com/cryptopunkscc/portal/runner/query"
 	"github.com/cryptopunkscc/portal/target"
@@ -20,24 +19,27 @@ func main() {
 	go osExec.OnShutdown(cancel)
 
 	scope := feature.Scope[target.AppJs]{
-		Port:            target.PortPortal,
-		GetPath:         featApps.Path,
-		TargetFinder:    apps.NewFind[target.AppJs],
-		TargetCache:     target.NewCache[target.AppJs](),
-		DispatchService: exec.NewDispatcher("portal-app").Dispatch,
-		JoinTarget:      query.NewRunner[target.App](target.PortOpen).Run,
-		NewRunTarget:    goja.NewRun,
+		WrapApi:        NewAdapter,
+		GetPath:        featApps.Path,
+		TargetFinder:   apps.NewFind[target.AppJs],
+		TargetCache:    target.NewCache[target.AppJs](),
+		DispatchTarget: query.NewRunner[target.AppJs](target.PortOpen).Start,
+		NewRunTarget:   goja.NewRun,
 	}
 
 	cli := clir.NewCli(ctx,
-		"Portal",
-		"Portal command line.",
+		"Portal-goja",
+		"Portal js runner driven by goja.",
 		version.Run,
 	)
-	cli.Dispatch(scope.GetDispatchFeature())
+	cli.Open(scope.GetOpenFeature())
 
 	if err := cli.Run(); err != nil {
 		log.Println(err)
 	}
 	cancel()
 }
+
+type Adapter struct{ target.Api }
+
+func NewAdapter(api target.Api) target.Api { return &Adapter{Api: api} }

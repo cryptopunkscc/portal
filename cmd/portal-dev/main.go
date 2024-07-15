@@ -15,28 +15,20 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	portalPort "github.com/cryptopunkscc/portal/pkg/port"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
+	"github.com/cryptopunkscc/portal/runner/app"
 	"github.com/cryptopunkscc/portal/runner/dist"
 	"github.com/cryptopunkscc/portal/runner/exec"
-	"github.com/cryptopunkscc/portal/runner/go_dev"
-	"github.com/cryptopunkscc/portal/runner/goja"
-	"github.com/cryptopunkscc/portal/runner/goja_dev"
-	"github.com/cryptopunkscc/portal/runner/goja_dist"
 	"github.com/cryptopunkscc/portal/runner/multi"
 	"github.com/cryptopunkscc/portal/runner/pack"
 	"github.com/cryptopunkscc/portal/runner/query"
-	"github.com/cryptopunkscc/portal/runner/reload"
 	"github.com/cryptopunkscc/portal/runner/service"
 	"github.com/cryptopunkscc/portal/runner/template"
-	"github.com/cryptopunkscc/portal/runner/wails"
-	"github.com/cryptopunkscc/portal/runner/wails_dev"
-	"github.com/cryptopunkscc/portal/runner/wails_dist"
 	"github.com/cryptopunkscc/portal/target"
 	js "github.com/cryptopunkscc/portal/target/js/embed"
 	"github.com/cryptopunkscc/portal/target/msg"
 	"github.com/cryptopunkscc/portal/target/portals"
 	"github.com/cryptopunkscc/portal/target/sources"
 	"os"
-	"sync"
 )
 
 func main() {
@@ -50,39 +42,29 @@ func main() {
 	defer log.Println("closing portal development")
 
 	portalPort.InitPrefix("dev")
-	port := target.Port{Base: "portal"}
-	portOpen := port.Route("open")
-	portMsg := port.Route("broadcast")
 
 	scope := feature.Scope[target.Portal]{
-		Astral:         serve.CheckAstral,
-		Executable:     "portal-dev",
-		Port:           port,
-		WrapApi:        NewAdapter,
-		WaitGroup:      &sync.WaitGroup{},
-		TargetCache:    target.NewCache[target.Portal](),
-		NewRunService:  service.NewRun,
-		TargetFinder:   portals.NewFind,
-		NewExecTarget:  exec.NewRun[target.Portal],
-		GetPath:        featApps.Path,
-		FeatObserve:    featApps.Observe,
-		JoinTarget:     query.NewRunner[target.App](portOpen).Run,
-		DispatchTarget: query.NewRunner[target.App](portOpen).Start,
-		Processes:      &sig.Map[string, target.Portal]{},
+		Astral:        serve.CheckAstral,
+		Executable:    "portal-dev",
+		Port:          target.PortPortal,
+		TargetCache:   target.NewCache[target.Portal](),
+		NewRunService: service.NewRun,
+		TargetFinder:  portals.NewFind[target.Portal],
+		GetPath:       featApps.Path,
+		FeatObserve:   featApps.Observe,
+		JoinTarget:    query.NewRunner[target.App](target.PortOpen).Run,
+		Processes:     &sig.Map[string, target.Portal]{},
+		NewExecTarget: func(_ string, _ string) target.Run[target.Portal] {
+			return multi.NewRunner[target.Portal](
+				app.Run(exec.NewPortal[target.PortalJs]("portal-dev-goja", "o").Run),
+				app.Run(exec.NewPortal[target.PortalHtml]("portal-dev-wails", "o").Run),
+				app.Run(exec.NewPortal[target.ProjectGo]("portal-dev-go", "o").Run),
+				app.Run(exec.NewPortal[target.AppExec]("portal-dev-exec", "o").Run),
+			).Run
+		},
 	}
 	scope.RpcHandlers = rpc.Handlers{
-		portMsg.Name: msg.NewBroadcast(portMsg, scope.GetProcesses()).BroadcastMsg,
-	}
-	scope.NewRunTarget = func(newApi target.NewApi) target.Run[target.Portal] {
-		return multi.NewRunner(
-			reload.Mutable(newApi, portMsg, goja_dev.NewRunner),
-			reload.Immutable(newApi, portMsg, wails_dev.NewRunner), // FIXME propagate sendMsg
-			reload.Mutable(newApi, portMsg, go_dev.NewAdapter(scope.GetExecTarget())),
-			reload.Mutable(newApi, portMsg, goja_dist.NewRunner),
-			reload.Mutable(newApi, portMsg, wails_dist.NewRunner),
-			reload.Immutable(newApi, portMsg, goja.NewRunner),
-			reload.Immutable(newApi, portMsg, wails.NewRunner),
-		).Run
+		target.PortMsg.Name: msg.NewBroadcast(target.PortMsg, scope.GetProcesses()).BroadcastMsg,
 	}
 	scope.DispatchService = scope.GetServeFeature().Dispatch
 
@@ -94,7 +76,6 @@ func main() {
 
 	cli := clir.NewCli(ctx, manifest.NameDev, manifest.DescriptionDev, version.Run)
 	cli.Dev(scope.GetDispatchFeature())
-	cli.Open(scope.GetOpenFeature())
 	cli.Create(template.List, featCreate.Run)
 	cli.Build(featBuild.Run)
 	cli.Portals(scope.GetTargetFind())
@@ -105,7 +86,3 @@ func main() {
 	cancel()
 	scope.WaitGroup.Wait()
 }
-
-type Adapter struct{ target.Api }
-
-func NewAdapter(api target.Api) target.Api { return &Adapter{Api: api} }

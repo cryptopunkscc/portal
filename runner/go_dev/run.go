@@ -51,7 +51,7 @@ func (r *Runner) Reload() (err error) {
 	ctx, r.cancel = context.WithCancel(r.ctx)
 	go func() {
 		if err := r.run(ctx, r.dist); err != nil {
-			plog.Get(ctx).E().Println(err)
+			plog.Get(ctx).E().Println("reload", err)
 		}
 	}()
 	return

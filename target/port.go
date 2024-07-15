@@ -4,9 +4,17 @@ import (
 	"strings"
 )
 
+var PortPortal = NewPort("portal")
+var PortOpen = PortPortal.Route("open")
+var PortMsg = PortPortal.Route("broadcast")
+
 type Port struct {
 	Base string
 	Name string
+}
+
+func NewPort(base string) Port {
+	return Port{Base: base}
 }
 
 func (p Port) Copy(base string) Port {

@@ -53,11 +53,18 @@ func (d *Install) Run(jobs ...Make) {
 	}
 	if job&Dev == Dev {
 		log.Println(" * portal dev")
-		installPortalDev()
+		goPortalDev().Install()
+		goPortalDevExec().Install()
+		goPortalDevGo().Install()
+		goPortalDevGoja().Install()
+		goPortalDevWails().Install()
 	}
 	if job&Portal == Portal {
 		log.Println(" * portal")
-		installPortal()
+		goPortal().Install()
+		goPortalApp().Install()
+		goPortalAppGoja().Install()
+		goPortalAppWails().Install()
 	}
 	if job&Installer == Installer {
 		log.Println(" * installer")

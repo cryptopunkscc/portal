@@ -23,25 +23,22 @@ import (
 )
 
 type Scope[T target.Portal] struct {
-	Astral serve.Astral
-
 	CacheDir    string
 	Executable  string
 	Port        target.Port
-	WaitGroup   *sync.WaitGroup
+	NewApi      target.NewApi
 	TargetCache *target.Cache[T]
 	RpcHandlers rpc.Handlers
 	Processes   *sig.Map[string, T]
 
-	NewApi        target.NewApi
+	Astral        serve.Astral
 	WrapApi       func(target.Api) target.Api
 	NewRunTarget  func(target.NewApi) target.Run[T]
 	NewRunTray    func(target.Dispatch) target.Tray
 	NewRunService func(rpc.Handlers) target.Dispatch
-	NewExecTarget func(string, string) target.Run[T]
+	NewExecTarget func(string, string) target.Run[T] // TODO replace factory with direct reference
 
-	TargetFinder target.Finder[T]
-
+	TargetFinder    target.Finder[T]
 	GetPath         target.Path
 	DispatchTarget  target.Dispatch
 	DispatchService target.Dispatch
@@ -50,6 +47,7 @@ type Scope[T target.Portal] struct {
 	FeatObserve func(ctx context.Context, conn rpc.Conn) (err error)
 
 	// auto dependencies
+	WaitGroup    sync.WaitGroup
 	TargetFind   target.Find[T]
 	FeatDispatch target.Dispatch
 	FeatOpen     target.Dispatch
@@ -59,7 +57,7 @@ type Scope[T target.Portal] struct {
 
 func (s *Scope[T]) GetPort() target.Port                { return require(s.Port) }
 func (s *Scope[T]) GetExecutable() string               { return require(s.Executable) }
-func (s *Scope[T]) GetWaitGroup() *sync.WaitGroup       { return require(s.WaitGroup) }
+func (s *Scope[T]) GetWaitGroup() *sync.WaitGroup       { return &s.WaitGroup }
 func (s *Scope[T]) GetProcesses() *sig.Map[string, T]   { return require(s.Processes) }
 func (s *Scope[T]) GetTargetFinder() target.Finder[T]   { return require(s.TargetFinder) }
 func (s *Scope[T]) GetTargetCache() *target.Cache[T]    { return require(s.TargetCache) }
@@ -126,7 +124,7 @@ func (s *Scope[T]) GetServeFeature() *serve.Feat {
 			s.GetProcesses(),
 		).Run
 
-		runTray := target.Tray(nil)
+		var runTray target.Tray
 		if s.NewRunTray != nil {
 			runTray = s.NewRunTray(runSpawn)
 		}

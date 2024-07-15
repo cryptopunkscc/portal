@@ -10,8 +10,15 @@ func (d *Install) buildInstaller() {
 	mkdirBin()
 	buildAstral()
 	buildAnc()
-	buildPortal()
-	buildPortalDev()
+	goPortal().Build()
+	goPortalApp().Build()
+	goPortalAppGoja().Build()
+	goPortalAppWails().Build()
+	goPortalDev().Build()
+	goPortalDevGo().Build()
+	goPortalDevGoja().Build()
+	goPortalDevExec().Build()
+	goPortalDevWails().Build()
 	buildPortalInstaller()
 }
 

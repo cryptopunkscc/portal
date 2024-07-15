@@ -109,7 +109,7 @@ type Target struct {
 func (p Target) Assert(t *testing.T, portal target.Portal) {
 	assert.NotNil(t, portal)
 	assert.Contains(t, portal.Abs(), p.Abs)
-	assert.True(t, strings.HasSuffix(portal.Abs(), p.Abs))
+	assert.True(t, strings.HasSuffix(portal.Abs(), p.Abs), "%s %s", portal.Abs(), p.Abs)
 	assert.Equal(t, p.Path, portal.Path())
 	assert.Equal(t, p.Manifest, portal.Manifest())
 }

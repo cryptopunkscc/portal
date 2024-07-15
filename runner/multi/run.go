@@ -9,11 +9,11 @@ import (
 )
 
 type Runner[T target.Portal] struct {
-	runners []target.Run[T]
+	runners []target.Run[target.Portal]
 }
 
 func NewRunner[T target.Portal](
-	runners ...target.Run[T],
+	runners ...target.Run[target.Portal],
 ) *Runner[T] {
 	return &Runner[T]{runners: runners}
 }

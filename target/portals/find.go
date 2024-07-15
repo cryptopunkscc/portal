@@ -10,18 +10,18 @@ import (
 	"strings"
 )
 
-var Finder target.Finder[target.Portal] = NewFind
+var Finder target.Finder[target.Portal] = NewFind[target.Portal]
 
-func NewFind(getPath target.Path, files ...fs.FS) target.Find[target.Portal] {
-	return finder{apps.NewFinder(getPath, files...)}.find
+func NewFind[T target.Portal](getPath target.Path, files ...fs.FS) target.Find[T] {
+	return finder[T]{apps.NewFinder[target.App](getPath, files...)}.find
 }
 
-type finder struct{ apps.Finder }
+type finder[T target.Portal] struct{ apps.Finder[target.App] }
 
-func (p finder) find(ctx context.Context, src string) (portals target.Portals[target.Portal], err error) {
+func (p finder[T]) find(ctx context.Context, src string) (portals target.Portals[T], err error) {
 	base := src
 	src = strings.TrimPrefix(src, "dev.")
-	portals = make(target.Portals[target.Portal])
+	portals = make(target.Portals[T])
 
 	if s, _ := p.GetPath(src); s != "" {
 		src = s
@@ -29,12 +29,16 @@ func (p finder) find(ctx context.Context, src string) (portals target.Portals[ta
 
 	if a, err := p.Finder.ByPath(ctx, src); err == nil {
 		for s, app := range a {
-			portals[s] = app
+			if t, ok := app.(T); ok {
+				portals[s] = t
+			}
 		}
 	}
 
-	for _, a := range sources.FromPath[target.Project](src) {
-		portals[a.Manifest().Package] = a
+	for _, a := range sources.FromPath[T](src) {
+		if _, ok := any(a).(target.Project); ok {
+			portals[a.Manifest().Package] = a
+		}
 	}
 
 	if len(portals) > 0 {

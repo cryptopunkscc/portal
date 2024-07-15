@@ -12,7 +12,7 @@ func Mutable[T target.Portal](
 	portMsg target.Port,
 	newRunner func(target.NewApi, target.MsgSend) target.Runner[T],
 ) target.Run[target.Portal] {
-	return Runner[T]{
+	return runner[T]{
 		portMsg:   portMsg,
 		newApi:    newApi,
 		newRunner: newRunner,
@@ -24,7 +24,7 @@ func Immutable[T target.Portal](
 	portMsg target.Port,
 	newRunner func(target.NewApi) target.Runner[T],
 ) target.Run[target.Portal] {
-	return Runner[T]{
+	return runner[T]{
 		portMsg: portMsg,
 		newApi:  newApi,
 		newRunner: func(api target.NewApi, _ target.MsgSend) target.Runner[T] {
@@ -33,13 +33,13 @@ func Immutable[T target.Portal](
 	}.Run
 }
 
-type Runner[T target.Portal] struct {
+type runner[T target.Portal] struct {
 	portMsg   target.Port
 	newApi    target.NewApi
 	newRunner func(target.NewApi, target.MsgSend) target.Runner[T]
 }
 
-func (r Runner[T]) Run(ctx context.Context, portal target.Portal) (err error) {
+func (r runner[T]) Run(ctx context.Context, portal target.Portal) (err error) {
 	t, ok := portal.(T)
 	if !ok {
 		return target.ErrNotTarget
