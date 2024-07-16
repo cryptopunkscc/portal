@@ -11,6 +11,20 @@ import (
 	"time"
 )
 
+type Deps interface {
+	Port() target.Port
+	JoinTarget() target.Dispatch
+	DispatchService() target.Dispatch
+}
+
+func Inject(deps Deps) target.Dispatch {
+	return NewFeat(
+		deps.Port(),
+		deps.JoinTarget(),
+		deps.DispatchService(),
+	)
+}
+
 type Feat struct {
 	port         target.Port
 	runTarget    target.Dispatch

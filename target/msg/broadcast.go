@@ -13,9 +13,9 @@ type Broadcast struct {
 	targets *sig.Map[string, rpc.Conn]
 }
 
-func NewBroadcast(
+func NewBroadcast[T target.Portal](
 	port target.Port,
-	_ *sig.Map[string, target.Portal],
+	_ *sig.Map[string, T],
 ) *Broadcast {
 	return &Broadcast{
 		port:    port,

@@ -7,13 +7,28 @@ import (
 	"github.com/cryptopunkscc/portal/target"
 )
 
+type Deps[T target.Portal] interface {
+	TargetFind() target.Find[T]
+	TargetRun() target.Run[T]
+}
+
+func Inject[T target.Portal](deps Deps[T]) target.Dispatch {
+	return NewFeat(deps.TargetFind(), deps.TargetRun())
+}
+
 type Feat[T target.Portal] struct {
 	find target.Find[T]
 	run  target.Run[T]
 }
 
-func NewFeat[T target.Portal](find target.Find[T], run target.Run[T]) target.Dispatch {
-	return Feat[T]{find: find, run: run}.Run
+func NewFeat[T target.Portal](
+	find target.Find[T],
+	run target.Run[T],
+) target.Dispatch {
+	return Feat[T]{
+		find: find,
+		run:  run,
+	}.Run
 }
 
 func (f Feat[T]) Run(ctx context.Context, path string, _ ...string) (err error) {

@@ -10,6 +10,32 @@ import (
 	"github.com/cryptopunkscc/portal/target"
 )
 
+type Deps[T target.Portal] interface {
+	Astral() Astral
+	Port() target.Port
+	RunService() Service
+	RpcHandlers() rpc.Handlers
+	FeatObserve() Observe
+	NewTray() target.NewTray
+	RunSpawn() target.Dispatch
+}
+
+func Inject[T target.Portal](deps Deps[T]) *Feat {
+	var runTray target.Tray
+	if deps.NewTray() != nil {
+		runTray = deps.NewTray()(deps.RunSpawn())
+	}
+	return NewFeat(
+		deps.Astral(),
+		deps.Port(),
+		deps.RunService(),
+		deps.RpcHandlers(),
+		deps.RunSpawn(),
+		deps.FeatObserve(),
+		runTray,
+	)
+}
+
 // Feat representing portal service.
 type Feat struct {
 	astral Astral

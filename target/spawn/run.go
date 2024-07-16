@@ -8,6 +8,22 @@ import (
 	"sync"
 )
 
+type Deps[T target.Portal] interface {
+	WaitGroup() *sync.WaitGroup
+	TargetFind() target.Find[T]
+	TargetRun() target.Run[T]
+	Processes() *sig.Map[string, T]
+}
+
+func Inject[T target.Portal](deps Deps[T]) target.Dispatch {
+	return NewRunner[T](
+		deps.WaitGroup(),
+		deps.TargetFind(),
+		deps.TargetRun(),
+		deps.Processes(),
+	).Run
+}
+
 type Runner[T target.Portal] struct {
 	wait      *sync.WaitGroup
 	find      target.Find[T]
