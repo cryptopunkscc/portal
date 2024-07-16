@@ -1,7 +1,6 @@
-package exec
+package flow
 
 import (
-	"math"
 	"time"
 )
 
@@ -9,7 +8,8 @@ func AwaitExp(delay time.Duration) (delays []time.Duration) {
 	initial := 2
 	sum := time.Duration(0)
 	for i := initial; true; i++ {
-		t := 1 * time.Millisecond * time.Duration(math.Pow(2, float64(i)))
+		f := float64(i)
+		t := 1 * time.Millisecond * time.Duration(f*f)
 		sum = sum + t
 		if sum > delay {
 			t -= sum - delay

@@ -25,12 +25,6 @@ type (
 	// Observe on installed applications.
 	Observe func(ctx context.Context, conn rpc.Conn) (err error)
 
-	// Install application from given source (fs path).
-	Install func(src string) error
-
-	// Uninstall application with given id.
-	Uninstall func(id string) error
-
 	// Service starts portal rpc with additional handlers.
 	Service func(handlers rpc.Handlers) target.Dispatch
 )

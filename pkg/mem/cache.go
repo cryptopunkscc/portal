@@ -2,7 +2,6 @@ package mem
 
 import (
 	"maps"
-	"reflect"
 	"sync"
 )
 
@@ -40,7 +39,7 @@ func (c *Cache[T]) Set(id string, t T) {
 }
 
 func (c *Cache[T]) SetUnsafe(id string, t T) {
-	add := !reflect.ValueOf(t).IsZero()
+	add := any(t) != nil
 	ok := true
 	if add {
 		c.entries[id] = t

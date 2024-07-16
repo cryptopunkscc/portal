@@ -1,6 +1,6 @@
 package target
 
-import "strconv"
+import "fmt"
 
 const (
 	TypeAny     Type = 0
@@ -18,8 +18,7 @@ func (t Type) Is(p Type) bool {
 
 func ParseType(def Type, args ...string) (typ Type) {
 	if len(args) > 0 {
-		if i, err := strconv.Atoi(args[0]); err == nil {
-			typ = Type(i)
+		if _, err := fmt.Sscan(args[0], &typ); err != nil {
 			return
 		}
 	}

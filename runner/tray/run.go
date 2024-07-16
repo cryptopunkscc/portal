@@ -3,8 +3,8 @@ package tray
 import (
 	"context"
 	"github.com/cryptopunkscc/portal"
-	"github.com/cryptopunkscc/portal/pkg/exec"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/target"
 	"github.com/getlantern/systray"
 )
@@ -32,7 +32,7 @@ func (t *Runner) Run(ctx context.Context) {
 	quit := systray.AddMenuItem("Quit ", "Quit")
 	go onMenuItemClick(quit, func() {
 		systray.Quit()
-		if err := exec.Shutdown(); err != nil {
+		if err := sig.Shutdown(); err != nil {
 			t.log.Println("quit:", err)
 		}
 	})

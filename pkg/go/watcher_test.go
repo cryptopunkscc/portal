@@ -11,7 +11,7 @@ import (
 func TestWatcher_Run(t *testing.T) {
 	t.SkipNow()
 	src, _ := os.Getwd()
-	wd, _ := findProjectRoot(src)
+	wd, _ := FindProjectRoot(src)
 	target := path.Join(wd, "pkg/go")
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

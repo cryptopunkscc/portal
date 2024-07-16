@@ -9,7 +9,7 @@ import (
 
 func TestWatchCache_AddFile(t *testing.T) {
 	src, _ := os.Getwd()
-	wd, _ := findProjectRoot(src)
+	wd, _ := FindProjectRoot(src)
 	target := path.Join(wd, "pkg/go/imports.go")
 	w := NewWatchCache(wd, "github.com/cryptopunkscc/portal/")
 	w.AddFile(target)

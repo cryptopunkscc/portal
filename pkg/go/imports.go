@@ -9,19 +9,6 @@ import (
 	"strings"
 )
 
-func ListImports(absDir string) (imports []string, err error) {
-	projectRoot, err := findProjectRoot(absDir)
-	if err != nil {
-		return
-	}
-	_, err = getModuleRoot(projectRoot)
-	if err != nil {
-		return
-	}
-
-	return listImports(absDir)
-}
-
 func filterByModule(imports []string, module string) (filtered []string) {
 	for _, s := range imports {
 		if trim := strings.TrimPrefix(s, module); trim != s {
@@ -38,7 +25,7 @@ func withProjectPath(imports []string, abs string) (modified []string) {
 	return
 }
 
-func findProjectRoot(abs string) (s string, err error) {
+func FindProjectRoot(abs string) (s string, err error) {
 	if abs == "." || abs == "" || abs == "/" {
 		err = plog.Errorf("cannot find root")
 		return
@@ -48,10 +35,10 @@ func findProjectRoot(abs string) (s string, err error) {
 		return
 	}
 	dir := path.Dir(abs)
-	return findProjectRoot(dir)
+	return FindProjectRoot(dir)
 }
 
-func getModuleRoot(root string) (s string, err error) {
+func GetModuleRoot(root string) (s string, err error) {
 	goMod := path.Join(root, "go.mod")
 	file, err := os.Open(goMod)
 	if err != nil {
@@ -90,7 +77,7 @@ func sameImports(i1, i2 []string) bool {
 	return true
 }
 
-func listImports(absSrc string) (imports []string, err error) {
+func Imports(absSrc string) (imports []string, err error) {
 	if path.Ext(absSrc) != ".go" {
 		err = fmt.Errorf("%s is not a .go file", absSrc)
 		return

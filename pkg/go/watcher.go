@@ -26,10 +26,10 @@ func NewWatcher() *Watcher {
 func (w *Watcher) Run(ctx context.Context, abs string) (c <-chan fsnotify.Event, err error) {
 	log := plog.Get(ctx).Type(w).Set(&ctx)
 	log.Println("starting watcher", abs)
-	if w.projectRoot, err = findProjectRoot(abs); err != nil {
+	if w.projectRoot, err = FindProjectRoot(abs); err != nil {
 		return
 	}
-	if w.moduleName, err = getModuleRoot(w.projectRoot); err != nil {
+	if w.moduleName, err = GetModuleRoot(w.projectRoot); err != nil {
 		return
 	}
 	if w.watcher, err = fsnotify.NewWatcher(); err != nil {

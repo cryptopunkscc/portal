@@ -1,7 +1,7 @@
 package appstore
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/fs"
+	"github.com/cryptopunkscc/portal/pkg/fs2"
 	"github.com/cryptopunkscc/portal/target"
 	"github.com/cryptopunkscc/portal/target/apps"
 	"log"
@@ -13,7 +13,7 @@ func Install(src string) (err error) {
 		src = t.Abs()
 		dst := path.Join(portalAppsDir, path.Base(t.Path()))
 
-		err = fs.CopyFile(src, dst)
+		err = fs2.CopyFile(src, dst)
 		log.Printf("Installing %s to %s", src, dst)
 		if err != nil {
 			log.Printf("Error copying file %s: %v", src, err)

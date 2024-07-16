@@ -1,10 +1,10 @@
 package apphost
 
 import (
+	"errors"
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/astrald/lib/astral"
 	"github.com/cryptopunkscc/astrald/mod/apphost/proto"
-	"github.com/pkg/errors"
 	"os"
 	"strings"
 )

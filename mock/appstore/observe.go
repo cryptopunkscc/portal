@@ -3,7 +3,7 @@ package appstore
 import (
 	"context"
 	"errors"
-	"github.com/cryptopunkscc/portal/pkg/fs"
+	"github.com/cryptopunkscc/portal/pkg/fs2"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"github.com/cryptopunkscc/portal/target"
@@ -17,7 +17,7 @@ func Observe(ctx context.Context, conn rpc.Conn) (err error) {
 	if err != nil {
 		return
 	}
-	watch, err := fs.NotifyWatch(ctx, portalAppsDir, 0)
+	watch, err := fs2.NotifyWatch(ctx, portalAppsDir, 0)
 	if err != nil {
 		return
 	}

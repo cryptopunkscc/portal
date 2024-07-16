@@ -1,13 +1,14 @@
 package main
 
 import (
+	"context"
 	"github.com/cryptopunkscc/portal/clir"
 	feature "github.com/cryptopunkscc/portal/feat"
 	featApps "github.com/cryptopunkscc/portal/feat/apps"
 	"github.com/cryptopunkscc/portal/feat/version"
-	osExec "github.com/cryptopunkscc/portal/pkg/exec"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	portalPort "github.com/cryptopunkscc/portal/pkg/port"
+	"github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/runner/multi"
 	"github.com/cryptopunkscc/portal/runner/query"
 	"github.com/cryptopunkscc/portal/runner/reload"
@@ -16,14 +17,13 @@ import (
 	"github.com/cryptopunkscc/portal/runner/wails_dist"
 	"github.com/cryptopunkscc/portal/target"
 	"github.com/cryptopunkscc/portal/target/portals"
-	"golang.org/x/net/context"
 )
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
-	go osExec.OnShutdown(cancel)
-
 	log := plog.New().D().Scope("dev-wails").Set(&ctx)
+
+	go sig.OnShutdown(cancel)
 	portalPort.InitPrefix("dev")
 
 	scope := feature.Scope[target.PortalHtml]{

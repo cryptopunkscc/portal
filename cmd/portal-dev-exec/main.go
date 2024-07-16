@@ -1,26 +1,26 @@
 package main
 
 import (
+	"context"
 	"github.com/cryptopunkscc/portal/clir"
 	feature "github.com/cryptopunkscc/portal/feat"
 	featApps "github.com/cryptopunkscc/portal/feat/apps"
 	"github.com/cryptopunkscc/portal/feat/version"
-	osExec "github.com/cryptopunkscc/portal/pkg/exec"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/multi"
 	"github.com/cryptopunkscc/portal/runner/query"
 	"github.com/cryptopunkscc/portal/runner/reload"
 	"github.com/cryptopunkscc/portal/target"
 	"github.com/cryptopunkscc/portal/target/apps"
-	"golang.org/x/net/context"
 )
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
-	go osExec.OnShutdown(cancel)
-
 	log := plog.New().D().Scope("dev-exec").Set(&ctx)
+
+	go sig.OnShutdown(cancel)
 
 	scope := feature.Scope[target.AppExec]{
 		WrapApi:        NewAdapter,

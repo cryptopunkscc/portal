@@ -10,9 +10,9 @@ import (
 func Test_ListImports(t *testing.T) {
 	plog.ErrorStackTrace = true
 	src, _ := os.Getwd()
-	src, _ = findProjectRoot(src)
+	src, _ = FindProjectRoot(src)
 	src = path.Join(src, "pkg/go/imports.go")
-	imports, err := ListImports(src)
+	imports, err := Imports(src)
 	if err != nil {
 		plog.Println(err)
 	}

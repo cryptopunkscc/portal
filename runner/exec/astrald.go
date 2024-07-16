@@ -3,7 +3,8 @@ package exec
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/pkg/apphost"
-	exec2 "github.com/cryptopunkscc/portal/pkg/exec"
+	"github.com/cryptopunkscc/portal/pkg/flow"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"
 	"os/exec"
 	"time"
@@ -11,7 +12,7 @@ import (
 
 // Astral starts astral daemon process in a given [context.Context] and waits until available.
 func Astral(ctx context.Context) (err error) {
-
+	log := plog.Get(ctx)
 	// check if astrald already running
 	if err = apphost.Check(); err == nil {
 		return
@@ -27,7 +28,8 @@ func Astral(ctx context.Context) (err error) {
 	}
 
 	// await for apphost
-	return exec2.Retry(ctx, 10*time.Second, func(int, int, time.Duration) (err error) {
+	return flow.Retry(ctx, 10*time.Second, func(i int, n int, d time.Duration) (err error) {
+		log.Printf("%d/%d attempt %v: retry after %v", i+1, n, err, d)
 		return apphost.Init()
 	})
 }

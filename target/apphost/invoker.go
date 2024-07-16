@@ -2,7 +2,7 @@ package apphost
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/pkg/exec"
+	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/target"
 	"strings"
 	"time"
@@ -41,8 +41,8 @@ func (inv *Invoker) Query(identity string, query string) (data string, err error
 			}
 		}
 
-		data, err = exec.RetryT[string](inv.ctx, 8188*time.Millisecond, func(i, n int, d time.Duration) (string, error) {
-			log.Println("retry query:", i, n, data, err)
+		data, err = flow.RetryT[string](inv.ctx, 8188*time.Millisecond, func(i, n int, d time.Duration) (string, error) {
+			log.Printf("retry query: %s - %d/%d attempt %v: retry after %v", data, i+1, n, err, d)
 			return inv.Adapter.Query(identity, query)
 		})
 		if err == nil {

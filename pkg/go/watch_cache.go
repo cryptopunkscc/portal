@@ -28,7 +28,7 @@ func (c *WatchCache) UpdateFile(abs string) (remove, add map[string]any) {
 	if ok {
 		return
 	}
-	imports, err := listImports(abs)
+	imports, err := Imports(abs)
 	if err != nil {
 		return
 	}
@@ -54,7 +54,7 @@ func (c *WatchCache) AddFile(abs string) (dirs map[string]any) {
 	if _, ok := c.files[abs]; ok {
 		return
 	}
-	imports, err := listImports(abs)
+	imports, err := Imports(abs)
 	if err != nil {
 		return
 	}

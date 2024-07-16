@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/portal/pkg/apphost"
-	"github.com/cryptopunkscc/portal/pkg/exec"
+	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"github.com/cryptopunkscc/portal/target"
@@ -34,7 +34,7 @@ func (f Feat) Run(
 	src string,
 	args ...string,
 ) (err error) {
-	plog.Get(ctx).Type(f).Set(&ctx)
+	log := plog.Get(ctx).Type(f).Set(&ctx)
 
 	if src == "" {
 		err = f.checkService()
@@ -54,7 +54,8 @@ func (f Feat) Run(
 		return
 	}
 
-	if err = exec.Retry(ctx, 8*time.Second, func(i int, n int, duration time.Duration) (err error) {
+	if err = flow.Retry(ctx, 8*time.Second, func(i int, n int, d time.Duration) (err error) {
+		log.Printf("%d/%d attempt %v: retry after %v", i+1, n, err, d)
 		if err = apphost.Init(); err != nil {
 			return
 		}

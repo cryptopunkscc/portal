@@ -1,4 +1,4 @@
-package fs
+package fs2
 
 import (
 	"context"

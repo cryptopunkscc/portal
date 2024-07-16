@@ -4,7 +4,7 @@ package webview
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/pkg/exec"
+	"github.com/cryptopunkscc/portal/pkg/sig"
 	"log"
 	"os"
 	"path"
@@ -21,7 +21,7 @@ func main() {
 	title := path.Base(file)
 
 	ctx, cancel := context.WithCancel(context.Background())
-	go exec.OnShutdown(cancel)
+	go sig.OnShutdown(cancel)
 
 	Run(ctx, src, title)
 }

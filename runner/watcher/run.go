@@ -3,7 +3,7 @@ package watcher
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/pkg/flow"
-	"github.com/cryptopunkscc/portal/pkg/fs"
+	"github.com/cryptopunkscc/portal/pkg/fs2"
 	"github.com/cryptopunkscc/portal/target"
 	"github.com/fsnotify/fsnotify"
 	"time"
@@ -18,7 +18,7 @@ func NewRunner[T target.Dist](reload func() error) *Runner[T] {
 }
 
 func (r *Runner[T]) Run(ctx context.Context, dist T) (err error) {
-	changes, err := fs.NotifyWatch(ctx, dist.Abs(), fsnotify.Write)
+	changes, err := fs2.NotifyWatch(ctx, dist.Abs(), fsnotify.Write)
 	if err != nil {
 		return
 	}

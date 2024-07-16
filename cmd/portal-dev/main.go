@@ -11,10 +11,10 @@ import (
 	"github.com/cryptopunkscc/portal/feat/create"
 	"github.com/cryptopunkscc/portal/feat/serve"
 	"github.com/cryptopunkscc/portal/feat/version"
-	osExec "github.com/cryptopunkscc/portal/pkg/exec"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	portalPort "github.com/cryptopunkscc/portal/pkg/port"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
+	signal "github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/runner/app"
 	"github.com/cryptopunkscc/portal/runner/dist"
 	"github.com/cryptopunkscc/portal/runner/exec"
@@ -33,7 +33,8 @@ import (
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
-	go osExec.OnShutdown(cancel)
+
+	go signal.OnShutdown(cancel)
 
 	println("...")
 	plog.ErrorStackTrace = true

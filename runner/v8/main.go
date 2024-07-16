@@ -4,7 +4,7 @@ package v8
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/pkg/exec"
+	"github.com/cryptopunkscc/portal/pkg/sig"
 	"log"
 	"os"
 )
@@ -21,7 +21,7 @@ func main() {
 
 	// prepare context
 	ctx, cancel := context.WithCancel(context.Background())
-	exec.OnShutdown(cancel)
+	sig.OnShutdown(cancel)
 
 	if err = Run(ctx, file, src); err != nil {
 		log.Fatalln(err)
