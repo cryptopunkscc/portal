@@ -55,12 +55,11 @@ func main() {
 
 type Module[T Portal] struct{ srv.Module[T] }
 
-func (d *Module[T]) Executable() string        { return "portal-dev" }
-func (d *Module[T]) Astral() serve.Astral      { return serve.CheckAstral }
-func (d *Module[T]) JoinTarget() Dispatch      { return query.NewRunner[Portal](PortOpen).Run }
-func (d *Module[T]) TargetFinder() Finder[T]   { return portals.NewFind[T] }
-func (d *Module[T]) DispatchService() Dispatch { return di.Single(serve.Inject[T], d).Dispatch }
-func (d *Module[T]) FeatDispatch() Dispatch    { return di.Single(dispatch.Inject, d) }
+func (d *Module[T]) Executable() string      { return "portal-dev" }
+func (d *Module[T]) Astral() serve.Astral    { return serve.CheckAstral }
+func (d *Module[T]) JoinTarget() Dispatch    { return query.NewRunner[Portal](PortOpen).Run }
+func (d *Module[T]) TargetFinder() Finder[T] { return portals.NewFind[T] }
+func (d *Module[T]) FeatDispatch() Dispatch  { return di.Single(dispatch.Inject, dispatch.Deps(d)) }
 func (d *Module[T]) FeatCreate() *create.Feat {
 	return create.NewFeat(template.NewRun, d.FeatBuild().Dist)
 }
@@ -69,6 +68,9 @@ func (d *Module[T]) FeatBuild() *build.Feat {
 		dist.NewRun, pack.Run,
 		sources.FromFS[NodeModule](js.PortalLibFS),
 	)
+}
+func (d *Module[T]) DispatchService() Dispatch {
+	return di.Single(serve.Inject[T], serve.Deps[T](d)).Dispatch
 }
 func (d *Module[T]) RpcHandlers() rpc.Handlers {
 	return rpc.Handlers{

@@ -10,13 +10,13 @@ type Cache struct{ _cache sig.Map[any, any] }
 type cache interface{ cache() *sig.Map[any, any] }
 
 func (d *Cache) cache() *sig.Map[any, any] { return &d._cache }
-func Single[D any, T any](create Create[D, T], deps any) (t T) {
+func Single[D any, T any](create Create[D, T], deps D) (t T) {
 	key := reflect.ValueOf(create)
-	c := deps.(cache).cache()
+	c := any(deps).(cache).cache()
 	if d, ok := c.Get(key); ok {
 		return d.(T)
 	}
-	t = create(deps.(D))
+	t = create(deps)
 	c.Set(key, t)
 	return
 }

@@ -44,12 +44,12 @@ func main() {
 
 type Module[T App] struct{ srv.Module[App] }
 
-func (d *Module[T]) FeatServe() clir.Serve     { return di.Single(serve.Inject[T], d).Run }
+func (d *Module[T]) FeatServe() clir.Serve     { return di.Single(serve.Inject[T], serve.Deps[T](d)).Run }
 func (d *Module[T]) Astral() serve.Astral      { return exec.Astral }
 func (d *Module[T]) TargetFinder() Finder[T]   { return apps.NewFind[T] }
 func (d *Module[T]) Executable() string        { return "portal" }
 func (d *Module[T]) RpcHandlers() rpc.Handlers { return nil }
-func (d *Module[T]) GetCacheDir() string       { return di.Single(cache.Dir, d) }
+func (d *Module[T]) GetCacheDir() string       { return di.Single(cache.Dir, cache.Deps(d)) }
 func (d *Module[T]) TargetRun() Run[T] {
 	return multi.NewRunner[T](
 		app.Run(exec.NewPortal[AppJs]("portal-app-goja", "o").Run),

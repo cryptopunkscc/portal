@@ -36,7 +36,7 @@ func main() {
 type Module struct{ dev.Module[AppExec] }
 
 func (d *Module) Executable() string  { return "portal-dev" }
-func (d *Module) GetCacheDir() string { return di.Single(cache.Dir, d) }
+func (d *Module) GetCacheDir() string { return di.Single(cache.Dir, cache.Deps(d)) }
 func (d *Module) WrapApi(api Api) Api { return api }
 func (d *Module) NewRunTarget(newApi NewApi) Run[AppExec] {
 	return multi.NewRunner[AppExec](

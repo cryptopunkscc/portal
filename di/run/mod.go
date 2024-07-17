@@ -23,9 +23,9 @@ type Deps[T Portal] interface {
 }
 
 func (d *Module[T]) Path() Path               { return featApps.Path }
-func (d *Module[T]) NewApi() NewApi           { return di.Single(api.New, d) }
+func (d *Module[T]) NewApi() NewApi           { return di.Single(api.New, api.Deps(d)) }
 func (d *Module[T]) TargetRun() Run[T]        { return d.NewRunTarget(d.NewApi()) }
-func (d *Module[T]) TargetFind() Find[T]      { return di.Single(find.New[T], d) }
+func (d *Module[T]) TargetFind() Find[T]      { return di.Single(find.New[T], find.Deps[T](d)) }
 func (d *Module[T]) TargetCache() *Cache[T]   { return &d.targets }
 func (d *Module[T]) TargetDispatch() Dispatch { return query.NewRunner[T](PortOpen).Start }
-func (d *Module[T]) FeatOpen() Dispatch       { return di.Single(open.Inject[T], d) }
+func (d *Module[T]) FeatOpen() Dispatch       { return di.Single(open.Inject[T], open.Deps[T](d)) }
