@@ -36,11 +36,11 @@ func main() {
 type Module struct{ dev.Module[AppExec] }
 
 func (d *Module) Executable() string  { return "portal-dev" }
-func (d *Module) GetCacheDir() string { return di.Single(cache.Dir, cache.Deps(d)) }
+func (d *Module) CacheDir() string    { return di.S(cache.Dir, cache.Deps(d)) }
 func (d *Module) WrapApi(api Api) Api { return api }
 func (d *Module) NewRunTarget(newApi NewApi) Run[AppExec] {
 	return multi.NewRunner[AppExec](
-		reload.Immutable(newApi, PortMsg, reload.Adapter(exec.NewBundleRunner(d.GetCacheDir()))),
+		reload.Immutable(newApi, PortMsg, reload.Adapter(exec.NewBundleRunner(d.CacheDir()))),
 		reload.Immutable(newApi, PortMsg, reload.Adapter(exec.NewDistRunner())),
 	).Run
 }
