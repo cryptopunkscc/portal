@@ -33,6 +33,5 @@ func main() {
 type Module struct{ app.Module[AppHtml] }
 type Adapter struct{ Api }
 
-func NewAdapter(api Api) Api                              { return &Adapter{Api: api} }
-func (d *Module) WrapApi(api Api) Api                     { return NewAdapter(api) }
+func (d *Module) WrapApi(api Api) Api                     { return &Adapter{api} }
 func (d *Module) NewRunTarget(newApi NewApi) Run[AppHtml] { return wails.NewRun(newApi) }

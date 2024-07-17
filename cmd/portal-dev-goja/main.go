@@ -37,7 +37,6 @@ func main() {
 
 type Module struct{ dev.Module[PortalJs] }
 
-func (d *Module) WrapApi(api Api) Api { return api }
 func (d *Module) NewRunTarget(newApi NewApi) Run[PortalJs] {
 	return multi.NewRunner[PortalJs](
 		reload.Mutable(newApi, PortMsg, goja_dev.NewRunner),

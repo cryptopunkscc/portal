@@ -25,6 +25,7 @@ type Deps[T Portal] interface {
 
 func (d *Module[T]) Path() Path               { return featApps.Path }
 func (d *Module[T]) NewApi() NewApi           { return di.S(api.New, api.Deps(d.Deps)) }
+func (d *Module[T]) WrapApi(api Api) Api      { return api }
 func (d *Module[T]) TargetRun() Run[T]        { return d.NewRunTarget(d.NewApi()) }
 func (d *Module[T]) TargetFind() Find[T]      { return di.S(find.New[T], find.Deps[T](d.Deps)) }
 func (d *Module[T]) TargetCache() *Cache[T]   { return &d.targets }

@@ -31,5 +31,4 @@ func main() {
 
 type Module struct{ app.Module[AppJs] }
 
-func (d *Module) WrapApi(api Api) Api                   { return api }
 func (d *Module) NewRunTarget(newApi NewApi) Run[AppJs] { return goja.NewRun(newApi) }

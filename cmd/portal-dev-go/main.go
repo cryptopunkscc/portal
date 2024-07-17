@@ -38,7 +38,6 @@ func main() {
 
 type Module struct{ dev.Module[ProjectGo] }
 
-func (d *Module) WrapApi(api Api) Api { return api }
 func (d *Module) NewRunTarget(newApi NewApi) Run[ProjectGo] {
 	var runner = go_dev.NewAdapter(app.Run(exec.NewDistRunner().Run))
 	return multi.NewRunner[ProjectGo](reload.Mutable(newApi, PortMsg, runner)).Run
