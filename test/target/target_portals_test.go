@@ -50,7 +50,7 @@ func Test__portals_Find__embed_launcher(t *testing.T) {
 		appstore.Path,
 	)
 
-	cache := target.NewCache[target.Portal]()
+	cache := &target.Cache[target.Portal]{}
 	find := portals.Finder.Cached(cache)(findPath, embedFs)
 
 	for _, test := range portalTestCases {

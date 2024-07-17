@@ -10,7 +10,7 @@ import (
 )
 
 func Test__Builder_find(t *testing.T) {
-	f := find.New[target.Portal](deps{})
+	f := find.New[target.Portal](&deps{})
 
 	for _, test := range portalTestCases {
 		test := test
@@ -26,8 +26,10 @@ func Test__Builder_find(t *testing.T) {
 	}
 }
 
-type deps struct{}
+type deps struct {
+	cache target.Cache[target.Portal]
+}
 
-func (d deps) Path() target.Path                          { return apps.Path }
-func (d deps) TargetFinder() target.Finder[target.Portal] { return portals.NewFind[target.Portal] }
-func (d deps) TargetCache() *target.Cache[target.Portal]  { return target.NewCache[target.Portal]() }
+func (d *deps) Path() target.Path                          { return apps.Path }
+func (d *deps) TargetFinder() target.Finder[target.Portal] { return portals.NewFind[target.Portal] }
+func (d *deps) TargetCache() *target.Cache[target.Portal]  { return &d.cache }

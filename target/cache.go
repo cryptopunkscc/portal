@@ -34,29 +34,31 @@ func (finder Finder[T]) Cached(c *Cache[T]) Finder[T] {
 }
 
 type Cache[T Portal] struct {
-	portals Portals[T]
-	mu      sync.Mutex
+	_portals Portals[T]
+	mu       sync.Mutex
 }
 
-func NewCache[T Portal]() *Cache[T] {
-	return &Cache[T]{portals: make(Portals[T])}
+func (c *Cache[T]) portals() Portals[T] {
+	if c._portals == nil {
+		c._portals = make(Portals[T])
+	}
+	return c._portals
 }
-
 func (c *Cache[T]) Add(portals Portals[T]) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	for s, portal := range portals {
-		c.portals[s] = portal
+		c.portals()[s] = portal
 	}
 }
 
 func (c *Cache[T]) Get(src string) (portal Portal, ok bool) {
 	defer func() {
-		log.Println("get from cache:", src, ok, portal, c.portals)
+		log.Println("get from cache:", src, ok, portal, c.portals())
 	}()
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	for _, p := range c.portals {
+	for _, p := range c.portals() {
 		if p.Manifest().Match(src) {
 			ok = true
 			portal = p
