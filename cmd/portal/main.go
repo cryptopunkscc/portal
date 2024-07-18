@@ -13,26 +13,36 @@ import (
 )
 
 func main() {
+	mod := Module{}
 	ctx, cancel := context.WithCancel(context.Background())
 	log := plog.New().D().Scope("app").Set(&ctx)
 
 	go sig.OnShutdown(cancel)
-
-	dispatchFeat := dispatch.NewFeat(
-		target.PortPortal,
-		query.NewRunner[target.App](target.PortOpen).Run,
-		exec.NewDispatcher("portal-app").Dispatch,
-	)
 
 	cli := clir.NewCli(ctx,
 		"Portal",
 		"Portal command line.",
 		version.Run,
 	)
-	cli.Dispatch(dispatchFeat)
+	cli.Dispatch(mod.FeatDispatch())
+	cli.Tray(mod.FeatTray())
 
 	if err := cli.Run(); err != nil {
 		log.Println(err)
 	}
 	cancel()
+}
+
+type Module struct{ joinTarget target.Dispatch }
+
+func (m Module) Port() target.Port                { return target.PortPortal }
+func (m Module) DispatchService() target.Dispatch { return exec.NewDispatcher("portal-app").Dispatch }
+func (m Module) JoinTarget() target.Dispatch      { return m.joinTarget }
+func (m Module) FeatDispatch() target.Dispatch {
+	m.joinTarget = query.NewOpen().Run
+	return dispatch.Inject(m).Run
+}
+func (m Module) FeatTray() target.Tray {
+	m.joinTarget = query.NewPortal().Start
+	return dispatch.Inject(m).Tray
 }

@@ -10,38 +10,22 @@ import (
 	"github.com/cryptopunkscc/portal/target"
 )
 
+// Feat representing portal service.
+type Feat struct {
+	astral Astral
+	port   target.Port
+	serve  target.Dispatch
+}
+
 type Deps[T target.Portal] interface {
 	Astral() Astral
 	Port() target.Port
 	RunService() Service
 	RpcHandlers() rpc.Handlers
 	FeatObserve() Observe
-	NewTray() target.NewTray
 	RunSpawn() target.Dispatch
-}
-
-func Inject[T target.Portal](deps Deps[T]) *Feat {
-	var runTray target.Tray
-	if deps.NewTray() != nil {
-		runTray = deps.NewTray()(deps.RunSpawn())
-	}
-	return NewFeat(
-		deps.Astral(),
-		deps.Port(),
-		deps.RunService(),
-		deps.RpcHandlers(),
-		deps.RunSpawn(),
-		deps.FeatObserve(),
-		runTray,
-	)
-}
-
-// Feat representing portal service.
-type Feat struct {
-	astral Astral
-	port   target.Port
-	tray   target.Tray
-	serve  target.Dispatch
+	Tray() target.Tray
+	Close() context.CancelFunc
 }
 
 type (
@@ -55,8 +39,18 @@ type (
 	Service func(handlers rpc.Handlers) target.Dispatch
 )
 
-// CheckAstral is a default implementation of Astral function. Returns error if astral is not started.
-func CheckAstral(_ context.Context) error { return apphost.Check() }
+func Inject[T target.Portal](deps Deps[T]) *Feat {
+	return NewFeat(
+		deps.Astral(),
+		deps.Port(),
+		deps.RunService(),
+		deps.RpcHandlers(),
+		deps.RunSpawn(),
+		deps.FeatObserve(),
+		deps.Tray(),
+		deps.Close(),
+	)
+}
 
 func NewFeat(
 	astral Astral,
@@ -66,6 +60,7 @@ func NewFeat(
 	spawn target.Dispatch,
 	observe Observe,
 	tray target.Tray,
+	close context.CancelFunc,
 ) *Feat {
 	if handlers == nil {
 		handlers = rpc.Handlers{}
@@ -73,19 +68,22 @@ func NewFeat(
 	handlers["ping"] = func() {}
 	handlers["open"] = spawn
 	handlers["observe"] = observe
+	handlers["close"] = close
+	if tray != nil {
+		handlers["tray"] = tray
+	}
 	return &Feat{
 		astral: astral,
 		port:   port,
-		tray:   tray,
 		serve:  service(handlers),
 	}
 }
 
+// CheckAstral is a default implementation of Astral function. Returns error if astral is not started.
+func CheckAstral(_ context.Context) error { return apphost.Check() }
+
 // Run portal service including astral daemon if not started. Optionally displays an indicator in OS tray.
-func (f Feat) Run(
-	ctx context.Context,
-	tray bool,
-) (err error) {
+func (f Feat) Run(ctx context.Context) (err error) {
 	if err = f.astral(ctx); err != nil {
 		return
 	}
@@ -106,19 +104,13 @@ func (f Feat) Run(
 			log.Println("serve exit")
 		}
 	}()
-	if tray && f.tray != nil {
-		go func() {
-			defer cancel()
-			f.tray(ctx)
-		}()
-	}
 	<-ctx.Done()
 	return
 }
 
 func (f Feat) Dispatch(ctx context.Context, _ string, _ ...string) (err error) {
 	go func() {
-		if err = f.Run(ctx, false); err != nil {
+		if err = f.Run(ctx); err != nil {
 			plog.Get(ctx).Type(f).Println("dispatch:", err)
 		}
 	}()

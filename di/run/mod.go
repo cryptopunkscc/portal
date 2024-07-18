@@ -29,5 +29,5 @@ func (d *Module[T]) WrapApi(api Api) Api      { return api }
 func (d *Module[T]) TargetRun() Run[T]        { return d.NewRunTarget(d.NewApi()) }
 func (d *Module[T]) TargetFind() Find[T]      { return di.S(find.New[T], find.Deps[T](d.Deps)) }
 func (d *Module[T]) TargetCache() *Cache[T]   { return &d.targets }
-func (d *Module[T]) TargetDispatch() Dispatch { return query.NewRunner[T](PortOpen).Start }
+func (d *Module[T]) TargetDispatch() Dispatch { return query.NewOpen().Start }
 func (d *Module[T]) FeatOpen() Dispatch       { return di.S(open.Inject[T], open.Deps[T](d.Deps)) }

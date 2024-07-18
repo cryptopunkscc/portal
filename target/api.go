@@ -9,7 +9,7 @@ type Api interface{ Apphost }
 
 type NewApi func(context.Context, Portal) Api
 
-type Tray func(ctx context.Context)
+type Tray func(ctx context.Context) error
 
 type NewTray func(dispatch Dispatch) Tray
 

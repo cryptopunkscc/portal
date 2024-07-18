@@ -23,6 +23,7 @@ func main() {
 	mod := Module[App]{}
 	mod.Deps = &mod
 	ctx, cancel := context.WithCancel(context.Background())
+	mod.CancelFunc = cancel
 	log := plog.New().D().Scope("app").Set(&ctx)
 	cli := clir.NewCli(ctx,
 		"Portal-app",
@@ -45,6 +46,7 @@ func main() {
 type Module[T App] struct{ srv.Module[App] }
 
 func (d *Module[T]) Executable() string        { return "portal" }
+func (d *Module[T]) Tray() Tray                { return exec.Tray }
 func (d *Module[T]) Astral() serve.Astral      { return exec.Astral }
 func (d *Module[T]) TargetFinder() Finder[T]   { return apps.NewFind[T] }
 func (d *Module[T]) RpcHandlers() rpc.Handlers { return nil }
@@ -56,4 +58,4 @@ func (d *Module[T]) TargetRun() Run[T] {
 	).Run
 }
 func (d *Module[T]) CacheDir() string      { return di.S(cache.Dir, cache.Deps(d)) }
-func (d *Module[T]) FeatServe() clir.Serve { return di.S(serve.Inject[T], serve.Deps[T](d)).Run }
+func (d *Module[T]) FeatServe() clir.Serve { return serve.Inject[T](d).Run }

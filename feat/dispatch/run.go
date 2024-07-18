@@ -17,30 +17,34 @@ type Deps interface {
 	DispatchService() target.Dispatch
 }
 
-func Inject(deps Deps) target.Dispatch {
+func Inject(deps Deps) Feat {
 	return NewFeat(
 		deps.Port(),
-		deps.JoinTarget(),
 		deps.DispatchService(),
+		deps.JoinTarget(),
 	)
 }
 
 type Feat struct {
 	port         target.Port
-	runTarget    target.Dispatch
 	startService target.Dispatch
+	runTarget    target.Dispatch
 }
 
 func NewFeat(
 	port target.Port,
-	runTarget target.Dispatch,
 	startService target.Dispatch,
-) target.Dispatch {
+	runTarget target.Dispatch,
+) Feat {
 	return Feat{
 		port:         port,
 		runTarget:    runTarget,
 		startService: startService,
-	}.Run
+	}
+}
+
+func (f Feat) Tray(ctx context.Context) error {
+	return f.Run(ctx, "tray")
 }
 
 func (f Feat) Run(
@@ -60,11 +64,7 @@ func (f Feat) Run(
 		return
 	}
 
-	if err = f.startService(ctx, "s", "-t"); err != nil {
-		return
-	}
-
-	if src == "" {
+	if err = f.startService(ctx, "s"); err != nil {
 		return
 	}
 
@@ -73,16 +73,19 @@ func (f Feat) Run(
 		if err = apphost.Init(); err != nil {
 			return
 		}
-		return f.runTarget(ctx, src, args...)
+		return f.checkService()
 	}); err != nil {
 		return
 	}
 
+	if src != "" {
+		return f.runTarget(ctx, src, args...)
+	}
 	return
 }
 
 func (f Feat) checkService() (err error) {
-	request := rpc.NewRequest(id.Anyone, f.port.String())
+	request := rpc.NewRequest(id.Anyone, f.port.Base)
 	if err = rpc.Command(request, "ping"); err == nil {
 		return
 	}

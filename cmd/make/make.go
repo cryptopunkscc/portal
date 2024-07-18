@@ -65,6 +65,7 @@ func (d *Install) Run(jobs ...Make) {
 		goPortalApp().Install()
 		goPortalAppGoja().Install()
 		goPortalAppWails().Install()
+		goPortalTray().Install()
 	}
 	if job&Installer == Installer {
 		log.Println(" * installer")

@@ -9,26 +9,31 @@ import (
 	"github.com/cryptopunkscc/portal/target"
 )
 
-type Runner[T target.Portal] struct {
-	port string
+type Open struct {
+	port target.Port
 }
 
-func NewRunner[T target.Portal](port target.Port) *Runner[T] {
-	return &Runner[T]{port: port.String()}
+func NewOpen() *Open {
+	return &Open{port: target.PortOpen}
 }
 
-func (r Runner[T]) Run(ctx context.Context, src string, args ...string) (err error) {
-	plog.Get(ctx).Type(r).Println("Running query", r.port, src, args)
-	flow, err := rpc.QueryFlow(id.Anyone, r.port)
+func (r Open) Run(ctx context.Context, src string, args ...string) (err error) {
+	log := plog.Get(ctx).Type(r)
+	log.Println("Running query", r.port, src, args)
+	flow, err := rpc.QueryFlow(id.Anyone, r.port.Base)
+	if err != nil {
+		return
+	}
+	flow.Logger(log)
 	if err != nil {
 		return err
 	}
 	defer flow.Close()
 	typ := target.ParseType(target.TypeAny, args...)
 	sTyp := fmt.Sprintf("%d", typ)
-	err = rpc.Command(flow, "", src, sTyp)
+	err = rpc.Command(flow, r.port.Name, src, sTyp)
 	if err != nil {
-		plog.Get(ctx).Type(r).E().Printf("cannot query %s: %v", src, err)
+		log.E().Printf("cannot query %s %s: %v", r.port, src, err)
 		return fmt.Errorf("cannot query %s: %w", src, err)
 	}
 	c := make(chan any)
@@ -43,12 +48,12 @@ func (r Runner[T]) Run(ctx context.Context, src string, args ...string) (err err
 	return
 }
 
-func (r Runner[T]) Start(ctx context.Context, src string, args ...string) (err error) {
+func (r Open) Start(ctx context.Context, src string, args ...string) (err error) {
 	plog.Get(ctx).Type(r).Println("starting query", r.port, src, args)
-	request := rpc.NewRequest(id.Anyone, r.port)
+	request := rpc.NewRequest(id.Anyone, r.port.Base)
 	typ := target.ParseType(target.TypeAny, args...)
 	sTyp := fmt.Sprintf("%d", typ)
-	err = rpc.Command(request, "", src, sTyp)
+	err = rpc.Command(request, r.port.Name, src, sTyp)
 	if err != nil {
 		plog.Get(ctx).Type(r).E().Printf("cannot query %s: %v", src, err)
 		return fmt.Errorf("cannot query %s: %w", src, err)

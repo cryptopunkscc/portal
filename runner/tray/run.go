@@ -2,45 +2,66 @@ package tray
 
 import (
 	"context"
+	"errors"
 	"github.com/cryptopunkscc/portal"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/target"
 	"github.com/getlantern/systray"
 )
 
-func NewRun(open target.Dispatch) target.Tray {
-	return (&Runner{open: open}).Run
+type Api interface {
+	Open(src string) error
+	Close() error
+	Ping() error
+	Await()
+}
+
+type AwaitClose func()
+
+func NewRun(api Api) target.Tray {
+	return (&Runner{api: api}).Run
 }
 
 type Runner struct {
-	open target.Dispatch
-	log  plog.Logger
+	api Api
+	log plog.Logger
 }
 
-func (t *Runner) Run(ctx context.Context) {
+func (t *Runner) Run(ctx context.Context) (err error) {
 	t.log = plog.Get(ctx).Type(t).Set(&ctx)
+
+	if err = t.api.Ping(); err != nil {
+		return errors.New("portal-tray requires portal-app running")
+	}
+	go func() {
+		t.api.Await()
+		systray.Quit()
+	}()
+
 	systray.SetTitle(portal.Name)
 	launcherItem := systray.AddMenuItem("Launcher", "Launcher")
 	go onMenuItemClick(launcherItem, func() {
 		go func() {
-			if err := t.open(ctx, "launcher"); err != nil {
+			if err := t.api.Open("launcher"); err != nil {
 				t.log.Println("launcher:", err)
 			}
 		}()
 	})
+
 	quit := systray.AddMenuItem("Quit ", "Quit")
 	go onMenuItemClick(quit, func() {
-		systray.Quit()
-		if err := sig.Shutdown(); err != nil {
+		if err := t.api.Close(); err != nil {
 			t.log.Println("quit:", err)
+			systray.Quit()
 		}
 	})
+
 	go func() {
 		<-ctx.Done()
 		systray.Quit()
 	}()
 	systray.Run(t.onReady, t.onExit)
+	return
 }
 
 func (t *Runner) onReady() {

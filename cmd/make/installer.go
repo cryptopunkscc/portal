@@ -12,6 +12,7 @@ func (d *Install) buildInstaller() {
 	buildAnc()
 	goPortal().Build()
 	goPortalApp().Build()
+	goPortalTray().Build()
 	goPortalAppGoja().Build()
 	goPortalAppWails().Build()
 	goPortalDev().Build()

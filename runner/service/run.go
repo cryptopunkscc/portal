@@ -24,6 +24,7 @@ func (r Runner) Run(ctx context.Context, port string, _ ...string) (err error) {
 	log.Printf("start port:%s", port)
 	defer log.Printf("exit port:%s", port)
 	app := rpc.NewApp(port)
+	app.Routes("*")
 	for name, h := range r.handlers {
 		app.RouteFunc(name, h)
 	}

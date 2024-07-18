@@ -20,6 +20,7 @@ func goPortal() GoPortal         { return GoPortal{}.target("portal") }
 func goPortalApp() GoPortal      { return GoPortal{}.target("portal-app") }
 func goPortalAppWails() GoPortal { return GoWails.target("portal-app-wails") }
 func goPortalAppGoja() GoPortal  { return GoPortal{}.target("portal-app-goja") }
+func goPortalTray() GoPortal     { return GoPortal{}.target("portal-tray") }
 func goPortalDev() GoPortal      { return GoPortal{}.target("portal-dev") }
 func goPortalDevExec() GoPortal  { return GoPortal{}.target("portal-dev-exec") }
 func goPortalDevWails() GoPortal { return GoWailsDev.target("portal-dev-wails") }

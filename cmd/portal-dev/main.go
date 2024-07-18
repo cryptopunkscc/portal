@@ -10,7 +10,6 @@ import (
 	"github.com/cryptopunkscc/portal/feat/dispatch"
 	"github.com/cryptopunkscc/portal/feat/serve"
 	"github.com/cryptopunkscc/portal/feat/version"
-	"github.com/cryptopunkscc/portal/pkg/di"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	portalPort "github.com/cryptopunkscc/portal/pkg/port"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
@@ -42,7 +41,7 @@ func main() {
 	defer log.Println("closing portal development")
 	portalPort.InitPrefix("dev")
 	cli := clir.NewCli(ctx, manifest.NameDev, manifest.DescriptionDev, version.Run)
-	cli.Dev(mod.FeatDispatch())
+	cli.Dev(mod.FeatDev())
 	cli.Create(template.List, mod.FeatCreate().Run)
 	cli.Build(mod.FeatBuild().Run)
 	cli.Portals(mod.TargetFind())
@@ -71,11 +70,10 @@ func (d *Module[T]) TargetRun() Run[T] {
 		app.Run(exec.NewPortal[AppExec]("portal-dev-exec", "o").Run),
 	).Run
 }
-func (d *Module[T]) JoinTarget() Dispatch { return query.NewRunner[Portal](PortOpen).Run }
-func (d *Module[T]) DispatchService() Dispatch {
-	return di.S(serve.Inject[T], serve.Deps[T](d)).Dispatch
-}
-func (d *Module[T]) FeatDispatch() Dispatch { return di.S(dispatch.Inject, dispatch.Deps(d)) }
+func (d *Module[T]) Tray() Tray                { return nil }
+func (d *Module[T]) JoinTarget() Dispatch      { return query.NewOpen().Run }
+func (d *Module[T]) DispatchService() Dispatch { return serve.Inject[T](d).Dispatch }
+func (d *Module[T]) FeatDev() Dispatch         { return dispatch.Inject(d).Run }
 func (d *Module[T]) FeatCreate() *create.Feat {
 	return create.NewFeat(template.NewRun, d.FeatBuild().Dist)
 }
