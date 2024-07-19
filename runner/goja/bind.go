@@ -7,6 +7,7 @@ import (
 
 func Bind(vm *goja.Runtime, astral target.Apphost) (err error) {
 	var a = adapter{astral: astral, vm: vm, queue: make(chan func(), 1024)}
+
 	if err = vm.Set(target.Log, a.Log); err != nil {
 		return
 	}
@@ -63,174 +64,59 @@ type adapter struct {
 func (a *adapter) Log(arg ...any) {
 	a.astral.LogArr(arg)
 }
-
 func (a *adapter) Sleep(millis int64) *goja.Promise {
-	promise, resolve, _ := a.vm.NewPromise()
-	go func() {
-		a.astral.Sleep(millis)
-		a.queue <- func() {
-			resolve(goja.Undefined())
-		}
-	}()
-	return promise
+	return a.promise0(func() { a.astral.Sleep(millis) })
 }
-
 func (a *adapter) ServiceRegister(port string) *goja.Promise {
-	promise, resolve, reject := a.vm.NewPromise()
-	go func() {
-		err := a.astral.ServiceRegister(port)
-		a.queue <- func() {
-			if err != nil {
-				reject(err)
-			} else {
-				resolve(goja.Undefined())
-			}
-		}
-	}()
-	return promise
+	return a.promise1(func() error { return a.astral.ServiceRegister(port) })
 }
-
 func (a *adapter) ServiceClose(port string) *goja.Promise {
-	promise, resolve, reject := a.vm.NewPromise()
-	go func() {
-		err := a.astral.ServiceClose(port)
-		a.queue <- func() {
-			if err != nil {
-				reject(err)
-			} else {
-				resolve(goja.Undefined())
-			}
-		}
-	}()
-	return promise
+	return a.promise1(func() error { return a.astral.ServiceClose(port) })
 }
-
 func (a *adapter) ConnAccept(port string) *goja.Promise {
-	promise, resolve, reject := a.vm.NewPromise()
-	go func() {
-		conn, err := a.astral.ConnAccept(port)
-		a.queue <- func() {
-			if err != nil {
-				reject(err)
-			} else {
-				resolve(conn)
-			}
-		}
-	}()
-	return promise
+	return a.promise2(func() (any, error) { return a.astral.ConnAccept(port) })
 }
-
 func (a *adapter) ConnClose(id string) *goja.Promise {
-	promise, resolve, reject := a.vm.NewPromise()
-	go func() {
-		err := a.astral.ConnClose(id)
-		a.queue <- func() {
-			if err != nil {
-				reject(err)
-			} else {
-				resolve(goja.Undefined())
-			}
-		}
-	}()
-	return promise
+	return a.promise1(func() error { return a.astral.ConnClose(id) })
 }
-
 func (a *adapter) ConnWrite(id string, data string) *goja.Promise {
-	promise, resolve, reject := a.vm.NewPromise()
-	go func() {
-		err := a.astral.ConnWrite(id, data)
-		a.queue <- func() {
-			if err != nil {
-				reject(err)
-			} else {
-				resolve(goja.Undefined())
-			}
-		}
-	}()
-	return promise
+	return a.promise1(func() error { return a.astral.ConnWrite(id, data) })
 }
-
 func (a *adapter) ConnRead(id string) *goja.Promise {
-	promise, resolve, reject := a.vm.NewPromise()
-	go func() {
-		val, err := a.astral.ConnRead(id)
-		a.queue <- func() {
-			if err != nil {
-				reject(err)
-			} else {
-				resolve(val)
-			}
-		}
-	}()
-	return promise
+	return a.promise2(func() (any, error) { return a.astral.ConnRead(id) })
 }
-
 func (a *adapter) Query(identity string, query string) *goja.Promise {
-	promise, resolve, reject := a.vm.NewPromise()
-	go func() {
-		val, err := a.astral.Query(identity, query)
-		a.queue <- func() {
-			if err != nil {
-				reject(err)
-			} else {
-				resolve(val)
-			}
-		}
-	}()
-	return promise
+	return a.promise2(func() (any, error) { return a.astral.Query(identity, query) })
 }
-
 func (a *adapter) QueryName(name string, query string) *goja.Promise {
-	promise, resolve, reject := a.vm.NewPromise()
-	go func() {
-		val, err := a.astral.QueryName(name, query)
-		a.queue <- func() {
-			if err != nil {
-				reject(err)
-			} else {
-				resolve(val)
-			}
-		}
-	}()
-	return promise
+	return a.promise2(func() (any, error) { return a.astral.QueryName(name, query) })
 }
-
 func (a *adapter) Resolve(name string) *goja.Promise {
-	promise, resolve, reject := a.vm.NewPromise()
-	go func() {
-		val, err := a.astral.Resolve(name)
-		a.queue <- func() {
-			if err != nil {
-				reject(err)
-			} else {
-				resolve(val)
-			}
-		}
-	}()
-	return promise
+	return a.promise2(func() (any, error) { return a.astral.Resolve(name) })
 }
-
 func (a *adapter) NodeInfo(identity string) *goja.Promise {
+	return a.promise2(func() (any, error) { return a.astral.NodeInfo(identity) })
+}
+func (a *adapter) Interrupt() *goja.Promise {
+	return a.promise0(a.astral.Interrupt)
+}
+
+func (a *adapter) promise0(f func()) *goja.Promise {
+	return a.promise1(func() (err error) { f(); return })
+}
+func (a *adapter) promise1(f func() error) *goja.Promise {
+	return a.promise2(func() (any, error) { return goja.Undefined(), f() })
+}
+func (a *adapter) promise2(f func() (any, error)) *goja.Promise {
 	promise, resolve, reject := a.vm.NewPromise()
 	go func() {
-		val, err := a.astral.NodeInfo(identity)
+		val, err := f()
 		a.queue <- func() {
 			if err != nil {
 				reject(err)
 			} else {
 				resolve(val)
 			}
-		}
-	}()
-	return promise
-}
-
-func (a *adapter) Interrupt() *goja.Promise {
-	promise, resolve, _ := a.vm.NewPromise()
-	go func() {
-		a.astral.Interrupt()
-		a.queue <- func() {
-			resolve(nil)
 		}
 	}()
 	return promise
