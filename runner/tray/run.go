@@ -28,38 +28,41 @@ type Runner struct {
 }
 
 func (t *Runner) Run(ctx context.Context) (err error) {
-	t.log = plog.Get(ctx).Type(t).Set(&ctx)
-
 	if err = t.api.Ping(); err != nil {
 		return errors.New("portal-tray requires portal-app running")
 	}
+
+	t.log = plog.Get(ctx).Type(t).Set(&ctx)
+	systray.SetTitle(portal.Name)
+	launcher := systray.AddMenuItem("Launcher", "Launcher")
+	quit := systray.AddMenuItem("Quit ", "Quit")
+
 	go func() {
 		t.api.Await()
 		systray.Quit()
 	}()
-
-	systray.SetTitle(portal.Name)
-	launcherItem := systray.AddMenuItem("Launcher", "Launcher")
-	go onMenuItemClick(launcherItem, func() {
-		go func() {
-			if err := t.api.Open("launcher"); err != nil {
-				t.log.Println("launcher:", err)
-			}
-		}()
-	})
-
-	quit := systray.AddMenuItem("Quit ", "Quit")
-	go onMenuItemClick(quit, func() {
-		if err := t.api.Close(); err != nil {
-			t.log.Println("quit:", err)
-			systray.Quit()
-		}
-	})
-
 	go func() {
 		<-ctx.Done()
 		systray.Quit()
 	}()
+	go func() {
+		for {
+			select {
+			case <-launcher.ClickedCh:
+				go func() {
+					if err := t.api.Open("launcher"); err != nil {
+						t.log.Println("launcher:", err)
+					}
+				}()
+			case <-quit.ClickedCh:
+				if err := t.api.Close(); err != nil {
+					t.log.Println("quit:", err)
+					systray.Quit()
+				}
+			}
+		}
+	}()
+
 	systray.Run(t.onReady, t.onExit)
 	return
 }
@@ -70,10 +73,4 @@ func (t *Runner) onReady() {
 
 func (t *Runner) onExit() {
 	t.log.Println("portal tray exit")
-}
-
-func onMenuItemClick(item *systray.MenuItem, onClick func()) {
-	for range item.ClickedCh {
-		onClick()
-	}
 }
