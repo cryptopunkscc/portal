@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"strconv"
 )
 
 type Make int
@@ -17,6 +18,14 @@ const (
 	All = System | Libs | Apps | Dev | Portal | Installer
 )
 
+var mappings = map[rune]Make{
+	'l': Libs,
+	'a': Apps,
+	'd': Dev,
+	'p': Portal,
+	'i': Installer,
+}
+
 type Install struct {
 	root string
 }
@@ -25,28 +34,38 @@ func NewInstall(root string) *Install {
 	return &Install{root: root}
 }
 
-func (d *Install) Run(jobs ...Make) {
-	job := None
-	for _, v := range jobs {
-		job = job | v
+func ParseArgs(args []string) (jobs Make) {
+	for _, arg := range args {
+		if i, err := strconv.Atoi(arg); err == nil {
+			jobs += Make(i)
+			continue
+		}
+		for _, r := range []rune(arg) {
+			jobs += mappings[r]
+		}
 	}
-	if job == None {
-		job = All
+	if jobs == None {
+		jobs = All
 	}
+	log.Println("parsed jobs", jobs)
+	return
+}
+
+func (d *Install) Run(make Make) {
 	resolveVersion()
 	defer clearVersion()
-	if job&System == System {
+	if make&System == System {
 		// no-op
 	}
-	if job&Libs == Libs {
+	if make&Libs == Libs {
 		log.Println(" * js libs")
 		d.buildJsLibs()
 	}
-	if job&Apps == Apps {
+	if make&Apps == Apps {
 		log.Println(" * js apps")
 		d.buildJsApps()
 	}
-	if job&Dev == Dev {
+	if make&Dev == Dev {
 		log.Println(" * portal dev")
 		goPortalDev.Install()
 		goPortalDevExec.Install()
@@ -54,7 +73,7 @@ func (d *Install) Run(jobs ...Make) {
 		goPortalDevGoja.Install()
 		goPortalDevWails.Install()
 	}
-	if job&Portal == Portal {
+	if make&Portal == Portal {
 		log.Println(" * portal")
 		goPortal.Install()
 		goPortalApp.Install()
@@ -62,7 +81,7 @@ func (d *Install) Run(jobs ...Make) {
 		goPortalAppWails.Install()
 		goPortalTray.Install()
 	}
-	if job&Installer == Installer {
+	if make&Installer == Installer {
 		log.Println(" * installer")
 		d.buildInstaller()
 	}
