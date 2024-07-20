@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/dist"
 	"github.com/cryptopunkscc/portal/runner/wails"
@@ -31,6 +32,10 @@ func (r *Runner) Run(ctx context.Context, projectHtml target.ProjectHtml) (err e
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Println("start", projectHtml.Manifest().Package, projectHtml.Abs())
 	defer log.Println("exit", projectHtml.Manifest().Package, projectHtml.Abs())
+
+	if err = deps.RequireBinary("npm"); err != nil {
+		return
+	}
 
 	dependencies := sources.FromFS[target.NodeModule](js.PortalLibFS)
 	if err = dist.NewRun(dependencies)(ctx, projectHtml); err != nil {

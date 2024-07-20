@@ -2,6 +2,7 @@ package go_dev
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	golang "github.com/cryptopunkscc/portal/pkg/go"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -60,6 +61,9 @@ func (r *Runner) Reload() (err error) {
 func (r *Runner) Run(ctx context.Context, project target.ProjectGo) (err error) {
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Println("Running project Go")
+	if err = deps.RequireBinary("go"); err != nil {
+		return
+	}
 	r.ctx = ctx
 	build := dist.NewGoRunner().Run
 	if err = build(ctx, project); err != nil {

@@ -3,11 +3,15 @@ package npm
 import (
 	"errors"
 	"fmt"
+	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	"github.com/cryptopunkscc/portal/target"
 )
 
 func RunBuild(m target.NodeModule) (err error) {
+	if err = deps.RequireBinary("npm"); err != nil {
+		return
+	}
 	if !m.PkgJson().CanBuild() {
 		return errors.New("missing npm build in package.json")
 	}

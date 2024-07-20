@@ -3,6 +3,7 @@ package dist
 import (
 	"context"
 	"fmt"
+	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	"github.com/cryptopunkscc/portal/target"
 	"strings"
@@ -16,6 +17,9 @@ func NewGoRunner() GoRunner {
 }
 
 func (g GoRunner) Run(ctx context.Context, project target.ProjectGo) (err error) {
+	if err = deps.RequireBinary("go"); err != nil {
+		return
+	}
 	cmd := []string{"go", "build", "-o", "dist/main"}
 	if project.Manifest().Build != "" {
 		cmd = strings.Split(project.Manifest().Build, " ")

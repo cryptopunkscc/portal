@@ -2,30 +2,37 @@ package main
 
 import (
 	"fmt"
+	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	"log"
 	"strings"
 )
 
-var GoWails = GoPortal{
+var goWails = GoPortal{
 	Tags:    "desktop,wv2runtime.download,production,webkit2_41",
 	LdFlags: "-w -s",
+	Prepare: func() error { return deps.AptInstallMissing(wailsDeps) },
 }
 
-var GoWailsDev = GoPortal{
-	Tags: "dev,webkit2_41",
+var goWailsDev = GoPortal{
+	Tags:    "dev,webkit2_41",
+	Prepare: func() error { return deps.AptInstallMissing(wailsDeps) },
 }
 
-func goPortal() GoPortal         { return GoPortal{}.target("portal") }
-func goPortalApp() GoPortal      { return GoPortal{}.target("portal-app") }
-func goPortalAppWails() GoPortal { return GoWails.target("portal-app-wails") }
-func goPortalAppGoja() GoPortal  { return GoPortal{}.target("portal-app-goja") }
-func goPortalTray() GoPortal     { return GoPortal{}.target("portal-tray") }
-func goPortalDev() GoPortal      { return GoPortal{}.target("portal-dev") }
-func goPortalDevExec() GoPortal  { return GoPortal{}.target("portal-dev-exec") }
-func goPortalDevWails() GoPortal { return GoWailsDev.target("portal-dev-wails") }
-func goPortalDevGoja() GoPortal  { return GoPortal{}.target("portal-dev-goja") }
-func goPortalDevGo() GoPortal    { return GoPortal{}.target("portal-dev-go") }
+var goPortalTray = GoPortal{
+	Target:  "portal-tray",
+	Prepare: func() error { return deps.AptInstallMissing(trayDeps) },
+}
+
+var goPortal = GoPortal{}.target("portal")
+var goPortalApp = GoPortal{}.target("portal-app")
+var goPortalAppWails = goWails.target("portal-app-wails")
+var goPortalAppGoja = GoPortal{}.target("portal-app-goja")
+var goPortalDev = GoPortal{}.target("portal-dev")
+var goPortalDevExec = GoPortal{}.target("portal-dev-exec")
+var goPortalDevWails = goWailsDev.target("portal-dev-wails")
+var goPortalDevGoja = GoPortal{}.target("portal-dev-goja")
+var goPortalDevGo = GoPortal{}.target("portal-dev-go")
 
 func buildPortalInstaller() { GoPortal{Out: "./bin/"}.target("portal-installer").Build() }
 
@@ -36,11 +43,14 @@ type GoPortal struct {
 	Out     string
 	Target  string
 	Args    []string
+	Prepare func() error
 }
 
 func (g GoPortal) Install() {
 	g.Cmd = "install"
-	g.run()
+	if g.prepare() {
+		g.run()
+	}
 }
 
 func (g GoPortal) Build() {
@@ -49,7 +59,20 @@ func (g GoPortal) Build() {
 		g.Out = "./cmd/portal-installer/bin/"
 	}
 	g.Args = g.arg("-o", g.Out)
-	g.run()
+	if g.prepare() {
+		g.run()
+	}
+}
+
+func (g GoPortal) prepare() bool {
+	if g.Prepare == nil {
+		return true
+	}
+	if err := g.Prepare(); err != nil {
+		log.Printf("cannot %s %s: %v", g.Cmd, g.Target, err)
+		return false
+	}
+	return true
 }
 
 func (g GoPortal) target(target string) GoPortal {

@@ -2,6 +2,7 @@ package goja_dev
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/dist"
 	"github.com/cryptopunkscc/portal/runner/goja_dist"
@@ -29,17 +30,20 @@ func (r *Runner) Run(ctx context.Context, projectJs target.ProjectJs) (err error
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Println("start", projectJs.Manifest().Package, projectJs.Abs())
 	defer log.Println("exit", projectJs.Manifest().Package, projectJs.Abs())
+	if err = deps.RequireBinary("npm"); err != nil {
+		return
+	}
 
 	dependencies := sources.FromFS[target.NodeModule](jsEmbed.PortalLibFS)
 	if err = dist.NewRun(dependencies)(ctx, projectJs); err != nil {
 		return
 	}
 
-	if err = npm.RunWatch(ctx, projectJs.Abs()).Start(); err != nil {
+	if err = npm.RunWatchStart(ctx, projectJs.Abs()); err != nil {
 		return
 	}
 
-	// Wait 1 for npm.RunWatch finish initial build otherwise runner can restart on first launch.
+	// Wait 1 for npm.RunWatchStart finish initial build otherwise runner can restart on first launch.
 	time.Sleep(1 * time.Second)
 
 	return r.distRunner.Run(ctx, projectJs.DistJs())

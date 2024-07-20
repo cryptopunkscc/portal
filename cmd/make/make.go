@@ -36,12 +36,7 @@ func (d *Install) Run(jobs ...Make) {
 	resolveVersion()
 	defer clearVersion()
 	if job&System == System {
-		log.Println(" * native")
-		checkGo()
-		checkNpm()
-		installAstral()
-		installWails()
-		installApt()
+		// no-op
 	}
 	if job&Libs == Libs {
 		log.Println(" * js libs")
@@ -53,19 +48,19 @@ func (d *Install) Run(jobs ...Make) {
 	}
 	if job&Dev == Dev {
 		log.Println(" * portal dev")
-		goPortalDev().Install()
-		goPortalDevExec().Install()
-		goPortalDevGo().Install()
-		goPortalDevGoja().Install()
-		goPortalDevWails().Install()
+		goPortalDev.Install()
+		goPortalDevExec.Install()
+		goPortalDevGo.Install()
+		goPortalDevGoja.Install()
+		goPortalDevWails.Install()
 	}
 	if job&Portal == Portal {
 		log.Println(" * portal")
-		goPortal().Install()
-		goPortalApp().Install()
-		goPortalAppGoja().Install()
-		goPortalAppWails().Install()
-		goPortalTray().Install()
+		goPortal.Install()
+		goPortalApp.Install()
+		goPortalAppGoja.Install()
+		goPortalAppWails.Install()
+		goPortalTray.Install()
 	}
 	if job&Installer == Installer {
 		log.Println(" * installer")
