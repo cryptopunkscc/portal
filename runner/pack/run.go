@@ -17,7 +17,7 @@ func Run(_ context.Context, app target.Dist) (err error) {
 	}
 
 	// pack dist dir
-	bundleName := fmt.Sprintf("%s_%s.portal", app.Manifest().Name, app.Manifest().Version)
+	bundleName := fmt.Sprintf("%s_%s.portal", app.Manifest().Package, app.Manifest().Version)
 	if err = zip.Pack(app.Abs(), path.Join(buildDir, bundleName)); err != nil {
 		return fmt.Errorf("pack.Run: %v", err)
 	}

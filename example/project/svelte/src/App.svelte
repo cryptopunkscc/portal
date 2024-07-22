@@ -2,7 +2,7 @@
   import {apphost, log, platform, rpc} from 'portal';
   import {onDestroy, onMount} from "svelte";
 
-  const client = rpc.bind({"example.project.js": ["link", "*ticker"]})
+  const service = rpc.bind({"example.project.js": ["link", "*ticker"]})
 
   const max = 10
 
@@ -29,7 +29,7 @@
 
   async function connect() {
     state.status = "connecting..."
-    await client.link.conn()
+    await service.link.conn()
     state.status = "connected"
   }
 
@@ -39,7 +39,7 @@
   async function ticker() {
     log(state.limit)
     try {
-      state.status = await client.ticker.map(async next => {
+      state.status = await service.ticker.map(async next => {
         state.status = next
         if (next >= max) return "max"
       }).request(state.limit, state.delay)

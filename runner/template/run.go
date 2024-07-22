@@ -68,6 +68,6 @@ func (r *Runner) targetArgs(t target.Template) (args template.Args) {
 	name := r.templates[t.Name()]
 	args = r.args
 	args.ProjectName = name
-	args.PackageName = "missing.package." + name
+	args.PackageName = "new.portal." + name
 	return
 }
