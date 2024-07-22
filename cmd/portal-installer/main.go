@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/cryptopunkscc/portal/apps"
+	"github.com/cryptopunkscc/portal/mock/appstore"
+	"github.com/cryptopunkscc/portal/resolve/source"
 	"io"
 	"io/fs"
 	"os"
@@ -10,6 +13,12 @@ import (
 
 func main() {
 	println("Installing portal...\n")
+	installBinaries()
+	installApps()
+	println("\nPortal installed successfully")
+}
+
+func installBinaries() {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		panic(err)
@@ -50,5 +59,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	println("\nPortal installed successfully")
+}
+
+func installApps() {
+	if err := appstore.InstallSource(source.Embed(apps.LauncherSvelteFS)); err != nil {
+		panic(err)
+	}
 }

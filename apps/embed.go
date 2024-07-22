@@ -4,5 +4,5 @@ import (
 	"embed"
 )
 
-//go:embed launcher/svelte/dist
+//go:embed launcher/svelte/build
 var LauncherSvelteFS embed.FS

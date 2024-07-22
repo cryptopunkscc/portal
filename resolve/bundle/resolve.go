@@ -9,9 +9,12 @@ import (
 	"io/fs"
 )
 
-type of[T any] struct{ target.Dist[T] }
+type of[T any] struct {
+	target.Dist[T]
+	bundle target.Bundle
+}
 
-func (t of[T]) IsBundle() {}
+func (t of[T]) Package() target.Source { return t.bundle.Package() }
 
 func Resolver[T any](resolve target.Resolve[target.Dist[T]]) target.Resolve[target.AppBundle[T]] {
 	return func(src target.Source) (app target.AppBundle[T], err error) {
@@ -23,25 +26,32 @@ func Resolver[T any](resolve target.Resolve[target.Dist[T]]) target.Resolve[targ
 		if td.Dist, err = resolve(b); err != nil {
 			return
 		}
+		td.bundle = b
 		app = td
 		return
 	}
 }
 
-type raw struct{ target.Source }
+type raw struct {
+	target.Source
+	pkg target.Source
+}
 
-func (s *raw) IsBundle() {}
+func (s *raw) Package() target.Source { return s.pkg }
 
 func Resolve(src target.Source) (t target.Bundle, err error) {
 	if src.IsDir() {
 		return nil, errors.New("not a file")
 	}
-	r, err := zipFromSource(src)
+	zipReader, err := zipFromSource(src)
 	if err != nil {
 		return
 	}
-	s := source.FS(r, src.Abs())
-	t = &raw{s}
+	s := source.FS(zipReader, src.Abs())
+	t = &raw{
+		Source: s,
+		pkg:    src,
+	}
 	return
 
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/pack"
 	"github.com/cryptopunkscc/portal/target"
 	"log"
+	"path/filepath"
 )
 
 func (d *Install) buildEmbedApps() {
@@ -23,7 +24,8 @@ func (d *Install) buildEmbedApps() {
 		pack.Run,
 		target.List(npm.Resolve, file),
 	)
-	if err := feat.Dist(context.TODO(), d.root, "apps"); err != nil {
+	appsDir := filepath.Join(d.root, "apps")
+	if err := feat.Run(context.TODO(), appsDir); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -70,16 +70,16 @@ type App[T any] interface {
 
 type Bundle interface {
 	Source
-	IsBundle()
+	Package() Source
 }
 
 type Bundle_ interface {
-	IsBundle()
+	Package() Source
 	App_
 }
 
 type AppBundle[T any] interface {
-	IsBundle()
+	Package() Source
 	App[T]
 }
 
