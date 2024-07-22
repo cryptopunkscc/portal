@@ -6,6 +6,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	"log"
 	"strings"
+	"time"
 )
 
 var goWails = GoPortal{
@@ -98,4 +99,15 @@ func (g GoPortal) arg(key string, value string) []string {
 		return append(g.Args, key, value)
 	}
 	return g.Args
+}
+
+func gpgSignPortalInstaller() {
+	time.Sleep(1 * time.Second)
+	_ = exec.Run("./bin", "gpg",
+		"--sign",
+		"--detach-sign",
+		"--verbose",
+		"--digest-algo", "sha512",
+		"./portal-installer",
+	)
 }

@@ -21,6 +21,7 @@ func (d *Install) buildInstaller() {
 	goPortalDevExec.Build()
 	goPortalDevWails.Build()
 	buildPortalInstaller()
+	gpgSignPortalInstaller()
 }
 
 func mkdirBin() {
