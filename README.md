@@ -1,81 +1,48 @@
-# Portal
+# Portal to Astral
 
-Runtime & development environment for decentralized applications driven by [Astral](https://github.com/cryptopunkscc/astrald/blob/master/docs/quickstart.md) network.
+**Portal** is a runtime & development environment for multiplatform decentralized applications driven
+by **Astral**.
 
-## Installation
+### [What is the Astral Network](https://github.com/cryptopunkscc/astrald/blob/master/docs/overview.md)
 
-To build portal executables run:
+> Astral is an abstract network that provides authenticated and encrypted connections over a variety of physical networks.
+It provides simple and secure connectivity interface, which automatically adapts to existing network conditions.
+Its mission is to dramatically reduce the time it takes to build robust peer-to-peer networks.
 
-```shell
-./make <number?>
-```
+### What are the Astral Apps
 
-Where optional <number?> can be concatenation of the following options :
+**Astral Apps** are any applications capable to connect with **Astral** via [**Apphost Protocol**](https://github.com/cryptopunkscc/astrald/blob/master/mod/apphost/proto/protocol.md).
 
-```
-<empty> - Select all options.
-<1> - Install dependencies.
-<2> - Build JS libraries.
-<4> - Build embed JS applications.
-<8> - Install portal for developer into "$HOME/go/bin/portal-dev".
-<16> - Install portal for user into "$HOME/go/bin/portal". 
-<32> - Build portal installer.
-```
+[**Apphost Library**](https://github.com/cryptopunkscc/astrald/tree/master/lib/astral) is natively written in go, so you can import it into Golang project and write **Astral App**.
+While this approach can be useful for some cases, most likely may not be very convenient.
 
-See examples: [commands.md](./test.md)
+### Why Portal
 
-### Example commands
+**Portal** is aimed to provide runtime environment for multiplatform **Astral Apps** and simplify the development process.
 
-Print help.
+## How to use
 
-```shell
-portal -help
-```
+Depending on your case you may want to run the **Astral App**, develop the new one, or compile **Portal Project**. 
+Read the following docs to learn more about possible use cases.
 
-Run applications from directory.
+* [User guide](./user.md) - How to **install** and use **Portal Environment** for users. 
+* [Developer guide](./developer.md) - How to create, develop, and build **Astral Apps** using **Portal**. 
+* [Contributor guide](./contributor.md) - How to compile repository and general installer.
+* [Technical overview](./doc/overview.md) - Explains some technical details about the project.
 
-```shell
-portal ./example/rpc
-```
+# Current Status
 
-Run applications in development server supporting hot reload and node module based projects.
+This project is at the **alpha** stage, which means is ready for testing and developing proof of concept apps but the
+SDK isn't complete and the API may change before the beta release.
 
-```shell
-portal-dev ./example/project
-```
+Currently, only the **Debian** based distributions are supported.
+The next milestone before the **beta** release is to include support most popular OS distributions. 
+Below is a status of platforms that are planned to include in support:
+* Windows - require adjustments & dedicated installer
+* Android - Outdated POC, require adjustments. 
+* macOS - require adjustments & dedicated installer
+* iOS - TODO
+* Non-deb Linux - Not tested. Should work out of the box, but may require to install some dependencies manually. See [tray](cmd/make/tray.go) and [webview](cmd/make/wails.go)
 
-Build & generate application bundles.
 
-```shell
-portal-dev b ./example/project
-```
 
-Install applications from generated bundles.
-
-```shell
-portal i ./example/project
-```
-
-Run application by name.
-
-```shell
-portal launcher
-```
-
-Run application by package name.
-
-```shell
-portal example.project.svelte
-```
-
-Create new project from template.
-
-```shell
-portal-dev c "html:frontend js:backend" ./my_project
-```
-
-List available templates.
-
-```shell
-portal-dev c -l
-```
