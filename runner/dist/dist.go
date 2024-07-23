@@ -7,7 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/fs2"
 	"github.com/cryptopunkscc/portal/target"
 	"os"
-	"path"
+	"path/filepath"
 )
 
 func Dist(ctx context.Context, project target.Project) (err error) {
@@ -24,9 +24,9 @@ func CopyIcon(_ context.Context, project target.Project) (err error) {
 	if project.Manifest().Icon == "" {
 		return
 	}
-	iconSrc := path.Join(project.Abs(), project.Manifest().Icon)
-	iconName := "icon" + path.Ext(project.Manifest().Icon)
-	iconDst := path.Join(project.Abs(), "dist", iconName)
+	iconSrc := filepath.Join(project.Abs(), project.Manifest().Icon)
+	iconName := "icon" + filepath.Ext(project.Manifest().Icon)
+	iconDst := filepath.Join(project.Abs(), "dist", iconName)
 	if err = fs2.CopyFile(iconSrc, iconDst); err != nil {
 		return
 	}
@@ -39,7 +39,7 @@ func CopyManifest(_ context.Context, project target.Project) (err error) {
 	if err != nil {
 		return err
 	}
-	if err = os.WriteFile(path.Join(project.Abs(), "dist", target.PortalJsonFilename), bytes, 0644); err != nil {
+	if err = os.WriteFile(filepath.Join(project.Abs(), "dist", target.PortalJsonFilename), bytes, 0644); err != nil {
 		return fmt.Errorf("os.WriteFile: %v", err)
 	}
 	return

@@ -8,7 +8,7 @@ import (
 	"io"
 	"io/fs"
 	"os"
-	"path"
+	"path/filepath"
 )
 
 type Injector struct {
@@ -31,12 +31,12 @@ func (i Injector) Run(ctx context.Context, m target.NodeModule) (err error) {
 
 func inject(log plog.Logger, m target.NodeModule, lib target.NodeModule) (err error) {
 	dep := lib.Lift()
-	nm := path.Join(m.Abs(), "node_modules", path.Base(dep.Abs()))
+	nm := filepath.Join(m.Abs(), "node_modules", filepath.Base(dep.Abs()))
 	log.Printf("copying module %v %v into: %s", dep.Path(), dep.Abs(), nm)
 	return fs.WalkDir(dep.Files(), ".", func(s string, d fs.DirEntry, err error) error {
 		log.Println("* coping file", d, s)
 		if d.IsDir() {
-			dst := path.Join(nm, s)
+			dst := filepath.Join(nm, s)
 			if err = os.MkdirAll(dst, 0755); err != nil {
 				return fmt.Errorf("os.MkdirAll: %v", err)
 			}
@@ -47,7 +47,7 @@ func inject(log plog.Logger, m target.NodeModule, lib target.NodeModule) (err er
 			return fmt.Errorf("cannot open %s: %s", s, err)
 		}
 		defer src.Close()
-		dst, err := os.Create(path.Join(nm, s))
+		dst, err := os.Create(filepath.Join(nm, s))
 		if err != nil {
 			return fmt.Errorf("os.Create: %v", err)
 		}

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/portal/target"
 	"github.com/cryptopunkscc/portal/target/sources"
-	"path"
+	"path/filepath"
 )
 
 type Feat struct {
@@ -38,7 +38,7 @@ func (r Feat) Run(ctx context.Context, dir string) (err error) {
 }
 
 func (r Feat) Dist(ctx context.Context, dir ...string) (err error) {
-	for _, m := range sources.FromPath[target.Project](path.Join(dir...)) {
+	for _, m := range sources.FromPath[target.Project](filepath.Join(dir...)) {
 		if err = r.newRunDist(r.dependencies)(ctx, m); err != nil {
 			return fmt.Errorf("build.Dist: %w", err)
 		}
@@ -48,7 +48,7 @@ func (r Feat) Dist(ctx context.Context, dir ...string) (err error) {
 
 func (r Feat) Pack(ctx context.Context, base, sub string) (err error) {
 	err = errors.New("no targets found")
-	for _, app := range sources.FromPath[target.Dist](path.Join(base, sub)) {
+	for _, app := range sources.FromPath[target.Dist](filepath.Join(base, sub)) {
 		if err = r.runPack(ctx, app); err != nil {
 			return fmt.Errorf("bundle target %v: %v", app.Path(), err)
 		}

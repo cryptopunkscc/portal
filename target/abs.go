@@ -2,16 +2,16 @@ package target
 
 import (
 	"os"
-	"path"
+	"path/filepath"
 )
 
 func Abs(src string) string {
-	if path.IsAbs(src) {
+	if filepath.IsAbs(src) {
 		return src
 	}
 	base, err := os.Getwd()
 	if err != nil {
 		return src
 	}
-	return path.Join(base, src)
+	return filepath.Join(base, src)
 }

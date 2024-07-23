@@ -5,11 +5,11 @@ import (
 	"github.com/cryptopunkscc/portal/target"
 	"github.com/cryptopunkscc/portal/target/sources"
 	"log"
-	"path"
+	"path/filepath"
 )
 
 func (d *Install) buildJsLibs() {
-	dir := path.Join(d.root, "target/js")
+	dir := filepath.Join(d.root, "target/js")
 	libs := sources.FromPath[target.NodeModule](dir)
 	for _, p := range libs {
 		if !p.PkgJson().CanBuild() {

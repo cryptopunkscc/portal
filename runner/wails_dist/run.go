@@ -6,7 +6,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/wails"
 	"github.com/cryptopunkscc/portal/runner/watcher"
 	"github.com/cryptopunkscc/portal/target"
-	"path"
+	"path/filepath"
 )
 
 type Runner struct {
@@ -26,7 +26,7 @@ func (r *Runner) Reload() (err error) {
 }
 
 func (r *Runner) Run(ctx context.Context, dist target.DistHtml) (err error) {
-	if !path.IsAbs(dist.Abs()) {
+	if !filepath.IsAbs(dist.Abs()) {
 		return plog.Errorf("Runner needs absolute path: %s", dist.Abs())
 	}
 	log := plog.Get(ctx).Type(r)

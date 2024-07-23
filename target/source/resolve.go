@@ -5,15 +5,16 @@ import (
 	"io/fs"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 )
 
 func FromPath(src string) target.Source {
 	m := &source{}
 	m.abs = target.Abs(src)
-	if path.Ext(src) == ".portal" {
-		m.src = path.Base(src)
-		m.files = os.DirFS(path.Dir(m.abs))
+	if filepath.Ext(src) == ".portal" {
+		m.src = filepath.Base(src)
+		m.files = os.DirFS(filepath.Dir(m.abs))
 	} else {
 		m.src = "."
 		m.files = os.DirFS(m.abs)

@@ -5,7 +5,7 @@ import (
 	"github.com/cryptopunkscc/portal/target/apps"
 	"github.com/cryptopunkscc/portal/target/manifest"
 	"io/fs"
-	"path"
+	"path/filepath"
 )
 
 func Path(app string) (src string, err error) {
@@ -15,7 +15,7 @@ func Path(app string) (src string, err error) {
 			return
 		}
 		if m.Match(app) {
-			src = path.Join(portalAppsDir, t.Path())
+			src = filepath.Join(portalAppsDir, t.Path())
 			return
 		}
 	}

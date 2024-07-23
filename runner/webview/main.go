@@ -7,7 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/sig"
 	"log"
 	"os"
-	"path"
+	"path/filepath"
 )
 
 // legacy main function
@@ -18,7 +18,7 @@ func main() {
 		log.Fatalln(err)
 	}
 	src := string(srcBytes)
-	title := path.Base(file)
+	title := filepath.Base(file)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	go sig.OnShutdown(cancel)

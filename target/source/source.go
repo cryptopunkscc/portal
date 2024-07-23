@@ -5,7 +5,7 @@ import (
 	"github.com/cryptopunkscc/portal/target"
 	"io/fs"
 	"log"
-	"path"
+	"path/filepath"
 	"reflect"
 )
 
@@ -27,8 +27,8 @@ func (m *source) Abs() string {
 }
 
 func (m *source) Parent() target.Source {
-	dir := path.Dir(m.Abs())
-	if path.IsAbs(m.Abs()) {
+	dir := filepath.Dir(m.Abs())
+	if filepath.IsAbs(m.Abs()) {
 		return FromPath(dir)
 	}
 	sub, err := fs.Sub(m.files, dir)
@@ -47,7 +47,7 @@ func (m *source) Files() fs.FS {
 }
 
 func (m *source) IsFile() bool {
-	return m.Path() != "." && path.Ext(m.Path()) != ""
+	return m.Path() != "." && filepath.Ext(m.Path()) != ""
 }
 
 func (m *source) Type() (t target.Type) {
@@ -58,7 +58,7 @@ func (m *source) Type() (t target.Type) {
 		t += target.TypeBackend
 	}
 	// TODO verify blob type in addition
-	if path.Ext(m.src) == ".portal" {
+	if filepath.Ext(m.src) == ".portal" {
 		t += target.TypeBundle
 	}
 	return
@@ -109,14 +109,14 @@ func (m *source) Lift() target.Source {
 	}
 
 	// try lift a file
-	if dir := path.Dir(m.src); dir != "." {
+	if dir := filepath.Dir(m.src); dir != "." {
 		mm := *m
 		var err error
-		if mm.files, err = fs.Sub(m.files, path.Dir(m.src)); err != nil {
+		if mm.files, err = fs.Sub(m.files, filepath.Dir(m.src)); err != nil {
 			log.Printf("[ERROR] cannot lift file %s: %v", m.src, err)
 			mm.files = nil
 		}
-		mm.src = path.Base(m.src)
+		mm.src = filepath.Base(m.src)
 		return &mm
 	}
 

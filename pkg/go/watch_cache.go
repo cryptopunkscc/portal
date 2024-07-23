@@ -3,7 +3,7 @@ package golang
 import (
 	"log"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 )
 
@@ -90,7 +90,7 @@ func (c *WatchCache) AddDir(dir string) (dirs map[string]any) {
 		if !strings.HasSuffix(entire.Name(), ".go") {
 			continue
 		}
-		e := path.Join(dir, entire.Name())
+		e := filepath.Join(dir, entire.Name())
 		for s, a := range c.AddFile(e) {
 			dirs[s] = a
 		}

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 )
 
@@ -20,7 +20,7 @@ func filterByModule(imports []string, module string) (filtered []string) {
 
 func withProjectPath(imports []string, abs string) (modified []string) {
 	for _, s := range imports {
-		modified = append(modified, path.Join(abs, s))
+		modified = append(modified, filepath.Join(abs, s))
 	}
 	return
 }
@@ -30,16 +30,16 @@ func FindProjectRoot(abs string) (s string, err error) {
 		err = plog.Errorf("cannot find root")
 		return
 	}
-	if _, err = os.Stat(path.Join(abs, "go.mod")); err == nil {
+	if _, err = os.Stat(filepath.Join(abs, "go.mod")); err == nil {
 		s = abs
 		return
 	}
-	dir := path.Dir(abs)
+	dir := filepath.Dir(abs)
 	return FindProjectRoot(dir)
 }
 
 func GetModuleRoot(root string) (s string, err error) {
-	goMod := path.Join(root, "go.mod")
+	goMod := filepath.Join(root, "go.mod")
 	file, err := os.Open(goMod)
 	if err != nil {
 		err = plog.Err(err)
@@ -78,7 +78,7 @@ func sameImports(i1, i2 []string) bool {
 }
 
 func Imports(absSrc string) (imports []string, err error) {
-	if path.Ext(absSrc) != ".go" {
+	if filepath.Ext(absSrc) != ".go" {
 		err = fmt.Errorf("%s is not a .go file", absSrc)
 		return
 	}

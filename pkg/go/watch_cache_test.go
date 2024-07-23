@@ -3,14 +3,14 @@ package golang
 import (
 	"log"
 	"os"
-	"path"
+	"path/filepath"
 	"testing"
 )
 
 func TestWatchCache_AddFile(t *testing.T) {
 	src, _ := os.Getwd()
 	wd, _ := FindProjectRoot(src)
-	target := path.Join(wd, "pkg/go/imports.go")
+	target := filepath.Join(wd, "pkg/go/imports.go")
 	w := NewWatchCache(wd, "github.com/cryptopunkscc/portal/")
 	w.AddFile(target)
 	for s, i := range w.dirs {
