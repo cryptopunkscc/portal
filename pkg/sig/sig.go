@@ -17,7 +17,3 @@ func OnShutdown(cancel func()) {
 	log.Println("force shutdown")
 	os.Exit(2)
 }
-
-func Shutdown() error {
-	return syscall.Kill(os.Getpid(), syscall.SIGTERM)
-}

@@ -1,14 +1,13 @@
 package apphost
 
-import "C"
 import (
 	"context"
 	"github.com/cryptopunkscc/astrald/sig"
 	"github.com/cryptopunkscc/portal/pkg/mem"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/port"
+	sig2 "github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/target"
-	"syscall"
 	"time"
 )
 
@@ -83,7 +82,7 @@ func (f Factory) WithTimeout(ctx context.Context, portal target.Portal) target.A
 				duration = time.Duration(manifest.Env.Timeout) * time.Millisecond
 			}
 			timeout := NewTimout(duration, func() {
-				_ = syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+				_ = sig2.Interrupt()
 			})
 			timeout.Enable(true)
 			for range flat.Events().Subscribe(ctx) {
