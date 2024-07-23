@@ -5,6 +5,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	"log"
+	"os"
 	"strings"
 	"time"
 )
@@ -102,6 +103,7 @@ func (g GoPortal) arg(key string, value string) []string {
 }
 
 func gpgSignPortalInstaller() {
+	_ = os.Remove("./bin/portal-installer.sig")
 	time.Sleep(1 * time.Second)
 	_ = exec.Run("./bin", "gpg",
 		"--sign",
