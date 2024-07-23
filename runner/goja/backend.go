@@ -7,7 +7,7 @@ import (
 	"github.com/dop251/goja"
 	"io/fs"
 	"os"
-	"path"
+	"path/filepath"
 )
 
 type Backend struct {
@@ -34,7 +34,7 @@ func (b *Backend) RunPath(app string) (err error) {
 	}
 	var src []byte
 	if stat.IsDir() {
-		app = path.Join(app, "main.js")
+		app = filepath.Join(app, "main.js")
 	}
 	src, err = os.ReadFile(app)
 	if err != nil {

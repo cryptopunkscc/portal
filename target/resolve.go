@@ -3,7 +3,7 @@ package target
 import (
 	"errors"
 	"io/fs"
-	"path"
+	"path/filepath"
 )
 
 func Any[T Source](of ...func(Source) (Source, error)) Resolve[T] {
@@ -63,7 +63,7 @@ func Try[A Source, B Source](f func(A) (B, error)) ResolveSource {
 func Skip(names ...string) func(source Source) (result Source, err error) {
 	return func(source Source) (result Source, err error) {
 		for _, n := range names {
-			if path.Base(source.Path()) == n {
+			if filepath.Base(source.Path()) == n {
 				return nil, fs.SkipDir
 			}
 		}

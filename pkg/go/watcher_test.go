@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
-	"path"
+	"path/filepath"
 	"testing"
 )
 
@@ -12,7 +12,7 @@ func TestWatcher_Run(t *testing.T) {
 	t.SkipNow()
 	src, _ := os.Getwd()
 	wd, _ := FindProjectRoot(src)
-	target := path.Join(wd, "pkg/go")
+	target := filepath.Join(wd, "pkg/go")
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	events, err := NewWatcher().Run(ctx, target)

@@ -2,7 +2,7 @@ package template
 
 import (
 	"github.com/cryptopunkscc/portal/target"
-	"path"
+	"path/filepath"
 )
 
 type source struct {
@@ -13,7 +13,7 @@ type source struct {
 func (t *source) Name() (name string) {
 	name = t.info.ShortName
 	if name == "" {
-		name = path.Base(t.Abs())
+		name = filepath.Base(t.Abs())
 	}
 	return
 }

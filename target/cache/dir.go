@@ -2,7 +2,7 @@ package cache
 
 import (
 	"os"
-	"path"
+	"path/filepath"
 )
 
 type Deps interface {
@@ -14,6 +14,6 @@ func Dir(deps Deps) (dir string) {
 	if dir, err = os.UserCacheDir(); err != nil {
 		panic(err)
 	}
-	dir = path.Join(dir, deps.Executable())
+	dir = filepath.Join(dir, deps.Executable())
 	return
 }

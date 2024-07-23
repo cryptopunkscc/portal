@@ -3,7 +3,7 @@ package appstore
 import (
 	"io/fs"
 	"os"
-	"path"
+	"path/filepath"
 )
 
 var portalAppsDir string
@@ -15,7 +15,7 @@ func init() {
 		panic(err)
 	}
 
-	portalAppsDir = path.Join(dir, "portal", "apps")
+	portalAppsDir = filepath.Join(dir, "portal", "apps")
 	err = os.MkdirAll(portalAppsDir, 0755)
 	if err != nil {
 		panic(err)
