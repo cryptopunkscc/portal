@@ -26,7 +26,10 @@ func (finder Finder[T]) Cached(c *Cache[T]) Finder[T] {
 			portals, err = find(ctx, src)
 			if err == nil {
 				c.Add(portals)
-				plog.Get(ctx).Println("added to cache:", c.portals)
+				logger := plog.Get(ctx)
+				for _, t := range portals {
+					logger.Printf("added to cache: %v %v", t.Manifest(), t.Abs())
+				}
 			}
 			return
 		}
