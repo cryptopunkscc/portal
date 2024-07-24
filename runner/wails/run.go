@@ -53,9 +53,6 @@ func AppOptions(app target.Api) *options.App {
 		Height:           768,
 		BackgroundColour: options.NewRGB(27, 38, 54),
 		Bind:             []interface{}{app},
-		OnDomReady: func(ctx context.Context) {
-			app.Interrupt()
-		},
 		OnBeforeClose: func(ctx context.Context) (prevent bool) {
 			app.Interrupt()
 			return false
