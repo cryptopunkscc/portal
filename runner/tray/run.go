@@ -33,9 +33,6 @@ func (t *Runner) Run(ctx context.Context) (err error) {
 	}
 
 	t.log = plog.Get(ctx).Type(t).Set(&ctx)
-	systray.SetTitle(portal.Name)
-	launcher := systray.AddMenuItem("Launcher", "Launcher")
-	quit := systray.AddMenuItem("Quit ", "Quit")
 
 	go func() {
 		t.api.Await()
@@ -45,6 +42,17 @@ func (t *Runner) Run(ctx context.Context) (err error) {
 		<-ctx.Done()
 		systray.Quit()
 	}()
+
+	systray.Run(t.onReady, t.onExit)
+	return
+}
+
+func (t *Runner) onReady() {
+	t.log.Println("portal tray start")
+	systray.SetTitle(portal.Name)
+	launcher := systray.AddMenuItem("Launcher", "Launcher")
+	quit := systray.AddMenuItem("Quit ", "Quit")
+
 	go func() {
 		for {
 			select {
@@ -62,13 +70,6 @@ func (t *Runner) Run(ctx context.Context) (err error) {
 			}
 		}
 	}()
-
-	systray.Run(t.onReady, t.onExit)
-	return
-}
-
-func (t *Runner) onReady() {
-	t.log.Println("portal tray start")
 }
 
 func (t *Runner) onExit() {
