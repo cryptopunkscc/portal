@@ -7,6 +7,7 @@ import (
 )
 
 func (d *Install) buildInstaller() {
+	cleanInstallerBin()
 	mkdirBin()
 	buildAstral()
 	buildAnc()
@@ -22,6 +23,10 @@ func (d *Install) buildInstaller() {
 	goPortalDevWails.Build()
 	buildPortalInstaller()
 	gpgSignPortalInstaller()
+}
+
+func cleanInstallerBin() {
+	_ = os.RemoveAll("./cmd/portal-installer/bin")
 }
 
 func mkdirBin() {
