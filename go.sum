@@ -32,6 +32,10 @@ github.com/containerd/console v1.0.3/go.mod h1:7LqA/THxQ86k76b8c/EMSiaJ3h1eZkMkX
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/cryptopunkscc/astrald v0.0.0-20240510192132-6172557ff205 h1:fIxSA6e0N/0woQppmTi9t6z85MnnB7InniNgtSOGIog=
 github.com/cryptopunkscc/astrald v0.0.0-20240510192132-6172557ff205/go.mod h1:Vd1Iy/CRZ/IM69Huzfn4EHzYDeJfxZLoTQO2vl5YiTc=
+github.com/cryptopunkscc/astrald v0.0.0-20240724185937-68d460d404b8 h1:NzksmqPg76pbpdiCZNo36TYq1LHSODuk1eKD50h9Ens=
+github.com/cryptopunkscc/astrald v0.0.0-20240724185937-68d460d404b8/go.mod h1:Vd1Iy/CRZ/IM69Huzfn4EHzYDeJfxZLoTQO2vl5YiTc=
+github.com/cryptopunkscc/astrald v0.0.0-20240724222951-5cbd36ed486a h1:B4GvMjdO05ap4+1bpu+nPvbi046zgPbuxO3OhyFBqVw=
+github.com/cryptopunkscc/astrald v0.0.0-20240724222951-5cbd36ed486a/go.mod h1:Vd1Iy/CRZ/IM69Huzfn4EHzYDeJfxZLoTQO2vl5YiTc=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

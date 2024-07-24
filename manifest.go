@@ -5,6 +5,6 @@ const (
 	Name           = "Portal"
 	NameDev        = "Portal Development"
 	DescriptionDev = "Development environment for Astral apps."
-	AstralVersion  = "v0.0.0-20240510192132-6172557ff205"
+	AstralVersion  = "v0.0.0-20240724222951-5cbd36ed486a"
 	Module         = "github.com/cryptopunkscc/portal/"
 )
