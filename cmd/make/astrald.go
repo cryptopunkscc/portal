@@ -33,11 +33,9 @@ func buildAstral() {
 	astrald := "github.com/cryptopunkscc/astrald@" + portal.AstralVersion
 	astrald = filepath.Join(home, "go/pkg/mod", astrald)
 	out := filepath.Join(wd, "cmd/portal-installer/bin/")
-	if err := exec.Run(
-		astrald, "go", "build",
-		"-o", out,
-		"./cmd/astrald",
-	); err != nil {
+
+	err = exec.Cmd{Dir: astrald}.Parse("go", "build -o", out, "./cmd/astrald").Default().Build().Run()
+	if err != nil {
 		log.Fatalln("cannot build astrald:", err)
 	}
 	log.Println("astrald build succeed.")
@@ -55,11 +53,9 @@ func buildAnc() {
 	astrald := "github.com/cryptopunkscc/astrald@" + portal.AstralVersion
 	astrald = filepath.Join(home, "go/pkg/mod", astrald)
 	out := filepath.Join(wd, "cmd/portal-installer/bin/")
-	if err := exec.Run(
-		astrald, "go", "build",
-		"-o", out,
-		"./cmd/anc",
-	); err != nil {
+
+	err = exec.Cmd{Dir: astrald}.Parse("go", "build -o", out, "./cmd/anc").Default().Build().Run()
+	if err != nil {
 		log.Fatalln("cannot build anc:", err)
 	}
 	log.Println("anc build succeed.")
