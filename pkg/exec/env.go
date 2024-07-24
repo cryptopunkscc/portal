@@ -1,5 +1,7 @@
 package exec
 
+import "strings"
+
 var _env []string
 
 func AddEnv(env ...string) {
@@ -8,4 +10,14 @@ func AddEnv(env ...string) {
 
 func SetEnv(env ...string) {
 	_env = env
+}
+
+func GetEnv(key string) string {
+	for _, s := range _env {
+		split := strings.Split(s, "=")
+		if split[0] == key {
+			return split[1]
+		}
+	}
+	return ""
 }

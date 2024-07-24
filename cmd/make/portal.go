@@ -10,7 +10,7 @@ import (
 
 var goWails = GoPortal{
 	Tags:    "desktop,wv2runtime.download,production,webkit2_41",
-	LdFlags: "-w -s",
+	LdFlags: []string{"-w -s"},
 	Prepare: func() error { return deps.AptInstallMissing(wailsDeps) },
 }
 
@@ -22,6 +22,12 @@ var goWailsDev = GoPortal{
 var goPortalTray = GoPortal{
 	Target:  "portal-tray",
 	Prepare: func() error { return deps.AptInstallMissing(trayDeps) },
+	Os: map[string]GoPortal{
+		"windows": {
+			LdFlags: []string{"-H=windowsgui"},
+			Env:     []string{"CGO_ENABLED=1"},
+		},
+	},
 }
 
 var goPortal = GoPortal{}.target("portal")
@@ -39,12 +45,13 @@ func buildPortalInstaller() { GoPortal{Out: "./bin/"}.target("portal-installer")
 type GoPortal struct {
 	Cmd     string
 	Tags    string
-	LdFlags string
+	LdFlags []string
 	Out     string
 	Target  string
 	Args    []string
 	Env     []string
 	Prepare func() error
+	Os      map[string]GoPortal
 }
 
 func (g GoPortal) Install() {
@@ -54,7 +61,7 @@ func (g GoPortal) Install() {
 	}
 }
 
-func (g GoPortal) Build(platforms ...string) {
+func (g GoPortal) Build() {
 	g.Cmd = "build"
 	if g.Out == "" {
 		g.Out = "./cmd/portal-installer/bin/"
@@ -63,13 +70,7 @@ func (g GoPortal) Build(platforms ...string) {
 	if !g.prepare() {
 		return
 	}
-	for _, platform := range platforms {
-		g.Env = append(g.Env, "GOOS="+platform)
-		g.run()
-	}
-	if len(platforms) == 0 {
-		g.run()
-	}
+	g.run()
 }
 
 func (g GoPortal) prepare() bool {
@@ -89,10 +90,15 @@ func (g GoPortal) target(target string) GoPortal {
 }
 
 func (g GoPortal) run() {
+	if goos, ok := g.Os[exec.GetEnv("GOOS")]; ok {
+		g.Env = append(g.Env, goos.Env...)
+		g.LdFlags = append(g.LdFlags, goos.LdFlags...)
+	}
+
 	target := fmt.Sprintf("./cmd/%s", g.Target)
 	g.Args = append([]string{g.Cmd}, g.Args...)
 	g.Args = g.arg("-tags", g.Tags)
-	g.Args = g.arg("-ldflags", g.LdFlags)
+	g.Args = g.arg("-ldflags", strings.Join(g.LdFlags, " "))
 	g.Args = append(g.Args, target)
 	log.Printf("$ %s", strings.Join(g.Args, " "))
 	cmd := exec.Cmd{Cmd: "go", Args: g.Args}.Default().AddEnv().Build()
