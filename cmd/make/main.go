@@ -12,5 +12,5 @@ func main() {
 		log.Fatal(err)
 	}
 	install := NewInstall(wd)
-	install.Run(ParseArgs(os.Args[1:]))
+	install.Run(ParseArgs(os.Args[1:2]), os.Args[2:])
 }

@@ -51,7 +51,7 @@ func ParseArgs(args []string) (jobs Make) {
 	return
 }
 
-func (d *Install) Run(make Make) {
+func (d *Install) Run(make Make, goos []string) {
 	resolveVersion()
 	defer clearVersion()
 	if make&System == System {
@@ -83,6 +83,6 @@ func (d *Install) Run(make Make) {
 	}
 	if make&Installer == Installer {
 		log.Println(" * installer")
-		d.buildInstaller()
+		d.buildInstaller(goos...)
 	}
 }

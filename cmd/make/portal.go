@@ -5,9 +5,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	"log"
-	"os"
 	"strings"
-	"time"
 )
 
 var goWails = GoPortal{
@@ -45,6 +43,7 @@ type GoPortal struct {
 	Out     string
 	Target  string
 	Args    []string
+	Env     []string
 	Prepare func() error
 }
 
@@ -55,13 +54,20 @@ func (g GoPortal) Install() {
 	}
 }
 
-func (g GoPortal) Build() {
+func (g GoPortal) Build(platforms ...string) {
 	g.Cmd = "build"
 	if g.Out == "" {
 		g.Out = "./cmd/portal-installer/bin/"
 	}
 	g.Args = g.arg("-o", g.Out)
-	if g.prepare() {
+	if !g.prepare() {
+		return
+	}
+	for _, platform := range platforms {
+		g.Env = append(g.Env, "GOOS="+platform)
+		g.run()
+	}
+	if len(platforms) == 0 {
 		g.run()
 	}
 }
@@ -84,12 +90,13 @@ func (g GoPortal) target(target string) GoPortal {
 
 func (g GoPortal) run() {
 	target := fmt.Sprintf("./cmd/%s", g.Target)
-	g.Args = append([]string{"go", g.Cmd}, g.Args...)
+	g.Args = append([]string{g.Cmd}, g.Args...)
 	g.Args = g.arg("-tags", g.Tags)
 	g.Args = g.arg("-ldflags", g.LdFlags)
 	g.Args = append(g.Args, target)
 	log.Printf("$ %s", strings.Join(g.Args, " "))
-	if err := exec.Run(".", g.Args...); err != nil {
+	cmd := exec.Cmd{Cmd: "go", Args: g.Args}.Default().AddEnv().Build()
+	if err := cmd.Run(); err != nil {
 		log.Fatalf("%s %s failed: %v", g.Target, g.Cmd, err)
 	}
 	log.Printf("%s %s succeed.", g.Target, g.Cmd)
@@ -100,16 +107,4 @@ func (g GoPortal) arg(key string, value string) []string {
 		return append(g.Args, key, value)
 	}
 	return g.Args
-}
-
-func gpgSignPortalInstaller() {
-	_ = os.Remove("./bin/portal-installer.sig")
-	time.Sleep(1 * time.Second)
-	_ = exec.Run("./bin", "gpg",
-		"--sign",
-		"--detach-sign",
-		"--verbose",
-		"--digest-algo", "sha512",
-		"./portal-installer",
-	)
 }

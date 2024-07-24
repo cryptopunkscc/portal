@@ -2,12 +2,36 @@ package main
 
 import (
 	"errors"
+	"github.com/cryptopunkscc/portal/pkg/exec"
+	"github.com/cryptopunkscc/portal/pkg/gpg"
 	"io/fs"
+	"log"
 	"os"
+	"path/filepath"
+	"runtime"
+	"strings"
+	"time"
 )
 
-func (d *Install) buildInstaller() {
+func (d *Install) buildInstaller(platforms ...string) {
 	cleanInstallerBin()
+
+	if len(platforms) == 0 {
+		platforms = []string{runtime.GOOS}
+	}
+
+	for _, platform := range platforms {
+		goos := "GOOS=" + platform
+		log.Println(goos)
+		exec.SetEnv(goos)
+		d.buildInstallerFor()
+		exec.SetEnv()
+	}
+
+	gpgSignPortalInstallers()
+}
+
+func (d *Install) buildInstallerFor() {
 	mkdirBin()
 	buildAstral()
 	buildAnc()
@@ -22,7 +46,6 @@ func (d *Install) buildInstaller() {
 	goPortalDevExec.Build()
 	goPortalDevWails.Build()
 	buildPortalInstaller()
-	gpgSignPortalInstaller()
 }
 
 func cleanInstallerBin() {
@@ -34,4 +57,17 @@ func mkdirBin() {
 	if err != nil && !errors.Is(err, fs.ErrExist) {
 		panic(err)
 	}
+}
+
+func gpgSignPortalInstallers() {
+	_ = filepath.WalkDir("./bin", func(path string, d fs.DirEntry, err error) error {
+		if d.IsDir() ||
+			!strings.HasPrefix(d.Name(), "portal-installer") ||
+			strings.HasSuffix(d.Name(), ".sig") {
+			return nil
+		}
+		time.Sleep(1 * time.Second)
+		gpg.Sign(path)
+		return nil
+	})
 }
