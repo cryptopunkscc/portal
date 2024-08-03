@@ -4,39 +4,33 @@ import (
 	"context"
 	"errors"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target2/source"
 	"log"
 )
 
 type Deps[T target.Base] interface {
 	TargetResolve() target.Resolve[T]
 	TargetCache() *target.Cache[T]
+	TargetFile() target.File
 	Path() target.Path
 	Embed() []target.Source
 	Priority() target.Priority
 }
 
 func Inject[T target.Base](deps Deps[T]) target.Find[T] {
-	return (&finder[T]{
-		resolveTarget: deps.TargetResolve(),
-		cache:         deps.TargetCache(),
-		resolvePath:   deps.Path(),
-		embed:         deps.Embed(),
-		priority:      deps.Priority(),
-	}).Find
-}
-
-type finder[T target.Base] struct {
-	cache         *target.Cache[T]
-	resolvePath   target.Path
-	resolveTarget target.Resolve[T]
-	priority      target.Priority
-	embed         []target.Source
+	return New[T](
+		deps.TargetCache(),
+		deps.Path(),
+		deps.TargetFile(),
+		deps.TargetResolve(),
+		deps.Priority(),
+		deps.Embed()...,
+	)
 }
 
 func New[T target.Base](
 	cache *target.Cache[T],
 	resolvePath target.Path,
+	resolveFile target.File,
 	resolveTarget target.Resolve[T],
 	priority target.Priority,
 	embed ...target.Source,
@@ -44,10 +38,20 @@ func New[T target.Base](
 	return (&finder[T]{
 		cache:         cache,
 		resolvePath:   resolvePath,
+		resolveFile:   resolveFile,
 		resolveTarget: resolveTarget,
 		priority:      priority,
 		embed:         embed,
 	}).Find
+}
+
+type finder[T target.Base] struct {
+	cache         *target.Cache[T]
+	resolvePath   target.Path
+	resolveFile   target.File
+	resolveTarget target.Resolve[T]
+	priority      target.Priority
+	embed         []target.Source
 }
 
 func (f *finder[T]) Find(_ context.Context, src string) (apps target.Portals[T], err error) {
@@ -94,7 +98,7 @@ func (f *finder[T]) fromCache(src string) (apps []T) {
 }
 
 func (f *finder[T]) fromFS(src string) (apps []T, err error) {
-	file, err := source.File(src)
+	file, err := f.resolveFile(src)
 	if err == nil {
 		apps = target.List(f.resolveTarget, file)
 		f.cache.Add(apps)

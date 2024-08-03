@@ -4,8 +4,8 @@ import (
 	"context"
 	apps2 "github.com/cryptopunkscc/portal/apps"
 	"github.com/cryptopunkscc/portal/feat/apps"
+	"github.com/cryptopunkscc/portal/feat/find"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target/find"
 	"github.com/cryptopunkscc/portal/target2/source"
 	"github.com/cryptopunkscc/portal/target2/sources"
 	"github.com/stretchr/testify/assert"
@@ -19,6 +19,7 @@ func Test__Target_Find(t *testing.T) {
 	f := find.New[target.Base](
 		&target.Cache[target.Base]{},
 		apps.Path,
+		source.File,
 		sources.Resolver[target.Base](),
 		target.Priority{
 			target.Match[target.Project_],

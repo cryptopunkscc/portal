@@ -4,8 +4,8 @@ import (
 	"context"
 	apps2 "github.com/cryptopunkscc/portal/apps"
 	"github.com/cryptopunkscc/portal/feat/apps"
+	"github.com/cryptopunkscc/portal/feat/find"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target/find"
 	"github.com/cryptopunkscc/portal/target2/source"
 	"github.com/cryptopunkscc/portal/target2/sources"
 	"testing"
@@ -39,8 +39,8 @@ func (d *deps) Priority() target.Priority {
 		target.Match[target.Dist_],
 	}
 }
-
 func (d *deps) Path() target.Path                          { return apps.Path }
 func (d *deps) Embed() []target.Source                     { return []target.Source{source.Embed(apps2.LauncherSvelteFS)} }
+func (d *deps) TargetFile() target.File                    { return source.File }
 func (d *deps) TargetCache() *target.Cache[target.Base]    { return &d.cache }
 func (d *deps) TargetResolve() target.Resolve[target.Base] { return sources.Resolver[target.Base]() }
