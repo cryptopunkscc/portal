@@ -4,24 +4,46 @@ This user guide explains how to install **Portal** with **Astral Apps**, and run
 
 ## Installing Portal
 
-To install **Portal Environment** you have to obtain a copy of `portal-installer`, and execute it from command line:
+To install **Portal Environment** obtain a [copy](https://github.com/cryptopunkscc/portal/releases) of `portal-installer`, and execute it from the command line:
+
+#### Linux
 
 ```shell
 ./portal-installer
 ```
 
-Or if you know the art, read [Contributor](./contributor.md) guide for more options.
+Make sure you have the following line in your `$PATH`:
+
+```
+$HOME/.local/bin
+```
+
+#### Windows
+
+```shell
+portal-installer.exe
+```
+
+When installing the fist time, add the following line to the user's environment variable `%PATH%`:
+
+```
+%USERPROFILE%\AppData\Local\portal\bin
+```
+
+#### Others
+
+If you know the art, read [Contributor](./contributor.md) guide for more options.
 
 ## Running Portal
 
-**Portal** starts **Astral Apps** through the [`portal-app`](./cmd/portal-app) service. 
-You can start `portal-app` with tray icon by calling: 
+**Portal** starts **Astral Apps** through the [`portal-app`](./cmd/portal-app) service.
+You can start `portal-app` with tray icon by calling:
 
 ```shell
 portal t
 ```
 
-Tray contains a shortcut to applications launcher and option to close portal environment. 
+Tray contains a shortcut to applications launcher and option to close portal environment.
 _If you start the launcher for the first time, most likely expect an empty window if no applications were installed._
 
 If you are using OS without GUI or you just don't need tray icon, execute:
@@ -29,6 +51,7 @@ If you are using OS without GUI or you just don't need tray icon, execute:
 ```shell
 portal
 ```
+
 _If you execute `portal`, then execute `portal t` the tray will be attached to the existing `portal-app` process._
 
 ## Installing Applications
@@ -53,9 +76,10 @@ portal-dev b ./example
 
 ## Running Application
 
-You can run the installed app from the launcher accessible via tray, 
+You can run the installed app from the launcher accessible via tray,
 or from the command line by calling `portal` with the application name or package as the argument.
-If you have no applications installed you can test the command by opening the embedded launcher (which is just an **HTML App**):
+If you have no applications installed you can test the command by opening the embedded launcher (which is just an **HTML
+App**):
 
 ```shell
 portal launcher

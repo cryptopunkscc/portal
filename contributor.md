@@ -55,5 +55,12 @@ Here is a complete list of modifiers for make tool:
 Is worth mentioning that the installation using:
 
 * `<dp|24>` options depends on `go install` command so it outputs binaries into `$GOPATH/bin/`.
-* `./bin/portal-installer` copies embedded binaries into `$HOME/local/bin/`.
+* `./bin/portal-installer` copies embedded binaries into platform specific directory.
 
+## GOOS
+
+To build `portal-installer` for different platforms provide them as additional arguments:
+
+```shell
+./make i linux windows
+```
