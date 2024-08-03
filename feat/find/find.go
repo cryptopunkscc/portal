@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-type Deps[T target.Base] interface {
+type Deps[T target.Portal_] interface {
 	TargetResolve() target.Resolve[T]
 	TargetCache() *target.Cache[T]
 	TargetFile() target.File
@@ -16,7 +16,7 @@ type Deps[T target.Base] interface {
 	Priority() target.Priority
 }
 
-func Inject[T target.Base](deps Deps[T]) target.Find[T] {
+func Inject[T target.Portal_](deps Deps[T]) target.Find[T] {
 	return New[T](
 		deps.TargetCache(),
 		deps.Path(),
@@ -27,7 +27,7 @@ func Inject[T target.Base](deps Deps[T]) target.Find[T] {
 	)
 }
 
-func New[T target.Base](
+func New[T target.Portal_](
 	cache *target.Cache[T],
 	resolvePath target.Path,
 	resolveFile target.File,
@@ -45,7 +45,7 @@ func New[T target.Base](
 	}).Find
 }
 
-type finder[T target.Base] struct {
+type finder[T target.Portal_] struct {
 	cache         *target.Cache[T]
 	resolvePath   target.Path
 	resolveFile   target.File

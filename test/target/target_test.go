@@ -11,7 +11,7 @@ import (
 )
 
 func Test__target_Any__test_assets(t *testing.T) {
-	var resolve = sources.Resolver[target.Base]()
+	var resolve = sources.Resolver[target.Portal_]()
 	src, err := source.File("test_data")
 	if err != nil {
 		t.Fatal(err)

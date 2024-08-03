@@ -13,7 +13,7 @@ type exec struct{ exec target.Source }
 
 func (e exec) Executable() target.Source { return e.exec }
 
-func New(portal target.Base) (t target.Exec, err error) {
+func New(portal target.Portal_) (t target.Exec, err error) {
 	file := portal.Manifest().Exec
 	stat, err := fs.Stat(portal.Files(), file)
 	if err != nil {

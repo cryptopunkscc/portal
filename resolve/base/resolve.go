@@ -19,9 +19,9 @@ func (p *base) LoadManifest() error {
 	return json.Load(&p.manifest, p.Files(), target.PortalJsonFilename)
 }
 
-var ResolveBase Resolve[Base] = resolve
+var ResolveBase Resolve[Portal_] = resolve
 
-func resolve(src Source) (t Base, err error) {
+func resolve(src Source) (t Portal_, err error) {
 	p := base{Source: src}
 	if err = p.LoadManifest(); err != nil {
 		return

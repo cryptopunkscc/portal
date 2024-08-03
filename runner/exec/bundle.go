@@ -56,7 +56,7 @@ func (r *BundleRunner) Reload() error {
 
 	var ctx context.Context
 	ctx, r.cancel = context.WithCancel(r.ctx)
-	err = NewPortal[target.Base](execFile.Name()).Run(ctx, r.bundle)
+	err = NewPortal[target.Portal_](execFile.Name()).Run(ctx, r.bundle)
 	if err != nil {
 		return err
 	}

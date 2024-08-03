@@ -7,7 +7,7 @@ import (
 )
 
 func TestBuild(t *testing.T) {
-	mod := Module[Base]{}
+	mod := Module[Portal_]{}
 	mod.Deps = &mod
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

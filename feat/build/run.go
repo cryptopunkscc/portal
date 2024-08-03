@@ -13,14 +13,14 @@ import (
 	"slices"
 )
 
-type Feat[T target.Base] struct {
+type Feat[T target.Portal_] struct {
 	resolve      target.Resolve[T]
 	newRunDist   func([]target.NodeModule) target.Run[target.Project_]
 	runPack      target.Run[target.Dist_]
 	dependencies []target.NodeModule
 }
 
-func NewFeat[T target.Base](
+func NewFeat[T target.Portal_](
 	resolve target.Resolve[T],
 	newRunDist func([]target.NodeModule) target.Run[target.Project_],
 	runPack target.Run[target.Dist_],

@@ -14,7 +14,7 @@ func Test__sources_FromPath__test_assets(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	targets := target.List(sources.Resolver[target.Base](), file)
+	targets := target.List(sources.Resolver[target.Portal_](), file)
 
 	for _, s := range targets {
 		PrintTarget(s)
@@ -24,7 +24,7 @@ func Test__sources_FromPath__test_assets(t *testing.T) {
 }
 
 func Test__sources_FromFS__js_PortalLibFS(t *testing.T) {
-	targets := target.List(sources.Resolver[target.Base](), source.Embed(js.PortalLibFS))
+	targets := target.List(sources.Resolver[target.Portal_](), source.Embed(js.PortalLibFS))
 
 	for _, s := range targets {
 		PrintTarget(s)

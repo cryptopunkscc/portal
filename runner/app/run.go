@@ -5,8 +5,8 @@ import (
 	"github.com/cryptopunkscc/portal/target"
 )
 
-func Run[T target.Base](run target.Run[T]) target.Run[target.Base] {
-	return func(ctx context.Context, app target.Base) error {
+func Run[T target.Portal_](run target.Run[T]) target.Run[target.Portal_] {
+	return func(ctx context.Context, app target.Portal_) error {
 		t, ok := app.(T)
 		if !ok {
 			return target.ErrNotTarget

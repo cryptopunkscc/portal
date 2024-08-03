@@ -14,7 +14,7 @@ import (
 	"sync"
 )
 
-type Module[T Base] struct {
+type Module[T Portal_] struct {
 	Deps[T]
 	di.Cache
 	CancelFunc context.CancelFunc
@@ -23,7 +23,7 @@ type Module[T Base] struct {
 	targets    Cache[T]
 }
 
-type Deps[T Base] interface {
+type Deps[T Portal_] interface {
 	TargetResolve() Resolve[T]
 	Priority() Priority
 	TargetRun() Run[T]

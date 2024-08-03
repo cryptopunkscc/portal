@@ -16,11 +16,11 @@ import (
 
 func Test__Target_Find(t *testing.T) {
 	ctx := context.TODO()
-	f := find.New[target.Base](
-		&target.Cache[target.Base]{},
+	f := find.New[target.Portal_](
+		&target.Cache[target.Portal_]{},
 		apps.Path,
 		source.File,
-		sources.Resolver[target.Base](),
+		sources.Resolver[target.Portal_](),
 		target.Priority{
 			target.Match[target.Project_],
 			target.Match[target.Dist_],

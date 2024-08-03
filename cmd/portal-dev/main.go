@@ -31,7 +31,7 @@ import (
 )
 
 func main() {
-	mod := Module[Base]{}
+	mod := Module[Portal_]{}
 	mod.Deps = &mod
 	ctx, cancel := context.WithCancel(context.Background())
 	mod.CancelFunc = cancel
@@ -54,7 +54,7 @@ func main() {
 	mod.WaitGroup().Wait()
 }
 
-type Module[T Base] struct{ srv.Module[T] }
+type Module[T Portal_] struct{ srv.Module[T] }
 
 func (d *Module[T]) Executable() string   { return "portal-dev" }
 func (d *Module[T]) Astral() serve.Astral { return serve.CheckAstral }

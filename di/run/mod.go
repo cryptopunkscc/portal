@@ -8,13 +8,13 @@ import (
 	"github.com/cryptopunkscc/portal/target/api"
 )
 
-type Module[T Base] struct {
+type Module[T Portal_] struct {
 	Deps[T]
 	di.Cache
 	targets Cache[T]
 }
 
-type Deps[T Base] interface {
+type Deps[T Portal_] interface {
 	api.Deps
 	open.Deps[T]
 	NewRunTarget(newApi NewApi) Run[T]

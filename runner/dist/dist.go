@@ -34,7 +34,7 @@ func CopyIcon(_ context.Context, project target.Project_) (err error) {
 	return
 }
 
-func CopyManifest(_ context.Context, project target.Base) (err error) {
+func CopyManifest(_ context.Context, project target.Portal_) (err error) {
 	bytes, err := json.Marshal(project.Manifest())
 	if err != nil {
 		return err

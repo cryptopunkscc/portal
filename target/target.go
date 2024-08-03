@@ -18,17 +18,17 @@ type Template interface {
 	Name() string
 }
 
-type Base interface {
+type Portal_ interface {
 	Source
 	Manifest() *Manifest
 }
 
 type Portal[T any] interface {
-	Base
+	Portal_
 	Target() T
 }
 
-type Portals[T Base] []T
+type Portals[T Portal_] []T
 
 type NodeModule interface {
 	Source
@@ -36,7 +36,7 @@ type NodeModule interface {
 }
 
 type Project_ interface {
-	Base
+	Portal_
 	IsProject()
 	Dist_() Dist_
 }
@@ -59,7 +59,7 @@ type ProjectNpm[T any] interface {
 }
 
 type App_ interface {
-	Base
+	Portal_
 	IsApp()
 }
 

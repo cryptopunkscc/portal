@@ -6,6 +6,6 @@ import (
 	. "github.com/cryptopunkscc/portal/target"
 )
 
-type Module[T Base] struct{ run.Module[T] }
+type Module[T Portal_] struct{ run.Module[T] }
 
 func (d *Module[T]) TargetResolve() Resolve[T] { return sources.Resolver[T]() }

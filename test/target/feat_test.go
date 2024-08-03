@@ -14,7 +14,7 @@ import (
 )
 
 func Test__Builder_find(t *testing.T) {
-	f := find.Inject[target.Base](&deps{})
+	f := find.Inject[target.Portal_](&deps{})
 
 	for _, test := range portalTestCases {
 		test := test
@@ -31,7 +31,7 @@ func Test__Builder_find(t *testing.T) {
 }
 
 type deps struct {
-	cache target.Cache[target.Base]
+	cache target.Cache[target.Portal_]
 }
 
 func (d *deps) Priority() target.Priority {
@@ -44,8 +44,10 @@ func (d *deps) Priority() target.Priority {
 func (d *deps) Path() target.Path                          { return apps.Path }
 func (d *deps) Embed() []target.Source                     { return []target.Source{source.Embed(apps2.LauncherSvelteFS)} }
 func (d *deps) TargetFile() target.File                    { return source.File }
-func (d *deps) TargetCache() *target.Cache[target.Base]    { return &d.cache }
-func (d *deps) TargetResolve() target.Resolve[target.Base] { return sources.Resolver[target.Base]() }
+func (d *deps) TargetCache() *target.Cache[target.Portal_] { return &d.cache }
+func (d *deps) TargetResolve() target.Resolve[target.Portal_] {
+	return sources.Resolver[target.Portal_]()
+}
 
 func TestCase_Assert(t *testing.T) {
 	//_ = fs.WalkDir(os.DirFS("."), ".", func(path string, d fs.DirEntry, err error) error {

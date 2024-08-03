@@ -8,21 +8,21 @@ import (
 	"github.com/cryptopunkscc/portal/target"
 )
 
-type Deps[T target.Base] interface {
+type Deps[T target.Portal_] interface {
 	TargetResolve() target.Resolve[T]
 	TargetRun() target.Run[T]
 }
 
-func Inject[T target.Base](deps Deps[T]) target.Dispatch {
+func Inject[T target.Portal_](deps Deps[T]) target.Dispatch {
 	return NewFeat(deps.TargetResolve(), deps.TargetRun())
 }
 
-type Feat[T target.Base] struct {
+type Feat[T target.Portal_] struct {
 	resolve target.Resolve[T]
 	run     target.Run[T]
 }
 
-func NewFeat[T target.Base](
+func NewFeat[T target.Portal_](
 	resolve target.Resolve[T],
 	run target.Run[T],
 ) target.Dispatch {

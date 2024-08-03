@@ -6,9 +6,9 @@ import (
 	"sync"
 )
 
-type portalMap[T Base] map[string]T
+type portalMap[T Portal_] map[string]T
 
-type Cache[T Base] struct {
+type Cache[T Portal_] struct {
 	_portals portalMap[T]
 	mu       sync.Mutex
 }

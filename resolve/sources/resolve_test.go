@@ -16,7 +16,7 @@ func TestResolveAll_List(t *testing.T) {
 	}
 	embed := source.Embed(apps.LauncherSvelteFS)
 
-	for i, base := range target.List(Resolver[target.Base](), embed, file) {
+	for i, base := range target.List(Resolver[target.Portal_](), embed, file) {
 		log.Println(i, reflect.TypeOf(base), base.Manifest().Package, base.Abs())
 	}
 }
@@ -27,7 +27,7 @@ func TestResolveAll_Set(t *testing.T) {
 		t.Error(err)
 	}
 
-	for i, base := range target.Set(Resolver[target.Base](), file) {
+	for i, base := range target.Set(Resolver[target.Portal_](), file) {
 		log.Println(i, reflect.TypeOf(base), base.Abs())
 	}
 }

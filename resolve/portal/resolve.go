@@ -5,7 +5,7 @@ import (
 	"github.com/cryptopunkscc/portal/target"
 )
 
-type portal[T any] struct{ target.Base }
+type portal[T any] struct{ target.Portal_ }
 
 func (a *portal[T]) IsApp()        {}
 func (a *portal[T]) Target() (t T) { return }

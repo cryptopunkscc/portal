@@ -9,8 +9,8 @@ func ApiFactory(
 	wrap func(Api) Api,
 	frontendApphost NewApphost,
 	backendApphost NewApphost,
-) func(context.Context, Base) Api {
-	return func(ctx context.Context, p Base) (a Api) {
+) func(context.Context, Portal_) Api {
+	return func(ctx context.Context, p Portal_) (a Api) {
 		var n NewApphost
 		switch any(p).(type) {
 		case PortalHtml:

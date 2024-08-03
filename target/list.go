@@ -9,7 +9,7 @@ import (
 )
 
 // Set all Source from a given dir.
-func Set[T Base](resolve Resolve[T], from ...Source) (out Portals[T]) {
+func Set[T Portal_](resolve Resolve[T], from ...Source) (out Portals[T]) {
 	return Portals[T](List(resolve, from...)).Reduced()
 }
 

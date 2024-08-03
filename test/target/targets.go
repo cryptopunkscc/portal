@@ -111,7 +111,7 @@ type Case[T any] struct {
 	Matchers []*Target
 }
 
-func (c Case[T]) Assert(t *testing.T, portal target.Base) {
+func (c Case[T]) Assert(t *testing.T, portal target.Portal_) {
 	if c.Matcher != nil {
 		c.Matcher.Assert(t, portal)
 		return
@@ -132,7 +132,7 @@ type Target struct {
 	Manifest *target.Manifest
 }
 
-func (p Target) Assert(t *testing.T, portal target.Base) {
+func (p Target) Assert(t *testing.T, portal target.Portal_) {
 	assert.NotNil(t, portal)
 	assert.Contains(t, portal.Abs(), p.Abs)
 	assert.True(t, strings.HasSuffix(portal.Abs(), p.Abs), "\n%s\n%s", portal.Abs(), p.Abs)

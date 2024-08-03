@@ -8,7 +8,7 @@ import (
 	"github.com/cryptopunkscc/portal/target"
 )
 
-func Resolver[A target.Base]() target.Resolve[A] {
+func Resolver[A target.Portal_]() target.Resolve[A] {
 	return target.Any[A](
 		target.Skip("node_modules"),
 		target.Try(golang.ResolveProject),
