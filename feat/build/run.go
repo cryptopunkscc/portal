@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/cryptopunkscc/portal/resolve/exec"
+	golang "github.com/cryptopunkscc/portal/resolve/go"
+	"github.com/cryptopunkscc/portal/resolve/html"
+	"github.com/cryptopunkscc/portal/resolve/js"
+	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target2/exec"
-	golang "github.com/cryptopunkscc/portal/target2/go"
-	"github.com/cryptopunkscc/portal/target2/html"
-	"github.com/cryptopunkscc/portal/target2/js"
-	"github.com/cryptopunkscc/portal/target2/source"
 	"slices"
 )
 

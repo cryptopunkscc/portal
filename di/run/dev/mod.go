@@ -2,8 +2,8 @@ package dev
 
 import (
 	"github.com/cryptopunkscc/portal/di/run"
+	"github.com/cryptopunkscc/portal/resolve/sources"
 	. "github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target2/sources"
 )
 
 type Module[T Base] struct{ run.Module[T] }

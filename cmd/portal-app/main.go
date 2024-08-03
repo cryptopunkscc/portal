@@ -11,12 +11,12 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	singal "github.com/cryptopunkscc/portal/pkg/sig"
+	"github.com/cryptopunkscc/portal/resolve/apps"
 	"github.com/cryptopunkscc/portal/runner/app"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/multi"
 	. "github.com/cryptopunkscc/portal/target"
 	"github.com/cryptopunkscc/portal/target/cache"
-	"github.com/cryptopunkscc/portal/target2/apps"
 )
 
 func main() {

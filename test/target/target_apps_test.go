@@ -2,8 +2,8 @@ package test
 
 import (
 	embedApps "github.com/cryptopunkscc/portal/apps"
-	"github.com/cryptopunkscc/portal/target2/apps"
-	"github.com/cryptopunkscc/portal/target2/source"
+	"github.com/cryptopunkscc/portal/resolve/apps"
+	"github.com/cryptopunkscc/portal/resolve/source"
 	"testing"
 )
 

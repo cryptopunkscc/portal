@@ -7,10 +7,10 @@ import (
 	"github.com/cryptopunkscc/portal/feat/find"
 	"github.com/cryptopunkscc/portal/feat/serve"
 	"github.com/cryptopunkscc/portal/pkg/di"
+	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/service"
 	"github.com/cryptopunkscc/portal/runner/spawn"
 	. "github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target2/source"
 	"sync"
 )
 

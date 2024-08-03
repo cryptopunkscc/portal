@@ -3,9 +3,9 @@ package create
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/resolve/source"
+	"github.com/cryptopunkscc/portal/resolve/template"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target2/source"
-	"github.com/cryptopunkscc/portal/target2/template"
 )
 
 type (

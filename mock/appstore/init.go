@@ -1,8 +1,8 @@
 package appstore
 
 import (
+	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target2/source"
 	"os"
 	"path/filepath"
 )

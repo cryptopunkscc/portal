@@ -14,6 +14,9 @@ import (
 	portalPort "github.com/cryptopunkscc/portal/pkg/port"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	signal "github.com/cryptopunkscc/portal/pkg/sig"
+	"github.com/cryptopunkscc/portal/resolve/npm"
+	"github.com/cryptopunkscc/portal/resolve/source"
+	"github.com/cryptopunkscc/portal/resolve/sources"
 	"github.com/cryptopunkscc/portal/runner/all_build"
 	"github.com/cryptopunkscc/portal/runner/app"
 	"github.com/cryptopunkscc/portal/runner/exec"
@@ -24,9 +27,6 @@ import (
 	. "github.com/cryptopunkscc/portal/target"
 	js "github.com/cryptopunkscc/portal/target/js/embed"
 	"github.com/cryptopunkscc/portal/target/msg"
-	"github.com/cryptopunkscc/portal/target2/npm"
-	"github.com/cryptopunkscc/portal/target2/source"
-	"github.com/cryptopunkscc/portal/target2/sources"
 	"os"
 )
 

@@ -4,13 +4,13 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	npm2 "github.com/cryptopunkscc/portal/resolve/npm"
+	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/goja_dist"
 	"github.com/cryptopunkscc/portal/runner/npm"
 	"github.com/cryptopunkscc/portal/runner/npm_build"
 	"github.com/cryptopunkscc/portal/target"
 	jsEmbed "github.com/cryptopunkscc/portal/target/js/embed"
-	npm2 "github.com/cryptopunkscc/portal/target2/npm"
-	"github.com/cryptopunkscc/portal/target2/source"
 	"time"
 )
 

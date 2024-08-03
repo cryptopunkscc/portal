@@ -1,9 +1,9 @@
 package template
 
 import (
+	"github.com/cryptopunkscc/portal/resolve/source"
+	"github.com/cryptopunkscc/portal/resolve/template"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target2/source"
-	"github.com/cryptopunkscc/portal/target2/template"
 	"github.com/pterm/pterm"
 )
 

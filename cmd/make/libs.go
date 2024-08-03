@@ -1,10 +1,10 @@
 package main
 
 import (
+	npm2 "github.com/cryptopunkscc/portal/resolve/npm"
+	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/npm"
 	"github.com/cryptopunkscc/portal/target"
-	npm2 "github.com/cryptopunkscc/portal/target2/npm"
-	"github.com/cryptopunkscc/portal/target2/source"
 	"log"
 )
 
@@ -13,10 +13,18 @@ func (d *Install) buildJsLibs() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	for _, p := range target.List(npm2.Resolve, libs) {
+
+	for _, p := range target.List(
+		target.Any[target.NodeModule](
+			target.Skip("node_modules"),
+			target.Try(npm2.Resolve),
+		),
+		libs,
+	) {
 		if !p.PkgJson().CanBuild() {
 			continue
 		}
+		log.Printf("building js libs for %s", p.Abs())
 		if err := npm.Install(p); err != nil {
 			log.Fatalln(err)
 		}

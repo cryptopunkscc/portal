@@ -3,12 +3,12 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/feat/build"
+	"github.com/cryptopunkscc/portal/resolve/npm"
+	"github.com/cryptopunkscc/portal/resolve/source"
+	"github.com/cryptopunkscc/portal/resolve/sources"
 	"github.com/cryptopunkscc/portal/runner/all_build"
 	"github.com/cryptopunkscc/portal/runner/pack"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target2/npm"
-	"github.com/cryptopunkscc/portal/target2/source"
-	"github.com/cryptopunkscc/portal/target2/sources"
 	"log"
 )
 
