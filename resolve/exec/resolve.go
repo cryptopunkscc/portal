@@ -2,9 +2,9 @@ package exec
 
 import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/resolve/base"
 	"github.com/cryptopunkscc/portal/resolve/bundle"
 	"github.com/cryptopunkscc/portal/resolve/dist"
+	"github.com/cryptopunkscc/portal/resolve/portal"
 	"github.com/cryptopunkscc/portal/target"
 	"io/fs"
 )
@@ -31,8 +31,8 @@ func New(portal target.Portal_) (t target.Exec, err error) {
 	return
 }
 
-func ResolveExec(portal target.Source) (t target.Exec, err error) {
-	b, err := base.ResolveBase(portal)
+func ResolveExec(source target.Source) (t target.Exec, err error) {
+	b, err := portal.Resolve_(source)
 	if err != nil {
 		return
 	}
