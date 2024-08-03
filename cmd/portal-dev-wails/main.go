@@ -38,7 +38,8 @@ func main() {
 type Module struct{ dev.Module[PortalHtml] }
 type Adapter struct{ Api }
 
-func (d *Module) WrapApi(api Api) Api { return &Adapter{api} }
+func NewAdapter(api Api) Api          { return &Adapter{Api: api} }
+func (d *Module) WrapApi(api Api) Api { return NewAdapter(api) }
 func (d *Module) NewRunTarget(newApi NewApi) Run[PortalHtml] {
 	return multi.NewRunner[PortalHtml](
 		reload.Immutable(newApi, PortMsg, wails_dev.NewRunner), // FIXME propagate sendMsg

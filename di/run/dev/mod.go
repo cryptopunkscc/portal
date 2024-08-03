@@ -2,10 +2,10 @@ package dev
 
 import (
 	"github.com/cryptopunkscc/portal/di/run"
+	"github.com/cryptopunkscc/portal/resolve/sources"
 	. "github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target/portals"
 )
 
-type Module[T Portal] struct{ run.Module[T] }
+type Module[T Portal_] struct{ run.Module[T] }
 
-func (d *Module[T]) TargetFinder() Finder[T] { return portals.NewFind[T] }
+func (d *Module[T]) TargetResolve() Resolve[T] { return sources.Resolver[T]() }

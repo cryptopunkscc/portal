@@ -1,61 +1,33 @@
 package target
 
 import (
-	"context"
-	"github.com/cryptopunkscc/portal/pkg/plog"
-	"io/fs"
+	"fmt"
 	"log"
 	"sync"
 )
 
-func (finder Finder[T]) Cached(c *Cache[T]) Finder[T] {
-	return func(resolve Path, files ...fs.FS) Find[T] {
-		resolveCached := func(src string) (path string, err error) {
-			// try resolve from cache
-			if portal, ok := c.Get(src); ok {
-				return portal.Abs(), err
-			}
+type portalMap[T Portal_] map[string]T
 
-			// try resolve from resolver
-			path, err = resolve(src)
-			return
-		}
-
-		find := finder(resolveCached, files...)
-		return func(ctx context.Context, src string) (portals Portals[T], err error) {
-			portals, err = find(ctx, src)
-			if err == nil {
-				c.Add(portals)
-				logger := plog.Get(ctx)
-				for _, t := range portals {
-					logger.Printf("added to cache: %v %v", t.Manifest(), t.Abs())
-				}
-			}
-			return
-		}
-	}
-}
-
-type Cache[T Portal] struct {
-	_portals Portals[T]
+type Cache[T Portal_] struct {
+	_portals portalMap[T]
 	mu       sync.Mutex
 }
 
-func (c *Cache[T]) portals() Portals[T] {
+func (c *Cache[T]) portals() portalMap[T] {
 	if c._portals == nil {
-		c._portals = make(Portals[T])
+		c._portals = make(portalMap[T])
 	}
 	return c._portals
 }
-func (c *Cache[T]) Add(portals Portals[T]) {
+
+func (c *Cache[T]) Add(portals []T) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	for s, portal := range portals {
-		c.portals()[s] = portal
+	for _, portal := range portals {
+		c.portals()[portal.Manifest().Package] = portal
 	}
 }
-
-func (c *Cache[T]) Get(src string) (portal Portal, ok bool) {
+func (c *Cache[T]) Get(src string) (portal T, ok bool) {
 	defer func() {
 		log.Println("get from cache:", src, ok, portal, c.portals())
 	}()
@@ -67,6 +39,15 @@ func (c *Cache[T]) Get(src string) (portal Portal, ok bool) {
 			portal = p
 			return
 		}
+	}
+	return
+}
+
+func (c *Cache[T]) Path(src string) (path string, err error) {
+	if portal, ok := c.Get(src); ok {
+		path = portal.Abs()
+	} else {
+		err = fmt.Errorf("no entry for %v", src)
 	}
 	return
 }

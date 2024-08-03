@@ -60,7 +60,7 @@ func AppOptions(app target.Api) *options.App {
 	}
 }
 
-func SetupOptions(src target.Portal, opt *options.App) {
+func SetupOptions(src target.Portal_, opt *options.App) {
 	// Setup defaults
 	if opt.AssetServer == nil {
 		opt.AssetServer = &assetserver.Options{}

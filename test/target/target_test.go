@@ -1,12 +1,9 @@
 package test
 
 import (
+	"github.com/cryptopunkscc/portal/resolve/source"
+	"github.com/cryptopunkscc/portal/resolve/sources"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target/bundle"
-	"github.com/cryptopunkscc/portal/target/dist"
-	"github.com/cryptopunkscc/portal/target/npm"
-	"github.com/cryptopunkscc/portal/target/project"
-	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"reflect"
@@ -14,16 +11,12 @@ import (
 )
 
 func Test__target_Any__test_assets(t *testing.T) {
-	var find = target.Any[target.Project](
-		target.Skip("node_modules"),
-		target.Try(bundle.Resolve),
-		target.Try(npm.ResolveNodeModule).Lift(
-			target.Try(project.ResolveNpm)),
-		target.Try(project.ResolveGo),
-		target.Try(dist.Resolve),
-	)
-	src := source.FromPath("test_data")
-	for _, s := range source.List[target.Project](find, src) {
+	var resolve = sources.Resolver[target.Portal_]()
+	src, err := source.File("test_data")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, s := range target.List(resolve, src) {
 		PrintTarget(s)
 	}
 }

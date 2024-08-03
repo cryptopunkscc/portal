@@ -27,7 +27,7 @@ func (p Port) Route(name string) Port {
 	return p
 }
 
-func (p Port) Target(portal Portal) Port {
+func (p Port) Target(portal Portal_) Port {
 	p.Base = portal.Manifest().Package
 	return p
 }

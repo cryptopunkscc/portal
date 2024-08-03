@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 )
 
-func Dist(ctx context.Context, project target.Project) (err error) {
+func Dist(ctx context.Context, project target.Project_) (err error) {
 	if err = CopyIcon(ctx, project); err != nil {
 		return
 	}
@@ -20,7 +20,7 @@ func Dist(ctx context.Context, project target.Project) (err error) {
 	return
 }
 
-func CopyIcon(_ context.Context, project target.Project) (err error) {
+func CopyIcon(_ context.Context, project target.Project_) (err error) {
 	if project.Manifest().Icon == "" {
 		return
 	}
@@ -34,7 +34,7 @@ func CopyIcon(_ context.Context, project target.Project) (err error) {
 	return
 }
 
-func CopyManifest(_ context.Context, project target.Project) (err error) {
+func CopyManifest(_ context.Context, project target.Portal_) (err error) {
 	bytes, err := json.Marshal(project.Manifest())
 	if err != nil {
 		return err

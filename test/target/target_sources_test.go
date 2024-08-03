@@ -1,16 +1,20 @@
 package test
 
 import (
+	"github.com/cryptopunkscc/portal/resolve/source"
+	"github.com/cryptopunkscc/portal/resolve/sources"
 	"github.com/cryptopunkscc/portal/target"
 	js "github.com/cryptopunkscc/portal/target/js/embed"
-	"github.com/cryptopunkscc/portal/target/sources"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func Test__sources_FromPath__test_assets(t *testing.T) {
-	assets := target.Abs("test_data")
-	targets := sources.FromPath[target.Portal](assets)
+	file, err := source.File("test_data")
+	if err != nil {
+		t.Fatal(err)
+	}
+	targets := target.List(sources.Resolver[target.Portal_](), file)
 
 	for _, s := range targets {
 		PrintTarget(s)
@@ -20,7 +24,7 @@ func Test__sources_FromPath__test_assets(t *testing.T) {
 }
 
 func Test__sources_FromFS__js_PortalLibFS(t *testing.T) {
-	targets := sources.FromFS[target.Source](js.PortalLibFS)
+	targets := target.List(sources.Resolver[target.Portal_](), source.Embed(js.PortalLibFS))
 
 	for _, s := range targets {
 		PrintTarget(s)

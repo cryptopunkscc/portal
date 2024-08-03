@@ -8,14 +8,14 @@ import (
 	"os/exec"
 )
 
-type Portal[T target.Portal] struct {
+type Portal[T target.Portal_] struct {
 	command []string
 	cmd     *exec.Cmd
 	ctx     context.Context
 	src     T
 }
 
-func NewPortal[T target.Portal](command ...string) target.Runner[T] {
+func NewPortal[T target.Portal_](command ...string) target.Runner[T] {
 	return &Portal[T]{command: command}
 }
 

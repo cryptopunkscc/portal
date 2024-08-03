@@ -59,7 +59,7 @@ func eventEmitter[T any](queue *sig.Queue[target.ApphostEvent]) func(ref string,
 	}
 }
 
-func (f Factory) NewAdapter(ctx context.Context, portal target.Portal) target.Apphost {
+func (f Factory) NewAdapter(ctx context.Context, portal target.Portal_) target.Apphost {
 	flat := newAdapter(ctx, portal.Manifest().Package)
 	go func() {
 		sleep := time.Duration(3) * time.Millisecond
@@ -71,7 +71,7 @@ func (f Factory) NewAdapter(ctx context.Context, portal target.Portal) target.Ap
 
 var ConnectionsThreshold = -1
 
-func (f Factory) WithTimeout(ctx context.Context, portal target.Portal) target.Apphost {
+func (f Factory) WithTimeout(ctx context.Context, portal target.Portal_) target.Apphost {
 	manifest := portal.Manifest()
 	flat := newAdapter(ctx, manifest.Package)
 

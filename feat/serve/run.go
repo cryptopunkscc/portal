@@ -17,7 +17,7 @@ type Feat struct {
 	serve  target.Dispatch
 }
 
-type Deps[T target.Portal] interface {
+type Deps[T target.Portal_] interface {
 	Astral() Astral
 	Port() target.Port
 	RunService() Service
@@ -39,7 +39,7 @@ type (
 	Service func(handlers rpc.Handlers) target.Dispatch
 )
 
-func Inject[T target.Portal](deps Deps[T]) *Feat {
+func Inject[T target.Portal_](deps Deps[T]) *Feat {
 	return NewFeat(
 		deps.Astral(),
 		deps.Port(),

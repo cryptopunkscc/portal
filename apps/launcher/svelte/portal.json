@@ -3,5 +3,6 @@
   "package": "cc.cryptopunks.portal.launcher",
   "title": "Portal Launcher",
   "description": "Portal applications launcher.",
-  "icon": "./src/assets/images/logo.svg"
+  "icon": "./src/assets/images/logo.svg",
+  "version": "0.0.0"
 }

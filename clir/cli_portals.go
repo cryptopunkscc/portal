@@ -9,7 +9,7 @@ import (
 )
 
 func (c Cli) Portals(
-	find target.Find[target.Portal],
+	find target.Find[target.Portal_],
 ) {
 	flags := struct {
 		Path string `pos:"1" default:"."`

@@ -1,21 +1,18 @@
 package appstore
 
 import (
+	"github.com/cryptopunkscc/portal/resolve/apps"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target/apps"
-	"github.com/cryptopunkscc/portal/target/manifest"
 	"io/fs"
-	"path/filepath"
 )
 
-func Path(app string) (src string, err error) {
-	for _, t := range apps.FromPath[target.Bundle](portalAppsDir) {
-		var m target.Manifest
-		if m, err = manifest.Read(t.Files()); err != nil {
-			return
-		}
-		if m.Match(app) {
-			src = filepath.Join(portalAppsDir, t.Path())
+func Path(port string) (path string, err error) {
+	for _, t := range target.List(
+		apps.Resolver[target.Bundle_](),
+		portalAppsSource,
+	) {
+		if t.Manifest().Match(port) {
+			path = t.Abs()
 			return
 		}
 	}

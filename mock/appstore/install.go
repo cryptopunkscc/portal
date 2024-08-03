@@ -2,19 +2,27 @@ package appstore
 
 import (
 	"github.com/cryptopunkscc/portal/pkg/fs2"
+	"github.com/cryptopunkscc/portal/resolve/apps"
+	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target/apps"
 	"log"
 	"path/filepath"
 )
 
 func Install(src string) (err error) {
-	for _, t := range apps.FromPath[target.Bundle](src) {
+	file, err := source.File(src)
+	if err != nil {
+		return err
+	}
+	for _, t := range target.List(
+		apps.Resolver[target.Bundle_](),
+		file,
+	) {
 		src = t.Abs()
-		dst := filepath.Join(portalAppsDir, filepath.Base(t.Path()))
+		dst := filepath.Join(portalAppsDir, filepath.Base(t.Abs()))
 
-		err = fs2.CopyFile(src, dst)
 		log.Printf("Installing %s to %s", src, dst)
+		err = fs2.CopyFile(src, dst)
 		if err != nil {
 			log.Printf("Error copying file %s: %v", src, err)
 			return

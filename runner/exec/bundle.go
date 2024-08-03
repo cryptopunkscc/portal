@@ -30,32 +30,33 @@ func (r *BundleRunner) Reload() error {
 		r.cancel()
 	}
 
-	p := r.bundle.Executable().Lift().Path()
-	temp, err := os.CreateTemp(r.cacheDir, p)
+	execFile, err := os.CreateTemp(r.cacheDir, r.bundle.Manifest().Package)
 	if err != nil {
 		return plog.Err(err)
 	}
-	e := r.bundle.Executable()
-	file, err := e.Files().Open(e.Path())
+
+	e := r.bundle.Target().Executable()
+	srcFile, err := e.Files().Open(e.Path())
 	if err != nil {
 		return plog.Err(err)
 	}
-	if err = temp.Chmod(0755); err != nil {
+
+	if err = execFile.Chmod(0755); err != nil {
 		return plog.Err(err)
 	}
-	_, err = io.Copy(temp, file)
+	_, err = io.Copy(execFile, srcFile)
 	if err != nil {
 		return plog.Err(err)
 	}
-	if err = temp.Close(); err != nil {
+	if err = execFile.Close(); err != nil {
 		return plog.Err(err)
 	}
-	defer os.Remove(temp.Name())
-	_ = file.Close()
+	defer os.Remove(execFile.Name())
+	_ = srcFile.Close()
 
 	var ctx context.Context
 	ctx, r.cancel = context.WithCancel(r.ctx)
-	err = NewPortal[target.Portal](temp.Name()).Run(ctx, r.bundle)
+	err = NewPortal[target.Portal_](execFile.Name()).Run(ctx, r.bundle)
 	if err != nil {
 		return err
 	}

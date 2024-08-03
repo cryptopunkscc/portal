@@ -1,15 +1,16 @@
 package template
 
 import (
+	"context"
 	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/git"
+	"github.com/cryptopunkscc/portal/resolve/template"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target/template"
 	"os"
 	"path/filepath"
 )
 
-func NewRun(dir string, templates map[string]string) target.CreateProject {
+func NewRun(dir string, templates map[string]string) target.Run[target.Template] {
 	return NewRunner(dir, templates).Run
 }
 
@@ -36,7 +37,7 @@ func NewRunner(dir string, templates map[string]string) *Runner {
 	}
 }
 
-func (r *Runner) Run(t target.Template) (err error) {
+func (r *Runner) Run(_ context.Context, t target.Template) (err error) {
 	name := r.templates[t.Name()]
 	dir := filepath.Join(r.dir, name)
 

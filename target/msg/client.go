@@ -24,7 +24,7 @@ func (s *Client) Init(reloader Reloader, apphost target.ApphostCache) *Client {
 	return s
 }
 
-func (s *Client) Connect(ctx context.Context, portal target.Portal) (err error) {
+func (s *Client) Connect(ctx context.Context, portal target.Portal_) (err error) {
 	if s.flow != nil {
 		return
 	}

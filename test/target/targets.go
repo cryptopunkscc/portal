@@ -7,6 +7,32 @@ import (
 	"testing"
 )
 
+var portalTestCases = []Case[string]{
+	{Src: ".", Matchers: []*Target{
+		RpcBackend,
+		RpcFrontend,
+		BasicBackend,
+		BasicFrontend,
+		ProjectFrontend,
+		ProjectBackend,
+		ProjectGo,
+		Launcher,
+		DistExecutable,
+	}},
+	{Src: "test_data/rpc", Matchers: []*Target{
+		RpcBackend,
+		RpcFrontend,
+	}},
+	{Matcher: Launcher, Src: Launcher.Manifest.Name},
+	{Matcher: Launcher, Src: Launcher.Manifest.Package},
+	{Matcher: BasicBackend, Src: BasicBackend.Abs},
+	{Matcher: BasicFrontend, Src: BasicFrontend.Abs},
+	{Matcher: RpcFrontend, Src: RpcFrontend.Abs},
+	{Matcher: RpcBackend, Src: RpcBackend.Abs},
+	{Matcher: ProjectBackend, Src: ProjectBackend.Abs},
+	{Matcher: ProjectFrontend, Src: ProjectFrontend.Abs},
+}
+
 var Launcher = &Target{
 	Path:     ".",
 	Abs:      "launcher/svelte/dist",
@@ -85,7 +111,7 @@ type Case[T any] struct {
 	Matchers []*Target
 }
 
-func (c Case[T]) Assert(t *testing.T, portal target.Portal) {
+func (c Case[T]) Assert(t *testing.T, portal target.Portal_) {
 	if c.Matcher != nil {
 		c.Matcher.Assert(t, portal)
 		return
@@ -106,10 +132,10 @@ type Target struct {
 	Manifest *target.Manifest
 }
 
-func (p Target) Assert(t *testing.T, portal target.Portal) {
+func (p Target) Assert(t *testing.T, portal target.Portal_) {
 	assert.NotNil(t, portal)
 	assert.Contains(t, portal.Abs(), p.Abs)
-	assert.True(t, strings.HasSuffix(portal.Abs(), p.Abs), "%s %s", portal.Abs(), p.Abs)
+	assert.True(t, strings.HasSuffix(portal.Abs(), p.Abs), "\n%s\n%s", portal.Abs(), p.Abs)
 	assert.Equal(t, p.Path, portal.Path())
 	assert.Equal(t, p.Manifest, portal.Manifest())
 }

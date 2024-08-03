@@ -11,16 +11,16 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	singal "github.com/cryptopunkscc/portal/pkg/sig"
+	"github.com/cryptopunkscc/portal/resolve/apps"
 	"github.com/cryptopunkscc/portal/runner/app"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/multi"
 	. "github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target/apps"
 	"github.com/cryptopunkscc/portal/target/cache"
 )
 
 func main() {
-	mod := Module[App]{}
+	mod := Module[App_]{}
 	mod.Deps = &mod
 	ctx, cancel := context.WithCancel(context.Background())
 	mod.CancelFunc = cancel
@@ -31,7 +31,6 @@ func main() {
 		version.Run,
 	)
 	cli.Serve(mod.FeatServe())
-	cli.Apps(mod.TargetFind())
 	cli.List(featApps.List)
 	cli.Install(featApps.Install)
 	cli.Uninstall(featApps.Uninstall)
@@ -43,13 +42,12 @@ func main() {
 	mod.WaitGroup().Wait()
 }
 
-type Module[T App] struct{ srv.Module[App] }
+type Module[T App_] struct{ srv.Module[App_] }
 
 func (d *Module[T]) Executable() string        { return "portal" }
-func (d *Module[T]) Tray() Tray                { return exec.Tray }
 func (d *Module[T]) Astral() serve.Astral      { return exec.Astral }
-func (d *Module[T]) TargetFinder() Finder[T]   { return apps.NewFind[T] }
 func (d *Module[T]) RpcHandlers() rpc.Handlers { return nil }
+func (d *Module[T]) TargetResolve() Resolve[T] { return apps.Resolver[T]() }
 func (d *Module[T]) TargetRun() Run[T] {
 	return multi.NewRunner[T](
 		app.Run(exec.NewPortal[AppJs]("portal-app-goja", "o").Run),
@@ -57,5 +55,12 @@ func (d *Module[T]) TargetRun() Run[T] {
 		app.Run(exec.NewBundleRunner(d.CacheDir()).Run),
 	).Run
 }
+func (d *Module[T]) Priority() Priority {
+	return []Matcher{
+		Match[Bundle_],
+		Match[Dist_],
+	}
+}
+func (d *Module[T]) Tray() Tray            { return exec.Tray }
 func (d *Module[T]) CacheDir() string      { return di.S(cache.Dir, cache.Deps(d)) }
 func (d *Module[T]) FeatServe() clir.Serve { return serve.Inject[T](d).Run }

@@ -4,17 +4,18 @@ import (
 	"context"
 )
 
+// ApiFactory deprecated FIXME refactor & remove
 func ApiFactory(
 	wrap func(Api) Api,
 	frontendApphost NewApphost,
 	backendApphost NewApphost,
-) func(context.Context, Portal) Api {
-	return func(ctx context.Context, p Portal) (a Api) {
+) func(context.Context, Portal_) Api {
+	return func(ctx context.Context, p Portal_) (a Api) {
 		var n NewApphost
 		switch any(p).(type) {
-		case Html:
+		case PortalHtml:
 			n = frontendApphost
-		case Js:
+		case PortalJs:
 			n = backendApphost
 		default:
 			return

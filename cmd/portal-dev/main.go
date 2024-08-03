@@ -14,8 +14,11 @@ import (
 	portalPort "github.com/cryptopunkscc/portal/pkg/port"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	signal "github.com/cryptopunkscc/portal/pkg/sig"
+	"github.com/cryptopunkscc/portal/resolve/npm"
+	"github.com/cryptopunkscc/portal/resolve/source"
+	"github.com/cryptopunkscc/portal/resolve/sources"
+	"github.com/cryptopunkscc/portal/runner/all_build"
 	"github.com/cryptopunkscc/portal/runner/app"
-	"github.com/cryptopunkscc/portal/runner/dist"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/multi"
 	"github.com/cryptopunkscc/portal/runner/pack"
@@ -24,15 +27,14 @@ import (
 	. "github.com/cryptopunkscc/portal/target"
 	js "github.com/cryptopunkscc/portal/target/js/embed"
 	"github.com/cryptopunkscc/portal/target/msg"
-	"github.com/cryptopunkscc/portal/target/portals"
-	"github.com/cryptopunkscc/portal/target/sources"
 	"os"
 )
 
 func main() {
-	mod := Module[Portal]{}
+	mod := Module[Portal_]{}
 	mod.Deps = &mod
 	ctx, cancel := context.WithCancel(context.Background())
+	mod.CancelFunc = cancel
 	go signal.OnShutdown(cancel)
 	println("...")
 	plog.ErrorStackTrace = true
@@ -52,16 +54,16 @@ func main() {
 	mod.WaitGroup().Wait()
 }
 
-type Module[T Portal] struct{ srv.Module[T] }
+type Module[T Portal_] struct{ srv.Module[T] }
 
-func (d *Module[T]) Executable() string      { return "portal-dev" }
-func (d *Module[T]) Astral() serve.Astral    { return serve.CheckAstral }
-func (d *Module[T]) TargetFinder() Finder[T] { return portals.NewFind[T] }
+func (d *Module[T]) Executable() string   { return "portal-dev" }
+func (d *Module[T]) Astral() serve.Astral { return serve.CheckAstral }
 func (d *Module[T]) RpcHandlers() rpc.Handlers {
 	return rpc.Handlers{
 		PortMsg.Name: msg.NewBroadcast(PortMsg, d.Processes()).BroadcastMsg,
 	}
 }
+func (d *Module[T]) TargetResolve() Resolve[T] { return sources.Resolver[T]() }
 func (d *Module[T]) TargetRun() Run[T] {
 	return multi.NewRunner[T](
 		app.Run(exec.NewPortal[PortalJs]("portal-dev-goja", "o").Run),
@@ -70,6 +72,13 @@ func (d *Module[T]) TargetRun() Run[T] {
 		app.Run(exec.NewPortal[AppExec]("portal-dev-exec", "o").Run),
 	).Run
 }
+func (d *Module[T]) Priority() Priority {
+	return []Matcher{
+		Match[Project_],
+		Match[Dist_],
+		Match[Bundle_],
+	}
+}
 func (d *Module[T]) Tray() Tray                { return nil }
 func (d *Module[T]) JoinTarget() Dispatch      { return query.NewOpen().Run }
 func (d *Module[T]) DispatchService() Dispatch { return serve.Inject[T](d).Dispatch }
@@ -77,9 +86,17 @@ func (d *Module[T]) FeatDev() Dispatch         { return dispatch.Inject(d).Run }
 func (d *Module[T]) FeatCreate() *create.Feat {
 	return create.NewFeat(template.NewRun, d.FeatBuild().Dist)
 }
-func (d *Module[T]) FeatBuild() *build.Feat {
-	return build.NewFeat(
-		dist.NewRun, pack.Run,
-		sources.FromFS[NodeModule](js.PortalLibFS),
+func (d *Module[T]) FeatBuild() *build.Feat[T] {
+	return build.NewFeat[T](
+		d.TargetResolve(),
+		all_build.NewRun,
+		pack.Run,
+		List(
+			Any[NodeModule](
+				Skip("node_modules"),
+				Try(npm.Resolve),
+			),
+			source.Embed(js.PortalLibFS),
+		),
 	)
 }

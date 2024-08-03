@@ -8,17 +8,8 @@ type Source interface {
 	Abs() string
 	Path() string
 	Files() fs.FS
-	Type() Type
-	Lift() Source
-	Parent() Source
-	IsFile() bool
-}
-
-type Portals[T Portal] map[string]T
-
-type Portal interface {
-	Source
-	Manifest() *Manifest
+	Sub(dir string) (Source, error)
+	IsDir() bool
 }
 
 type Template interface {
@@ -27,117 +18,103 @@ type Template interface {
 	Name() string
 }
 
+type Portal_ interface {
+	Source
+	Manifest() *Manifest
+}
+
+type Portal[T any] interface {
+	Portal_
+	Target() T
+}
+
+type Portals[T Portal_] []T
+
 type NodeModule interface {
 	Source
 	PkgJson() *PackageJson
 }
 
-type Project interface {
-	Portal
+type Project_ interface {
+	Portal_
 	IsProject()
-	Dist() Dist
+	Dist_() Dist_
 }
 
-type ProjectNpm interface {
-	Project
-	NodeModule
+type Project[T any] interface {
+	Portal[T]
+	IsProject()
+	Dist_() Dist_
+	Dist() Dist[T]
 }
 
-type App interface {
+type ProjectNpm_ interface {
+	Project_
+	PkgJson() *PackageJson
+}
+
+type ProjectNpm[T any] interface {
+	Project[T]
+	PkgJson() *PackageJson
+}
+
+type App_ interface {
+	Portal_
 	IsApp()
-	Portal
+}
+
+type App[T any] interface {
+	Portal[T]
+	IsApp()
 }
 
 type Bundle interface {
+	Source
 	IsBundle()
-	App
 }
 
-type Dist interface {
+type Bundle_ interface {
+	IsBundle()
+	App_
+}
+
+type AppBundle[T any] interface {
+	IsBundle()
+	App[T]
+}
+
+type Dist_ interface {
 	IsDist()
-	App
+	App_
 }
 
-type Html interface {
-	IsHtml()
+type Dist[T any] interface {
+	IsDist()
+	App[T]
 }
 
-type AppHtml interface {
-	App
-	Html
-}
+type Html interface{ IndexHtml() }
+type PortalHtml Portal[Html]
+type AppHtml App[Html]
+type DistHtml Dist[Html]
+type BundleHtml AppBundle[Html]
+type ProjectHtml ProjectNpm[Html]
 
-type PortalHtml interface {
-	Portal
-	Html
-}
+type Js interface{ MainJs() }
+type PortalJs Portal[Js]
+type AppJs App[Js]
+type DistJs Dist[Js]
+type BundleJs AppBundle[Js]
+type ProjectJs ProjectNpm[Js]
 
-type ProjectHtml interface {
-	ProjectNpm
-	Html
-	DistHtml() DistHtml
-}
-
-type DistHtml interface {
-	Dist
-	Html
-}
-
-type BundleHtml interface {
-	Bundle
-	Html
-}
-
-type Js interface {
-	IsJs()
-}
-
-type ProjectJs interface {
-	ProjectNpm
-	Js
-	DistJs() DistJs
-}
-
-type AppJs interface {
-	App
-	Js
-}
-
-type PortalJs interface {
-	Portal
-	Js
-}
-
-type DistJs interface {
-	Dist
-	Js
-}
-
-type BundleJs interface {
-	Bundle
-	Js
-}
-
-type Exec interface {
-	Executable() Source
-}
-
-type AppExec interface {
-	App
-	Exec
-}
-
-type DistExec interface {
-	Dist
-	Exec
-}
-
-type BundleExec interface {
-	Bundle
-	Exec
-}
+type Exec interface{ Executable() Source }
+type PortalExec Portal[Exec]
+type AppExec App[Exec]
+type DistExec Dist[Exec]
+type BundleExec AppBundle[Exec]
+type ProjectExec Project[Exec]
 
 type ProjectGo interface {
-	Project
-	DistGolang() DistExec
+	Project[Exec]
+	IsGo()
 }

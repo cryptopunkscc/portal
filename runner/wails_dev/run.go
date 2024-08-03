@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runner/dist"
+	"github.com/cryptopunkscc/portal/resolve/npm"
+	"github.com/cryptopunkscc/portal/resolve/source"
+	"github.com/cryptopunkscc/portal/runner/npm_build"
 	"github.com/cryptopunkscc/portal/runner/wails"
 	"github.com/cryptopunkscc/portal/target"
 	js "github.com/cryptopunkscc/portal/target/js/embed"
-	"github.com/cryptopunkscc/portal/target/project"
-	"github.com/cryptopunkscc/portal/target/sources"
 	"github.com/wailsapp/wails/v2/pkg/application"
 	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 	"os"
@@ -37,8 +37,15 @@ func (r *Runner) Run(ctx context.Context, projectHtml target.ProjectHtml) (err e
 		return
 	}
 
-	dependencies := sources.FromFS[target.NodeModule](js.PortalLibFS)
-	if err = dist.NewRun(dependencies)(ctx, projectHtml); err != nil {
+	resolve := target.Any[target.NodeModule](
+		target.Skip("node_modules"),
+		target.Try(npm.Resolve),
+	)
+	dependencies := target.List(resolve, source.Embed(js.PortalLibFS))
+	if len(dependencies) == 0 {
+		log.P().Println("dependencies are empty")
+	}
+	if err = npm_build.NewRunner(dependencies).Run(ctx, projectHtml); err != nil {
 		return
 	}
 
@@ -64,11 +71,7 @@ func (r *Runner) Run(ctx context.Context, projectHtml target.ProjectHtml) (err e
 	// setup opt
 	front := path
 	path = path + "/dist"
-	src, err := project.FromPath(front)
-	if err != nil {
-		return err
-	}
-	wails.SetupOptions(src, opt)
+	wails.SetupOptions(projectHtml, opt)
 	if opt.Title == "" {
 		opt.Title = "development"
 	}

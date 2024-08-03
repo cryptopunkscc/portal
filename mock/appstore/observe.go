@@ -6,15 +6,16 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/fs2"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
+	"github.com/cryptopunkscc/portal/resolve/apps"
+	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target/apps"
 	"io"
 )
 
 func Observe(ctx context.Context, conn rpc.Conn) (err error) {
 	plog.Get(ctx).Println("Observing...")
-	err = send(portalAppsDir, conn)
-	if err != nil {
+	resolve := apps.Resolver[target.Bundle_]()
+	if err = send(resolve, conn, portalAppsDir); err != nil {
 		return
 	}
 	watch, err := fs2.NotifyWatch(ctx, portalAppsDir, 0)
@@ -22,7 +23,7 @@ func Observe(ctx context.Context, conn rpc.Conn) (err error) {
 		return
 	}
 	for event := range watch {
-		err = send(event.Name, conn)
+		err = send(resolve, conn, event.Name)
 		if errors.Is(err, io.EOF) {
 			return
 		}
@@ -35,10 +36,15 @@ func Observe(ctx context.Context, conn rpc.Conn) (err error) {
 }
 
 func send(
-	src string,
+	resolve target.Resolve[target.Bundle_],
 	conn rpc.Conn,
+	src string,
 ) (err error) {
-	for _, t := range apps.FromPath[target.Bundle](src) {
+	file, err := source.File(src)
+	if err != nil {
+		return err
+	}
+	for _, t := range target.List(resolve, file) {
 		if err = conn.Encode(t.Manifest()); err != nil {
 			return
 		}

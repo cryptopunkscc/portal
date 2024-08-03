@@ -17,6 +17,9 @@ type Backend struct {
 }
 
 func NewBackend(apphost target.Apphost) *Backend {
+	if any(apphost) == nil {
+		panic("apphost nil")
+	}
 	return &Backend{
 		apphost:   apphost,
 		apphostJs: common.JsString,

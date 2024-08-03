@@ -16,8 +16,8 @@ type Manifest struct {
 	Env         Env    `json:"env,omitempty"`
 }
 
-func (m Manifest) Match(port string) bool {
-	return port == m.Name || strings.HasPrefix(port, m.Package)
+func (m Manifest) Match(id string) bool {
+	return id == m.Name || strings.HasPrefix(id, m.Package)
 }
 
 type Env struct {

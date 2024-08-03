@@ -7,11 +7,11 @@ import (
 	"github.com/cryptopunkscc/portal/target/msg"
 )
 
-func Mutable[T target.Portal](
+func Mutable[T target.Portal_](
 	newApi target.NewApi,
 	portMsg target.Port,
 	newRunner func(target.NewApi, target.MsgSend) target.Runner[T],
-) target.Run[target.Portal] {
+) target.Run[target.Portal_] {
 	return runner[T]{
 		portMsg:   portMsg,
 		newApi:    newApi,
@@ -19,11 +19,11 @@ func Mutable[T target.Portal](
 	}.Run
 }
 
-func Immutable[T target.Portal](
+func Immutable[T target.Portal_](
 	newApi target.NewApi,
 	portMsg target.Port,
 	newRunner func(target.NewApi) target.Runner[T],
-) target.Run[target.Portal] {
+) target.Run[target.Portal_] {
 	return runner[T]{
 		portMsg: portMsg,
 		newApi:  newApi,
@@ -33,13 +33,13 @@ func Immutable[T target.Portal](
 	}.Run
 }
 
-type runner[T target.Portal] struct {
+type runner[T target.Portal_] struct {
 	portMsg   target.Port
 	newApi    target.NewApi
 	newRunner func(target.NewApi, target.MsgSend) target.Runner[T]
 }
 
-func (r runner[T]) Run(ctx context.Context, portal target.Portal) (err error) {
+func (r runner[T]) Run(ctx context.Context, portal target.Portal_) (err error) {
 	t, ok := portal.(T)
 	if !ok {
 		return target.ErrNotTarget
@@ -48,7 +48,7 @@ func (r runner[T]) Run(ctx context.Context, portal target.Portal) (err error) {
 	var reloader msg.Reloader
 	client := msg.NewClient(r.portMsg)
 	sendMsg := client.Send
-	newApi := func(ctx context.Context, portal target.Portal) target.Api {
+	newApi := func(ctx context.Context, portal target.Portal_) target.Api {
 		api := r.newApi(ctx, portal)
 		if api != nil {
 			client.Init(reloader, api)
@@ -58,7 +58,7 @@ func (r runner[T]) Run(ctx context.Context, portal target.Portal) (err error) {
 		}
 		return api
 	}
-	runner := r.newRunner(newApi, sendMsg)
-	reloader = runner
-	return runner.Run(ctx, t)
+	_runner := r.newRunner(newApi, sendMsg)
+	reloader = _runner
+	return _runner.Run(ctx, t)
 }

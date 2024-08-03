@@ -26,7 +26,7 @@ type Apphost interface {
 	ApphostApi
 }
 
-type NewApphost func(ctx context.Context, portal Portal) Apphost
+type NewApphost func(ctx context.Context, portal Portal_) Apphost
 
 type ApphostApi interface {
 	Close() error

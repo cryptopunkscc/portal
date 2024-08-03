@@ -27,7 +27,8 @@ func (d *DistRunner) Reload() error {
 	if d.cancel != nil {
 		_ = d.cancel()
 	}
-	cmd := exec.CommandContext(d.ctx, d.src.Executable().Abs())
+	abs := d.src.Target().Executable().Abs()
+	cmd := exec.CommandContext(d.ctx, abs)
 	d.cancel = cmd.Cancel
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

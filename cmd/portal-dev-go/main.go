@@ -8,7 +8,6 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/port"
 	"github.com/cryptopunkscc/portal/pkg/sig"
-	"github.com/cryptopunkscc/portal/runner/app"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/go_dev"
 	"github.com/cryptopunkscc/portal/runner/multi"
@@ -39,6 +38,5 @@ func main() {
 type Module struct{ dev.Module[ProjectGo] }
 
 func (d *Module) NewRunTarget(newApi NewApi) Run[ProjectGo] {
-	var runner = go_dev.NewAdapter(app.Run(exec.NewDistRunner().Run))
-	return multi.NewRunner[ProjectGo](reload.Mutable(newApi, PortMsg, runner)).Run
+	return multi.NewRunner[ProjectGo](reload.Mutable(newApi, PortMsg, go_dev.NewAdapter(exec.NewDistRunner().Run))).Run
 }

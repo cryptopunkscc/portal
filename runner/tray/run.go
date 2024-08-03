@@ -3,7 +3,6 @@ package tray
 import (
 	"context"
 	"errors"
-	"github.com/cryptopunkscc/portal"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target"
 	"github.com/getlantern/systray"
@@ -49,7 +48,6 @@ func (t *Runner) Run(ctx context.Context) (err error) {
 
 func (t *Runner) onReady() {
 	t.log.Println("portal tray start")
-	systray.SetTitle(portal.Name)
 	launcher := systray.AddMenuItem("Launcher", "Launcher")
 	quit := systray.AddMenuItem("Quit ", "Quit")
 

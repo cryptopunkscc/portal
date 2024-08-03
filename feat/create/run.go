@@ -3,14 +3,14 @@ package create
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/resolve/source"
+	"github.com/cryptopunkscc/portal/resolve/template"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target/source"
-	"github.com/cryptopunkscc/portal/target/template"
 )
 
 type (
 	Dist    func(context.Context, ...string) error
-	Factory func(dir string, templates map[string]string) target.CreateProject
+	Factory func(dir string, templates map[string]string) target.Run[target.Template]
 )
 
 type Feat struct {
@@ -35,14 +35,14 @@ func (f Feat) Run(
 ) (err error) {
 	log := plog.Get(ctx).Type(f).Set(&ctx)
 	create := f.factory(dir, targets)
-	resolve := target.Any[target.Template](target.Try(template.Resolve))
-	src := source.FromFS(template.TemplatesFs)
-
-	for _, t := range source.List(resolve, src) {
+	for _, t := range target.List(
+		template.Resolve,
+		source.Embed(template.TemplatesFs),
+	) {
 		if _, ok := targets[t.Name()]; !ok {
 			continue
 		}
-		if err = create(t); err != nil {
+		if err = create(ctx, t); err != nil {
 			log.E().Printf("Error creating project from template: %v", err)
 		}
 	}

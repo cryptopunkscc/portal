@@ -62,8 +62,8 @@ func (d *Install) Run(make Make, goos []string) {
 		d.buildJsLibs()
 	}
 	if make&Apps == Apps {
-		log.Println(" * js apps")
-		d.buildJsApps()
+		log.Println(" * embed apps")
+		d.buildEmbedApps()
 	}
 	if make&Dev == Dev {
 		log.Println(" * portal dev")

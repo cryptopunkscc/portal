@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-type List func() []target.App
+type List func() []target.App_
 
 func (c Cli) List(handle List) {
 	cmd := c.clir.NewSubCommand("l", "List installed apps.")

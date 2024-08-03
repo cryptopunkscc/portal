@@ -4,12 +4,13 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runner/dist"
+	npm2 "github.com/cryptopunkscc/portal/resolve/npm"
+	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/goja_dist"
 	"github.com/cryptopunkscc/portal/runner/npm"
+	"github.com/cryptopunkscc/portal/runner/npm_build"
 	"github.com/cryptopunkscc/portal/target"
 	jsEmbed "github.com/cryptopunkscc/portal/target/js/embed"
-	"github.com/cryptopunkscc/portal/target/sources"
 	"time"
 )
 
@@ -34,8 +35,12 @@ func (r *Runner) Run(ctx context.Context, projectJs target.ProjectJs) (err error
 		return
 	}
 
-	dependencies := sources.FromFS[target.NodeModule](jsEmbed.PortalLibFS)
-	if err = dist.NewRun(dependencies)(ctx, projectJs); err != nil {
+	resolve := target.Any[target.NodeModule](
+		target.Skip("node_modules"),
+		target.Try(npm2.Resolve),
+	)
+	dependencies := target.List(resolve, source.Embed(jsEmbed.PortalLibFS))
+	if err = npm_build.NewRunner(dependencies).Run(ctx, projectJs); err != nil {
 		return
 	}
 
@@ -46,5 +51,5 @@ func (r *Runner) Run(ctx context.Context, projectJs target.ProjectJs) (err error
 	// Wait 1 for npm.RunWatchStart finish initial build otherwise runner can restart on first launch.
 	time.Sleep(1 * time.Second)
 
-	return r.distRunner.Run(ctx, projectJs.DistJs())
+	return r.distRunner.Run(ctx, projectJs.Dist())
 }
