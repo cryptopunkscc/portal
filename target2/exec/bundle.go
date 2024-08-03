@@ -1,7 +1,7 @@
 package exec
 
 import (
-	. "github.com/cryptopunkscc/portal/target2"
+	. "github.com/cryptopunkscc/portal/target"
 	"github.com/cryptopunkscc/portal/target2/bundle"
 )
 

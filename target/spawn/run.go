@@ -8,34 +8,34 @@ import (
 	"sync"
 )
 
-type Deps[T target.Portal] interface {
+type Deps[T target.Base] interface {
 	WaitGroup() *sync.WaitGroup
+	Processes() *sig.Map[string, T]
 	TargetFind() target.Find[T]
 	TargetRun() target.Run[T]
-	Processes() *sig.Map[string, T]
 }
 
-func Inject[T target.Portal](deps Deps[T]) target.Dispatch {
+func Inject[T target.Base](deps Deps[T]) target.Dispatch {
 	return NewRunner[T](
 		deps.WaitGroup(),
+		deps.Processes(),
 		deps.TargetFind(),
 		deps.TargetRun(),
-		deps.Processes(),
 	).Run
 }
 
-type Runner[T target.Portal] struct {
+type Runner[T target.Base] struct {
 	wait      *sync.WaitGroup
+	processes *sig.Map[string, T]
 	find      target.Find[T]
 	run       target.Run[T]
-	processes *sig.Map[string, T]
 }
 
-func NewRunner[T target.Portal](
+func NewRunner[T target.Base](
 	wait *sync.WaitGroup,
+	processes *sig.Map[string, T],
 	find target.Find[T],
 	run target.Run[T],
-	processes *sig.Map[string, T],
 ) *Runner[T] {
 	return &Runner[T]{
 		wait:      wait,
@@ -46,7 +46,7 @@ func NewRunner[T target.Portal](
 }
 
 func (r *Runner[T]) Run(ctx context.Context, src string, args ...string) (err error) {
-	typ := target.ParseType(target.TypeAny, args...)
+	//typ := target.ParseType(target.TypeAny, args...) // TODO
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	portals, err := r.find(ctx, src)
 	if err != nil {
@@ -54,9 +54,9 @@ func (r *Runner[T]) Run(ctx context.Context, src string, args ...string) (err er
 	}
 	log.D().Printf("found %d portals for %s", len(portals), src)
 	for _, t := range portals {
-		if t.Type().Is(typ) {
-			r.start(ctx, log, t)
-		}
+		//if t.Type().Is(typ) {
+		r.start(ctx, log, t)
+		//}
 	}
 	return
 }
@@ -64,6 +64,7 @@ func (r *Runner[T]) Run(ctx context.Context, src string, args ...string) (err er
 func (r *Runner[T]) start(ctx context.Context, log plog.Logger, portal T) {
 	id := portal.Manifest().Package
 	if _, ok := r.processes.Set(id, portal); !ok {
+		log.Printf("%s already started ", id)
 		return
 	}
 	r.wait.Add(1)

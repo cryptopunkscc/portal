@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/git"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target/template"
+	"github.com/cryptopunkscc/portal/target2/template"
 	"os"
 	"path/filepath"
 )

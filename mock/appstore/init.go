@@ -1,13 +1,14 @@
 package appstore
 
 import (
-	"io/fs"
+	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/target2/source"
 	"os"
 	"path/filepath"
 )
 
 var portalAppsDir string
-var portalAppsFs fs.FS
+var portalAppsSource target.Source
 
 func init() {
 	dir, err := os.UserCacheDir()
@@ -20,5 +21,8 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	portalAppsFs = os.DirFS(portalAppsDir)
+	if portalAppsSource, err = source.File(portalAppsDir); err != nil {
+		panic(err)
+	}
+
 }

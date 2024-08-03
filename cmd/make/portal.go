@@ -9,7 +9,8 @@ import (
 )
 
 var goWails = GoPortal{
-	Tags:    "desktop,wv2runtime.download,production,webkit2_41",
+	//Tags: "desktop,wv2runtime.download,production,webkit2_41,devtools",
+	Tags:    "dev,webkit2_41",
 	LdFlags: []string{"-w -s"},
 	Prepare: func() error { return deps.AptInstallMissing(wailsDeps) },
 }

@@ -2,7 +2,7 @@ package js
 
 import (
 	"errors"
-	. "github.com/cryptopunkscc/portal/target2"
+	. "github.com/cryptopunkscc/portal/target"
 	"github.com/cryptopunkscc/portal/target2/bundle"
 	"github.com/cryptopunkscc/portal/target2/dist"
 	"github.com/cryptopunkscc/portal/target2/npm"

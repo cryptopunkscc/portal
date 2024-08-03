@@ -3,7 +3,6 @@ package app
 import (
 	"embed"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target2"
 	"github.com/cryptopunkscc/portal/target2/source"
 	"github.com/stretchr/testify/assert"
 	"path/filepath"
@@ -14,8 +13,8 @@ import (
 var embedFS embed.FS
 
 var (
-	fsSrc    target2.Source
-	embedSrc target2.Source
+	fsSrc    target.Source
+	embedSrc target.Source
 )
 
 var testManifest = &target.Manifest{

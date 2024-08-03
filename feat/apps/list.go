@@ -5,6 +5,6 @@ import (
 	"github.com/cryptopunkscc/portal/target"
 )
 
-func List() []target.App {
+func List() []target.App_ {
 	return appstore.ListApps()
 }

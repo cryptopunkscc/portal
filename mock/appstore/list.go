@@ -2,9 +2,9 @@ package appstore
 
 import (
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target/apps"
+	"github.com/cryptopunkscc/portal/target2/apps"
 )
 
-func ListApps() []target.App {
-	return apps.FromFS[target.App](portalAppsFs)
+func ListApps() []target.App_ {
+	return target.List(apps.ResolveAll, portalAppsSource)
 }

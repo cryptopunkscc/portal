@@ -9,9 +9,9 @@ import (
 	"path/filepath"
 )
 
-func Run(_ context.Context, app target.Dist) (err error) {
+func Run(_ context.Context, app target.Dist_) (err error) {
 	// create build dir
-	buildDir := filepath.Join(app.Parent().Abs(), "build")
+	buildDir := filepath.Join(app.Abs(), "..", "build")
 	if err = os.MkdirAll(buildDir, 0775); err != nil && !os.IsExist(err) {
 		return fmt.Errorf("os.MkdirAll: %v", err)
 	}

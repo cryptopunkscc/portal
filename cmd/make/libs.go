@@ -3,15 +3,17 @@ package main
 import (
 	"github.com/cryptopunkscc/portal/runner/npm"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target/sources"
+	npm2 "github.com/cryptopunkscc/portal/target2/npm"
+	"github.com/cryptopunkscc/portal/target2/source"
 	"log"
-	"path/filepath"
 )
 
 func (d *Install) buildJsLibs() {
-	dir := filepath.Join(d.root, "target/js")
-	libs := sources.FromPath[target.NodeModule](dir)
-	for _, p := range libs {
+	libs, err := source.File(d.root, "target", "js")
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, p := range target.List(npm2.Resolve, libs) {
 		if !p.PkgJson().CanBuild() {
 			continue
 		}

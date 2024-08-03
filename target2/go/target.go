@@ -1,7 +1,7 @@
 package golang
 
 import (
-	. "github.com/cryptopunkscc/portal/target2"
+	. "github.com/cryptopunkscc/portal/target"
 	"github.com/cryptopunkscc/portal/target2/exec"
 	"github.com/cryptopunkscc/portal/target2/portal"
 	"io/fs"
@@ -12,7 +12,9 @@ type project struct {
 }
 
 func (p *project) IsProject() {}
-func (p *project) IsGo()      {}
+
+func (p *project) IsGo()        {}
+func (p *project) Dist_() Dist_ { return p.Dist() }
 func (p *project) Dist() (t Dist[Exec]) {
 	sub, err := p.Sub("dist")
 	if err != nil {

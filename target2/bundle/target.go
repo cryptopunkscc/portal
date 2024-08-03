@@ -1,15 +1,13 @@
 package bundle
 
-import (
-	"github.com/cryptopunkscc/portal/target2"
-)
+import "github.com/cryptopunkscc/portal/target"
 
-type of[T any] struct{ target2.Dist[T] }
+type of[T any] struct{ target.Dist[T] }
 
 func (t of[T]) IsBundle() {}
 
-func Resolver[T any](resolve target2.Resolve[target2.Dist[T]]) target2.Resolve[target2.AppBundle[T]] {
-	return func(src target2.Source) (app target2.AppBundle[T], err error) {
+func Resolver[T any](resolve target.Resolve[target.Dist[T]]) target.Resolve[target.AppBundle[T]] {
+	return func(src target.Source) (app target.AppBundle[T], err error) {
 		b, err := Resolve(src)
 		if err != nil {
 			return

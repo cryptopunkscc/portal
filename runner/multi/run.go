@@ -8,12 +8,12 @@ import (
 	"reflect"
 )
 
-type Runner[T target.Portal] struct {
-	runners []target.Run[target.Portal]
+type Runner[T target.Base] struct {
+	runners []target.Run[target.Base]
 }
 
-func NewRunner[T target.Portal](
-	runners ...target.Run[target.Portal],
+func NewRunner[T target.Base](
+	runners ...target.Run[target.Base],
 ) *Runner[T] {
 	return &Runner[T]{runners: runners}
 }

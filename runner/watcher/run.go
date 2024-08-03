@@ -9,11 +9,11 @@ import (
 	"time"
 )
 
-type Runner[T target.Dist] struct {
+type Runner[T target.Dist_] struct {
 	reload func() error
 }
 
-func NewRunner[T target.Dist](reload func() error) *Runner[T] {
+func NewRunner[T target.Dist_](reload func() error) *Runner[T] {
 	return &Runner[T]{reload: reload}
 }
 

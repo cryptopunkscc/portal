@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target/source"
-	"github.com/cryptopunkscc/portal/target/template"
+	"github.com/cryptopunkscc/portal/target2/source"
+	"github.com/cryptopunkscc/portal/target2/template"
 )
 
 type (
@@ -35,10 +35,10 @@ func (f Feat) Run(
 ) (err error) {
 	log := plog.Get(ctx).Type(f).Set(&ctx)
 	create := f.factory(dir, targets)
-	resolve := target.Any[target.Template](target.Try(template.Resolve))
-	src := source.FromFS(template.TemplatesFs)
-
-	for _, t := range source.List(resolve, src) {
+	for _, t := range target.List(
+		template.Resolve,
+		source.Embed(template.TemplatesFs),
+	) {
 		if _, ok := targets[t.Name()]; !ok {
 			continue
 		}

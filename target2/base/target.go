@@ -1,9 +1,9 @@
 package base
 
 import (
+	"github.com/cryptopunkscc/portal/pkg/json"
 	"github.com/cryptopunkscc/portal/target"
-	. "github.com/cryptopunkscc/portal/target2"
-	"github.com/cryptopunkscc/portal/target2/json"
+	. "github.com/cryptopunkscc/portal/target"
 )
 
 type base struct {
@@ -16,7 +16,7 @@ func (p *base) Manifest() *target.Manifest {
 }
 
 func (p *base) LoadManifest() error {
-	return json.Load(&p.manifest, p, target.PortalJsonFilename)
+	return json.Load(&p.manifest, p.Files(), target.PortalJsonFilename)
 }
 
 var ResolveBase Resolve[Base] = resolve

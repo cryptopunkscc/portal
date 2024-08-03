@@ -30,7 +30,7 @@ func (i Injector) Run(ctx context.Context, m target.NodeModule) (err error) {
 }
 
 func inject(log plog.Logger, m target.NodeModule, lib target.NodeModule) (err error) {
-	dep := lib.Lift()
+	dep := lib
 	nm := filepath.Join(m.Abs(), "node_modules", filepath.Base(dep.Abs()))
 	log.Printf("copying module %v %v into: %s", dep.Path(), dep.Abs(), nm)
 	return fs.WalkDir(dep.Files(), ".", func(s string, d fs.DirEntry, err error) error {

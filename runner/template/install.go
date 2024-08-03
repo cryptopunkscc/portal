@@ -2,7 +2,7 @@ package template
 
 import (
 	"fmt"
-	"github.com/cryptopunkscc/portal/target/template"
+	"github.com/cryptopunkscc/portal/target2/template"
 	"github.com/leaanthony/gosod"
 	"io/fs"
 )

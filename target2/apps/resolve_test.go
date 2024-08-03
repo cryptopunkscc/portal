@@ -1,7 +1,7 @@
 package apps
 
 import (
-	"github.com/cryptopunkscc/portal/target2"
+	"github.com/cryptopunkscc/portal/target"
 	"github.com/cryptopunkscc/portal/target2/source"
 	"log"
 	"reflect"
@@ -14,7 +14,7 @@ func TestResolveAll_List(t *testing.T) {
 		t.Error(err)
 	}
 
-	for i, base := range target2.List(ResolveAll, file) {
+	for i, base := range target.List(ResolveAll, file) {
 		log.Println(i, reflect.TypeOf(base), base.Abs())
 	}
 
@@ -26,7 +26,7 @@ func TestResolveAll_Set(t *testing.T) {
 		t.Error(err)
 	}
 
-	for i, base := range target2.Set(ResolveAll, file) {
+	for i, base := range target.Set(ResolveAll, file) {
 		log.Println(i, reflect.TypeOf(base), base.Abs())
 	}
 

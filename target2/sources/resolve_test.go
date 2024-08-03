@@ -2,7 +2,7 @@ package sources
 
 import (
 	"github.com/cryptopunkscc/portal/apps"
-	"github.com/cryptopunkscc/portal/target2"
+	"github.com/cryptopunkscc/portal/target"
 	"github.com/cryptopunkscc/portal/target2/source"
 	"log"
 	"reflect"
@@ -16,7 +16,7 @@ func TestResolveAll_List(t *testing.T) {
 	}
 	embed := source.Embed(apps.LauncherSvelteFS)
 
-	for i, base := range target2.List(Resolve[target2.Base], embed, file) {
+	for i, base := range target.List(Resolver[target.Base](), embed, file) {
 		log.Println(i, reflect.TypeOf(base), base.Manifest().Package, base.Abs())
 	}
 }
@@ -27,7 +27,7 @@ func TestResolveAll_Set(t *testing.T) {
 		t.Error(err)
 	}
 
-	for i, base := range target2.Set(ResolveAll, file) {
+	for i, base := range target.Set(Resolver[target.Base](), file) {
 		log.Println(i, reflect.TypeOf(base), base.Abs())
 	}
 }

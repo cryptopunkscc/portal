@@ -4,6 +4,8 @@ import (
 	"github.com/cryptopunkscc/portal/target"
 	"github.com/cryptopunkscc/portal/target2/source"
 	"github.com/stretchr/testify/assert"
+	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -36,6 +38,7 @@ func TestResolveDist(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Equal(t, testManifest, dist.Manifest())
+	assert.True(t, strings.HasSuffix(dist.Abs(), filepath.Join("target2", "js", "test", "dist")))
 }
 
 func TestResolveProject(t *testing.T) {

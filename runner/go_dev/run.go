@@ -6,7 +6,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	golang "github.com/cryptopunkscc/portal/pkg/go"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runner/dist"
+	"github.com/cryptopunkscc/portal/runner/go_build"
 	"github.com/cryptopunkscc/portal/target"
 	"time"
 )
@@ -31,7 +31,7 @@ func NewRunner(
 	}
 }
 
-func NewAdapter(run target.Run[target.Portal]) func(
+func NewAdapter(run target.Run[target.DistExec]) func(
 	_ target.NewApi,
 	send target.MsgSend,
 ) target.Runner[target.ProjectGo] {
@@ -65,11 +65,11 @@ func (r *Runner) Run(ctx context.Context, project target.ProjectGo) (err error) 
 		return
 	}
 	r.ctx = ctx
-	build := dist.NewGoRunner().Run
+	build := go_build.NewRunner().Run
 	if err = build(ctx, project); err != nil {
 		return
 	}
-	r.dist = project.DistGolang()
+	r.dist = project.Dist()
 
 	if err = r.Reload(); err != nil {
 		return

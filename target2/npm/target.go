@@ -1,13 +1,12 @@
 package npm
 
 import (
+	"github.com/cryptopunkscc/portal/pkg/json"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target2"
-	"github.com/cryptopunkscc/portal/target2/json"
 )
 
 type nodeModule struct {
-	target2.Source
+	target.Source
 	packageJson *target.PackageJson
 }
 
@@ -16,10 +15,13 @@ func (n *nodeModule) PkgJson() *target.PackageJson {
 }
 
 func (n *nodeModule) LoadPkgJson() error {
-	return json.Load(&n.packageJson, n, target.PackageJsonFilename)
+	return json.Load(&n.packageJson, n.Files(), target.PackageJsonFilename)
 }
 
-func Resolve(src target2.Source) (t target2.NodeModule, err error) {
+func Resolve(src target.Source) (t target.NodeModule, err error) {
+	if !src.IsDir() {
+		return nil, target.ErrNotTarget
+	}
 	s := &nodeModule{Source: src}
 	if err = s.LoadPkgJson(); err != nil {
 		return

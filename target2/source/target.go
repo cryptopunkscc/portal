@@ -4,8 +4,8 @@ import (
 	"embed"
 	"errors"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target2"
 	"io/fs"
+	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -23,10 +23,7 @@ type source struct {
 func (s *source) IsDir() bool { return !s.isFile }
 
 func (s *source) Abs() (abs string) {
-	if filepath.IsAbs(s.external) {
-		abs = s.join(s.external, s.internal)
-	}
-	return
+	return s.join(s.external, s.internal)
 }
 
 func (s *source) Path() string {
@@ -37,7 +34,7 @@ func (s *source) Files() fs.FS {
 	return s.files
 }
 
-func (s *source) Sub(src string) (t target2.Source, err error) {
+func (s *source) Sub(src string) (t target.Source, err error) {
 	if s.isFile {
 		return nil, errors.New("cannot sub file")
 	}
@@ -61,7 +58,7 @@ func (s *source) Sub(src string) (t target2.Source, err error) {
 	return
 }
 
-func Embed(files embed.FS) target2.Source {
+func Embed(files embed.FS) target.Source {
 	return &source{
 		scheme:   "embed",
 		files:    files,
@@ -70,7 +67,7 @@ func Embed(files embed.FS) target2.Source {
 	}
 }
 
-func FS(files fs.FS, abs string) target2.Source {
+func FS(files fs.FS, abs string) target.Source {
 	return &source{
 		scheme:   "files",
 		external: abs,
@@ -80,8 +77,16 @@ func FS(files fs.FS, abs string) target2.Source {
 	}
 }
 
-func File(path ...string) (t target2.Source, err error) {
+func File(path ...string) (t target.Source, err error) {
 	abs := target.Abs(filepath.Join(path...))
 	abs, file := filepath.Split(abs)
-	return FS(os.DirFS(abs), abs).Sub(file)
+	log.Println("abs file:", abs, file)
+	tt := FS(os.DirFS(abs), abs)
+	if file != "" {
+		tt, err = tt.Sub(file)
+		log.Println("abs file sub:", tt, err)
+	}
+	t = tt
+	log.Println("abs file return:", t, err)
+	return
 }
