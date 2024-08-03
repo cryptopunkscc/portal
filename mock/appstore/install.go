@@ -35,7 +35,7 @@ func install(bundle target.Bundle_) error {
 	pkg := bundle.Package()
 	name := filepath.Base(bundle.Abs())
 	dstPath := filepath.Join(portalAppsDir, name)
-	println(fmt.Sprintf("* copy %s to %s [DONE]", name, dstPath))
+	println(fmt.Sprintf("* copying %s to %s [DONE]", name, dstPath))
 	dst, err := os.Create(dstPath)
 	if err != nil {
 		return err
