@@ -57,3 +57,10 @@ Is worth mentioning that the installation using:
 * `<dp|24>` options depends on `go install` command so it outputs binaries into `$GOPATH/bin/`.
 * `./bin/portal-installer` copies embedded binaries into `$HOME/local/bin/`.
 
+## GOOS
+
+When build `portal-installer` you can specify targets as optional arguments:
+
+```shell
+./make i linux windows
+```
