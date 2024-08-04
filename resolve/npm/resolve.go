@@ -1,7 +1,7 @@
 package npm
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/json"
+	"github.com/cryptopunkscc/portal/pkg/dec/json"
 	"github.com/cryptopunkscc/portal/target"
 )
 
@@ -15,7 +15,7 @@ func (n *nodeModule) PkgJson() *target.PackageJson {
 }
 
 func (n *nodeModule) LoadPkgJson() error {
-	return json.Load(&n.packageJson, n.Files(), target.PackageJsonFilename)
+	return json.Unmarshaler.Load(&n.packageJson, n.Files(), target.PackageJsonFilename)
 }
 
 func Resolve(src target.Source) (t target.NodeModule, err error) {
@@ -36,10 +36,10 @@ type project[T any] struct {
 	resolveDist target.Resolve[target.Dist[T]]
 }
 
-func (p project[T]) IsProject()                   {}
-func (p project[T]) PkgJson() *target.PackageJson { return p.nodeModule.PkgJson() }
-func (p project[T]) Dist_() (t target.Dist_)      { return p.Dist() }
-func (p project[T]) Dist() (t target.Dist[T]) {
+func (p *project[T]) IsProject()                   {}
+func (p *project[T]) PkgJson() *target.PackageJson { return p.nodeModule.PkgJson() }
+func (p *project[T]) Dist_() (t target.Dist_)      { return p.Dist() }
+func (p *project[T]) Dist() (t target.Dist[T]) {
 	sub, err := p.Sub("dist")
 	if err != nil {
 		return

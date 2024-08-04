@@ -1,7 +1,7 @@
 package portal
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/json"
+	"github.com/cryptopunkscc/portal/pkg/dec/all"
 	"github.com/cryptopunkscc/portal/target"
 )
 
@@ -29,7 +29,7 @@ func (p *unknown) Manifest() *target.Manifest {
 }
 
 func (p *unknown) LoadManifest() error {
-	return json.Load(&p.manifest, p.Files(), target.PortalJsonFilename)
+	return all.Unmarshalers.Load(&p.manifest, p.Files(), target.ManifestFilename)
 }
 
 func resolve(src target.Source) (t target.Portal_, err error) {

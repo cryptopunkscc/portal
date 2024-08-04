@@ -38,7 +38,7 @@ func TestResolveDist(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Equal(t, testManifest, dist.Manifest())
-	assert.True(t, strings.HasSuffix(dist.Abs(), filepath.Join("target2", "js", "test", "dist")))
+	assert.True(t, strings.HasSuffix(dist.Abs(), filepath.Join("js", "test", "dist")))
 }
 
 func TestResolveProject(t *testing.T) {
