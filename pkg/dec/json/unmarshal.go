@@ -6,5 +6,5 @@ import (
 )
 
 var Unmarshaler = dec.Unmarshalers{
-	"yaml": json.Unmarshal,
+	"json": json.Unmarshal,
 }

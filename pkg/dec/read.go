@@ -1,7 +1,6 @@
 package dec
 
 import (
-	"github.com/cryptopunkscc/portal/target"
 	"io/fs"
 )
 
@@ -25,7 +24,10 @@ func (u Unmarshalers) Load(dst any, src fs.FS, name string) (err error) {
 			return
 		}
 	}
-	return target.ErrNotTarget
+	if err == nil {
+		err = fs.ErrNotExist
+	}
+	return err
 }
 
 func load(

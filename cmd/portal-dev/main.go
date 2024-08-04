@@ -87,7 +87,7 @@ func (d *Module[T]) FeatCreate() *create.Feat {
 	return create.NewFeat(template.NewRun, d.FeatBuild().Dist)
 }
 func (d *Module[T]) FeatBuild() *build.Feat[T] {
-	return build.NewFeat[T](
+	return build.NewFeat(
 		d.TargetResolve(),
 		all_build.NewRun,
 		pack.Run,

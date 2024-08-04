@@ -7,10 +7,13 @@ import (
 	"github.com/cryptopunkscc/portal/target"
 )
 
-func NewRun(dependencies []target.NodeModule) target.Run[target.Project_] {
+func NewRun(
+	dependencies []target.NodeModule,
+	platforms []string,
+) target.Run[target.Project_] {
 	return Runner{
 		NpmRunner: npm_build.NewRunner(dependencies),
-		GoRunner:  go_build.NewRunner(),
+		GoRunner:  go_build.NewRunner(platforms...),
 	}.Run
 }
 

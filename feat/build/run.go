@@ -15,22 +15,25 @@ import (
 
 type Feat[T target.Portal_] struct {
 	resolve      target.Resolve[T]
-	newRunDist   func([]target.NodeModule) target.Run[target.Project_]
+	newRunDist   func([]target.NodeModule, []string) target.Run[target.Project_]
 	runPack      target.Run[target.Dist_]
 	dependencies []target.NodeModule
+	platforms    []string
 }
 
 func NewFeat[T target.Portal_](
 	resolve target.Resolve[T],
-	newRunDist func([]target.NodeModule) target.Run[target.Project_],
+	newRunDist func([]target.NodeModule, []string) target.Run[target.Project_],
 	runPack target.Run[target.Dist_],
 	dependencies []target.NodeModule,
+	platforms ...string,
 ) *Feat[T] {
 	return &Feat[T]{
 		resolve:      resolve,
 		newRunDist:   newRunDist,
 		runPack:      runPack,
 		dependencies: dependencies,
+		platforms:    platforms,
 	}
 }
 
@@ -57,7 +60,7 @@ func (r Feat[T]) Dist(ctx context.Context, dir ...string) (err error) {
 	)
 	projects := target.List(resolve, file)
 	for _, m := range projects {
-		if err = r.newRunDist(r.dependencies)(ctx, m); err != nil {
+		if err = r.newRunDist(r.dependencies, r.platforms)(ctx, m); err != nil {
 			return fmt.Errorf("build.Dist: %w", err)
 		}
 	}

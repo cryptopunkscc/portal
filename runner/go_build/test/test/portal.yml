@@ -1,0 +1,9 @@
+name: test
+package: cc.cryptopunks.test
+title: test
+version: 0.0.0
+build:
+  default:
+    cmd: go build -o dist/main
+  windows:
+    cmd: go build -o dist/main.exe

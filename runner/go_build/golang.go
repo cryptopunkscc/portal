@@ -5,32 +5,55 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/exec"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/dist"
 	"github.com/cryptopunkscc/portal/target"
-	"strings"
+	"os"
+	"path/filepath"
+	"runtime"
 )
 
-type GoRunner struct {
-}
+type GoRunner struct{ platforms []string }
 
-func NewRunner() GoRunner {
-	return GoRunner{}
+func NewRunner(platforms ...string) GoRunner {
+	return GoRunner{platforms}
 }
 
 func (g GoRunner) Run(ctx context.Context, project target.ProjectGo) (err error) {
+	log := plog.Get(ctx).Type(g).Set(&ctx)
 	if err = deps.RequireBinary("go"); err != nil {
 		return
 	}
-	cmd := []string{"go", "build", "-o", "dist/main"}
-	if project.Manifest().Build != "" {
-		cmd = strings.Split(project.Manifest().Build, " ")
+
+	if len(g.platforms) == 0 {
+		g.platforms = []string{runtime.GOOS}
 	}
-	if err = exec.Run(project.Abs(), cmd...); err != nil {
-		return fmt.Errorf("run golang build %s: %s", project.Abs(), err)
+
+	log.Printf("go build %T %s %v", project, project.Abs(), g.platforms)
+	cmd := exec.Cmd{
+		Cmd:  "go",
+		Args: []string{"build", "-o", "dist/main"},
+		Dir:  project.Abs(),
+	}.Default()
+
+	if err = os.RemoveAll(filepath.Join(project.Abs(), "dist")); err != nil {
+		log.W().Println(err)
 	}
-	project.Manifest().Exec = "main"
-	if err = dist.Dist(ctx, project); err != nil {
-		return
+	for _, platform := range g.platforms {
+		build, ok := project.Build()[platform]
+		if !ok {
+			build, ok = project.Build()["default"]
+		}
+		if ok {
+			cmd = cmd.Parse(build.Cmd).AddEnv(build.Env...).AddEnv("GOOS=" + platform)
+		}
+		if err = cmd.Build().Run(); err != nil {
+			return fmt.Errorf("run golang build %s: %s", project.Abs(), err)
+		}
+		project.Manifest().Exec = build.Exec
+		if err = dist.Dist(ctx, project); err != nil {
+			return
+		}
 	}
 	return
 }

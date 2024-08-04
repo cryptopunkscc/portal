@@ -37,13 +37,13 @@ type NodeModule interface {
 
 type Project_ interface {
 	Portal_
-	IsProject()
+	Build() Builds
 	Dist_() Dist_
 }
 
 type Project[T any] interface {
 	Portal[T]
-	IsProject()
+	Build() Builds
 	Dist_() Dist_
 	Dist() Dist[T]
 }

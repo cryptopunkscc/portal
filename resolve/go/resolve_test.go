@@ -15,6 +15,11 @@ var testManifest = target.Manifest{
 	Version: "0.0.0",
 }
 
+var testBuild = target.Builds{
+	"default": target.Build{Cmd: "cmd1", Env: []string(nil)},
+	"windows": target.Build{Cmd: "cmd1", Env: []string{"FOO=bar"}},
+}
+
 func TestResolveProject(t *testing.T) {
 	file, err := source.File("test")
 	if err != nil {
@@ -25,6 +30,7 @@ func TestResolveProject(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Equal(t, &testManifest, bundle.Manifest())
+	assert.Equal(t, testBuild, bundle.Build())
 }
 
 func TestResolveBundle(t *testing.T) {

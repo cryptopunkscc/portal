@@ -32,12 +32,13 @@ func (c Cmd) AddEnv(env ...string) Cmd {
 	return c
 }
 
-func (c Cmd) Parse(cmd string, args ...string) Cmd {
-	c.Cmd = cmd
-	for _, s := range args {
-		chunks := strings.Split(s, " ")
-		c.Args = append(c.Args, chunks...)
+func (c Cmd) Parse(cmd ...string) Cmd {
+	var chunks []string
+	for _, s := range cmd {
+		chunks = append(chunks, strings.Split(s, " ")...)
 	}
+	c.Cmd = chunks[0]
+	c.Args = chunks[1:]
 	return c
 }
 

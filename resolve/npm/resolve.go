@@ -31,12 +31,13 @@ func Resolve(src target.Source) (t target.NodeModule, err error) {
 }
 
 type project[T any] struct {
-	nodeModule target.NodeModule
 	target.Portal[T]
+	build       target.Builds
+	nodeModule  target.NodeModule
 	resolveDist target.Resolve[target.Dist[T]]
 }
 
-func (p *project[T]) IsProject()                   {}
+func (p *project[T]) Build() target.Builds         { return p.build }
 func (p *project[T]) PkgJson() *target.PackageJson { return p.nodeModule.PkgJson() }
 func (p *project[T]) Dist_() (t target.Dist_)      { return p.Dist() }
 func (p *project[T]) Dist() (t target.Dist[T]) {
@@ -57,6 +58,7 @@ func Resolver[T any](resolve target.Resolve[target.Dist[T]]) target.Resolve[targ
 		if p.Portal, err = resolve(src); err != nil {
 			return
 		}
+		p.build = target.LoadBuilds(src)
 		p.resolveDist = resolve
 		t = p
 		return

@@ -12,7 +12,6 @@ type Manifest struct {
 	Version     string `json:"version,omitempty" yaml:"version,omitempty"`
 	Icon        string `json:"icon,omitempty" yaml:"icon,omitempty"`
 	Exec        string `json:"exec,omitempty" yaml:"exec,omitempty"`
-	Build       string `json:"build,omitempty" yaml:"build,omitempty"`
 	Env         Env    `json:"env,omitempty" yaml:"env,omitempty"`
 }
 

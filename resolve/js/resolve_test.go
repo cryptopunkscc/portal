@@ -41,6 +41,12 @@ func TestResolveDist(t *testing.T) {
 	assert.True(t, strings.HasSuffix(dist.Abs(), filepath.Join("js", "test", "dist")))
 }
 
+var testBuild = target.Builds{
+	"default": target.Build{Cmd: "cmd2", Deps: []string{"dep2"}},
+	"linux":   target.Build{Cmd: "cmd3", Deps: []string{"dep2", "dep3"}},
+	"windows": target.Build{Cmd: "cmd4", Deps: []string{"dep2", "dep4"}},
+}
+
 func TestResolveProject(t *testing.T) {
 	file, err := source.File("test")
 	if err != nil {
@@ -51,4 +57,5 @@ func TestResolveProject(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Equal(t, testManifest, bundle.Manifest())
+	assert.Equal(t, testBuild, bundle.Build())
 }

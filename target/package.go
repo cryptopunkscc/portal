@@ -1,6 +1,6 @@
 package target
 
-const PackageJsonFilename = "package.json"
+const PackageJsonFilename = "package"
 
 type PackageJson struct {
 	Portal  string `json:"portal,omitempty"`

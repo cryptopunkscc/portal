@@ -21,6 +21,5 @@ func Run(_ context.Context, app target.Dist_) (err error) {
 	if err = zip.Pack(app.Abs(), filepath.Join(buildDir, bundleName)); err != nil {
 		return fmt.Errorf("pack.Run: %v", err)
 	}
-
 	return
 }
