@@ -19,17 +19,6 @@ var goWailsDev = GoPortal{
 	Prepare: func() error { return deps.AptInstallMissing(wailsDeps) },
 }
 
-var goPortalTray = GoPortal{
-	Target:  "portal-tray",
-	Prepare: func() error { return deps.AptInstallMissing(trayDeps) },
-	Os: map[string]GoPortal{
-		"windows": {
-			LdFlags: []string{"-H=windowsgui"},
-			Env:     []string{"CGO_ENABLED=1"},
-		},
-	},
-}
-
 var goPortal = GoPortal{}.target("portal")
 var goPortalApp = GoPortal{}.target("portal-app")
 var goPortalAppWails = goWails.target("portal-app-wails")

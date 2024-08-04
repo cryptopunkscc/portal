@@ -24,7 +24,6 @@ type Deps[T target.Portal_] interface {
 	RpcHandlers() rpc.Handlers
 	FeatObserve() Observe
 	RunSpawn() target.Dispatch
-	Tray() target.Tray
 	Close() context.CancelFunc
 }
 
@@ -47,7 +46,6 @@ func Inject[T target.Portal_](deps Deps[T]) *Feat {
 		deps.RpcHandlers(),
 		deps.RunSpawn(),
 		deps.FeatObserve(),
-		deps.Tray(),
 		deps.Close(),
 	)
 }
@@ -59,7 +57,6 @@ func NewFeat(
 	handlers rpc.Handlers,
 	spawn target.Dispatch,
 	observe Observe,
-	tray target.Tray,
 	close context.CancelFunc,
 ) *Feat {
 	if handlers == nil {
@@ -69,9 +66,6 @@ func NewFeat(
 	handlers["open"] = spawn
 	handlers["observe"] = observe
 	handlers["close"] = close
-	if tray != nil {
-		handlers["tray"] = tray
-	}
 	return &Feat{
 		astral: astral,
 		port:   port,

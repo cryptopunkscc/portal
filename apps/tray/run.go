@@ -1,32 +1,22 @@
-package tray
+package main
 
 import (
 	"context"
 	"errors"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/target"
 	"github.com/getlantern/systray"
 )
 
-type Api interface {
-	Open(src string) error
-	Close() error
-	Ping() error
-	Await()
+func newRunner(api portalApi) *runner {
+	return &runner{api: api}
 }
 
-type AwaitClose func()
-
-func NewRun(api Api) target.Tray {
-	return (&Runner{api: api}).Run
-}
-
-type Runner struct {
-	api Api
+type runner struct {
+	api portalApi
 	log plog.Logger
 }
 
-func (t *Runner) Run(ctx context.Context) (err error) {
+func (t *runner) Run(ctx context.Context) (err error) {
 	if err = t.api.Ping(); err != nil {
 		return errors.New("portal-tray requires portal-app running")
 	}
@@ -46,7 +36,7 @@ func (t *Runner) Run(ctx context.Context) (err error) {
 	return
 }
 
-func (t *Runner) onReady() {
+func (t *runner) onReady() {
 	t.log.Println("portal tray start")
 	launcher := systray.AddMenuItem("Launcher", "Launcher")
 	quit := systray.AddMenuItem("Quit ", "Quit")
@@ -70,6 +60,6 @@ func (t *Runner) onReady() {
 	}()
 }
 
-func (t *Runner) onExit() {
+func (t *runner) onExit() {
 	t.log.Println("portal tray exit")
 }

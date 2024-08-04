@@ -13,18 +13,23 @@ import (
 	"path/filepath"
 )
 
-func (d *Install) buildEmbedApps() {
-	file, err := source.File(d.root, "target", "js", "embed", "portal")
+func (d *Install) buildEmbedApps(platforms ...string) {
+	buildEmbedApps[target.Project_](d.root, platforms...)
+}
+
+func buildEmbedApps[T target.Portal_](root string, platforms ...string) {
+	file, err := source.File(root, "target", "js", "embed", "portal")
 	if err != nil {
 		log.Fatal(err)
 	}
 	feat := build.NewFeat(
-		sources.Resolver[target.Project_](),
+		sources.Resolver[T](),
 		all_build.NewRun,
 		pack.Run,
 		target.List(npm.Resolve, file),
+		platforms...,
 	)
-	appsDir := filepath.Join(d.root, "apps")
+	appsDir := filepath.Join(root, "apps")
 	if err := feat.Run(context.TODO(), appsDir); err != nil {
 		log.Fatal(err)
 	}

@@ -63,7 +63,7 @@ func (d *Install) Run(make Make, goos []string) {
 	}
 	if make&Apps == Apps {
 		log.Println(" * embed apps")
-		d.buildEmbedApps()
+		d.buildEmbedApps(goos...)
 	}
 	if make&Dev == Dev {
 		log.Println(" * portal dev")
@@ -79,7 +79,6 @@ func (d *Install) Run(make Make, goos []string) {
 		goPortalApp.Install()
 		goPortalAppGoja.Install()
 		goPortalAppWails.Install()
-		goPortalTray.Install()
 	}
 	if make&Installer == Installer {
 		log.Println(" * installer")

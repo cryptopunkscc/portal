@@ -61,6 +61,5 @@ func (d *Module[T]) Priority() Priority {
 		Match[Dist_],
 	}
 }
-func (d *Module[T]) Tray() Tray            { return exec.Tray }
 func (d *Module[T]) CacheDir() string      { return di.S(cache.Dir, cache.Deps(d)) }
 func (d *Module[T]) FeatServe() clir.Serve { return serve.Inject[T](d).Run }

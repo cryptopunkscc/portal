@@ -1,0 +1,15 @@
+name: tray
+package: cc.cryptopunks.portal.tray
+title: Portal Tray
+description: Tray icon for Portal.
+version: 0.0.0
+build:
+  default:
+    exec: main
+    cmd: go build -o dist/main
+  linux:
+    deps: [ gcc, libgtk-3-dev, libayatana-appindicator3-dev ]
+  windows:
+    exec: main.exe
+    cmd: go build -ldflags -H=windowsgui -o dist/main.exe
+    env: [ CGO_ENABLED=1 ]

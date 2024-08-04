@@ -25,7 +25,6 @@ func main() {
 		version.Run,
 	)
 	cli.Dispatch(mod.FeatDispatch())
-	cli.Tray(mod.FeatTray())
 
 	if err := cli.Run(); err != nil {
 		log.Println(err)
@@ -41,8 +40,4 @@ func (m Module) JoinTarget() target.Dispatch      { return m.joinTarget }
 func (m Module) FeatDispatch() target.Dispatch {
 	m.joinTarget = query.NewOpen().Run
 	return dispatch.Inject(m).Run
-}
-func (m Module) FeatTray() target.Tray {
-	m.joinTarget = query.NewPortal().Start
-	return dispatch.Inject(m).Tray
 }

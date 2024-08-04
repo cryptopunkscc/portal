@@ -8,8 +8,6 @@ type Api interface{ Apphost }
 
 type NewApi func(context.Context, Portal_) Api
 
-type Tray func(ctx context.Context) error
-
 type Path func(src string) (path string, err error)
 
 type File func(path ...string) (source Source, err error)

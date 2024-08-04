@@ -79,7 +79,6 @@ func (d *Module[T]) Priority() Priority {
 		Match[Bundle_],
 	}
 }
-func (d *Module[T]) Tray() Tray                { return nil }
 func (d *Module[T]) JoinTarget() Dispatch      { return query.NewOpen().Run }
 func (d *Module[T]) DispatchService() Dispatch { return serve.Inject[T](d).Dispatch }
 func (d *Module[T]) FeatDev() Dispatch         { return dispatch.Inject(d).Run }

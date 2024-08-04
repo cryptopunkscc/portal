@@ -24,6 +24,7 @@ func (d *Install) buildInstaller(platforms ...string) {
 		goos := "GOOS=" + platform
 		log.Println(goos)
 		exec.SetEnv(goos)
+		d.buildEmbedApps(platforms...)
 		d.buildInstallerFor()
 		exec.SetEnv()
 	}
@@ -37,7 +38,6 @@ func (d *Install) buildInstallerFor() {
 	buildAnc()
 	goPortal.Build()
 	goPortalApp.Build()
-	goPortalTray.Build()
 	goPortalAppGoja.Build()
 	goPortalAppWails.Build()
 	goPortalDev.Build()
