@@ -16,15 +16,12 @@ var portalTestCases = []Case[string]{
 		ProjectFrontend,
 		ProjectBackend,
 		ProjectGo,
-		Launcher,
 		DistExecutable,
 	}},
 	{Src: "test_data/rpc", Matchers: []*Target{
 		RpcBackend,
 		RpcFrontend,
 	}},
-	{Matcher: Launcher, Src: Launcher.Manifest.Name},
-	{Matcher: Launcher, Src: Launcher.Manifest.Package},
 	{Matcher: BasicBackend, Src: BasicBackend.Abs},
 	{Matcher: BasicFrontend, Src: BasicFrontend.Abs},
 	{Matcher: RpcFrontend, Src: RpcFrontend.Abs},
@@ -90,13 +87,13 @@ var ProjectFrontend = &Target{
 var ProjectGo = &Target{
 	Path:     ".",
 	Abs:      "test_data/project/go",
-	Manifest: &target.Manifest{Name: "test-project-go", Title: "test project go", Description: "", Package: "test.project.go", Version: "0.0.0", Icon: ""},
+	Manifest: &target.Manifest{Name: "test-project-go", Title: "test project go", Description: "", Package: "test.project.go", Version: "0.0.0", Icon: "", Exec: "main"},
 }
 
 var DistExecutable = &Target{
 	Path:     ".",
 	Abs:      "test_data/exec/sh",
-	Manifest: &target.Manifest{Name: "test-dist-sh", Title: "test dist sh", Description: "", Package: "test.dist.sh", Version: "0.0.0", Icon: "", Exec: "exec.sh", Build: "", Env: target.Env{Timeout: 0}},
+	Manifest: &target.Manifest{Name: "test-dist-sh", Title: "test dist sh", Description: "", Package: "test.dist.sh", Version: "0.0.0", Icon: "", Exec: "exec.sh", Env: target.Env{Timeout: 0}},
 }
 
 var BundleExecutable = &Target{

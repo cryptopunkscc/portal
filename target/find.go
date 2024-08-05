@@ -1,21 +1,42 @@
 package target
 
-import "context"
+import (
+	"context"
+)
 
-func (f Find[T]) SortedBy(priority Priority) Find[T] {
+func (find Find[T]) Call(ctx context.Context, src string) (portals Portals[T], err error) {
+	return find(ctx, src)
+}
+
+func (find Find[T]) ById(path Path) Find[T] {
 	return func(ctx context.Context, src string) (portals Portals[T], err error) {
-		if portals, err = f(ctx, src); err == nil {
+		if resolved, err := path(src); err == nil {
+			src = resolved
+		}
+		return find(ctx, src)
+	}
+}
+
+func (find Find[T]) Reduced(priority ...Matcher) Find[T] {
+	return func(ctx context.Context, src string) (portals Portals[T], err error) {
+		if portals, err = find(ctx, src); err == nil {
 			portals.SortBy(priority)
+			portals = portals.Reduced()
 		}
 		return
 	}
 }
 
-func (f Find[T]) Reduced() Find[T] {
-	return func(ctx context.Context, src string) (reduced Portals[T], err error) {
-		if reduced, err = f(ctx, src); err != nil {
-			reduced = reduced.Reduced()
+func (find Find[T]) Cached(cache *Cache[T]) Find[T] {
+	return func(ctx context.Context, src string) (portals Portals[T], err error) {
+		if t, ok := cache.Get(src); ok {
+			portals = append(portals, t)
+			return
 		}
+		if portals, err = find(ctx, src); err != nil {
+			return
+		}
+		cache.Add(portals)
 		return
 	}
 }

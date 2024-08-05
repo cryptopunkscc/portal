@@ -4,90 +4,74 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/cryptopunkscc/portal/resolve/exec"
-	golang "github.com/cryptopunkscc/portal/resolve/go"
-	"github.com/cryptopunkscc/portal/resolve/html"
-	"github.com/cryptopunkscc/portal/resolve/js"
 	"github.com/cryptopunkscc/portal/resolve/source"
+	"github.com/cryptopunkscc/portal/resolve/sources"
 	"github.com/cryptopunkscc/portal/target"
-	"slices"
+	"github.com/cryptopunkscc/portal/target/find"
+	"path/filepath"
 )
 
-type Feat[T target.Portal_] struct {
-	resolve      target.Resolve[T]
-	newRunDist   func([]target.NodeModule, []string) target.Run[target.Project_]
-	runPack      target.Run[target.Dist_]
-	dependencies []target.NodeModule
-	platforms    []string
+type Feat struct {
+	runDist target.Run[target.Project_]
+	runPack target.Run[target.Dist_]
 }
 
-func NewFeat[T target.Portal_](
-	resolve target.Resolve[T],
-	newRunDist func([]target.NodeModule, []string) target.Run[target.Project_],
+func NewFeat(
+	runDist target.Run[target.Project_],
 	runPack target.Run[target.Dist_],
-	dependencies []target.NodeModule,
-	platforms ...string,
-) *Feat[T] {
-	return &Feat[T]{
-		resolve:      resolve,
-		newRunDist:   newRunDist,
-		runPack:      runPack,
-		dependencies: dependencies,
-		platforms:    platforms,
+) *Feat {
+	return &Feat{
+		runDist: runDist,
+		runPack: runPack,
 	}
 }
 
-func (r Feat[T]) Run(ctx context.Context, dir string) (err error) {
+func (r Feat) Run(ctx context.Context, dir string) (err error) {
 	if err = r.Dist(ctx, dir); err != nil {
 		return fmt.Errorf("cannot build portal apps: %w", err)
 	}
 	if err = r.Pack(ctx, dir, "."); err != nil {
-		return fmt.Errorf("cannot bundle portal apps: %w", err)
+		return fmt.Errorf("cannot bundle portal apps: %s %w", dir, err)
 	}
 	return
 }
 
-func (r Feat[T]) Dist(ctx context.Context, dir ...string) (err error) {
-	file, err := source.File(dir...)
-	if err != nil {
-		return err
+func (r Feat) Dist(ctx context.Context, dir ...string) (err error) {
+	if err = run[target.Project_](ctx, r.runDist, dir, target.Match[target.Project_]); err != nil {
+		err = fmt.Errorf("build.Dist: %w", err)
 	}
-	resolve := target.Any[target.Project_](
-		target.Skip("node_modules"),
-		target.Try(js.ResolveProject),
-		target.Try(html.ResolveProject),
-		target.Try(golang.ResolveProject),
-	)
-	projects := target.List(resolve, file)
+	return
+}
+
+func (r Feat) Pack(ctx context.Context, dir ...string) (err error) {
+	if err = run[target.Dist_](ctx, r.runPack, dir,
+		target.Match[target.Dist_],
+	); err != nil {
+		err = fmt.Errorf("build.Pack: %w", err)
+	}
+	return
+}
+
+func run[T target.Portal_](ctx context.Context, run target.Run[T], dir []string, matchers ...target.Matcher) (err error) {
+	projects, err := findIn[T](ctx, dir, matchers...)
+	if err != nil {
+		return
+	}
+	if len(projects) == 0 {
+		return errors.New("no targets found")
+	}
 	for _, m := range projects {
-		if err = r.newRunDist(r.dependencies, r.platforms)(ctx, m); err != nil {
-			return fmt.Errorf("build.Dist: %w", err)
+		if err = run(ctx, m); err != nil {
+			return
 		}
 	}
 	return
 }
 
-func (r Feat[T]) Pack(ctx context.Context, base, sub string) (err error) {
-	file, err := source.File(base, sub)
-	if err != nil {
-		return err
-	}
-
-	resolve := target.Any[target.Dist_](
-		target.Skip("node_modules"),
-		target.Try(js.ResolveDist),
-		target.Try(html.ResolveDist),
-		target.Try(exec.ResolveDist),
-	)
-	distributions := target.Portals[target.Dist_](target.List(resolve, file))
-	slices.Reverse(distributions)
-	distributions = distributions.Reduced()
-
-	err = errors.New("no targets found")
-	for _, dist := range distributions {
-		if err = r.runPack(ctx, dist); err != nil {
-			return fmt.Errorf("bundle target %v: %v", dist.Path(), err)
-		}
-	}
-	return
+func findIn[T target.Portal_](ctx context.Context, dir []string, matchers ...target.Matcher) ([]T, error) {
+	return find.ByPath(
+		source.File,
+		sources.Resolver[T]()).
+		Reduced(matchers...).
+		Call(ctx, filepath.Join(dir...))
 }

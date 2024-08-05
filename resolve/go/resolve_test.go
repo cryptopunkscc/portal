@@ -5,19 +5,23 @@ import (
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/target"
 	"github.com/stretchr/testify/assert"
+	"path/filepath"
+	"strings"
 	"testing"
 )
 
 var testManifest = target.Manifest{
-	Name:    "test",
-	Title:   "test",
-	Package: "test.go",
-	Version: "0.0.0",
+	Name:        "tray",
+	Title:       "Portal Tray",
+	Description: "Tray icon for Portal.",
+	Package:     "portal.tray",
+	Exec:        "main",
 }
 
 var testBuild = target.Builds{
-	"default": target.Build{Cmd: "cmd1", Env: []string(nil)},
-	"windows": target.Build{Cmd: "cmd1", Env: []string{"FOO=bar"}},
+	"default": target.Build{Exec: "main", Cmd: "go build -o dist/main"},
+	"linux":   target.Build{Exec: "main", Cmd: "go build -o dist/main", Deps: []string{"gcc", "libgtk-3-dev", "libayatana-appindicator3-dev"}},
+	"windows": target.Build{Exec: "main.exe", Cmd: "go build -ldflags -H=windowsgui -o dist/main.exe", Env: []string{"CGO_ENABLED=1"}},
 }
 
 func TestResolveProject(t *testing.T) {
@@ -31,10 +35,12 @@ func TestResolveProject(t *testing.T) {
 	}
 	assert.Equal(t, &testManifest, bundle.Manifest())
 	assert.Equal(t, testBuild, bundle.Build())
+	assert.Equal(t, &testManifest, bundle.Dist().Manifest())
 }
 
 func TestResolveBundle(t *testing.T) {
-	file, err := source.File("test/build/test.go_0.0.0.portal")
+	name := "test/build/portal.tray_.portal"
+	file, err := source.File(name)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -45,6 +51,6 @@ func TestResolveBundle(t *testing.T) {
 	bundleManifest := testManifest
 	bundleManifest.Exec = "main"
 	assert.Equal(t, &bundleManifest, bundle.Manifest())
-	assert.Equal(t, "", bundle.Target().Executable().Path())
-	assert.Equal(t, "", bundle.Target().Executable().Abs())
+	assert.Equal(t, "main", bundle.Target().Executable().Path())
+	assert.True(t, strings.HasSuffix(bundle.Target().Executable().Abs(), filepath.Join(name, "main")))
 }

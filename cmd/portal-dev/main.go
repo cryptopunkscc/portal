@@ -17,10 +17,11 @@ import (
 	"github.com/cryptopunkscc/portal/resolve/npm"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/resolve/sources"
-	"github.com/cryptopunkscc/portal/runner/all_build"
 	"github.com/cryptopunkscc/portal/runner/app"
 	"github.com/cryptopunkscc/portal/runner/exec"
+	"github.com/cryptopunkscc/portal/runner/go_build"
 	"github.com/cryptopunkscc/portal/runner/multi"
+	"github.com/cryptopunkscc/portal/runner/npm_build"
 	"github.com/cryptopunkscc/portal/runner/pack"
 	"github.com/cryptopunkscc/portal/runner/query"
 	"github.com/cryptopunkscc/portal/runner/template"
@@ -85,17 +86,17 @@ func (d *Module[T]) FeatDev() Dispatch         { return dispatch.Inject(d).Run }
 func (d *Module[T]) FeatCreate() *create.Feat {
 	return create.NewFeat(template.NewRun, d.FeatBuild().Dist)
 }
-func (d *Module[T]) FeatBuild() *build.Feat[T] {
+func (d *Module[T]) FeatBuild() *build.Feat {
 	return build.NewFeat(
-		d.TargetResolve(),
-		all_build.NewRun,
+		multi.NewRunner[Project_](
+			go_build.NewRun().Portal(),
+			npm_build.NewRun(
+				List(Any[NodeModule](
+					Skip("node_modules"),
+					Try(npm.Resolve)),
+					source.Embed(js.PortalLibFS))...,
+			).Portal(),
+		).Run,
 		pack.Run,
-		List(
-			Any[NodeModule](
-				Skip("node_modules"),
-				Try(npm.Resolve),
-			),
-			source.Embed(js.PortalLibFS),
-		),
 	)
 }

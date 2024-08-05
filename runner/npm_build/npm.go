@@ -12,7 +12,11 @@ type NpmRunner struct {
 	dependencies []target.NodeModule
 }
 
-func NewRunner(dependencies []target.NodeModule) NpmRunner {
+func NewRun(dependencies ...target.NodeModule) target.Run[target.ProjectNpm_] {
+	return NewRunner(dependencies...).Run
+}
+
+func NewRunner(dependencies ...target.NodeModule) NpmRunner {
 	return NpmRunner{dependencies: dependencies}
 }
 

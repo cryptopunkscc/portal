@@ -5,8 +5,9 @@ import (
 	"github.com/cryptopunkscc/portal/feat/build"
 	"github.com/cryptopunkscc/portal/resolve/npm"
 	"github.com/cryptopunkscc/portal/resolve/source"
-	"github.com/cryptopunkscc/portal/resolve/sources"
-	"github.com/cryptopunkscc/portal/runner/all_build"
+	"github.com/cryptopunkscc/portal/runner/go_build"
+	"github.com/cryptopunkscc/portal/runner/multi"
+	"github.com/cryptopunkscc/portal/runner/npm_build"
 	"github.com/cryptopunkscc/portal/runner/pack"
 	"github.com/cryptopunkscc/portal/target"
 	"log"
@@ -14,22 +15,23 @@ import (
 )
 
 func (d *Install) buildEmbedApps(platforms ...string) {
-	buildEmbedApps[target.Project_](d.root, platforms...)
-}
-
-func buildEmbedApps[T target.Portal_](root string, platforms ...string) {
-	file, err := source.File(root, "target", "js", "embed", "portal")
+	file, err := source.File(d.root, "target", "js", "embed", "portal")
 	if err != nil {
 		log.Fatal(err)
 	}
+	jsLibs := target.List(target.Any[target.NodeModule](
+		target.Skip("node_modules"),
+		target.Try(npm.Resolve),
+	), file)
+
 	feat := build.NewFeat(
-		sources.Resolver[T](),
-		all_build.NewRun,
+		multi.NewRunner[target.Project_](
+			go_build.NewRun(platforms...).Portal(),
+			npm_build.NewRun(jsLibs...).Portal(),
+		).Run,
 		pack.Run,
-		target.List(npm.Resolve, file),
-		platforms...,
 	)
-	appsDir := filepath.Join(root, "apps")
+	appsDir := filepath.Join(d.root, "apps")
 	if err := feat.Run(context.TODO(), appsDir); err != nil {
 		log.Fatal(err)
 	}

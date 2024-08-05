@@ -10,7 +10,7 @@ import (
 )
 
 type of[T any] struct {
-	target.Dist[T]
+	target.App[T]
 	bundle target.Bundle
 }
 
@@ -23,7 +23,7 @@ func Resolver[T any](resolve target.Resolve[target.Dist[T]]) target.Resolve[targ
 			return
 		}
 		td := &of[T]{}
-		if td.Dist, err = resolve(b); err != nil {
+		if td.App, err = resolve(b); err != nil {
 			return
 		}
 		td.bundle = b

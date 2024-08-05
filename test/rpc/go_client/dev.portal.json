@@ -3,5 +3,7 @@
   "package": "test.go.client",
   "title": "test go client",
   "version": "0.0.0",
-  "build": "go test -c -o dist/main"
+  "build": {
+    "cmd": "go test -c -o dist/main"
+  }
 }

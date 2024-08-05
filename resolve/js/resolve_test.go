@@ -58,4 +58,5 @@ func TestResolveProject(t *testing.T) {
 	}
 	assert.Equal(t, testManifest, bundle.Manifest())
 	assert.Equal(t, testBuild, bundle.Build())
+	assert.Equal(t, testManifest, bundle.Dist().Manifest())
 }

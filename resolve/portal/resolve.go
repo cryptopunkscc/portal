@@ -21,11 +21,11 @@ func Resolve[T any](src target.Source) (t target.Portal[T], err error) {
 
 type unknown struct {
 	target.Source
-	manifest *target.Manifest
+	manifest target.Manifest
 }
 
 func (p *unknown) Manifest() *target.Manifest {
-	return p.manifest
+	return &p.manifest
 }
 
 func (p *unknown) LoadManifest() error {

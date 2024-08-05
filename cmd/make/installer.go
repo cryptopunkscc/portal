@@ -14,17 +14,17 @@ import (
 )
 
 func (d *Install) buildInstaller(platforms ...string) {
-	cleanInstallerBin()
 
 	if len(platforms) == 0 {
 		platforms = []string{runtime.GOOS}
 	}
 
 	for _, platform := range platforms {
+		cleanInstallerBin()
 		goos := "GOOS=" + platform
 		log.Println(goos)
 		exec.SetEnv(goos)
-		d.buildEmbedApps(platforms...)
+		d.buildEmbedApps(platform)
 		d.buildInstallerFor()
 		exec.SetEnv()
 	}

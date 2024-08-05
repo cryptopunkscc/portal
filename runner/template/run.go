@@ -6,6 +6,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/git"
 	"github.com/cryptopunkscc/portal/resolve/template"
 	"github.com/cryptopunkscc/portal/target"
+	"io/fs"
 	"os"
 	"path/filepath"
 )
@@ -52,6 +53,14 @@ func (r *Runner) Run(_ context.Context, t target.Template) (err error) {
 	if err = Install(dir, t.Files(), args); err != nil {
 		err = fmt.Errorf("cannot install template: %w", err)
 	}
+	if isDev(t) {
+		if err = os.Rename(
+			filepath.Join(dir, "portal.json"),
+			filepath.Join(dir, "dev.portal.json"),
+		); err != nil {
+			return
+		}
+	}
 	return
 }
 
@@ -71,4 +80,9 @@ func (r *Runner) targetArgs(t target.Template) (args template.Args) {
 	args.ProjectName = name
 	args.PackageName = "new.portal." + name
 	return
+}
+
+func isDev(t target.Template) bool {
+	stat, err := fs.Stat(t.Files(), "dev")
+	return err == nil && !stat.IsDir()
 }

@@ -15,6 +15,9 @@ import (
 
 type GoRunner struct{ platforms []string }
 
+func NewRun(platforms ...string) target.Run[target.ProjectGo] {
+	return NewRunner(platforms...).Run
+}
 func NewRunner(platforms ...string) GoRunner {
 	return GoRunner{platforms}
 }

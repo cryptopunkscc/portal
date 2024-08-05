@@ -26,4 +26,4 @@ func ResolveHtml(src Source) (t Html, err error) {
 
 var ResolveDist = dist.Resolver[Html](ResolveHtml)
 var ResolveBundle = bundle.Resolver[Html](ResolveDist)
-var ResolveProject = npm.Resolver[Html](ResolveDist)
+var ResolveProject = npm.Resolver[Html](ResolveHtml)

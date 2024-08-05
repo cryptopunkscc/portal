@@ -37,15 +37,15 @@ func (r *Runner) Run(ctx context.Context, projectHtml target.ProjectHtml) (err e
 		return
 	}
 
-	resolve := target.Any[target.NodeModule](
+	libs := target.List(target.Any[target.NodeModule](
 		target.Skip("node_modules"),
-		target.Try(npm.Resolve),
-	)
-	dependencies := target.List(resolve, source.Embed(js.PortalLibFS))
-	if len(dependencies) == 0 {
-		log.P().Println("dependencies are empty")
+		target.Try(npm.Resolve)),
+		source.Embed(js.PortalLibFS))
+	if len(libs) == 0 {
+		log.P().Println("libs are empty")
 	}
-	if err = npm_build.NewRunner(dependencies).Run(ctx, projectHtml); err != nil {
+
+	if err = npm_build.NewRunner(libs...).Run(ctx, projectHtml); err != nil {
 		return
 	}
 

@@ -1,1 +1,1 @@
-{"name":"test","title":"test","package":"test.go","version":"0.0.0","exec":"main","env":{}}
+{"name":"tray","title":"Portal Tray","description":"Tray icon for Portal.","package":"portal.tray","exec":"main","env":{}}

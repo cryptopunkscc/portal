@@ -27,4 +27,4 @@ func ResolveJs(src Source) (t Js, err error) {
 
 var ResolveDist = dist.Resolver[Js](ResolveJs)
 var ResolveBundle = bundle.Resolver[Js](ResolveDist)
-var ResolveProject = npm.Resolver[Js](ResolveDist)
+var ResolveProject = npm.Resolver[Js](ResolveJs)
