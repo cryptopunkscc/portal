@@ -8,25 +8,32 @@ import (
 	"github.com/cryptopunkscc/portal/resolve/sources"
 	"github.com/cryptopunkscc/portal/target"
 	"github.com/cryptopunkscc/portal/target/find"
+	"github.com/labstack/gommon/log"
 	"path/filepath"
 )
 
 type Feat struct {
+	clean   func(string) error
 	runDist target.Run[target.Project_]
 	runPack target.Run[target.Dist_]
 }
 
 func NewFeat(
+	clean func(string) error,
 	runDist target.Run[target.Project_],
 	runPack target.Run[target.Dist_],
 ) *Feat {
 	return &Feat{
+		clean:   clean,
 		runDist: runDist,
 		runPack: runPack,
 	}
 }
 
 func (r Feat) Run(ctx context.Context, dir string) (err error) {
+	if err = r.clean(dir); err != nil {
+		log.Warn(err)
+	}
 	if err = r.Dist(ctx, dir); err != nil {
 		return fmt.Errorf("cannot build portal apps: %w", err)
 	}

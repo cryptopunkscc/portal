@@ -5,6 +5,7 @@ import (
 	"github.com/cryptopunkscc/portal/feat/build"
 	"github.com/cryptopunkscc/portal/resolve/npm"
 	"github.com/cryptopunkscc/portal/resolve/source"
+	"github.com/cryptopunkscc/portal/runner/clean"
 	"github.com/cryptopunkscc/portal/runner/go_build"
 	"github.com/cryptopunkscc/portal/runner/multi"
 	"github.com/cryptopunkscc/portal/runner/npm_build"
@@ -25,6 +26,7 @@ func (d *Install) buildEmbedApps(platforms ...string) {
 	), file)
 
 	feat := build.NewFeat(
+		clean.NewRunner().Call,
 		multi.NewRunner[target.Project_](
 			go_build.NewRun(platforms...).Portal(),
 			npm_build.NewRun(jsLibs...).Portal(),

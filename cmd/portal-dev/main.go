@@ -18,6 +18,7 @@ import (
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/resolve/sources"
 	"github.com/cryptopunkscc/portal/runner/app"
+	"github.com/cryptopunkscc/portal/runner/clean"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/go_build"
 	"github.com/cryptopunkscc/portal/runner/multi"
@@ -46,7 +47,7 @@ func main() {
 	cli := clir.NewCli(ctx, manifest.NameDev, manifest.DescriptionDev, version.Run)
 	cli.Dev(mod.FeatDev())
 	cli.Create(template.List, mod.FeatCreate().Run)
-	cli.Build(mod.FeatBuild().Run)
+	cli.Build(mod.FeatBuild().Run, mod.Clean().Call)
 	cli.Portals(mod.TargetFind())
 	if err := cli.Run(); err != nil {
 		log.Println(err)
@@ -82,12 +83,14 @@ func (d *Module[T]) Priority() Priority {
 }
 func (d *Module[T]) JoinTarget() Dispatch      { return query.NewOpen().Run }
 func (d *Module[T]) DispatchService() Dispatch { return serve.Inject[T](d).Dispatch }
+func (d *Module[T]) Clean() *clean.Runner      { return clean.NewRunner() }
 func (d *Module[T]) FeatDev() Dispatch         { return dispatch.Inject(d).Run }
 func (d *Module[T]) FeatCreate() *create.Feat {
 	return create.NewFeat(template.NewRun, d.FeatBuild().Dist)
 }
 func (d *Module[T]) FeatBuild() *build.Feat {
 	return build.NewFeat(
+		d.Clean().Call,
 		multi.NewRunner[Project_](
 			go_build.NewRun().Portal(),
 			npm_build.NewRun(
