@@ -14,13 +14,10 @@ func (d *Install) buildJsLibs() {
 		log.Fatal(err)
 	}
 
-	for _, p := range target.List(
-		target.Any[target.NodeModule](
-			target.Skip("node_modules"),
-			target.Try(npm2.Resolve),
-		),
-		libs,
-	) {
+	for _, p := range target.Any[target.NodeModule](
+		target.Skip("node_modules"),
+		target.Try(npm2.Resolve),
+	).List(libs) {
 		if !p.PkgJson().CanBuild() {
 			continue
 		}

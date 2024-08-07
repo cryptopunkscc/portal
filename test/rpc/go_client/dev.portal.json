@@ -4,6 +4,7 @@
   "title": "test go client",
   "version": "0.0.0",
   "build": {
-    "cmd": "go test -c -o dist/main"
+    "cmd": "go test -c -o dist/main",
+    "exec": "main"
   }
 }

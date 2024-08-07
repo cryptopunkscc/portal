@@ -20,16 +20,16 @@ func (d *Install) buildEmbedApps(platforms ...string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	jsLibs := target.List(target.Any[target.NodeModule](
+	jsLibs := target.Any[target.NodeModule](
 		target.Skip("node_modules"),
 		target.Try(npm.Resolve),
-	), file)
+	).List(file)
 
 	feat := build.NewFeat(
 		clean.NewRunner().Call,
 		multi.NewRunner[target.Project_](
-			go_build.NewRun(platforms...).Portal(),
-			npm_build.NewRun(jsLibs...).Portal(),
+			go_build.NewRun(platforms...).Portal,
+			npm_build.NewRun(jsLibs...).Portal,
 		).Run,
 		pack.Run,
 	)

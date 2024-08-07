@@ -2,6 +2,7 @@ package target
 
 import (
 	"context"
+	"slices"
 )
 
 func (find Find[T]) Call(ctx context.Context, src string) (portals Portals[T], err error) {
@@ -39,4 +40,22 @@ func (find Find[T]) Cached(cache *Cache[T]) Find[T] {
 		cache.Add(portals)
 		return
 	}
+}
+
+func (p Portals[T]) SortBy(priority Priority) {
+	slices.SortFunc(p, func(a, b T) int {
+		return priority.Get(a) - priority.Get(b)
+	})
+}
+
+func (p Portals[T]) Reduced() (reduced Portals[T]) {
+	mem := make(map[string]T)
+	for _, t := range p {
+		if _, ok := mem[t.Manifest().Package]; ok {
+			continue
+		}
+		mem[t.Manifest().Package] = t
+		reduced = append(reduced, t)
+	}
+	return
 }

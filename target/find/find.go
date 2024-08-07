@@ -10,7 +10,7 @@ func ByPath[T t.Portal_](file t.File, resolve t.Resolve[T]) t.Find[T] {
 	return func(ctx context.Context, src string) (portals t.Portals[T], err error) {
 		f, err := file(src)
 		if err == nil {
-			portals = t.List(resolve, f)
+			portals = resolve.List(f)
 		}
 		return
 	}
@@ -18,7 +18,7 @@ func ByPath[T t.Portal_](file t.File, resolve t.Resolve[T]) t.Find[T] {
 
 func ById[T t.Portal_](resolve t.Resolve[T], sources ...t.Source) t.Find[T] {
 	return func(ctx context.Context, src string) (portals t.Portals[T], err error) {
-		for _, next := range t.List(resolve, sources...) {
+		for _, next := range resolve.List(sources...) {
 			if next.Manifest().Match(src) {
 				portals = append(portals, next)
 			}

@@ -12,8 +12,6 @@ type Path func(src string) (path string, err error)
 
 type File func(path ...string) (source Source, err error)
 
-type Resolve[T any] func(src Source) (result T, err error)
-
 type Find[T Portal_] func(ctx context.Context, src string) (portals Portals[T], err error)
 
 type Dispatch func(context.Context, string, ...string) (err error)

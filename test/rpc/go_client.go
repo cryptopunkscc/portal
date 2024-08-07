@@ -11,20 +11,19 @@ import (
 )
 
 type TestClient struct {
-	port string
+	port     string
+	services []string
 }
 
-func NewTestClient(port string) *TestClient {
-	return &TestClient{port: port}
+func NewTestClient(port string, services ...string) *TestClient {
+	if len(services) == 0 {
+		panic("must provide at least one service")
+	}
+	return &TestClient{port: port, services: services}
 }
 
 func (c TestClient) Run(t *testing.T) {
 	t.Log("Starting test client")
-
-	services := []string{
-		"go",
-		"js",
-	}
 
 	tests := []struct {
 		name    string
@@ -51,7 +50,7 @@ func (c TestClient) Run(t *testing.T) {
 		},
 	}
 
-	for _, srv := range services {
+	for _, srv := range c.services {
 		for _, test := range tests {
 			t.Run(test.name, func(t *testing.T) {
 				if test.skip {

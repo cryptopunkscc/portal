@@ -35,10 +35,12 @@ func (r *Runner) Run(ctx context.Context, projectJs target.ProjectJs) (err error
 		return
 	}
 
-	libs := target.List(target.Any[target.NodeModule](
+	libs := target.Any[target.NodeModule](
 		target.Skip("node_modules"),
-		target.Try(npm2.Resolve)),
-		source.Embed(jsEmbed.PortalLibFS))
+		target.Try(npm2.Resolve),
+	).List(
+		source.Embed(jsEmbed.PortalLibFS),
+	)
 	if len(libs) == 0 {
 		log.P().Println("libs are empty")
 	}

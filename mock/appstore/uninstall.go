@@ -9,10 +9,7 @@ import (
 )
 
 func Uninstall(id string) (err error) {
-	for _, t := range target.List(
-		apps.Resolver[target.Bundle_](),
-		portalAppsSource,
-	) {
+	for _, t := range apps.Resolver[target.Bundle_]().List(portalAppsSource) {
 		if t.Manifest().Match(id) {
 			log.Println("Uninstalling", t.Manifest().Package, "from", t.Abs())
 			err = os.Remove(t.Abs())

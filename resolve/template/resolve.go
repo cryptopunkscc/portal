@@ -22,7 +22,9 @@ func (t *source) Name() (name string) {
 	return
 }
 
-func Resolve(src target.Source) (template target.Template, err error) {
+var Resolve target.Resolve[target.Template] = resolve
+
+func resolve(src target.Source) (template target.Template, err error) {
 	if !src.IsDir() {
 		return nil, ErrNotTemplate
 	}

@@ -36,7 +36,7 @@ func (r Runner) Call(dir string) error {
 			if err = os.RemoveAll(path); err != nil {
 				return err
 			}
-			log.Println("* removed:", path)
+			log.Println("* clean:", path)
 			return fs.SkipDir
 		}
 		return nil

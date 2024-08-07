@@ -18,5 +18,5 @@ func TestGoRpc(t *testing.T) {
 
 	time.Sleep(100 * time.Millisecond)
 
-	NewTestClient("test.go").Run(t)
+	NewTestClient("test.%s", "go").Run(t)
 }

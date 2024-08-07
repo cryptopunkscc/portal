@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/resolve/sources"
 	"github.com/cryptopunkscc/portal/target"
 	"github.com/cryptopunkscc/portal/target/find"
-	"github.com/labstack/gommon/log"
 	"path/filepath"
 )
 
@@ -31,14 +31,15 @@ func NewFeat(
 }
 
 func (r Feat) Run(ctx context.Context, dir string) (err error) {
+	log := plog.Get(ctx).Type(r).Set(&ctx)
 	if err = r.clean(dir); err != nil {
-		log.Warn(err)
+		log.W().Println(err)
 	}
 	if err = r.Dist(ctx, dir); err != nil {
-		return fmt.Errorf("cannot build portal apps: %w", err)
+		log.W().Printf("cannot build portal apps: %w", err)
 	}
 	if err = r.Pack(ctx, dir, "."); err != nil {
-		return fmt.Errorf("cannot bundle portal apps: %s %w", dir, err)
+		log.W().Printf("cannot bundle portal apps: %s %w", dir, err)
 	}
 	return
 }

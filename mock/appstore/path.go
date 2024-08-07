@@ -7,10 +7,7 @@ import (
 )
 
 func Path(port string) (path string, err error) {
-	for _, t := range target.List(
-		apps.Resolver[target.Bundle_](),
-		portalAppsSource,
-	) {
+	for _, t := range apps.Resolver[target.Bundle_]().List(portalAppsSource) {
 		if t.Manifest().Match(port) {
 			path = t.Abs()
 			return

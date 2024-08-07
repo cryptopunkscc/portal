@@ -35,8 +35,7 @@ func (f Feat) Run(
 ) (err error) {
 	log := plog.Get(ctx).Type(f).Set(&ctx)
 	create := f.factory(dir, targets)
-	for _, t := range target.List(
-		template.Resolve,
+	for _, t := range template.Resolve.List(
 		source.Embed(template.TemplatesFs),
 	) {
 		if _, ok := targets[t.Name()]; !ok {

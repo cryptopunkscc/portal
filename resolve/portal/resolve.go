@@ -13,6 +13,7 @@ func (a *of[T]) Target() (t T) { return }
 func Resolve[T any](src target.Source) (t target.Portal[T], err error) {
 	b, err := resolve(src)
 	if err != nil {
+		err = target.ErrNotTarget
 		return
 	}
 	t = &of[T]{b}

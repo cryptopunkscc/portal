@@ -6,5 +6,5 @@ import (
 )
 
 func ListApps() []target.App_ {
-	return target.List(apps.ResolveAll, portalAppsSource)
+	return apps.ResolveAll.List(portalAppsSource)
 }

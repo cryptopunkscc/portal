@@ -44,7 +44,7 @@ func send(
 	if err != nil {
 		return err
 	}
-	for _, t := range target.List(resolve, file) {
+	for _, t := range resolve.List(file) {
 		if err = conn.Encode(t.Manifest()); err != nil {
 			return
 		}

@@ -92,13 +92,13 @@ func (d *Module[T]) FeatBuild() *build.Feat {
 	return build.NewFeat(
 		d.Clean().Call,
 		multi.NewRunner[Project_](
-			go_build.NewRun().Portal(),
+			go_build.NewRun().Portal,
 			npm_build.NewRun(
-				List(Any[NodeModule](
+				Any[NodeModule](
 					Skip("node_modules"),
-					Try(npm.Resolve)),
-					source.Embed(js.PortalLibFS))...,
-			).Portal(),
+					Try(npm.Resolve)).
+					List(source.Embed(js.PortalLibFS))...,
+			).Portal,
 		).Run,
 		pack.Run,
 	)

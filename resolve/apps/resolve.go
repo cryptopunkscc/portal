@@ -9,7 +9,7 @@ import (
 
 var ResolveAll target.Resolve[target.App_] = Resolver[target.App_]()
 
-func Resolver[T target.App_]() func(target.Source) (T, error) {
+func Resolver[T target.App_]() target.Resolve[T] {
 	return target.Any[T](
 		target.Skip("node_modules"),
 		target.Try(js.ResolveBundle),

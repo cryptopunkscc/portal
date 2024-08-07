@@ -1,7 +1,0 @@
-{
-  "name": "test-dist-sh",
-  "package": "test.dist.sh",
-  "title": "test dist sh",
-  "version": "0.0.0",
-  "exec": "exec.sh"
-}

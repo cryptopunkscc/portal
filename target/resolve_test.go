@@ -8,27 +8,35 @@ import (
 )
 
 func TestAny(t *testing.T) {
+	// given
 	var counter = 0
 	r := func(source Source) (Source, error) {
 		counter++
 		return source, nil
 	}
 	expected := testSource{}
-	resolve := Any[Source](r, r, r)
-	actual, _ := resolve(expected)
+
+	// when
+	actual, _ := Any[Source](r, r, r).Resolve(expected)
+
+	// then
 	assert.Equal(t, expected, actual)
 	assert.Equal(t, 1, counter)
 }
 
 func TestAny_nil(t *testing.T) {
+	// given
 	err := errors.New("test error")
 	var counter = 0
 	r := func(source Source) (Source, error) {
 		counter++
 		return source, err
 	}
-	resolve := Any[Source](r, r, r)
-	actual, _ := resolve(testSource{})
+
+	// when
+	actual, _ := Any[Source](r, r, r).Resolve(testSource{})
+
+	// then
 	assert.Equal(t, nil, actual)
 	assert.Equal(t, 3, counter)
 }
