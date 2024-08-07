@@ -2,8 +2,8 @@ package api
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/runtime/apphost"
 	. "github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target/apphost"
 )
 
 type Deps interface {

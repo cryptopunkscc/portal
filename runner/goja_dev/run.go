@@ -9,8 +9,8 @@ import (
 	"github.com/cryptopunkscc/portal/runner/goja_dist"
 	"github.com/cryptopunkscc/portal/runner/npm"
 	"github.com/cryptopunkscc/portal/runner/npm_build"
+	jsEmbed "github.com/cryptopunkscc/portal/runtime/js/embed"
 	"github.com/cryptopunkscc/portal/target"
-	jsEmbed "github.com/cryptopunkscc/portal/target/js/embed"
 	"time"
 )
 

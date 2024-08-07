@@ -2,8 +2,8 @@ package webview
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/runtime/js/embed/common"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target/js/embed/common"
 	"github.com/webview/webview"
 )
 

@@ -26,9 +26,9 @@ import (
 	"github.com/cryptopunkscc/portal/runner/npm_build"
 	"github.com/cryptopunkscc/portal/runner/pack"
 	"github.com/cryptopunkscc/portal/runner/template"
+	js "github.com/cryptopunkscc/portal/runtime/js/embed"
+	"github.com/cryptopunkscc/portal/runtime/msg"
 	. "github.com/cryptopunkscc/portal/target"
-	js "github.com/cryptopunkscc/portal/target/js/embed"
-	"github.com/cryptopunkscc/portal/target/msg"
 	"os"
 )
 
