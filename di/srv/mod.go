@@ -10,7 +10,6 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/di"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	. "github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target/find"
 	"sync"
 )
 
@@ -37,8 +36,7 @@ func (d *Module[T]) FeatObserve() serve.Observe     { return featApps.Observe }
 func (d *Module[T]) WaitGroup() *sync.WaitGroup     { return &d.wg }
 func (d *Module[T]) Processes() *sig.Map[string, T] { return &d.processes }
 func (d *Module[T]) TargetFind() Find[T] {
-	return find.
-		ByPath(source.File, d.TargetResolve()).
+	return FindByPath(source.File, d.TargetResolve()).
 		ById(featApps.Path).
 		Cached(&d.targets).
 		Reduced(d.Priority()...)

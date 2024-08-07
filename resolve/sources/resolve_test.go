@@ -1,9 +1,8 @@
-package find
+package sources
 
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/resolve/source"
-	"github.com/cryptopunkscc/portal/resolve/sources"
 	"github.com/cryptopunkscc/portal/target"
 	"github.com/cryptopunkscc/portal/test"
 	"github.com/stretchr/testify/assert"
@@ -76,9 +75,9 @@ func path(src string) (path string, err error) {
 
 }
 
-var findByPath = ByPath(
+var findByPath = target.FindByPath(
 	source.File,
-	sources.Resolver[target.Portal_](),
+	Resolver[target.Portal_](),
 )
 
 var findByPathReduced = findByPath.Reduced(
@@ -91,9 +90,9 @@ func TestByPath(t *testing.T) {
 	defer test.Clean()
 	src := test.Copy(test.EmbedRoot)
 	expected := pathManifestAll
-	find := ByPath(
+	find := target.FindByPath(
 		source.File,
-		sources.Resolver[target.Portal_](),
+		Resolver[target.Portal_](),
 	)
 
 	portals := test.Assert(find(context.Background(), src.Abs()))
@@ -110,9 +109,9 @@ func TestByPathReduced(t *testing.T) {
 	defer test.Clean()
 	src := test.Copy(test.EmbedRoot)
 	expected := pathManifestReduced
-	find := ByPath(
+	find := target.FindByPath(
 		source.File,
-		sources.Resolver[target.Portal_](),
+		Resolver[target.Portal_](),
 	).Reduced(
 		target.Match[target.Project_],
 		target.Match[target.Bundle_],

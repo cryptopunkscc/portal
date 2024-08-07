@@ -8,7 +8,6 @@ import (
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/resolve/sources"
 	"github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target/find"
 	"path/filepath"
 )
 
@@ -77,7 +76,7 @@ func run[T target.Portal_](ctx context.Context, run target.Run[T], dir []string,
 }
 
 func findIn[T target.Portal_](ctx context.Context, dir []string, matchers ...target.Matcher) ([]T, error) {
-	return find.ByPath(
+	return target.FindByPath(
 		source.File,
 		sources.Resolver[T]()).
 		Reduced(matchers...).

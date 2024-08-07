@@ -5,6 +5,16 @@ import (
 	"slices"
 )
 
+func FindByPath[T Portal_](file File, resolve Resolve[T]) Find[T] {
+	return func(ctx context.Context, src string) (portals Portals[T], err error) {
+		f, err := file(src)
+		if err == nil {
+			portals = resolve.List(f)
+		}
+		return
+	}
+}
+
 func (find Find[T]) Call(ctx context.Context, src string) (portals Portals[T], err error) {
 	return find(ctx, src)
 }
