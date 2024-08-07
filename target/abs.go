@@ -15,3 +15,12 @@ func Abs(src string) string {
 	}
 	return filepath.Join(base, src)
 }
+
+func CacheDir(name string) (dir string) {
+	var err error
+	if dir, err = os.UserCacheDir(); err != nil {
+		panic(err)
+	}
+	dir = filepath.Join(dir, name)
+	return
+}

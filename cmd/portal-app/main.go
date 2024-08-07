@@ -7,7 +7,6 @@ import (
 	featApps "github.com/cryptopunkscc/portal/feat/apps"
 	"github.com/cryptopunkscc/portal/feat/serve"
 	"github.com/cryptopunkscc/portal/feat/version"
-	"github.com/cryptopunkscc/portal/pkg/di"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	singal "github.com/cryptopunkscc/portal/pkg/sig"
@@ -16,7 +15,6 @@ import (
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/multi"
 	. "github.com/cryptopunkscc/portal/target"
-	"github.com/cryptopunkscc/portal/target/cache"
 )
 
 func main() {
@@ -61,5 +59,5 @@ func (d *Module[T]) Priority() Priority {
 		Match[Dist_],
 	}
 }
-func (d *Module[T]) CacheDir() string      { return di.S(cache.Dir, cache.Deps(d)) }
+func (d *Module[T]) CacheDir() string      { return CacheDir(d.Executable()) }
 func (d *Module[T]) FeatServe() clir.Serve { return serve.Inject[T](d).Run }
