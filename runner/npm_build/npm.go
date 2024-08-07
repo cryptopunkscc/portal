@@ -37,7 +37,7 @@ func (r NpmRunner) Run(ctx context.Context, project target.ProjectNpm_) (err err
 func (r NpmRunner) Prepare(ctx context.Context, project target.ProjectNpm_) (err error) {
 	log := plog.Get(ctx)
 	log.Println("npm install...")
-	if err = npm.Install(project); err != nil {
+	if err = npm.Install(ctx, project); err != nil {
 		return
 	}
 	for i, dependency := range r.dependencies {
@@ -52,7 +52,7 @@ func (r NpmRunner) Prepare(ctx context.Context, project target.ProjectNpm_) (err
 
 func (r NpmRunner) Build(ctx context.Context, project target.ProjectNpm_) (err error) {
 	plog.Get(ctx).Println("npm run build...")
-	if err = npm.RunBuild(project); err != nil {
+	if err = npm.RunBuild(ctx, project); err != nil {
 		return
 	}
 	return

@@ -49,7 +49,7 @@ func (r *Runner) Run(ctx context.Context, projectJs target.ProjectJs) (err error
 		return
 	}
 
-	if err = npm.RunWatchStart(ctx, projectJs.Abs()); err != nil {
+	if err = npm.RunWatchStart(ctx, projectJs); err != nil {
 		return
 	}
 

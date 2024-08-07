@@ -1,13 +1,14 @@
 package npm
 
 import (
+	"context"
 	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	"github.com/cryptopunkscc/portal/target"
 )
 
-func Install(m target.NodeModule) (err error) {
+func Install(_ context.Context, m target.NodeModule) (err error) {
 	if err = deps.RequireBinary("npm"); err != nil {
 		return
 	}

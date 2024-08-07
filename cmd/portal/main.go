@@ -3,12 +3,12 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/clir"
+	"github.com/cryptopunkscc/portal/dispatch/exec"
+	"github.com/cryptopunkscc/portal/dispatch/query"
 	"github.com/cryptopunkscc/portal/feat/dispatch"
 	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/sig"
-	"github.com/cryptopunkscc/portal/runner/exec"
-	"github.com/cryptopunkscc/portal/runner/query"
 	"github.com/cryptopunkscc/portal/target"
 )
 

@@ -27,6 +27,7 @@ func NewRunner(names ...string) (r *Runner) {
 func (r Runner) match(name string) bool { return r.names[name] != nil }
 
 func (r Runner) Run(_ context.Context, src target.Source) error { return r.Call(src.Abs()) }
+
 func (r Runner) Call(dir string) error {
 	return filepath.Walk(dir, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {

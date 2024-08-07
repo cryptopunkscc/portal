@@ -1,9 +1,9 @@
 package run
 
 import (
+	"github.com/cryptopunkscc/portal/dispatch/query"
 	"github.com/cryptopunkscc/portal/feat/open"
 	"github.com/cryptopunkscc/portal/pkg/di"
-	"github.com/cryptopunkscc/portal/runner/query"
 	. "github.com/cryptopunkscc/portal/target"
 	"github.com/cryptopunkscc/portal/target/api"
 )

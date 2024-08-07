@@ -1,6 +1,7 @@
 package npm
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/deps"
@@ -8,7 +9,7 @@ import (
 	"github.com/cryptopunkscc/portal/target"
 )
 
-func RunBuild(m target.NodeModule) (err error) {
+func RunBuild(_ context.Context, m target.NodeModule) (err error) {
 	if err = deps.RequireBinary("npm"); err != nil {
 		return
 	}
