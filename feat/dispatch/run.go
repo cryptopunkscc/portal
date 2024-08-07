@@ -43,10 +43,6 @@ func NewFeat(
 	}
 }
 
-func (f Feat) Tray(ctx context.Context) error {
-	return f.Run(ctx, "tray")
-}
-
 func (f Feat) Run(
 	ctx context.Context,
 	src string,

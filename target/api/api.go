@@ -1,20 +1,41 @@
 package api
 
 import (
-	"github.com/cryptopunkscc/portal/target"
+	"context"
+	. "github.com/cryptopunkscc/portal/target"
 	"github.com/cryptopunkscc/portal/target/apphost"
 )
 
 type Deps interface {
-	TargetDispatch() target.Dispatch
-	WrapApi(target.Api) target.Api
+	TargetDispatch() Dispatch
+	WrapApi(Api) Api
 }
 
-func New(deps Deps) target.NewApi {
+func New(deps Deps) NewApi {
 	apphost.ConnectionsThreshold = 0
 	newApphost := apphost.NewFactory(deps.TargetDispatch())
-	return target.ApiFactory(deps.WrapApi,
+	return apiFactory(deps.WrapApi,
 		newApphost.NewAdapter,
 		newApphost.WithTimeout,
 	)
+}
+
+func apiFactory(
+	wrap func(Api) Api,
+	frontendApphost NewApphost,
+	backendApphost NewApphost,
+) func(context.Context, Portal_) Api {
+	return func(ctx context.Context, p Portal_) (a Api) {
+		var n NewApphost
+		switch any(p).(type) {
+		case PortalHtml:
+			n = frontendApphost
+		case PortalJs:
+			n = backendApphost
+		default:
+			return
+		}
+		a = wrap(n(ctx, p))
+		return
+	}
 }
