@@ -4,10 +4,8 @@ import (
 	"context"
 	manifest "github.com/cryptopunkscc/portal"
 	"github.com/cryptopunkscc/portal/clir"
-	"github.com/cryptopunkscc/portal/di/build"
 	"github.com/cryptopunkscc/portal/di/srv"
 	"github.com/cryptopunkscc/portal/dispatch/query"
-	"github.com/cryptopunkscc/portal/feat/create"
 	"github.com/cryptopunkscc/portal/feat/dispatch"
 	"github.com/cryptopunkscc/portal/feat/serve"
 	"github.com/cryptopunkscc/portal/feat/version"
@@ -20,7 +18,6 @@ import (
 	"github.com/cryptopunkscc/portal/runner/clean"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/multi"
-	"github.com/cryptopunkscc/portal/runner/template"
 	"github.com/cryptopunkscc/portal/runtime/msg"
 	. "github.com/cryptopunkscc/portal/target"
 	"os"
@@ -40,7 +37,6 @@ func main() {
 	portalPort.InitPrefix("dev")
 	cli := clir.NewCli(ctx, manifest.NameDev, manifest.DescriptionDev, version.Run)
 	cli.Dev(mod.FeatDev())
-	cli.Create(template.List, mod.FeatCreate().Run)
 	cli.Portals(mod.TargetFind())
 	if err := cli.Run(); err != nil {
 		log.Println(err)
@@ -78,6 +74,3 @@ func (d *Module[T]) JoinTarget() Dispatch      { return query.NewOpen().Run }
 func (d *Module[T]) DispatchService() Dispatch { return serve.Inject[T](d).Dispatch }
 func (d *Module[T]) Clean() *clean.Runner      { return clean.NewRunner() }
 func (d *Module[T]) FeatDev() Dispatch         { return dispatch.Inject(d).Run }
-func (d *Module[T]) FeatCreate() *create.Feat {
-	return create.NewFeat(template.NewRun, build.Create().Dist)
-}

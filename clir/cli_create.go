@@ -23,9 +23,8 @@ func (c Cli) Create(
 		List    bool   `name:"l" description:"List available templates."`
 	}{}
 	flags := emptyFlags
-	cmd := c.clir.NewSubCommand("c", "Create new project from template.")
-	cmd.AddFlags(&flags)
-	cmd.Action(func() error {
+	c.clir.AddFlags(&flags)
+	c.clir.Action(func() error {
 		switch {
 		case flags == emptyFlags || flags.List:
 			return templates()
