@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/clir"
-	"github.com/cryptopunkscc/portal/feat/apps"
 	"github.com/cryptopunkscc/portal/feat/version"
+	"github.com/cryptopunkscc/portal/mock/appstore"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
@@ -15,9 +15,9 @@ func main() {
 		"Portal-apps",
 		"Portal applications management.",
 		version.Run)
-	cli.List(apps.List)
-	cli.Install(apps.Install)
-	cli.Uninstall(apps.Uninstall)
+	cli.List(appstore.ListApps)
+	cli.Install(appstore.Install)
+	cli.Uninstall(appstore.Uninstall)
 	if err := cli.Run(); err != nil {
 		panic(err)
 	}

@@ -1,7 +1,7 @@
 package find
 
 import (
-	featApps "github.com/cryptopunkscc/portal/feat/apps"
+	"github.com/cryptopunkscc/portal/mock/appstore"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	. "github.com/cryptopunkscc/portal/target"
 )
@@ -12,7 +12,7 @@ func Create[T Portal_](
 	priority Priority,
 ) Find[T] {
 	return FindByPath(source.File, resolve).
-		ById(featApps.Path).
+		ById(appstore.Path).
 		Cached(targets).
 		Reduced(priority...)
 }

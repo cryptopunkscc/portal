@@ -6,8 +6,8 @@ import (
 	"github.com/cryptopunkscc/portal/di/find"
 	"github.com/cryptopunkscc/portal/dispatch/service"
 	"github.com/cryptopunkscc/portal/dispatch/spawn"
-	featApps "github.com/cryptopunkscc/portal/feat/apps"
 	"github.com/cryptopunkscc/portal/feat/serve"
+	"github.com/cryptopunkscc/portal/mock/appstore"
 	"github.com/cryptopunkscc/portal/pkg/di"
 	. "github.com/cryptopunkscc/portal/target"
 	"sync"
@@ -32,7 +32,7 @@ func (d *Module[T]) Port() Port                     { return PortPortal }
 func (d *Module[T]) Close() context.CancelFunc      { return d.CancelFunc }
 func (d *Module[T]) RunSpawn() Dispatch             { return spawn.Inject[T](d) }
 func (d *Module[T]) RunService() serve.Service      { return service.NewRun }
-func (d *Module[T]) FeatObserve() serve.Observe     { return featApps.Observe }
+func (d *Module[T]) FeatObserve() serve.Observe     { return appstore.Observe }
 func (d *Module[T]) WaitGroup() *sync.WaitGroup     { return &d.wg }
 func (d *Module[T]) Processes() *sig.Map[string, T] { return &d.processes }
 func (d *Module[T]) TargetFind() Find[T] {
