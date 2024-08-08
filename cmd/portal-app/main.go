@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/clir"
-	"github.com/cryptopunkscc/portal/di/srv"
+	"github.com/cryptopunkscc/portal/factory/srv"
 	"github.com/cryptopunkscc/portal/feat/serve"
 	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"

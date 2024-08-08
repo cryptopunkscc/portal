@@ -1,7 +1,7 @@
 package dev
 
 import (
-	"github.com/cryptopunkscc/portal/di/run"
+	"github.com/cryptopunkscc/portal/factory/run"
 	"github.com/cryptopunkscc/portal/resolve/sources"
 	. "github.com/cryptopunkscc/portal/target"
 )

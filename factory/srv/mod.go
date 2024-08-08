@@ -3,8 +3,8 @@ package srv
 import (
 	"context"
 	"github.com/cryptopunkscc/astrald/sig"
-	"github.com/cryptopunkscc/portal/di/dispatch"
-	"github.com/cryptopunkscc/portal/di/find"
+	"github.com/cryptopunkscc/portal/factory/dispatch"
+	"github.com/cryptopunkscc/portal/factory/find"
 	"github.com/cryptopunkscc/portal/feat/serve"
 	"github.com/cryptopunkscc/portal/mock/appstore"
 	"github.com/cryptopunkscc/portal/pkg/di"

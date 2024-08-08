@@ -4,5 +4,5 @@ bin
 dist
 !target/dist
 !resolve/dist
-!di/build
+!factory/build
 .idea/

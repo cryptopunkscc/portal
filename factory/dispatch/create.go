@@ -2,8 +2,8 @@ package dispatch
 
 import (
 	"github.com/cryptopunkscc/astrald/sig"
-	"github.com/cryptopunkscc/portal/di/find"
 	"github.com/cryptopunkscc/portal/dispatch/finder"
+	"github.com/cryptopunkscc/portal/factory/find"
 	"github.com/cryptopunkscc/portal/runner/supervisor"
 	"github.com/cryptopunkscc/portal/target"
 	"sync"

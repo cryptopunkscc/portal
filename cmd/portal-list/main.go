@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/clir"
-	find "github.com/cryptopunkscc/portal/di/find/portal"
+	find "github.com/cryptopunkscc/portal/factory/find/portal"
 	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target"
