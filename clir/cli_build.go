@@ -13,11 +13,10 @@ func (c Cli) Build(
 ) {
 	flags := struct {
 		Path  string `pos:"1" default:"."`
-		Clean bool   `name:"c" description:"Clean target directories from build artifacts."`
+		Clean bool   `name:"c" description:"Clean target directories from build artifacts without building."`
 	}{}
-	cmd := c.clir.NewSubCommand("b", "Build project and generate portal app bundle.")
-	cmd.AddFlags(&flags)
-	cmd.Action(func() (err error) {
+	c.clir.AddFlags(&flags)
+	c.clir.Action(func() (err error) {
 		if flags.Clean {
 			return clean(flags.Path)
 		} else {

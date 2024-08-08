@@ -4,9 +4,9 @@ import (
 	"context"
 	manifest "github.com/cryptopunkscc/portal"
 	"github.com/cryptopunkscc/portal/clir"
+	"github.com/cryptopunkscc/portal/di/build"
 	"github.com/cryptopunkscc/portal/di/srv"
 	"github.com/cryptopunkscc/portal/dispatch/query"
-	"github.com/cryptopunkscc/portal/feat/build"
 	"github.com/cryptopunkscc/portal/feat/create"
 	"github.com/cryptopunkscc/portal/feat/dispatch"
 	"github.com/cryptopunkscc/portal/feat/serve"
@@ -15,18 +15,12 @@ import (
 	portalPort "github.com/cryptopunkscc/portal/pkg/port"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	signal "github.com/cryptopunkscc/portal/pkg/sig"
-	"github.com/cryptopunkscc/portal/resolve/npm"
-	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/resolve/sources"
 	"github.com/cryptopunkscc/portal/runner/app"
 	"github.com/cryptopunkscc/portal/runner/clean"
 	"github.com/cryptopunkscc/portal/runner/exec"
-	"github.com/cryptopunkscc/portal/runner/go_build"
 	"github.com/cryptopunkscc/portal/runner/multi"
-	"github.com/cryptopunkscc/portal/runner/npm_build"
-	"github.com/cryptopunkscc/portal/runner/pack"
 	"github.com/cryptopunkscc/portal/runner/template"
-	js "github.com/cryptopunkscc/portal/runtime/js/embed"
 	"github.com/cryptopunkscc/portal/runtime/msg"
 	. "github.com/cryptopunkscc/portal/target"
 	"os"
@@ -47,7 +41,6 @@ func main() {
 	cli := clir.NewCli(ctx, manifest.NameDev, manifest.DescriptionDev, version.Run)
 	cli.Dev(mod.FeatDev())
 	cli.Create(template.List, mod.FeatCreate().Run)
-	cli.Build(mod.FeatBuild().Run, mod.Clean().Call)
 	cli.Portals(mod.TargetFind())
 	if err := cli.Run(); err != nil {
 		log.Println(err)
@@ -86,20 +79,5 @@ func (d *Module[T]) DispatchService() Dispatch { return serve.Inject[T](d).Dispa
 func (d *Module[T]) Clean() *clean.Runner      { return clean.NewRunner() }
 func (d *Module[T]) FeatDev() Dispatch         { return dispatch.Inject(d).Run }
 func (d *Module[T]) FeatCreate() *create.Feat {
-	return create.NewFeat(template.NewRun, d.FeatBuild().Dist)
-}
-func (d *Module[T]) FeatBuild() *build.Feat {
-	return build.NewFeat(
-		d.Clean().Call,
-		multi.NewRunner[Project_](
-			go_build.NewRun().Portal,
-			npm_build.NewRun(
-				Any[NodeModule](
-					Skip("node_modules"),
-					Try(npm.Resolve)).
-					List(source.Embed(js.PortalLibFS))...,
-			).Portal,
-		).Run,
-		pack.Run,
-	)
+	return create.NewFeat(template.NewRun, build.Create().Dist)
 }
