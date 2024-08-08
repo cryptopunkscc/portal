@@ -11,8 +11,8 @@ import (
 	"github.com/cryptopunkscc/portal/runner/multi"
 	"github.com/cryptopunkscc/portal/runner/reload"
 	"github.com/cryptopunkscc/portal/runner/wails"
-	"github.com/cryptopunkscc/portal/runner/wails_dev"
 	"github.com/cryptopunkscc/portal/runner/wails_dist"
+	"github.com/cryptopunkscc/portal/runner/wails_pro"
 	. "github.com/cryptopunkscc/portal/target"
 )
 
@@ -42,7 +42,7 @@ func NewAdapter(api Api) Api          { return &Adapter{Api: api} }
 func (d *Module) WrapApi(api Api) Api { return NewAdapter(api) }
 func (d *Module) NewRunTarget(newApi NewApi) Run[PortalHtml] {
 	return multi.NewRunner[PortalHtml](
-		reload.Immutable(newApi, PortMsg, wails_dev.NewRunner), // FIXME propagate sendMsg
+		reload.Immutable(newApi, PortMsg, wails_pro.NewRunner), // FIXME propagate sendMsg
 		reload.Mutable(newApi, PortMsg, wails_dist.NewRunner),
 		reload.Immutable(newApi, PortMsg, wails.NewRunner),
 	).Run

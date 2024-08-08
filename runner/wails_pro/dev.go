@@ -1,4 +1,4 @@
-package wails_dev
+package wails_pro
 
 import (
 	"context"

@@ -9,8 +9,8 @@ import (
 	portalPort "github.com/cryptopunkscc/portal/pkg/port"
 	"github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/runner/goja"
-	"github.com/cryptopunkscc/portal/runner/goja_dev"
 	"github.com/cryptopunkscc/portal/runner/goja_dist"
+	"github.com/cryptopunkscc/portal/runner/goja_pro"
 	"github.com/cryptopunkscc/portal/runner/multi"
 	"github.com/cryptopunkscc/portal/runner/reload"
 	. "github.com/cryptopunkscc/portal/target"
@@ -39,7 +39,7 @@ type Module struct{ dev.Module[PortalJs] }
 
 func (d *Module) NewRunTarget(newApi NewApi) Run[PortalJs] {
 	return multi.NewRunner[PortalJs](
-		reload.Mutable(newApi, PortMsg, goja_dev.NewRunner),
+		reload.Mutable(newApi, PortMsg, goja_pro.NewRunner),
 		reload.Mutable(newApi, PortMsg, goja_dist.NewRunner),
 		reload.Immutable(newApi, PortMsg, goja.NewRunner),
 	).Run

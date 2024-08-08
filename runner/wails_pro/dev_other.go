@@ -1,6 +1,6 @@
 //go:build darwin || linux
 
-package wails_dev
+package wails_pro
 
 import (
 	"os/exec"

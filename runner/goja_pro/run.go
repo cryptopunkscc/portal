@@ -1,4 +1,4 @@
-package goja_dev
+package goja_pro
 
 import (
 	"context"
