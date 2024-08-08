@@ -21,6 +21,7 @@ var goWailsDev = GoPortal{
 
 var goPortal = GoPortal{}.target("portal")
 var goPortalApp = GoPortal{}.target("portal-app")
+var goPortalApps = GoPortal{}.target("portal-apps")
 var goPortalAppWails = goWails.target("portal-app-wails")
 var goPortalAppGoja = GoPortal{}.target("portal-app-goja")
 var goPortalCreate = GoPortal{}.target("portal-create")

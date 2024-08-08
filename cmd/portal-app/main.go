@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/clir"
 	"github.com/cryptopunkscc/portal/di/srv"
-	featApps "github.com/cryptopunkscc/portal/feat/apps"
 	"github.com/cryptopunkscc/portal/feat/serve"
 	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -29,9 +28,6 @@ func main() {
 		version.Run,
 	)
 	cli.Serve(mod.FeatServe())
-	cli.List(featApps.List)
-	cli.Install(featApps.Install)
-	cli.Uninstall(featApps.Uninstall)
 	go singal.OnShutdown(cancel)
 	if err := cli.Run(); err != nil {
 		log.Println(err)
@@ -42,15 +38,16 @@ func main() {
 
 type Module[T App_] struct{ srv.Module[App_] }
 
-func (d *Module[T]) Executable() string        { return "portal" }
+func (d *Module[T]) FeatServe() clir.Serve     { return serve.Inject[T](d).Run }
 func (d *Module[T]) Astral() serve.Astral      { return exec.Astral }
+func (d *Module[T]) Executable() string        { return "portal" }
 func (d *Module[T]) RpcHandlers() rpc.Handlers { return nil }
 func (d *Module[T]) TargetResolve() Resolve[T] { return apps.Resolver[T]() }
 func (d *Module[T]) TargetRun() Run[T] {
 	return multi.NewRunner[T](
 		app.Run(exec.NewPortal[AppJs]("portal-app-goja", "o").Run),
 		app.Run(exec.NewPortal[AppHtml]("portal-app-wails", "o").Run),
-		app.Run(exec.NewBundleRunner(d.CacheDir()).Run),
+		app.Run(exec.NewBundleRunner(CacheDir(d.Executable())).Run),
 	).Run
 }
 func (d *Module[T]) Priority() Priority {
@@ -59,5 +56,3 @@ func (d *Module[T]) Priority() Priority {
 		Match[Dist_],
 	}
 }
-func (d *Module[T]) CacheDir() string      { return CacheDir(d.Executable()) }
-func (d *Module[T]) FeatServe() clir.Serve { return serve.Inject[T](d).Run }
