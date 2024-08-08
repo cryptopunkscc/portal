@@ -37,7 +37,6 @@ func main() {
 	portalPort.InitPrefix("dev")
 	cli := clir.NewCli(ctx, manifest.NameDev, manifest.DescriptionDev, version.Run)
 	cli.Dev(mod.FeatDev())
-	cli.Portals(mod.TargetFind())
 	if err := cli.Run(); err != nil {
 		log.Println(err)
 	}
