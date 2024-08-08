@@ -66,6 +66,13 @@ func (r *Router) RouteFunc(name string, function any) *Router {
 	return r.Routes(name).Func(name, function)
 }
 
+func (r *Router) RouteMap(handlers Handlers) *Router {
+	for name, h := range handlers {
+		r.RouteFunc(name, h)
+	}
+	return r
+}
+
 func (r *Router) Interface(srv any) *Router {
 	t := reflect.TypeOf(srv)
 	for i := 0; i < t.NumMethod(); i++ {

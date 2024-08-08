@@ -7,7 +7,6 @@ import (
 	"github.com/cryptopunkscc/portal/feat/serve"
 	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/pkg/rpc"
 	singal "github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/resolve/apps"
 	"github.com/cryptopunkscc/portal/runner/app"
@@ -27,7 +26,7 @@ func main() {
 		"Portal applications service.",
 		version.Run,
 	)
-	cli.Serve(mod.FeatServe())
+	cli.Serve(mod.Serve())
 	go singal.OnShutdown(cancel)
 	if err := cli.Run(); err != nil {
 		log.Println(err)
@@ -36,14 +35,13 @@ func main() {
 	mod.WaitGroup().Wait()
 }
 
-type Module[T App_] struct{ srv.Module[App_] }
+type Module[T App_] struct{ srv.Module[T] }
 
-func (d *Module[T]) FeatServe() clir.Serve     { return serve.Inject[T](d).Run }
-func (d *Module[T]) Astral() serve.Astral      { return exec.Astral }
-func (d *Module[T]) Executable() string        { return "portal" }
-func (d *Module[T]) RpcHandlers() rpc.Handlers { return nil }
-func (d *Module[T]) TargetResolve() Resolve[T] { return apps.Resolver[T]() }
-func (d *Module[T]) TargetRun() Run[T] {
+func (d *Module[T]) Executable() string   { return "portal" }
+func (d *Module[T]) Serve() clir.Serve    { return serve.Run(d) }
+func (d *Module[T]) Astral() serve.Astral { return exec.Astral }
+func (d *Module[T]) Resolve() Resolve[T]  { return apps.Resolver[T]() }
+func (d *Module[T]) Run() Run[T] {
 	return multi.NewRunner[T](
 		app.Run(exec.NewPortal[AppJs]("portal-app-goja", "o").Run),
 		app.Run(exec.NewPortal[AppHtml]("portal-app-wails", "o").Run),

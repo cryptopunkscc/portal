@@ -7,8 +7,8 @@ import (
 )
 
 func Create[T Portal_](
-	resolve Resolve[T],
 	targets *Cache[T],
+	resolve Resolve[T],
 	priority Priority,
 ) Find[T] {
 	return FindByPath(source.File, resolve).
