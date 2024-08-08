@@ -5,7 +5,7 @@ import (
 	"github.com/cryptopunkscc/portal/clir"
 	"github.com/cryptopunkscc/portal/dispatch/exec"
 	"github.com/cryptopunkscc/portal/dispatch/query"
-	"github.com/cryptopunkscc/portal/feat/dispatch"
+	"github.com/cryptopunkscc/portal/feat/start"
 	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/sig"
@@ -39,5 +39,5 @@ func (m Module) DispatchService() target.Dispatch { return exec.NewDispatcher("p
 func (m Module) JoinTarget() target.Dispatch      { return m.joinTarget }
 func (m Module) FeatDispatch() target.Dispatch {
 	m.joinTarget = query.NewOpen().Run
-	return dispatch.Inject(m).Run
+	return start.Inject(m).Run
 }

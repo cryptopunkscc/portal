@@ -6,8 +6,8 @@ import (
 	"github.com/cryptopunkscc/portal/clir"
 	"github.com/cryptopunkscc/portal/di/srv"
 	"github.com/cryptopunkscc/portal/dispatch/query"
-	"github.com/cryptopunkscc/portal/feat/dispatch"
 	"github.com/cryptopunkscc/portal/feat/serve"
+	"github.com/cryptopunkscc/portal/feat/start"
 	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	portalPort "github.com/cryptopunkscc/portal/pkg/port"
@@ -72,4 +72,4 @@ func (d *Module[T]) Priority() Priority {
 func (d *Module[T]) JoinTarget() Dispatch      { return query.NewOpen().Run }
 func (d *Module[T]) DispatchService() Dispatch { return serve.Inject[T](d).Dispatch }
 func (d *Module[T]) Clean() *clean.Runner      { return clean.NewRunner() }
-func (d *Module[T]) FeatDev() Dispatch         { return dispatch.Inject(d).Run }
+func (d *Module[T]) FeatDev() Dispatch         { return start.Inject(d).Run }
