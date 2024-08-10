@@ -13,22 +13,22 @@ import (
 
 type Deps interface {
 	Port() target.Port
-	JoinTarget() target.Request
 	Serve() target.Request
+	Request() target.Request
 }
 
 func Feat(deps Deps) target.Request {
 	return feat{
-		port:      deps.Port(),
-		runTarget: deps.JoinTarget(),
-		serve:     deps.Serve(),
+		port:    deps.Port(),
+		serve:   deps.Serve(),
+		request: deps.Request(),
 	}.Request
 }
 
 type feat struct {
-	port      target.Port
-	serve     target.Request
-	runTarget target.Request
+	port    target.Port
+	serve   target.Request
+	request target.Request
 }
 
 func (f feat) Request(
@@ -41,7 +41,7 @@ func (f feat) Request(
 	if src == "" {
 		err = f.checkService()
 	} else {
-		err = f.runTarget(ctx, src, args...)
+		err = f.request(ctx, src, args...)
 	}
 
 	if err == nil || ctx.Err() != nil {
@@ -63,7 +63,7 @@ func (f feat) Request(
 	}
 
 	if src != "" {
-		return f.runTarget(ctx, src, args...)
+		return f.request(ctx, src, args...)
 	}
 	return
 }

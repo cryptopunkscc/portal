@@ -45,7 +45,7 @@ func main() {
 type deps[T Portal_] struct{ srv.Module[T] }
 
 func (d *deps[T]) Executable() string   { return "portal-dev" }
-func (d *deps[T]) JoinTarget() Request  { return query.Request.Run }
+func (d *deps[T]) Request() Request     { return query.Request.Run }
 func (d *deps[T]) Serve() Request       { return serve.Feat(d).Start }
 func (d *deps[T]) Astral() serve.Astral { return serve.CheckAstral }
 func (d *deps[T]) Handlers() serve.Handlers {

@@ -23,7 +23,7 @@ func main() {
 		"Portal command line.",
 		version.Run,
 	)
-	cli.Request(start.Feat(deps{}))
+	cli.Start(start.Feat(deps{}))
 
 	if err := cli.Run(); err != nil {
 		log.Println(err)
@@ -33,6 +33,6 @@ func main() {
 
 type deps struct{}
 
-func (m deps) Port() target.Port          { return target.PortPortal }
-func (m deps) Serve() target.Request      { return exec.Request("portal-app") }
-func (m deps) JoinTarget() target.Request { return query.Request.Run }
+func (m deps) Port() target.Port       { return target.PortPortal }
+func (m deps) Serve() target.Request   { return exec.Request("portal-app") }
+func (m deps) Request() target.Request { return query.Request.Run }

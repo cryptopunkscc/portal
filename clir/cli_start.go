@@ -4,7 +4,7 @@ import (
 	"github.com/cryptopunkscc/portal/target"
 )
 
-func (c Cli) Request(handle target.Request) {
+func (c Cli) Start(handle target.Request) {
 	flags := &struct {
 		Src  string `pos:"1" default:"" description:"Application source. The source can be a app name, package name, app bundle path or app dir."`
 		Type string `pos:"2" default:"2"`
@@ -14,7 +14,7 @@ func (c Cli) Request(handle target.Request) {
 	}
 	cmd := c.clir.NewSubCommand(
 		"d",
-		"Request a given source to be run as an application(s). The source can be an app name, package name, app bundle path, or a directory containing application(s).",
+		"Start a given source to be run as an application(s). The source can be an app name, package name, app bundle path, or a directory containing application(s).",
 	)
 	cmd.AddFlags(flags)
 	cmd.Action(f)
