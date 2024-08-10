@@ -38,7 +38,7 @@ func main() {
 type Module[T App_] struct{ srv.Module[T] }
 
 func (d *Module[T]) Executable() string   { return "portal" }
-func (d *Module[T]) Serve() clir.Serve    { return serve.Run(d) }
+func (d *Module[T]) Serve() Request       { return serve.Feat(d) }
 func (d *Module[T]) Astral() serve.Astral { return exec.Astral }
 func (d *Module[T]) Resolve() Resolve[T]  { return apps.Resolver[T]() }
 func (d *Module[T]) Run() Run[T] {

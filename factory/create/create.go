@@ -6,8 +6,8 @@ import (
 	"github.com/cryptopunkscc/portal/runner/template"
 )
 
-func Create() *create.Feat {
-	return create.NewFeat(
+func Create() create.Run {
+	return create.Feat(
 		template.NewRun,
 		build.Create().Dist,
 	)

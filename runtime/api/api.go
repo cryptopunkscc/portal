@@ -7,13 +7,13 @@ import (
 )
 
 type Deps interface {
-	TargetDispatch() Dispatch
+	RequestTarget() Request
 	WrapApi(Api) Api
 }
 
 func New(deps Deps) NewApi {
 	apphost.ConnectionsThreshold = 0
-	newApphost := apphost.NewFactory(deps.TargetDispatch())
+	newApphost := apphost.NewFactory(deps.RequestTarget())
 	return apiFactory(deps.WrapApi,
 		newApphost.NewAdapter,
 		newApphost.WithTimeout,

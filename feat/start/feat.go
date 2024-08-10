@@ -13,25 +13,25 @@ import (
 
 type Deps interface {
 	Port() target.Port
-	JoinTarget() target.Dispatch
-	DispatchService() target.Dispatch
+	JoinTarget() target.Request
+	Serve() target.Request
 }
 
-func Inject(deps Deps) Feat {
-	return Feat{
-		port:         deps.Port(),
-		runTarget:    deps.JoinTarget(),
-		startService: deps.DispatchService(),
-	}
+func Feat(deps Deps) target.Request {
+	return feat{
+		port:      deps.Port(),
+		runTarget: deps.JoinTarget(),
+		serve:     deps.Serve(),
+	}.Request
 }
 
-type Feat struct {
-	port         target.Port
-	startService target.Dispatch
-	runTarget    target.Dispatch
+type feat struct {
+	port      target.Port
+	serve     target.Request
+	runTarget target.Request
 }
 
-func (f Feat) Run(
+func (f feat) Request(
 	ctx context.Context,
 	src string,
 	args ...string,
@@ -48,7 +48,7 @@ func (f Feat) Run(
 		return
 	}
 
-	if err = f.startService(ctx, "s"); err != nil {
+	if err = f.serve(ctx, "s"); err != nil {
 		return
 	}
 
@@ -68,7 +68,7 @@ func (f Feat) Run(
 	return
 }
 
-func (f Feat) checkService() (err error) {
+func (f feat) checkService() (err error) {
 	request := rpc.NewRequest(id.Anyone, f.port.Base)
 	if err = rpc.Command(request, "ping"); err == nil {
 		return

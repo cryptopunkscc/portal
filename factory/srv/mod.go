@@ -3,8 +3,7 @@ package srv
 import (
 	"context"
 	"github.com/cryptopunkscc/astrald/sig"
-	"github.com/cryptopunkscc/portal/factory/dispatch"
-	"github.com/cryptopunkscc/portal/factory/find"
+	"github.com/cryptopunkscc/portal/factory/request"
 	"github.com/cryptopunkscc/portal/feat/serve"
 	"github.com/cryptopunkscc/portal/mock/appstore"
 	"github.com/cryptopunkscc/portal/pkg/di"
@@ -30,16 +29,9 @@ type Deps[T Portal_] interface {
 }
 
 func (d *Module[T]) Port() Port                     { return PortPortal }
-func (d *Module[T]) Open() Dispatch                 { return dispatch.Create[T](d) }
+func (d *Module[T]) Open() Request                  { return request.Create[T](d) }
 func (d *Module[T]) Shutdown() context.CancelFunc   { return d.CancelFunc }
 func (d *Module[T]) Observe() serve.Observe         { return appstore.Observe }
 func (d *Module[T]) Handlers() serve.Handlers       { return serve.Handlers{} }
 func (d *Module[T]) WaitGroup() *sync.WaitGroup     { return &d.wg }
 func (d *Module[T]) Processes() *sig.Map[string, T] { return &d.processes }
-func (d *Module[T]) Find() Find[T] {
-	return find.Create[T](
-		&d.targets,
-		d.Resolve(),
-		d.Priority(),
-	)
-}

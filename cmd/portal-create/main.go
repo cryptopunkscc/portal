@@ -18,7 +18,7 @@ func main() {
 		version.Run)
 	cli.Create(
 		template.List,
-		create.Create().Run)
+		create.Create())
 	if err := cli.Run(); err != nil {
 		panic(err)
 	}

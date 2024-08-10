@@ -12,13 +12,13 @@ type Invoker struct {
 	*Adapter
 	ctx    context.Context
 	cancel context.CancelFunc
-	invoke target.Dispatch
+	invoke target.Request
 }
 
 func NewInvoker(
 	ctx context.Context,
 	flat *Adapter,
-	invoke target.Dispatch,
+	invoke target.Request,
 ) (i *Invoker) {
 	i = &Invoker{Adapter: flat, invoke: invoke}
 	i.ctx, i.cancel = context.WithCancel(ctx)

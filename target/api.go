@@ -14,8 +14,6 @@ type File func(path ...string) (source Source, err error)
 
 type Find[T Portal_] func(ctx context.Context, src string) (portals Portals[T], err error)
 
-type Dispatch func(context.Context, string, ...string) (err error)
-
 type Run[T Source] func(ctx context.Context, src T) (err error)
 
 type Runner[T Portal_] interface {

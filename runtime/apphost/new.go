@@ -12,10 +12,10 @@ import (
 )
 
 type Factory struct {
-	invoke target.Dispatch
+	invoke target.Request
 }
 
-func NewFactory(invoke target.Dispatch) *Factory {
+func NewFactory(invoke target.Request) *Factory {
 	return &Factory{invoke: invoke}
 }
 

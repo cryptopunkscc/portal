@@ -1,9 +1,9 @@
-package dispatch
+package request
 
 import (
 	"github.com/cryptopunkscc/astrald/sig"
-	"github.com/cryptopunkscc/portal/dispatch/finder"
 	"github.com/cryptopunkscc/portal/factory/find"
+	"github.com/cryptopunkscc/portal/request/finder"
 	"github.com/cryptopunkscc/portal/runner/supervisor"
 	"github.com/cryptopunkscc/portal/target"
 	"sync"
@@ -17,8 +17,8 @@ type Deps[T target.Portal_] interface {
 	Priority() target.Priority
 }
 
-func Create[T target.Portal_](d Deps[T]) target.Dispatch {
-	return finder.Dispatcher[T](
+func Create[T target.Portal_](d Deps[T]) target.Request {
+	return finder.Request[T](
 		find.Create[T](
 			&target.Cache[T]{},
 			d.Resolve(),

@@ -26,26 +26,14 @@ func CheckAstral(_ context.Context) error { return apphost.Check() }
 
 type Deps interface {
 	Port() target.Port
-	Open() target.Dispatch
+	Open() target.Request
 	Astral() Astral
 	Handlers() Handlers
 	Observe() Observe
 	Shutdown() context.CancelFunc
 }
 
-func Dispatch(d Deps) target.Dispatch {
-	run := Run(d)
-	return func(ctx context.Context, _ string, _ ...string) (err error) {
-		go func() {
-			if err = run(ctx); err != nil {
-				plog.Get(ctx).Type(d).Println("dispatch:", err)
-			}
-		}()
-		return
-	}
-}
-
-func Run(d Deps) func(ctx context.Context) error {
+func Feat(d Deps) target.Request {
 	astral := d.Astral()
 	port := d.Port()
 	handlers := d.Handlers()
@@ -55,7 +43,7 @@ func Run(d Deps) func(ctx context.Context) error {
 		"observe": d.Observe(),
 		"close":   d.Shutdown(),
 	})
-	return func(ctx context.Context) (err error) {
+	return func(ctx context.Context, src string, args ...string) (err error) {
 		if err = astral(ctx); err != nil {
 			return plog.Err(err)
 		}

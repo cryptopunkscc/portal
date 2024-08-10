@@ -1,21 +1,15 @@
 package clir
 
 import (
-	"context"
+	"github.com/cryptopunkscc/portal/feat/create"
 	"strings"
 )
 
 type Templates func() error
 
-type Create func(
-	ctx context.Context,
-	dir string,
-	targets map[string]string,
-) (err error)
-
 func (c Cli) Create(
 	templates Templates,
-	create Create,
+	create create.Run,
 ) {
 	emptyFlags := struct {
 		Targets string `pos:"1" description:"List of templates with optional module names like: 'svelte backend' or 'svelte:front backend:back'."`

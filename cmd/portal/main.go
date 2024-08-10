@@ -3,17 +3,16 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/clir"
-	"github.com/cryptopunkscc/portal/dispatch/exec"
-	"github.com/cryptopunkscc/portal/dispatch/query"
 	"github.com/cryptopunkscc/portal/feat/start"
 	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/sig"
+	"github.com/cryptopunkscc/portal/request/exec"
+	"github.com/cryptopunkscc/portal/request/query"
 	"github.com/cryptopunkscc/portal/target"
 )
 
 func main() {
-	mod := Module{}
 	ctx, cancel := context.WithCancel(context.Background())
 	log := plog.New().D().Scope("app").Set(&ctx)
 
@@ -24,7 +23,7 @@ func main() {
 		"Portal command line.",
 		version.Run,
 	)
-	cli.Dispatch(mod.FeatDispatch())
+	cli.Request(start.Feat(deps{}))
 
 	if err := cli.Run(); err != nil {
 		log.Println(err)
@@ -32,12 +31,8 @@ func main() {
 	cancel()
 }
 
-type Module struct{ joinTarget target.Dispatch }
+type deps struct{}
 
-func (m Module) Port() target.Port                { return target.PortPortal }
-func (m Module) DispatchService() target.Dispatch { return exec.NewDispatcher("portal-app").Dispatch }
-func (m Module) JoinTarget() target.Dispatch      { return m.joinTarget }
-func (m Module) FeatDispatch() target.Dispatch {
-	m.joinTarget = query.NewOpen().Run
-	return start.Inject(m).Run
-}
+func (m deps) Port() target.Port          { return target.PortPortal }
+func (m deps) Serve() target.Request      { return exec.Request("portal-app") }
+func (m deps) JoinTarget() target.Request { return query.Request.Run }
