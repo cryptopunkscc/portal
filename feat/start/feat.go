@@ -18,29 +18,17 @@ type Deps interface {
 }
 
 func Inject(deps Deps) Feat {
-	return NewFeat(
-		deps.Port(),
-		deps.DispatchService(),
-		deps.JoinTarget(),
-	)
+	return Feat{
+		port:         deps.Port(),
+		runTarget:    deps.JoinTarget(),
+		startService: deps.DispatchService(),
+	}
 }
 
 type Feat struct {
 	port         target.Port
 	startService target.Dispatch
 	runTarget    target.Dispatch
-}
-
-func NewFeat(
-	port target.Port,
-	startService target.Dispatch,
-	runTarget target.Dispatch,
-) Feat {
-	return Feat{
-		port:         port,
-		runTarget:    runTarget,
-		startService: startService,
-	}
 }
 
 func (f Feat) Run(
