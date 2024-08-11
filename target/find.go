@@ -5,6 +5,12 @@ import (
 	"slices"
 )
 
+type (
+	Find[T Portal_] func(ctx context.Context, src string) (portals Portals[T], err error)
+	File            func(path ...string) (source Source, err error)
+	Path            func(src string) (path string, err error)
+)
+
 func FindByPath[T Portal_](file File, resolve Resolve[T]) Find[T] {
 	return func(ctx context.Context, src string) (portals Portals[T], err error) {
 		f, err := file(src)
