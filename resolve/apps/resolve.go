@@ -7,7 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/target"
 )
 
-var ResolveAll target.Resolve[target.App_] = Resolver[target.App_]()
+var ResolveAll = Resolver[target.App_]()
 
 func Resolver[T target.App_]() target.Resolve[T] {
 	return target.Any[T](

@@ -4,6 +4,8 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/clir"
 	"github.com/cryptopunkscc/portal/factory/run/dev"
+	"github.com/cryptopunkscc/portal/factory/runtime"
+	"github.com/cryptopunkscc/portal/feat/open"
 	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	portalPort "github.com/cryptopunkscc/portal/pkg/port"
@@ -18,7 +20,6 @@ import (
 
 func main() {
 	mod := Module{}
-	mod.Deps = &mod
 	ctx, cancel := context.WithCancel(context.Background())
 	log := plog.New().D().Scope("dev-wails").Set(&ctx)
 	go sig.OnShutdown(cancel)
@@ -28,7 +29,7 @@ func main() {
 		"Portal html development driven by wails.",
 		version.Run,
 	)
-	cli.Open(mod.FeatOpen())
+	cli.Open(open.Feat[PortalHtml](&mod))
 	if err := cli.Run(); err != nil {
 		log.Println(err)
 	}
@@ -38,12 +39,13 @@ func main() {
 type Module struct{ dev.Module[PortalHtml] }
 type Adapter struct{ Api }
 
-func NewAdapter(api Api) Api          { return &Adapter{Api: api} }
-func (d *Module) WrapApi(api Api) Api { return NewAdapter(api) }
-func (d *Module) NewRunTarget(newApi NewApi) Run[PortalHtml] {
+func (d *Module) Runner() Run[PortalHtml] {
 	return multi.NewRunner[PortalHtml](
-		reload.Immutable(newApi, PortMsg, wails_pro.NewRunner), // FIXME propagate sendMsg
-		reload.Mutable(newApi, PortMsg, wails_dist.NewRunner),
-		reload.Immutable(newApi, PortMsg, wails.NewRunner),
+		reload.Immutable(d.runtime, PortMsg, wails_pro.NewRunner), // FIXME propagate sendMsg
+		reload.Mutable(d.runtime, PortMsg, wails_dist.NewRunner),
+		reload.Immutable(d.runtime, PortMsg, wails.NewRunner),
 	).Run
+}
+func (d *Module) runtime(ctx context.Context, portal Portal_) Api {
+	return &Adapter{runtime.Frontend(ctx, portal)}
 }

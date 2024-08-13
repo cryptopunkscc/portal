@@ -2,6 +2,7 @@ package apphost
 
 import (
 	"bufio"
+	"context"
 	_ "embed"
 	"encoding/json"
 	"errors"
@@ -18,6 +19,46 @@ import (
 	"strings"
 	"time"
 )
+
+func NewAdapter(ctx context.Context, pkg string) target.Apphost {
+	if pkg == "" {
+		panic("package is empty")
+	}
+	a := &Adapter{}
+	a.port = port.New(pkg)
+	a.log = plog.Get(ctx).Type(a).Set(&ctx)
+
+	a.listeners = mem.NewCache[*Listener]()
+	a.connections = mem.NewCache[*Conn]()
+
+	a.listeners.OnChange(eventEmitter[*Listener](a.Events()))
+	a.connections.OnChange(eventEmitter[*Conn](a.Events()))
+
+	return a
+}
+
+func eventEmitter[T any](queue *sig.Queue[target.ApphostEvent]) func(ref string, conn T, added bool) {
+	return func(ref string, conn T, added bool) {
+		event := target.ApphostEvent{Ref: ref}
+		switch v := any(conn).(type) {
+		case *Conn:
+			event.Port = v.conn.Query()
+			event.Type = target.ApphostDisconnect
+			if added {
+				event.Type = target.ApphostConnect
+			}
+		case *Listener:
+			event.Port = v.port
+			event.Type = target.ApphostUnregister
+			if added {
+				event.Type = target.ApphostRegister
+			}
+		default:
+			return
+		}
+		queue.Push(event)
+	}
+}
 
 type Adapter struct {
 	log plog.Logger

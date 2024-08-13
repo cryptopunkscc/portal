@@ -4,6 +4,8 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/clir"
 	"github.com/cryptopunkscc/portal/factory/run/app"
+	"github.com/cryptopunkscc/portal/factory/runtime"
+	"github.com/cryptopunkscc/portal/feat/open"
 	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/sig"
@@ -12,8 +14,7 @@ import (
 )
 
 func main() {
-	mod := Module{}
-	mod.Deps = &mod
+	mod := &Module{}
 	ctx, cancel := context.WithCancel(context.Background())
 	log := plog.New().D().Scope("app-goja").Set(&ctx)
 	go sig.OnShutdown(cancel)
@@ -22,7 +23,7 @@ func main() {
 		"Portal js runner driven by goja.",
 		version.Run,
 	)
-	cli.Open(mod.FeatOpen())
+	cli.Open(open.Feat[AppJs](mod))
 	if err := cli.Run(); err != nil {
 		log.Println(err)
 	}
@@ -31,4 +32,4 @@ func main() {
 
 type Module struct{ app.Module[AppJs] }
 
-func (d *Module) NewRunTarget(newApi NewApi) Run[AppJs] { return goja.NewRun(newApi) }
+func (d *Module) Runner() Run[AppJs] { return goja.NewRun(runtime.Backend) }

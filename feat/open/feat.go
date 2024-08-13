@@ -9,15 +9,15 @@ import (
 )
 
 type Deps[T target.Portal_] interface {
-	TargetResolve() target.Resolve[T]
-	TargetRun() target.Run[T]
+	Resolver() target.Resolve[T]
+	Runner() target.Run[T]
 }
 
 func Feat[T target.Portal_](
 	deps Deps[T],
 ) target.Request {
-	resolve := deps.TargetResolve()
-	run := deps.TargetRun()
+	resolve := deps.Resolver()
+	run := deps.Runner()
 	return func(ctx context.Context, path string, _ ...string) (err error) {
 		plog.Get(ctx)
 		file, err := source.File(path)

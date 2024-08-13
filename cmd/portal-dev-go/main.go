@@ -4,6 +4,8 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/clir"
 	"github.com/cryptopunkscc/portal/factory/run/dev"
+	"github.com/cryptopunkscc/portal/factory/runtime"
+	"github.com/cryptopunkscc/portal/feat/open"
 	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/port"
@@ -16,8 +18,7 @@ import (
 )
 
 func main() {
-	mod := Module{}
-	mod.Deps = &mod
+	mod := &Module{}
 	ctx, cancel := context.WithCancel(context.Background())
 	log := plog.New().D().Scope("dev-go").Set(&ctx)
 	go sig.OnShutdown(cancel)
@@ -27,7 +28,7 @@ func main() {
 		"Portal js development driven by goja.",
 		version.Run,
 	)
-	cli.Open(mod.FeatOpen())
+	cli.Open(open.Feat[ProjectGo](mod))
 
 	if err := cli.Run(); err != nil {
 		log.Println(err)
@@ -37,6 +38,8 @@ func main() {
 
 type Module struct{ dev.Module[ProjectGo] }
 
-func (d *Module) NewRunTarget(newApi NewApi) Run[ProjectGo] {
-	return multi.NewRunner[ProjectGo](reload.Mutable(newApi, PortMsg, go_dev.NewAdapter(exec.NewDistRunner().Run))).Run
+func (d *Module) Runner() Run[ProjectGo] {
+	return multi.NewRunner[ProjectGo](
+		reload.Mutable(runtime.Default, PortMsg, go_dev.NewAdapter(exec.NewDistRunner().Run)),
+	).Run
 }

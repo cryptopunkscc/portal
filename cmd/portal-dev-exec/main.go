@@ -4,6 +4,8 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/clir"
 	"github.com/cryptopunkscc/portal/factory/run/dev"
+	"github.com/cryptopunkscc/portal/factory/runtime"
+	"github.com/cryptopunkscc/portal/feat/open"
 	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/sig"
@@ -14,8 +16,7 @@ import (
 )
 
 func main() {
-	mod := Module{}
-	mod.Deps = &mod
+	mod := &Module{}
 	ctx, cancel := context.WithCancel(context.Background())
 	log := plog.New().D().Scope("dev-exec").Set(&ctx)
 	go sig.OnShutdown(cancel)
@@ -24,7 +25,7 @@ func main() {
 		"Portal js development runner for executables.",
 		version.Run,
 	)
-	cli.Open(mod.FeatOpen())
+	cli.Open(open.Feat[AppExec](mod))
 	if err := cli.Run(); err != nil {
 		log.Println(err)
 	}
@@ -33,11 +34,9 @@ func main() {
 
 type Module struct{ dev.Module[AppExec] }
 
-func (d *Module) Executable() string { return "portal-dev" }
-func (d *Module) CacheDir() string   { return CacheDir(d.Executable()) }
-func (d *Module) NewRunTarget(newApi NewApi) Run[AppExec] {
+func (d *Module) Runner() Run[AppExec] {
 	return multi.NewRunner[AppExec](
-		reload.Immutable(newApi, PortMsg, reload.Adapter(exec.NewBundleRunner(d.CacheDir()))),
-		reload.Immutable(newApi, PortMsg, reload.Adapter(exec.NewDistRunner())),
+		reload.Immutable(runtime.Default, PortMsg, reload.Adapter(exec.NewBundleRunner(CacheDir("portal-dev")))),
+		reload.Immutable(runtime.Default, PortMsg, reload.Adapter(exec.NewDistRunner())),
 	).Run
 }
