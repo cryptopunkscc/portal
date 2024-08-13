@@ -6,14 +6,12 @@ import (
 	"github.com/cryptopunkscc/portal/factory/request"
 	"github.com/cryptopunkscc/portal/feat/serve"
 	"github.com/cryptopunkscc/portal/mock/appstore"
-	"github.com/cryptopunkscc/portal/pkg/di"
 	. "github.com/cryptopunkscc/portal/target"
 	"sync"
 )
 
 type Module[T Portal_] struct {
 	Deps[T]
-	di.Cache
 	CancelFunc context.CancelFunc
 	wg         sync.WaitGroup
 	processes  sig.Map[string, T]
