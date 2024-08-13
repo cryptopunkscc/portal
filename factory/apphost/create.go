@@ -11,22 +11,22 @@ var request = query.Request.Start
 
 func Frontend() target.NewApphost {
 	return func(ctx context.Context, portal target.Portal_) target.Apphost {
-		adapter := apphost.NewAdapter(ctx, portal.Manifest().Package)
-		return apphost.NewInvoker(ctx, adapter, request)
+		adapter := apphost.Adapter(ctx, portal.Manifest().Package)
+		return apphost.Invoker(ctx, adapter, request)
 	}
 }
 
 func Backend() target.NewApphost {
 	return func(ctx context.Context, portal target.Portal_) target.Apphost {
 		apphost.ConnectionsThreshold = 0
-		adapter := apphost.NewAdapter(ctx, portal.Manifest().Package)
+		adapter := apphost.Adapter(ctx, portal.Manifest().Package)
 		adapter = apphost.WithTimeout(ctx, adapter, portal)
-		return apphost.NewInvoker(ctx, adapter, request)
+		return apphost.Invoker(ctx, adapter, request)
 	}
 }
 
 func Default() target.NewApphost {
 	return func(ctx context.Context, portal target.Portal_) target.Apphost {
-		return apphost.NewAdapter(ctx, portal.Manifest().Package)
+		return apphost.Adapter(ctx, portal.Manifest().Package)
 	}
 }

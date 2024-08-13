@@ -18,35 +18,35 @@ func WithTimeout(ctx context.Context, apphost target.Apphost, portal target.Port
 			if manifest.Env.Timeout > 0 {
 				duration = time.Duration(manifest.Env.Timeout) * time.Millisecond
 			}
-			timeout := NewTimout(duration, func() {
+			t := newTimout(duration, func() {
 				_ = sig2.Interrupt()
 			})
-			timeout.Enable(true)
+			t.Enable(true)
 			for range apphost.Events().Subscribe(ctx) {
 				activeConnections := len(apphost.Connections()) // TODO optimize
-				timeout.Enable(activeConnections <= ConnectionsThreshold)
+				t.Enable(activeConnections <= ConnectionsThreshold)
 			}
 		}()
 	}
 	return apphost
 }
 
-type Timout struct {
+type timout struct {
 	timeout   time.Duration
 	ticker    *time.Ticker
 	c         chan any
 	onTimeout func()
 }
 
-func NewTimout(timeout time.Duration, onTimeout func()) *Timout {
-	return &Timout{
+func newTimout(timeout time.Duration, onTimeout func()) *timout {
+	return &timout{
 		timeout:   timeout,
 		onTimeout: onTimeout,
 		ticker:    time.NewTicker(timeout),
 	}
 }
 
-func (t *Timout) Enable(value bool) {
+func (t *timout) Enable(value bool) {
 	if value {
 		go t.Start()
 	} else {
@@ -54,7 +54,7 @@ func (t *Timout) Enable(value bool) {
 	}
 }
 
-func (t *Timout) Start() {
+func (t *timout) Start() {
 	t.Stop()
 	log.Println("timout after", t.timeout)
 	t.ticker.Reset(t.timeout)
@@ -65,7 +65,7 @@ func (t *Timout) Start() {
 	}
 }
 
-func (t *Timout) Stop() {
+func (t *timout) Stop() {
 	if t.c != nil {
 		close(t.c)
 	}

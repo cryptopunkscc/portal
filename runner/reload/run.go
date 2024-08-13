@@ -8,35 +8,35 @@ import (
 )
 
 func Mutable[T target.Portal_](
-	newApi target.NewApi,
+	newRuntime target.NewRuntime,
 	portMsg target.Port,
-	newRunner func(target.NewApi, target.MsgSend) target.Runner[T],
+	newRunner func(target.NewRuntime, target.MsgSend) target.Runner[T],
 ) target.Run[target.Portal_] {
 	return runner[T]{
-		portMsg:   portMsg,
-		newApi:    newApi,
-		newRunner: newRunner,
+		portMsg:    portMsg,
+		newRuntime: newRuntime,
+		newRunner:  newRunner,
 	}.Run
 }
 
 func Immutable[T target.Portal_](
-	newApi target.NewApi,
+	newRuntime target.NewRuntime,
 	portMsg target.Port,
-	newRunner func(target.NewApi) target.Runner[T],
+	newRunner func(target.NewRuntime) target.Runner[T],
 ) target.Run[target.Portal_] {
 	return runner[T]{
-		portMsg: portMsg,
-		newApi:  newApi,
-		newRunner: func(api target.NewApi, _ target.MsgSend) target.Runner[T] {
+		portMsg:    portMsg,
+		newRuntime: newRuntime,
+		newRunner: func(api target.NewRuntime, _ target.MsgSend) target.Runner[T] {
 			return newRunner(api)
 		},
 	}.Run
 }
 
 type runner[T target.Portal_] struct {
-	portMsg   target.Port
-	newApi    target.NewApi
-	newRunner func(target.NewApi, target.MsgSend) target.Runner[T]
+	portMsg    target.Port
+	newRuntime target.NewRuntime
+	newRunner  func(target.NewRuntime, target.MsgSend) target.Runner[T]
 }
 
 func (r runner[T]) Run(ctx context.Context, portal target.Portal_) (err error) {
@@ -48,8 +48,8 @@ func (r runner[T]) Run(ctx context.Context, portal target.Portal_) (err error) {
 	var reloader msg.Reloader
 	client := msg.NewClient(r.portMsg)
 	sendMsg := client.Send
-	newApi := func(ctx context.Context, portal target.Portal_) target.Api {
-		api := r.newApi(ctx, portal)
+	newRuntime := func(ctx context.Context, portal target.Portal_) target.Runtime {
+		api := r.newRuntime(ctx, portal)
 		if api != nil {
 			client.Init(reloader, api)
 		}
@@ -58,7 +58,7 @@ func (r runner[T]) Run(ctx context.Context, portal target.Portal_) (err error) {
 		}
 		return api
 	}
-	_runner := r.newRunner(newApi, sendMsg)
+	_runner := r.newRunner(newRuntime, sendMsg)
 	reloader = _runner
 	return _runner.Run(ctx, t)
 }

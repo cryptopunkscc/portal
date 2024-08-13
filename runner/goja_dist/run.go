@@ -11,14 +11,14 @@ import (
 )
 
 type Runner struct {
-	newApi  target.NewApi
-	send    target.MsgSend
-	dist    target.DistJs
-	backend *goja.Backend
+	newRuntime target.NewRuntime
+	send       target.MsgSend
+	dist       target.DistJs
+	backend    *goja.Backend
 }
 
-func NewRunner(newApi target.NewApi, send target.MsgSend) target.Runner[target.DistJs] {
-	return &Runner{newApi: newApi, send: send}
+func NewRunner(newRuntime target.NewRuntime, send target.MsgSend) target.Runner[target.DistJs] {
+	return &Runner{newRuntime: newRuntime, send: send}
 }
 
 func (r *Runner) Reload() (err error) {
@@ -32,10 +32,10 @@ func (r *Runner) Run(ctx context.Context, dist target.DistJs) (err error) {
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Printf("run %T %s", dist, dist.Abs())
 	r.dist = dist
-	if any(r.newApi) == nil {
-		panic("newApi cannot be nil")
+	if any(r.newRuntime) == nil {
+		panic("newRuntime cannot be nil")
 	}
-	r.backend = goja.NewBackend(r.newApi(ctx, dist))
+	r.backend = goja.NewBackend(r.newRuntime(ctx, dist))
 	if err = r.Reload(); err != nil {
 		log.E().Println(err.Error())
 	}

@@ -32,12 +32,12 @@ func NewRunner(
 }
 
 func NewAdapter(run target.Run[target.DistExec]) func(
-	_ target.NewApi,
+	_ target.NewRuntime,
 	send target.MsgSend,
 ) target.Runner[target.ProjectGo] {
-	return func(newApi target.NewApi, send target.MsgSend) target.Runner[target.ProjectGo] {
+	return func(newRuntime target.NewRuntime, send target.MsgSend) target.Runner[target.ProjectGo] {
 		run := func(ctx context.Context, src target.DistExec) (err error) {
-			newApi(ctx, src) // initiate connection
+			newRuntime(ctx, src) // initiate connection
 			return run(ctx, src)
 		}
 		return NewRunner(run, send)

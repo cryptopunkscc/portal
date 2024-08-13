@@ -37,7 +37,7 @@ func main() {
 }
 
 type Module struct{ dev.Module[PortalHtml] }
-type Adapter struct{ Api }
+type Adapter struct{ Runtime }
 
 func (d *Module) Runner() Run[PortalHtml] {
 	return multi.NewRunner[PortalHtml](
@@ -46,6 +46,6 @@ func (d *Module) Runner() Run[PortalHtml] {
 		reload.Immutable(d.runtime, PortMsg, wails.NewRunner),
 	).Run
 }
-func (d *Module) runtime(ctx context.Context, portal Portal_) Api {
+func (d *Module) runtime(ctx context.Context, portal Portal_) Runtime {
 	return &Adapter{runtime.Frontend(ctx, portal)}
 }

@@ -5,22 +5,22 @@ import (
 	"github.com/cryptopunkscc/portal/target"
 )
 
-func Adapter[T target.Portal_](runner target.Runner[T]) func(target.NewApi) target.Runner[T] {
-	return func(newApi target.NewApi) target.Runner[T] {
+func Adapter[T target.Portal_](runner target.Runner[T]) func(target.NewRuntime) target.Runner[T] {
+	return func(newRuntime target.NewRuntime) target.Runner[T] {
 		return adapter[T]{
-			newApi: newApi,
-			inner:  runner,
+			newRuntime: newRuntime,
+			inner:      runner,
 		}
 	}
 }
 
 type adapter[T target.Portal_] struct {
-	newApi target.NewApi
-	inner  target.Runner[T]
+	newRuntime target.NewRuntime
+	inner      target.Runner[T]
 }
 
 func (a adapter[T]) Run(ctx context.Context, src T) (err error) {
-	a.newApi(ctx, src)
+	a.newRuntime(ctx, src)
 	return a.inner.Run(ctx, src)
 }
 

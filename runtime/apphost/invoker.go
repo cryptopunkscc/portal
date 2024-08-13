@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func NewInvoker(
+func Invoker(
 	ctx context.Context,
 	flat target.Apphost,
 	invoke target.Request,

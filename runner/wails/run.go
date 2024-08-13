@@ -13,16 +13,16 @@ import (
 )
 
 type Runner struct {
-	newApi   target.NewApi
-	frontCtx context.Context
+	newRuntime target.NewRuntime
+	frontCtx   context.Context
 }
 
-func NewRunner(newApi target.NewApi) target.Runner[target.AppHtml] {
-	return &Runner{newApi: newApi}
+func NewRunner(newRuntime target.NewRuntime) target.Runner[target.AppHtml] {
+	return &Runner{newRuntime: newRuntime}
 }
 
-func NewRun(newApi target.NewApi) target.Run[target.AppHtml] {
-	return NewRunner(newApi).Run
+func NewRun(newRuntime target.NewRuntime) target.Run[target.AppHtml] {
+	return NewRunner(newRuntime).Run
 }
 
 func (r *Runner) Reload() (err error) {
@@ -37,7 +37,7 @@ func (r *Runner) Run(ctx context.Context, app target.AppHtml) (err error) {
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Println("start", app.Manifest().Package, app.Abs())
 	defer log.Println("exit", app.Manifest().Package, app.Abs())
-	api := r.newApi(ctx, app)
+	api := r.newRuntime(ctx, app)
 	opt := AppOptions(api)
 	opt.OnStartup = func(ctx context.Context) { r.frontCtx = ctx }
 	SetupOptions(app, opt)
@@ -47,7 +47,7 @@ func (r *Runner) Run(ctx context.Context, app target.AppHtml) (err error) {
 	return
 }
 
-func AppOptions(app target.Api) *options.App {
+func AppOptions(app target.Runtime) *options.App {
 	return &options.App{
 		Width:            1024,
 		Height:           768,

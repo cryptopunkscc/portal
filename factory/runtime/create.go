@@ -7,13 +7,13 @@ import (
 )
 
 var (
-	Default  = runtime(apphost.Default())
-	Frontend = runtime(apphost.Frontend())
-	Backend  = runtime(apphost.Backend())
+	Default  = newRuntime(apphost.Default())
+	Frontend = newRuntime(apphost.Frontend())
+	Backend  = newRuntime(apphost.Backend())
 )
 
-func runtime(n target.NewApphost) target.NewApi {
-	return func(ctx context.Context, portal target.Portal_) target.Api {
+func newRuntime(n target.NewApphost) target.NewRuntime {
+	return func(ctx context.Context, portal target.Portal_) target.Runtime {
 		return n(ctx, portal)
 	}
 }

@@ -20,11 +20,11 @@ import (
 	"time"
 )
 
-func NewAdapter(ctx context.Context, pkg string) target.Apphost {
+func Adapter(ctx context.Context, pkg string) target.Apphost {
 	if pkg == "" {
 		panic("package is empty")
 	}
-	a := &Adapter{}
+	a := &adapter{}
 	a.port = port.New(pkg)
 	a.log = plog.Get(ctx).Type(a).Set(&ctx)
 
@@ -60,7 +60,7 @@ func eventEmitter[T any](queue *sig.Queue[target.ApphostEvent]) func(ref string,
 	}
 }
 
-type Adapter struct {
+type adapter struct {
 	log plog.Logger
 
 	port port.Port
@@ -70,34 +70,34 @@ type Adapter struct {
 	events      sig.Queue[target.ApphostEvent]
 }
 
-func (api *Adapter) Connections() (c []target.ApphostConn) {
+func (api *adapter) Connections() (c []target.ApphostConn) {
 	for _, s := range api.connections.Copy() {
 		c = append(c, target.ApphostConn{Query: s.conn.Query(), In: s.in})
 	}
 	return
 }
 
-func (api *Adapter) Listeners() (l []target.ApphostListener) {
+func (api *adapter) Listeners() (l []target.ApphostListener) {
 	for _, s := range api.listeners.Copy() {
 		l = append(l, target.ApphostListener{Port: s.port})
 	}
 	return
 }
 
-func (api *Adapter) Events() *sig.Queue[target.ApphostEvent] {
+func (api *adapter) Events() *sig.Queue[target.ApphostEvent] {
 	return &api.events
 }
 
-func (api *Adapter) Port(service ...string) string {
+func (api *adapter) Port(service ...string) string {
 	return port.New(service...).String()
 }
 
-func (api *Adapter) Close() error {
+func (api *adapter) Close() error {
 	api.Interrupt()
 	return nil
 }
 
-func (api *Adapter) Interrupt() {
+func (api *adapter) Interrupt() {
 	for name, closer := range api.listeners.Release() {
 		api.log.Println("[Interrupt] closing listener:", name)
 		_ = closer.Close()
@@ -108,19 +108,19 @@ func (api *Adapter) Interrupt() {
 	}
 }
 
-func (api *Adapter) Log(arg ...any) {
+func (api *adapter) Log(arg ...any) {
 	api.log.Scope("js").Println(arg...)
 }
 
-func (api *Adapter) LogArr(arg []any) {
+func (api *adapter) LogArr(arg []any) {
 	api.log.Scope("js").Println(arg...)
 }
 
-func (api *Adapter) Sleep(duration int64) {
+func (api *adapter) Sleep(duration int64) {
 	time.Sleep(time.Duration(duration) * time.Millisecond)
 }
 
-func (api *Adapter) ServiceRegister(service string) (err error) {
+func (api *adapter) ServiceRegister(service string) (err error) {
 	port := service
 	switch service {
 	case "*":
@@ -140,7 +140,7 @@ func (api *Adapter) ServiceRegister(service string) (err error) {
 	return
 }
 
-func (api *Adapter) ServiceClose(service string) (err error) {
+func (api *adapter) ServiceClose(service string) (err error) {
 	listener, ok := api.listeners.Get(service)
 	if !ok {
 		err = errors.New("[ServiceClose] not listening on port: " + service)
@@ -153,7 +153,7 @@ func (api *Adapter) ServiceClose(service string) (err error) {
 	return
 }
 
-func (api *Adapter) ConnAccept(service string) (data string, err error) {
+func (api *adapter) ConnAccept(service string) (data string, err error) {
 	listener, ok := api.listeners.Get(service)
 	if !ok {
 		err = fmt.Errorf("[ConnAccept] not listening on port: %v", service)
@@ -194,7 +194,7 @@ type queryData struct {
 	RemoteId string `json:"remoteId"`
 }
 
-func (api *Adapter) ConnClose(id string) (err error) {
+func (api *adapter) ConnClose(id string) (err error) {
 	conn, ok := api.connections.Get(id)
 	if !ok {
 		err = errors.New("[ConnClose] not found connection with id: " + id)
@@ -205,7 +205,7 @@ func (api *Adapter) ConnClose(id string) (err error) {
 	return
 }
 
-func (api *Adapter) ConnWrite(id string, data string) (err error) {
+func (api *adapter) ConnWrite(id string, data string) (err error) {
 	api.log.Printf("> %s <%s>", strings.TrimRight(data, "\r\n"), id)
 	conn, ok := api.connections.Get(id)
 	if !ok {
@@ -219,7 +219,7 @@ func (api *Adapter) ConnWrite(id string, data string) (err error) {
 	return
 }
 
-func (api *Adapter) ConnRead(id string) (data string, err error) {
+func (api *adapter) ConnRead(id string) (data string, err error) {
 	conn, ok := api.connections.Get(id)
 	if !ok {
 		err = errors.New("[ConnRead] not found connection with id: " + id)
@@ -234,7 +234,7 @@ func (api *Adapter) ConnRead(id string) (data string, err error) {
 	return
 }
 
-func (api *Adapter) Query(identity string, query string) (data string, err error) {
+func (api *adapter) Query(identity string, query string) (data string, err error) {
 	api.log.Println("~>", query)
 	nid := id.Identity{}
 	if len(identity) > 0 {
@@ -261,7 +261,7 @@ func (api *Adapter) Query(identity string, query string) (data string, err error
 	return
 }
 
-func (api *Adapter) QueryName(name string, query string) (data string, err error) {
+func (api *adapter) QueryName(name string, query string) (data string, err error) {
 	conn, err := astral.QueryName(name, api.Port(query))
 	if err != nil {
 		return
@@ -280,7 +280,7 @@ func (api *Adapter) QueryName(name string, query string) (data string, err error
 	return
 }
 
-func (api *Adapter) Resolve(name string) (id string, err error) {
+func (api *adapter) Resolve(name string) (id string, err error) {
 	identity, err := astral.Resolve(name)
 	if err != nil {
 		return
@@ -289,7 +289,7 @@ func (api *Adapter) Resolve(name string) (id string, err error) {
 	return
 }
 
-func (api *Adapter) NodeInfo(identity string) (info target.NodeInfo, err error) {
+func (api *adapter) NodeInfo(identity string) (info target.NodeInfo, err error) {
 	nid, err := id.ParsePublicKeyHex(identity)
 	if err != nil {
 		return

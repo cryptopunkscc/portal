@@ -14,10 +14,10 @@ type Runner struct {
 	inner target.Runner[target.AppHtml]
 }
 
-func NewRunner(newApi target.NewApi, send target.MsgSend) target.Runner[target.DistHtml] {
+func NewRunner(newRuntime target.NewRuntime, send target.MsgSend) target.Runner[target.DistHtml] {
 	return &Runner{
 		send:  send,
-		inner: wails.NewRunner(newApi),
+		inner: wails.NewRunner(newRuntime),
 	}
 }
 

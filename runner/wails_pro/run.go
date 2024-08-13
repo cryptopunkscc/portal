@@ -19,13 +19,13 @@ import (
 	"syscall"
 )
 
-func NewRunner(newApi target.NewApi) target.Runner[target.ProjectHtml] {
-	return &Runner{NewApi: newApi}
+func NewRunner(newRuntime target.NewRuntime) target.Runner[target.ProjectHtml] {
+	return &Runner{NewRuntime: newRuntime}
 }
 
 type Runner struct {
 	frontCtx context.Context
-	target.NewApi
+	target.NewRuntime
 }
 
 func (r *Runner) Run(ctx context.Context, projectHtml target.ProjectHtml) (err error) {
@@ -51,7 +51,7 @@ func (r *Runner) Run(ctx context.Context, projectHtml target.ProjectHtml) (err e
 		return
 	}
 
-	api := r.NewApi(ctx, projectHtml)
+	api := r.NewRuntime(ctx, projectHtml)
 	opt := wails.AppOptions(api)
 	opt.OnStartup = func(ctx context.Context) { r.frontCtx = ctx }
 	path := projectHtml.Abs()

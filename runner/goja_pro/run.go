@@ -14,20 +14,20 @@ import (
 	"time"
 )
 
-type Runner struct {
+type runner struct {
 	distRunner target.Runner[target.DistJs]
 }
 
-func NewRunner(newApi target.NewApi, send target.MsgSend) target.Runner[target.ProjectJs] {
-	distRunner := goja_dist.NewRunner(newApi, send)
-	return &Runner{distRunner: distRunner}
+func NewRunner(newRuntime target.NewRuntime, send target.MsgSend) target.Runner[target.ProjectJs] {
+	distRunner := goja_dist.NewRunner(newRuntime, send)
+	return &runner{distRunner: distRunner}
 }
 
-func (r *Runner) Reload() (err error) {
+func (r *runner) Reload() (err error) {
 	return r.distRunner.Reload()
 }
 
-func (r *Runner) Run(ctx context.Context, projectJs target.ProjectJs) (err error) {
+func (r *runner) Run(ctx context.Context, projectJs target.ProjectJs) (err error) {
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Println("start", projectJs.Manifest().Package, projectJs.Abs())
 	defer log.Println("exit", projectJs.Manifest().Package, projectJs.Abs())

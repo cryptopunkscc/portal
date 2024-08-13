@@ -32,9 +32,9 @@ func main() {
 }
 
 type Module struct{ app.Module[AppHtml] }
-type Adapter struct{ Api }
+type Adapter struct{ Runtime }
 
 func (d *Module) Runner() Run[AppHtml] { return wails.NewRun(d.runtime) }
-func (d *Module) runtime(ctx context.Context, portal Portal_) Api {
+func (d *Module) runtime(ctx context.Context, portal Portal_) Runtime {
 	return &Adapter{runtime.Frontend(ctx, portal)}
 }
