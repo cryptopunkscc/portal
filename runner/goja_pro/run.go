@@ -45,15 +45,16 @@ func (r *runner) Run(ctx context.Context, projectJs target.ProjectJs) (err error
 		log.P().Println("libs are empty")
 	}
 
-	if err = npm_build.NewRunner(libs...).Run(ctx, projectJs); err != nil {
+	build := npm_build.Runner(libs...)
+	if err = build(ctx, projectJs); err != nil {
 		return
 	}
 
-	if err = npm.RunWatchStart(ctx, projectJs); err != nil {
+	if err = npm.Watch(ctx, projectJs); err != nil {
 		return
 	}
 
-	// Wait 1 for npm.RunWatchStart finish initial build otherwise runner can restart on first launch.
+	// Wait 1 sec for npm.Watch finish initial build otherwise runner can restart on first launch.
 	time.Sleep(1 * time.Second)
 
 	return r.distRunner.Run(ctx, projectJs.Dist())

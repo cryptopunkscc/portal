@@ -8,17 +8,17 @@ import (
 	"reflect"
 )
 
-type Runner[T target.Portal_] struct {
+type runner[T target.Portal_] struct {
 	runners []target.Run[target.Portal_]
 }
 
-func NewRunner[T target.Portal_](
+func Runner[T target.Portal_](
 	runners ...target.Run[target.Portal_],
-) *Runner[T] {
-	return &Runner[T]{runners: runners}
+) target.Run[T] {
+	return runner[T]{runners: runners}.Run
 }
 
-func (r Runner[T]) Run(ctx context.Context, portal T) (err error) {
+func (r runner[T]) Run(ctx context.Context, portal T) (err error) {
 	for _, runner := range r.runners {
 		err = runner(ctx, portal)
 		if !errors.Is(err, target.ErrNotTarget) {

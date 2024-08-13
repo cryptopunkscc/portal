@@ -8,14 +8,14 @@ import (
 	"os/exec"
 )
 
-func RunWatchStart(ctx context.Context, src target.ProjectNpm_) (err error) {
+func Watch(ctx context.Context, src target.ProjectNpm_) (err error) {
 	if err = deps.RequireBinary("npm"); err != nil {
 		return
 	}
-	return cmdRunWatch(ctx, src.Abs()).Start()
+	return npmRunWatch(ctx, src.Abs()).Start()
 }
 
-func cmdRunWatch(ctx context.Context, src string) *exec.Cmd {
+func npmRunWatch(ctx context.Context, src string) *exec.Cmd {
 	//cmd := exec.CommandContext(ctx, "gnome-terminal", "--", "npm", "run", "watch")
 	cmd := exec.CommandContext(ctx, "npm", "run", "watch")
 	cmd.Env = os.Environ()

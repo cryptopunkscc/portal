@@ -6,7 +6,7 @@ import (
 	"github.com/cryptopunkscc/portal/target"
 )
 
-func Request[T target.Portal_](find target.Find[T], run target.Run[T]) target.Request {
+func Requester[T target.Portal_](find target.Find[T], run target.Run[T]) target.Request {
 	return func(ctx context.Context, src string, args ...string) (err error) {
 		log := plog.Get(ctx)
 		portals, err := find(ctx, src)

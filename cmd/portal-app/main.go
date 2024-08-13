@@ -42,11 +42,11 @@ func (d *Module[T]) Serve() Request       { return serve.Feat(d) }
 func (d *Module[T]) Astral() serve.Astral { return exec.Astral }
 func (d *Module[T]) Resolve() Resolve[T]  { return apps.Resolver[T]() }
 func (d *Module[T]) Run() Run[T] {
-	return multi.NewRunner[T](
-		app.Run(exec.NewPortal[AppJs]("portal-app-goja", "o").Run),
-		app.Run(exec.NewPortal[AppHtml]("portal-app-wails", "o").Run),
-		app.Run(exec.NewBundleRunner(CacheDir(d.Executable())).Run),
-	).Run
+	return multi.Runner[T](
+		app.Run(exec.Portal[AppJs]("portal-app-goja", "o").Run),
+		app.Run(exec.Portal[AppHtml]("portal-app-wails", "o").Run),
+		app.Run(exec.Bundle(CacheDir(d.Executable())).Run),
+	)
 }
 func (d *Module[T]) Priority() Priority {
 	return []Matcher{

@@ -13,16 +13,13 @@ import (
 	"runtime"
 )
 
-type GoRunner struct{ platforms []string }
+type runner struct{ platforms []string }
 
-func NewRun(platforms ...string) target.Run[target.ProjectGo] {
-	return NewRunner(platforms...).Run
-}
-func NewRunner(platforms ...string) GoRunner {
-	return GoRunner{platforms}
+func Runner(platforms ...string) target.Run[target.ProjectGo] {
+	return runner{platforms}.Run
 }
 
-func (g GoRunner) Run(ctx context.Context, project target.ProjectGo) (err error) {
+func (g runner) Run(ctx context.Context, project target.ProjectGo) (err error) {
 	log := plog.Get(ctx).Type(g).Set(&ctx)
 	if err = deps.RequireBinary("go"); err != nil {
 		return

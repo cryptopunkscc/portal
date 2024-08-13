@@ -7,23 +7,23 @@ import (
 	"os/exec"
 )
 
-type DistRunner struct {
+type dist struct {
 	ctx    context.Context
 	src    target.DistExec
 	cancel func() error
 }
 
-func NewDistRunner() target.Runner[target.DistExec] {
-	return &DistRunner{}
+func Dist() target.Runner[target.DistExec] {
+	return &dist{}
 }
 
-func (d *DistRunner) Run(ctx context.Context, src target.DistExec) (err error) {
+func (d *dist) Run(ctx context.Context, src target.DistExec) (err error) {
 	d.ctx = ctx
 	d.src = src
 	return d.Reload()
 }
 
-func (d *DistRunner) Reload() error {
+func (d *dist) Reload() error {
 	if d.cancel != nil {
 		_ = d.cancel()
 	}

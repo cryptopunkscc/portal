@@ -8,24 +8,24 @@ import (
 	"os"
 )
 
-type BundleRunner struct {
+type bundle struct {
 	cacheDir string
 	ctx      context.Context
 	bundle   target.BundleExec
 	cancel   context.CancelFunc
 }
 
-func NewBundleRunner(cacheDir string) target.Runner[target.BundleExec] {
-	return &BundleRunner{cacheDir: cacheDir}
+func Bundle(cacheDir string) target.Runner[target.BundleExec] {
+	return &bundle{cacheDir: cacheDir}
 }
 
-func (r *BundleRunner) Run(ctx context.Context, bundle target.BundleExec) error {
+func (r *bundle) Run(ctx context.Context, bundle target.BundleExec) error {
 	r.ctx = ctx
 	r.bundle = bundle
 	return r.Reload()
 }
 
-func (r *BundleRunner) Reload() error {
+func (r *bundle) Reload() error {
 	if r.cancel != nil {
 		r.cancel()
 	}
@@ -56,7 +56,7 @@ func (r *BundleRunner) Reload() error {
 
 	var ctx context.Context
 	ctx, r.cancel = context.WithCancel(r.ctx)
-	err = NewPortal[target.Portal_](execFile.Name()).Run(ctx, r.bundle)
+	err = Portal[target.Portal_](execFile.Name()).Run(ctx, r.bundle)
 	if err != nil {
 		return err
 	}

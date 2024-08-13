@@ -40,7 +40,7 @@ func (r *Runner) Run(ctx context.Context, dist target.DistJs) (err error) {
 		log.E().Println(err.Error())
 	}
 	pkg := dist.Manifest().Package
-	watch := watcher.NewRunner[target.DistJs](func() error {
+	watch := watcher.Runner[target.DistJs](func() error {
 		if err := r.send(target.NewMsg(pkg, target.DevChanged)); err != nil {
 			log.E().Println(err)
 		}

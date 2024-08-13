@@ -26,11 +26,11 @@ func (d *Install) buildEmbedApps(platforms ...string) {
 	).List(file)
 
 	feat := build.NewFeat(
-		clean.NewRunner().Call,
-		multi.NewRunner[target.Project_](
-			go_build.NewRun(platforms...).Portal,
-			npm_build.NewRun(jsLibs...).Portal,
-		).Run,
+		clean.Runner(),
+		multi.Runner[target.Project_](
+			go_build.Runner(platforms...).Portal,
+			npm_build.Runner(jsLibs...).Portal,
+		),
 		pack.Run,
 	)
 	appsDir := filepath.Join(d.root, "apps")

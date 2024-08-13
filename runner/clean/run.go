@@ -1,8 +1,6 @@
 package clean
 
 import (
-	"context"
-	"github.com/cryptopunkscc/portal/target"
 	"io/fs"
 	"log"
 	"os"
@@ -11,24 +9,22 @@ import (
 
 var Defaults = []string{"build", "dist", "node_modules"}
 
-type Runner struct{ names map[string]any }
+type runner struct{ names map[string]any }
 
-func NewRunner(names ...string) (r *Runner) {
+func Runner(names ...string) func(string) error {
 	if len(names) == 0 {
 		names = Defaults
 	}
-	r = &Runner{names: make(map[string]any)}
+	r := &runner{names: make(map[string]any)}
 	for _, name := range names {
 		r.names[name] = name
 	}
-	return
+	return r.call
 }
 
-func (r Runner) match(name string) bool { return r.names[name] != nil }
+func (r runner) match(name string) bool { return r.names[name] != nil }
 
-func (r Runner) Run(_ context.Context, src target.Source) error { return r.Call(src.Abs()) }
-
-func (r Runner) Call(dir string) error {
+func (r runner) call(dir string) error {
 	return filepath.Walk(dir, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
 			return err

@@ -8,25 +8,25 @@ import (
 	"os/exec"
 )
 
-type Portal[T target.Portal_] struct {
+type portal[T target.Portal_] struct {
 	command []string
 	cmd     *exec.Cmd
 	ctx     context.Context
 	src     T
 }
 
-func NewPortal[T target.Portal_](command ...string) target.Runner[T] {
-	return &Portal[T]{command: command}
+func Portal[T target.Portal_](command ...string) target.Runner[T] {
+	return &portal[T]{command: command}
 }
 
-func (p *Portal[T]) Reload() (err error) {
+func (p *portal[T]) Reload() (err error) {
 	if c := p.cmd; c != nil {
 		_ = c.Cancel()
 	}
 	return p.Run(p.ctx, p.src)
 }
 
-func (p *Portal[T]) Run(ctx context.Context, src T) (err error) {
+func (p *portal[T]) Run(ctx context.Context, src T) (err error) {
 	p.ctx = ctx
 	p.src = src
 	cmd := p.command[0]

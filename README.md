@@ -3,14 +3,14 @@
 **Portal** is a runtime & development environment for multiplatform decentralized applications driven
 by **Astral**.
 
-### [What is the Astral Network](https://github.com/cryptopunkscc/astrald/blob/master/docs/overview.md)
+### [What is Astral Network](https://github.com/cryptopunkscc/astrald/blob/master/docs/overview.md)
 
 > Astral is an abstract network that provides authenticated and encrypted connections over a variety of physical
 > networks.
 > It provides simple and secure connectivity interface, which automatically adapts to existing network conditions.
 > Its mission is to dramatically reduce the time it takes to build robust peer-to-peer networks.
 
-### What are the Astral Apps
+### What are Astral Apps
 
 **Astral Apps** are any applications capable to connect with **Astral** via
 [**Apphost Protocol**](https://github.com/cryptopunkscc/astrald/blob/master/mod/apphost/proto/protocol.md).
@@ -36,7 +36,7 @@ Read the following docs to learn more about possible use cases.
 
 # Current Status
 
-This project is at the **alpha** stage, which means is ready for testing and developing proof of concept apps but the
+This project is at the **alpha** stage, is ready for testing and developing proof of concept apps but the
 SDK isn't complete and the API may change before the beta release.
 
 ## Supported Platforms

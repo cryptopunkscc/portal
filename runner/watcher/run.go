@@ -9,15 +9,15 @@ import (
 	"time"
 )
 
-type Runner[T target.Dist_] struct {
+type runner[T target.Dist_] struct {
 	reload func() error
 }
 
-func NewRunner[T target.Dist_](reload func() error) *Runner[T] {
-	return &Runner[T]{reload: reload}
+func Runner[T target.Dist_](reload func() error) target.Runner[T] {
+	return &runner[T]{reload: reload}
 }
 
-func (r *Runner[T]) Run(ctx context.Context, dist T) (err error) {
+func (r *runner[T]) Run(ctx context.Context, dist T) (err error) {
 	changes, err := fs2.NotifyWatch(ctx, dist.Abs(), fsnotify.Write)
 	if err != nil {
 		return
@@ -32,6 +32,6 @@ func (r *Runner[T]) Run(ctx context.Context, dist T) (err error) {
 	return
 }
 
-func (r *Runner[T]) Reload() error {
+func (r *runner[T]) Reload() error {
 	return r.reload()
 }

@@ -33,7 +33,7 @@ func (r *Runner) Run(ctx context.Context, dist target.DistHtml) (err error) {
 
 	go func() {
 		pkg := dist.Manifest().Package
-		watch := watcher.NewRunner[target.DistHtml](func() (err error) {
+		watch := watcher.Runner[target.DistHtml](func() (err error) {
 			if err := r.send(target.NewMsg(pkg, target.DevChanged)); err != nil {
 				log.F().Println(err)
 			}

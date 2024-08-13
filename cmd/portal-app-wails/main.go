@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/clir"
-	"github.com/cryptopunkscc/portal/factory/run/app"
+	"github.com/cryptopunkscc/portal/factory/app"
 	"github.com/cryptopunkscc/portal/factory/runtime"
 	"github.com/cryptopunkscc/portal/feat/open"
 	"github.com/cryptopunkscc/portal/feat/version"

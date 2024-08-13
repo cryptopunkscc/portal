@@ -19,14 +19,14 @@ func Run() string {
 }
 
 func Resolve() (version string) {
-	version = GoModuleVersion()
+	version = goModuleVersion()
 	if vcs.ReadBuildInfo().Modified != "" {
 		version += " [MODIFIED]"
 	}
 	return
 }
 
-func GoModuleVersion() (version string) {
+func goModuleVersion() (version string) {
 	version = portal.Version
 	if hash, err := git.TimestampHash(); err == nil {
 		version += "-" + hash

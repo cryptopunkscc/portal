@@ -8,7 +8,7 @@ import (
 
 func Create() create.Run {
 	return create.Feat(
-		template.NewRun,
+		template.Runner,
 		build.Create().Dist,
 	)
 }

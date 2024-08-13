@@ -16,7 +16,7 @@ func main() {
 		"portal-build",
 		"Builds portal project and generates application bundle.",
 		version.Run)
-	cli.Build(build.Create().Run, clean.NewRunner().Call)
+	cli.Build(build.Create().Run, clean.Runner())
 	if err := cli.Run(); err != nil {
 		panic(err)
 	}

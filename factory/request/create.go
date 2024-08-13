@@ -18,13 +18,13 @@ type Deps[T target.Portal_] interface {
 }
 
 func Create[T target.Portal_](d Deps[T]) target.Request {
-	return finder.Request[T](
+	return finder.Requester[T](
 		find.Create[T](
 			&target.Cache[T]{},
 			d.Resolve(),
 			d.Priority(),
 		),
-		supervisor.NewRun[T](
+		supervisor.Runner[T](
 			d.WaitGroup(),
 			d.Processes(),
 			d.Run(),

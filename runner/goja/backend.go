@@ -6,8 +6,6 @@ import (
 	"github.com/cryptopunkscc/portal/target"
 	"github.com/dop251/goja"
 	"io/fs"
-	"os"
-	"path/filepath"
 )
 
 type Backend struct {
@@ -24,27 +22,6 @@ func NewBackend(apphost target.Apphost) *Backend {
 		apphost:   apphost,
 		apphostJs: common.JsString,
 	}
-}
-
-func (b *Backend) Run(app string) (err error) {
-	return b.RunPath(app)
-}
-
-func (b *Backend) RunPath(app string) (err error) {
-	stat, err := os.Stat(app)
-	if err != nil {
-		return plog.Err(err)
-	}
-	var src []byte
-	if stat.IsDir() {
-		app = filepath.Join(app, "main.js")
-	}
-	src, err = os.ReadFile(app)
-	if err != nil {
-		return plog.Err(err)
-	}
-
-	return b.RunSource(string(src))
 }
 
 func (b *Backend) RunFs(files fs.FS) (err error) {

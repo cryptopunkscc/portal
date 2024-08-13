@@ -24,8 +24,8 @@ func TestGoRunner_Run(t *testing.T) {
 		"windows": target.Build{Deps: []string(nil), Env: []string(nil), Cmd: "go build -o dist/main.exe"},
 	}
 	assert.Equal(t, expected, project.Build())
-
-	if err = NewRunner().Run(ctx, project); err != nil {
+	run := Runner()
+	if err = run(ctx, project); err != nil {
 		t.Fatal(err)
 	}
 }

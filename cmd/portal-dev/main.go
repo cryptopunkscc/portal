@@ -55,12 +55,12 @@ func (d *deps[T]) Handlers() serve.Handlers {
 }
 func (d *deps[T]) Resolve() Resolve[T] { return sources.Resolver[T]() }
 func (d *deps[T]) Run() Run[T] {
-	return multi.NewRunner[T](
-		app.Run(exec.NewPortal[PortalJs]("portal-dev-goja", "o").Run),
-		app.Run(exec.NewPortal[PortalHtml]("portal-dev-wails", "o").Run),
-		app.Run(exec.NewPortal[ProjectGo]("portal-dev-go", "o").Run),
-		app.Run(exec.NewPortal[AppExec]("portal-dev-exec", "o").Run),
-	).Run
+	return multi.Runner[T](
+		app.Run(exec.Portal[PortalJs]("portal-dev-goja", "o").Run),
+		app.Run(exec.Portal[PortalHtml]("portal-dev-wails", "o").Run),
+		app.Run(exec.Portal[ProjectGo]("portal-dev-go", "o").Run),
+		app.Run(exec.Portal[AppExec]("portal-dev-exec", "o").Run),
+	)
 }
 func (d *deps[T]) Priority() Priority {
 	return Priority{

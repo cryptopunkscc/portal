@@ -9,7 +9,7 @@ import (
 	"github.com/cryptopunkscc/portal/target"
 )
 
-func RunBuild(_ context.Context, m target.NodeModule) (err error) {
+func Build(_ context.Context, m target.NodeModule) (err error) {
 	if err = deps.RequireBinary("npm"); err != nil {
 		return
 	}
@@ -17,7 +17,7 @@ func RunBuild(_ context.Context, m target.NodeModule) (err error) {
 		return errors.New("missing npm build in package.json")
 	}
 	if err = exec.Run(m.Abs(), "npm", "run", "build"); err != nil {
-		return fmt.Errorf("npm.RunBuild %v: %w", m.Abs(), err)
+		return fmt.Errorf("npm.Build %v: %w", m.Abs(), err)
 	}
 	return
 }

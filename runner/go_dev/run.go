@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-type Runner struct {
+type runner struct {
 	watcher *golang.Watcher
 	run     target.Run[target.DistExec]
 	send    target.MsgSend
@@ -20,18 +20,18 @@ type Runner struct {
 	cancel  context.CancelFunc
 }
 
-func NewRunner(
+func Runner(
 	run target.Run[target.DistExec],
 	send target.MsgSend,
 ) target.Runner[target.ProjectGo] {
-	return &Runner{
+	return &runner{
 		watcher: golang.NewWatcher(),
 		send:    send,
 		run:     run,
 	}
 }
 
-func NewAdapter(run target.Run[target.DistExec]) func(
+func Adapter(run target.Run[target.DistExec]) func(
 	_ target.NewRuntime,
 	send target.MsgSend,
 ) target.Runner[target.ProjectGo] {
@@ -40,11 +40,11 @@ func NewAdapter(run target.Run[target.DistExec]) func(
 			newRuntime(ctx, src) // initiate connection
 			return run(ctx, src)
 		}
-		return NewRunner(run, send)
+		return Runner(run, send)
 	}
 }
 
-func (r *Runner) Reload() (err error) {
+func (r *runner) Reload() (err error) {
 	if r.cancel != nil {
 		r.cancel()
 	}
@@ -58,14 +58,14 @@ func (r *Runner) Reload() (err error) {
 	return
 }
 
-func (r *Runner) Run(ctx context.Context, project target.ProjectGo) (err error) {
+func (r *runner) Run(ctx context.Context, project target.ProjectGo) (err error) {
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Println("Running project Go")
 	if err = deps.RequireBinary("go"); err != nil {
 		return
 	}
 	r.ctx = ctx
-	build := go_build.NewRunner().Run
+	build := go_build.Runner()
 	if err = build(ctx, project); err != nil {
 		return
 	}

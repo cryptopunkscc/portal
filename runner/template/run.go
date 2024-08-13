@@ -11,17 +11,13 @@ import (
 	"path/filepath"
 )
 
-func NewRun(dir string, templates map[string]string) target.Run[target.Template] {
-	return NewRunner(dir, templates).Run
-}
-
-type Runner struct {
+type runner struct {
 	dir       string
 	templates map[string]string
 	args      template.Args
 }
 
-func NewRunner(dir string, templates map[string]string) *Runner {
+func Runner(dir string, templates map[string]string) target.Run[target.Template] {
 	args := template.Args{}
 	args.AuthorName = git.UserName(false)
 	if args.AuthorName == "" {
@@ -31,14 +27,15 @@ func NewRunner(dir string, templates map[string]string) *Runner {
 	if args.AuthorEmail == "" {
 		args.AuthorEmail = git.UserEmail(true)
 	}
-	return &Runner{
+	r := &runner{
 		dir:       target.Abs(dir),
 		templates: templates,
 		args:      args,
 	}
+	return r.Run
 }
 
-func (r *Runner) Run(_ context.Context, t target.Template) (err error) {
+func (r *runner) Run(_ context.Context, t target.Template) (err error) {
 	name := r.templates[t.Name()]
 	dir := filepath.Join(r.dir, name)
 
@@ -65,7 +62,7 @@ func (r *Runner) Run(_ context.Context, t target.Template) (err error) {
 }
 
 // check if already exist
-func (r *Runner) checkTargetDir(dir, name string) (err error) {
+func (r *runner) checkTargetDir(dir, name string) (err error) {
 	if _, err := os.Stat(dir); err == nil {
 		err = fmt.Errorf("cannot create project %s: %s already exists", name, dir)
 	} else if !os.IsNotExist(err) {
@@ -74,7 +71,7 @@ func (r *Runner) checkTargetDir(dir, name string) (err error) {
 	return
 }
 
-func (r *Runner) targetArgs(t target.Template) (args template.Args) {
+func (r *runner) targetArgs(t target.Template) (args template.Args) {
 	name := r.templates[t.Name()]
 	args = r.args
 	args.ProjectName = name

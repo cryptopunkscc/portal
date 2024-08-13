@@ -8,24 +8,20 @@ import (
 	"github.com/cryptopunkscc/portal/target"
 )
 
-type NpmRunner struct {
+type runner struct {
 	dependencies []target.NodeModule
 }
 
-func NewRun(dependencies ...target.NodeModule) target.Run[target.ProjectNpm_] {
-	return NewRunner(dependencies...).Run
+func Runner(dependencies ...target.NodeModule) target.Run[target.ProjectNpm_] {
+	return runner{dependencies: dependencies}.Run
 }
 
-func NewRunner(dependencies ...target.NodeModule) NpmRunner {
-	return NpmRunner{dependencies: dependencies}
-}
-
-func (r NpmRunner) Run(ctx context.Context, project target.ProjectNpm_) (err error) {
+func (r runner) Run(ctx context.Context, project target.ProjectNpm_) (err error) {
 	plog.Get(ctx).Type(r).Set(&ctx)
-	if err = r.Prepare(ctx, project); err != nil {
+	if err = r.prepare(ctx, project); err != nil {
 		return
 	}
-	if err = r.Build(ctx, project); err != nil {
+	if err = r.build(ctx, project); err != nil {
 		return
 	}
 	if err = dist.Dist(ctx, project); err != nil {
@@ -34,7 +30,7 @@ func (r NpmRunner) Run(ctx context.Context, project target.ProjectNpm_) (err err
 	return
 }
 
-func (r NpmRunner) Prepare(ctx context.Context, project target.ProjectNpm_) (err error) {
+func (r runner) prepare(ctx context.Context, project target.ProjectNpm_) (err error) {
 	log := plog.Get(ctx)
 	log.Println("npm install...")
 	if err = npm.Install(ctx, project); err != nil {
@@ -44,15 +40,16 @@ func (r NpmRunner) Prepare(ctx context.Context, project target.ProjectNpm_) (err
 		log.Println(i, dependency.Abs(), dependency.Path())
 	}
 	log.Println("injecting portal lib...")
-	if err = npm.NewInjector(r.dependencies).Run(ctx, project); err != nil {
+	inject := npm.Injector(r.dependencies)
+	if err = inject(ctx, project); err != nil {
 		return
 	}
 	return
 }
 
-func (r NpmRunner) Build(ctx context.Context, project target.ProjectNpm_) (err error) {
+func (r runner) build(ctx context.Context, project target.ProjectNpm_) (err error) {
 	plog.Get(ctx).Println("npm run build...")
-	if err = npm.RunBuild(ctx, project); err != nil {
+	if err = npm.Build(ctx, project); err != nil {
 		return
 	}
 	return

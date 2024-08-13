@@ -27,7 +27,7 @@ func (d *Install) buildJsLibs() {
 		if err := npm.Install(ctx, p); err != nil {
 			log.Fatalln(err)
 		}
-		if err := npm.RunBuild(ctx, p); err != nil {
+		if err := npm.Build(ctx, p); err != nil {
 			log.Fatalln(err)
 		}
 	}

@@ -15,16 +15,16 @@ import (
 
 func Create() *build.Feat {
 	return build.NewFeat(
-		clean.NewRunner().Call,
-		multi.NewRunner[Project_](
-			go_build.NewRun().Portal,
-			npm_build.NewRun(
+		clean.Runner(),
+		multi.Runner[Project_](
+			go_build.Runner().Portal,
+			npm_build.Runner(
 				Any[NodeModule](
 					Skip("node_modules"),
 					Try(npm.Resolve)).
 					List(source.Embed(js.PortalLibFS))...,
 			).Portal,
-		).Run,
+		),
 		pack.Run,
 	)
 }

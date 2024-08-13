@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/clir"
-	"github.com/cryptopunkscc/portal/factory/run/dev"
+	"github.com/cryptopunkscc/portal/factory/dev"
 	"github.com/cryptopunkscc/portal/factory/runtime"
 	"github.com/cryptopunkscc/portal/feat/open"
 	"github.com/cryptopunkscc/portal/feat/version"
@@ -39,9 +39,9 @@ func main() {
 type Module struct{ dev.Module[PortalJs] }
 
 func (d *Module) Runner() Run[PortalJs] {
-	return multi.NewRunner[PortalJs](
+	return multi.Runner[PortalJs](
 		reload.Mutable(runtime.Backend, PortMsg, goja_pro.NewRunner),
 		reload.Mutable(runtime.Backend, PortMsg, goja_dist.NewRunner),
 		reload.Immutable(runtime.Backend, PortMsg, goja.NewRunner),
-	).Run
+	)
 }

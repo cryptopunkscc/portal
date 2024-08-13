@@ -11,15 +11,15 @@ import (
 	"path/filepath"
 )
 
-type Injector struct {
+type injector struct {
 	deps []target.NodeModule
 }
 
-func NewInjector(deps []target.NodeModule) *Injector {
-	return &Injector{deps: deps}
+func Injector(deps []target.NodeModule) target.Run[target.NodeModule] {
+	return injector{deps: deps}.Run
 }
 
-func (i Injector) Run(ctx context.Context, m target.NodeModule) (err error) {
+func (i injector) Run(ctx context.Context, m target.NodeModule) (err error) {
 	log := plog.Get(ctx).Type(i).Set(&ctx)
 	for _, module := range i.deps {
 		if err = inject(log, m, module); err != nil {

@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/clir"
-	"github.com/cryptopunkscc/portal/factory/run/dev"
+	"github.com/cryptopunkscc/portal/factory/dev"
 	"github.com/cryptopunkscc/portal/factory/runtime"
 	"github.com/cryptopunkscc/portal/feat/open"
 	"github.com/cryptopunkscc/portal/feat/version"
@@ -35,8 +35,8 @@ func main() {
 type Module struct{ dev.Module[AppExec] }
 
 func (d *Module) Runner() Run[AppExec] {
-	return multi.NewRunner[AppExec](
-		reload.Immutable(runtime.Default, PortMsg, reload.Adapter(exec.NewBundleRunner(CacheDir("portal-dev")))),
-		reload.Immutable(runtime.Default, PortMsg, reload.Adapter(exec.NewDistRunner())),
-	).Run
+	return multi.Runner[AppExec](
+		reload.Immutable(runtime.Default, PortMsg, reload.Adapter(exec.Bundle(CacheDir("portal-dev")))),
+		reload.Immutable(runtime.Default, PortMsg, reload.Adapter(exec.Dist())),
+	)
 }

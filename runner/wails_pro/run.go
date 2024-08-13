@@ -47,7 +47,8 @@ func (r *Runner) Run(ctx context.Context, projectHtml target.ProjectHtml) (err e
 		log.P().Println("libs are empty")
 	}
 
-	if err = npm_build.NewRunner(libs...).Run(ctx, projectHtml); err != nil {
+	build := npm_build.Runner(libs...)
+	if err = build(ctx, projectHtml); err != nil {
 		return
 	}
 

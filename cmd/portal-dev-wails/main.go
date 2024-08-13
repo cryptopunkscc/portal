@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/clir"
-	"github.com/cryptopunkscc/portal/factory/run/dev"
+	"github.com/cryptopunkscc/portal/factory/dev"
 	"github.com/cryptopunkscc/portal/factory/runtime"
 	"github.com/cryptopunkscc/portal/feat/open"
 	"github.com/cryptopunkscc/portal/feat/version"
@@ -40,11 +40,11 @@ type Module struct{ dev.Module[PortalHtml] }
 type Adapter struct{ Runtime }
 
 func (d *Module) Runner() Run[PortalHtml] {
-	return multi.NewRunner[PortalHtml](
+	return multi.Runner[PortalHtml](
 		reload.Immutable(d.runtime, PortMsg, wails_pro.NewRunner), // FIXME propagate sendMsg
 		reload.Mutable(d.runtime, PortMsg, wails_dist.NewRunner),
 		reload.Immutable(d.runtime, PortMsg, wails.NewRunner),
-	).Run
+	)
 }
 func (d *Module) runtime(ctx context.Context, portal Portal_) Runtime {
 	return &Adapter{runtime.Frontend(ctx, portal)}
