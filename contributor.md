@@ -1,7 +1,6 @@
 # Contributor
 
-This section explains how to build & install portal executables.
-Read if you want to:
+This section explains how to build & install portal executables. Read if you want to:
 
 * generate `portal-installer`.
 * test changes applied to portal source code.
@@ -15,21 +14,20 @@ Before you can start, make sure you have installed:
 
 ## Building binaries
 
-Portal repository includes an internal tool [`./cmd/make`](./cmd/make/make.go) for automating project build &
-installation.
+Portal repository includes an internal tool [`./cmd/make`](./cmd/make/make.go) for automating project build & installation.
 
-If you are starting from a fresh local copy of portal repository,
-and want to verify the complete build & installation process, you can start just by executing:
+If you are starting from a fresh local copy of portal repository, 
+and want to verify the complete build & installation process, execute from the repository root:
 
 ```shell
 ./make
 ```
 
-This shell script will trigger a building of required JS libs & embedded apps, install executables, and generate an
-installer.
+This shell script is a shortcut to `./cmd/make`.
+When called without arguments it will run all building steps.
 
 Optionally you can select specific steps by applying concatenated options.
-For example, if you want to execute all steps except building this installer, execute:
+For example, if you want to execute all steps except building `portal-installer`, execute:
 
 ```shell
 ./make ladp
@@ -52,14 +50,14 @@ Here is a complete list of modifiers for make tool:
 <i|32> - Build portal installer into "./bin/portal-installer".
 ```
 
-Is worth mentioning that the installation using:
+Is worth mentioning that the installation run using:
 
-* `<dp|24>` options depends on `go install` command so it outputs binaries into `$GOPATH/bin/`.
+* `./make <dp|24>` depends on `go install` command so it outputs binaries into `$GOPATH/bin/`.
 * `./bin/portal-installer` copies embedded binaries into platform specific directory.
 
 ## GOOS
 
-To build `portal-installer` for different platforms provide them as additional arguments:
+To build `portal-installer` for specific platforms provide them as additional arguments:
 
 ```shell
 ./make i linux windows

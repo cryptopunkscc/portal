@@ -5,7 +5,7 @@
 Targets
 
 ```shell
-go test ./test/target/
+go test ./runner/... ./resolve/...
 ```
 
 RPC
