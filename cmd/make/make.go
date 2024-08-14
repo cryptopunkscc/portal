@@ -67,7 +67,7 @@ func (d *Install) Run(make Make, goos []string) {
 	}
 	if make&Dev == Dev {
 		log.Println(" * portal dev")
-		goPortalCreate.Install()
+		goPortalNew.Install()
 		goPortalList.Install()
 		goPortalBuild.Install()
 		goPortalDev.Install()

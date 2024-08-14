@@ -13,7 +13,7 @@ func main() {
 	ctx := context.Background()
 	plog.New().D().Set(&ctx)
 	cli := clir.NewCli(ctx,
-		"portal-create",
+		"portal-new",
 		"Create new portal project from template.",
 		version.Run)
 	cli.Create(
