@@ -187,7 +187,7 @@ var portal = (function (exports) {
     constructor(client, port, params) {
       this.client = client;
       this.port = port;
-      this.params = !Array.isArray(params) ? params : [];
+      this.params = !Array.isArray(params) ? params : params ? [params] : [];
     }
 
     map(f) {
