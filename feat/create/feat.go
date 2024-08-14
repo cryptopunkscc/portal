@@ -2,6 +2,7 @@ package create
 
 import (
 	"context"
+	"errors"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/resolve/template"
@@ -30,6 +31,9 @@ func Feat(factory Factory, dist Dist) Run {
 		}
 
 		// sanity check
-		return dist(ctx, dir)
+		if err = dist(ctx, dir); errors.Is(err, target.ErrNotFound) {
+			err = nil
+		}
+		return
 	}
 }

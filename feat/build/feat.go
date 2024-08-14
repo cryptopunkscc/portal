@@ -2,12 +2,12 @@ package build
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/resolve/sources"
 	"github.com/cryptopunkscc/portal/target"
+	"log"
 	"path/filepath"
 )
 
@@ -30,15 +30,16 @@ func NewFeat(
 }
 
 func (r Feat) Run(ctx context.Context, dir string) (err error) {
-	log := plog.Get(ctx).Type(r).Set(&ctx)
 	if err = r.clean(dir); err != nil {
-		log.W().Println(err)
+		plog.Get(ctx).Type(r).W().Println(err)
 	}
-	if err = r.Dist(ctx, dir); err != nil {
-		log.W().Printf("cannot build portal apps: %w", err)
+	if err = r.Dist(ctx, dir); err == nil {
+		log.Println("* build:", dir)
 	}
-	if err = r.Pack(ctx, dir, "."); err != nil {
-		log.W().Printf("cannot bundle portal apps: %s %w", dir, err)
+	if err = r.Pack(ctx, dir, "."); err == nil {
+		log.Println("* pack:", dir)
+	} else {
+		plog.Get(ctx).Type(r).W().Printf("build skipped: %v", err)
 	}
 	return
 }
@@ -65,7 +66,7 @@ func run[T target.Portal_](ctx context.Context, run target.Run[T], dir []string,
 		return
 	}
 	if len(projects) == 0 {
-		return errors.New("no targets found")
+		return target.ErrNotFound
 	}
 	for _, m := range projects {
 		if err = run(ctx, m); err != nil {

@@ -7,6 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/clean"
+	"log"
 )
 
 func main() {
@@ -20,4 +21,5 @@ func main() {
 	if err := cli.Run(); err != nil {
 		panic(err)
 	}
+	log.Println("* done")
 }
