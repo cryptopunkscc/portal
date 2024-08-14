@@ -15,7 +15,7 @@ const (
 	Dev
 	Portal
 	Installer
-	All = System | Libs | Apps | Dev | Portal | Installer
+	All = Libs | Apps | Dev | Portal | Installer
 )
 
 var mappings = map[rune]Make{
@@ -34,7 +34,7 @@ func NewInstall(root string) *Install {
 	return &Install{root: root}
 }
 
-func ParseArgs(args []string) (jobs Make) {
+func ParseMake(args []string) (jobs Make) {
 	for _, arg := range args {
 		if i, err := strconv.Atoi(arg); err == nil {
 			jobs += Make(i)

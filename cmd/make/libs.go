@@ -11,7 +11,7 @@ import (
 
 func (d *Install) buildJsLibs() {
 	ctx := context.Background()
-	libs, err := source.File(d.root, "target", "js")
+	libs, err := source.File(d.root, "runtime", "js")
 	if err != nil {
 		log.Fatal(err)
 	}
