@@ -2,12 +2,12 @@ package start
 
 import (
 	"context"
-	"github.com/cryptopunkscc/astrald/auth/id"
+	"github.com/cryptopunkscc/portal/api/portal"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runtime/apphost"
-	"github.com/cryptopunkscc/portal/runtime/rpc"
+	"github.com/cryptopunkscc/portal/runtime/client"
 	"time"
 )
 
@@ -22,6 +22,7 @@ func Feat(deps Deps) target.Request {
 		port:    deps.Port(),
 		serve:   deps.Serve(),
 		request: deps.Request(),
+		portal:  client.Portal(deps.Port().Base),
 	}.Request
 }
 
@@ -29,6 +30,7 @@ type feat struct {
 	port    target.Port
 	serve   target.Request
 	request target.Request
+	portal  portal.Client
 }
 
 func (f feat) Request(
@@ -39,7 +41,7 @@ func (f feat) Request(
 	log := plog.Get(ctx).Type(f).Set(&ctx)
 
 	if src == "" {
-		err = f.checkService()
+		err = f.portal.Ping()
 	} else {
 		err = f.request(ctx, src, args...)
 	}
@@ -57,21 +59,13 @@ func (f feat) Request(
 		if err = apphost.Init(); err != nil {
 			return
 		}
-		return f.checkService()
+		return f.portal.Ping()
 	}); err != nil {
 		return
 	}
 
 	if src != "" {
 		return f.request(ctx, src, args...)
-	}
-	return
-}
-
-func (f feat) checkService() (err error) {
-	request := rpc.NewRequest(id.Anyone, f.port.Base)
-	if err = rpc.Command(request, "ping"); err == nil {
-		return
 	}
 	return
 }

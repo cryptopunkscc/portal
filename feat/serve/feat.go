@@ -3,10 +3,10 @@ package serve
 import (
 	"context"
 	"fmt"
-	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runtime/apphost"
+	"github.com/cryptopunkscc/portal/runtime/client"
 	"github.com/cryptopunkscc/portal/runtime/rpc"
 	"maps"
 )
@@ -58,8 +58,7 @@ func Feat(d Deps) target.Request {
 }
 
 func check(port target.Port) (err error) {
-	request := rpc.NewRequest(id.Anyone, port.String())
-	if err = rpc.Command(request, "ping"); err == nil {
+	if err = client.Portal(port.String()).Ping(); err == nil {
 		err = fmt.Errorf("port already registered or astral not running: %v", err)
 	}
 	return nil
