@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/rpc"
+	"github.com/cryptopunkscc/portal/runtime/rpc"
 )
 
 type apiClient struct {

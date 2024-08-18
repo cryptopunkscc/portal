@@ -1,6 +1,6 @@
 package main
 
-import "github.com/cryptopunkscc/portal/pkg/rpc"
+import "github.com/cryptopunkscc/portal/runtime/rpc"
 
 type portalApi struct{ rpc.Conn }
 

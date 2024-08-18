@@ -5,7 +5,7 @@ import (
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/astrald/net"
 	"github.com/cryptopunkscc/astrald/node"
-	"github.com/cryptopunkscc/portal/pkg/rpc"
+	"github.com/cryptopunkscc/portal/runtime/rpc"
 )
 
 type Module struct {

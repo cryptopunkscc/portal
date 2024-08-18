@@ -3,7 +3,7 @@ package rpc
 import (
 	"errors"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/pkg/rpc"
+	"github.com/cryptopunkscc/portal/runtime/rpc"
 )
 
 type TestGoService struct {

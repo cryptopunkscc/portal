@@ -4,7 +4,7 @@ import (
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/astrald/lib/astral"
 	"github.com/cryptopunkscc/portal/pkg/android"
-	"github.com/cryptopunkscc/portal/pkg/rpc"
+	"github.com/cryptopunkscc/portal/runtime/rpc"
 	"io"
 )
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/android"
-	"github.com/cryptopunkscc/portal/pkg/rpc"
+	"github.com/cryptopunkscc/portal/runtime/rpc"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"testing"
