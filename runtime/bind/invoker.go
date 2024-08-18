@@ -1,4 +1,4 @@
-package apphost
+package bind
 
 import (
 	"context"
@@ -9,11 +9,11 @@ import (
 	"time"
 )
 
-func Invoker(
+func ApphostInvoker(
 	ctx context.Context,
-	flat target.Apphost,
+	flat Apphost,
 	invoke target.Request,
-) target.Apphost {
+) Apphost {
 	i := &invoker{Apphost: flat, invoke: invoke}
 	i.ctx, i.cancel = context.WithCancel(ctx)
 	i.log = plog.Get(i.ctx).Type(i)
@@ -21,7 +21,7 @@ func Invoker(
 }
 
 type invoker struct {
-	target.Apphost
+	Apphost
 	ctx    context.Context
 	cancel context.CancelFunc
 	invoke target.Request

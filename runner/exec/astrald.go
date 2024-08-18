@@ -2,9 +2,9 @@ package exec
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/pkg/apphost"
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"os"
 	"os/exec"
 	"time"

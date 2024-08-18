@@ -9,6 +9,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/goja_dist"
 	"github.com/cryptopunkscc/portal/runner/npm"
 	"github.com/cryptopunkscc/portal/runner/npm_build"
+	"github.com/cryptopunkscc/portal/runtime/bind"
 	jsEmbed "github.com/cryptopunkscc/portal/runtime/js/embed"
 	"github.com/cryptopunkscc/portal/target"
 	"time"
@@ -18,7 +19,7 @@ type runner struct {
 	distRunner target.Runner[target.DistJs]
 }
 
-func NewRunner(newRuntime target.NewRuntime, send target.MsgSend) target.Runner[target.ProjectJs] {
+func NewRunner(newRuntime bind.NewRuntime, send target.MsgSend) target.Runner[target.ProjectJs] {
 	distRunner := goja_dist.NewRunner(newRuntime, send)
 	return &runner{distRunner: distRunner}
 }

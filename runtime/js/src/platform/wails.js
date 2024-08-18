@@ -29,7 +29,7 @@ const adapter = () => ({
   astral_interrupt: wails['go']['main']['Adapter']['Interrupt'],
   // runtime
   sleep: wails['go']['main']['Adapter']['Sleep'],
-  log: async (...arg) => await wails['go']['main']['Adapter']['LogArr'](arg),
+  log: async (arg) => await wails['go']['main']['Adapter']['Log'](arg),
 })
 
 inject(platform, adapter)

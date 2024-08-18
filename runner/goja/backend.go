@@ -1,20 +1,20 @@
 package goja
 
 import (
+	"github.com/cryptopunkscc/portal/api/bind"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runtime/js/embed/common"
-	"github.com/cryptopunkscc/portal/target"
 	"github.com/dop251/goja"
 	"io/fs"
 )
 
 type Backend struct {
 	vm        *goja.Runtime
-	apphost   target.Apphost
+	apphost   bind.Runtime
 	apphostJs string
 }
 
-func NewBackend(apphost target.Apphost) *Backend {
+func NewBackend(apphost bind.Runtime) *Backend {
 	if any(apphost) == nil {
 		panic("apphost nil")
 	}

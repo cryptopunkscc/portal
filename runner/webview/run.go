@@ -2,8 +2,8 @@ package webview
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/api/bind"
 	"github.com/cryptopunkscc/portal/runtime/js/embed/common"
-	"github.com/cryptopunkscc/portal/target"
 	"github.com/webview/webview"
 )
 
@@ -21,9 +21,9 @@ func Run(ctx context.Context, title, src string) {
 	w.SetHtml(src)
 
 	// bind apphost adapter to js env
-	var ah target.Apphost
+	var runtime bind.Runtime
 	//ah = apphost.NewFactory(nil).NewAdapter(ctx, "src") // FIXME
-	w.BindApphost(ah)
+	w.BindApphost(runtime)
 
 	// start js application frontend
 	w.Run()

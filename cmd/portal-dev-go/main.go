@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/clir"
+	"github.com/cryptopunkscc/portal/factory/bind"
 	"github.com/cryptopunkscc/portal/factory/dev"
-	"github.com/cryptopunkscc/portal/factory/runtime"
 	"github.com/cryptopunkscc/portal/feat/open"
 	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -40,6 +40,6 @@ type Module struct{ dev.Module[ProjectGo] }
 
 func (d *Module) Runner() Run[ProjectGo] {
 	return multi.Runner[ProjectGo](
-		reload.Mutable(runtime.Default, PortMsg, go_dev.Adapter(exec.Dist().Run)),
+		reload.Mutable(bind.DefaultRuntime(), PortMsg, go_dev.Adapter(exec.Dist().Run)),
 	)
 }

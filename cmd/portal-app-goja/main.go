@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/clir"
 	"github.com/cryptopunkscc/portal/factory/app"
-	"github.com/cryptopunkscc/portal/factory/runtime"
+	"github.com/cryptopunkscc/portal/factory/bind"
 	"github.com/cryptopunkscc/portal/feat/open"
 	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -32,4 +32,4 @@ func main() {
 
 type Module struct{ app.Module[AppJs] }
 
-func (d *Module) Runner() Run[AppJs] { return goja.NewRun(runtime.Backend) }
+func (d *Module) Runner() Run[AppJs] { return goja.NewRun(bind.BackendRuntime()) }

@@ -7,6 +7,7 @@ import (
 	golang "github.com/cryptopunkscc/portal/pkg/go"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/go_build"
+	"github.com/cryptopunkscc/portal/runtime/bind"
 	"github.com/cryptopunkscc/portal/target"
 	"time"
 )
@@ -32,10 +33,10 @@ func Runner(
 }
 
 func Adapter(run target.Run[target.DistExec]) func(
-	_ target.NewRuntime,
+	_ bind.NewRuntime,
 	send target.MsgSend,
 ) target.Runner[target.ProjectGo] {
-	return func(newRuntime target.NewRuntime, send target.MsgSend) target.Runner[target.ProjectGo] {
+	return func(newRuntime bind.NewRuntime, send target.MsgSend) target.Runner[target.ProjectGo] {
 		run := func(ctx context.Context, src target.DistExec) (err error) {
 			newRuntime(ctx, src) // initiate connection
 			return run(ctx, src)

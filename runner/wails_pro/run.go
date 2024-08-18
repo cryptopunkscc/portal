@@ -10,6 +10,7 @@ import (
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/npm_build"
 	"github.com/cryptopunkscc/portal/runner/wails"
+	"github.com/cryptopunkscc/portal/runtime/bind"
 	js "github.com/cryptopunkscc/portal/runtime/js/embed"
 	"github.com/cryptopunkscc/portal/target"
 	"github.com/wailsapp/wails/v2/pkg/application"
@@ -19,13 +20,13 @@ import (
 	"syscall"
 )
 
-func NewRunner(newRuntime target.NewRuntime) target.Runner[target.ProjectHtml] {
+func NewRunner(newRuntime bind.NewRuntime) target.Runner[target.ProjectHtml] {
 	return &Runner{NewRuntime: newRuntime}
 }
 
 type Runner struct {
 	frontCtx context.Context
-	target.NewRuntime
+	bind.NewRuntime
 }
 
 func (r *Runner) Run(ctx context.Context, projectHtml target.ProjectHtml) (err error) {

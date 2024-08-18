@@ -5,19 +5,20 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/goja"
 	"github.com/cryptopunkscc/portal/runner/watcher"
+	"github.com/cryptopunkscc/portal/runtime/bind"
 	"github.com/cryptopunkscc/portal/target"
 	"path/filepath"
 	"time"
 )
 
 type Runner struct {
-	newRuntime target.NewRuntime
+	newRuntime bind.NewRuntime
 	send       target.MsgSend
 	dist       target.DistJs
 	backend    *goja.Backend
 }
 
-func NewRunner(newRuntime target.NewRuntime, send target.MsgSend) target.Runner[target.DistJs] {
+func NewRunner(newRuntime bind.NewRuntime, send target.MsgSend) target.Runner[target.DistJs] {
 	return &Runner{newRuntime: newRuntime, send: send}
 }
 

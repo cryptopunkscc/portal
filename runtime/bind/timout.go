@@ -1,4 +1,4 @@
-package apphost
+package bind
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 
 var ConnectionsThreshold = -1
 
-func WithTimeout(ctx context.Context, apphost target.Apphost, portal target.Portal_) target.Apphost {
+func ApphostTimeout(ctx context.Context, apphost Apphost, portal target.Portal_) Apphost {
 	manifest := portal.Manifest()
 	if manifest.Env.Timeout > -1 && ConnectionsThreshold >= 0 {
 		go func() {
@@ -23,8 +23,7 @@ func WithTimeout(ctx context.Context, apphost target.Apphost, portal target.Port
 			})
 			t.Enable(true)
 			for range apphost.Events().Subscribe(ctx) {
-				activeConnections := len(apphost.Connections()) // TODO optimize
-				t.Enable(activeConnections <= ConnectionsThreshold)
+				t.Enable(apphost.Connections().Size() <= ConnectionsThreshold)
 			}
 		}()
 	}

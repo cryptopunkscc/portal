@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/astrald/auth/id"
-	"github.com/cryptopunkscc/portal/pkg/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
+	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/target"
 	"maps"
 )
@@ -70,7 +70,7 @@ func serve(
 	port target.Port,
 	handlers Handlers,
 ) (err error) {
-	log := plog.Get(ctx).Set(&ctx)
+	log := plog.Get(ctx)
 	log.Printf("serve start at port:%s", port)
 	defer log.Printf("serve exit:%s", port)
 	if err = rpc.NewApp(port.String()).

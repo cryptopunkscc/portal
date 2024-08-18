@@ -5,6 +5,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/wails"
 	"github.com/cryptopunkscc/portal/runner/watcher"
+	"github.com/cryptopunkscc/portal/runtime/bind"
 	"github.com/cryptopunkscc/portal/target"
 	"path/filepath"
 )
@@ -14,7 +15,7 @@ type Runner struct {
 	inner target.Runner[target.AppHtml]
 }
 
-func NewRunner(newRuntime target.NewRuntime, send target.MsgSend) target.Runner[target.DistHtml] {
+func NewRunner(newRuntime bind.NewRuntime, send target.MsgSend) target.Runner[target.DistHtml] {
 	return &Runner{
 		send:  send,
 		inner: wails.NewRunner(newRuntime),

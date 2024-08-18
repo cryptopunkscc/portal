@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/pkg/assets"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/runtime/bind"
 	"github.com/cryptopunkscc/portal/runtime/js/embed/wails"
 	"github.com/cryptopunkscc/portal/target"
 	"github.com/wailsapp/wails/v2/pkg/application"
@@ -13,15 +14,15 @@ import (
 )
 
 type Runner struct {
-	newRuntime target.NewRuntime
+	newRuntime bind.NewRuntime
 	frontCtx   context.Context
 }
 
-func NewRunner(newRuntime target.NewRuntime) target.Runner[target.AppHtml] {
+func NewRunner(newRuntime bind.NewRuntime) target.Runner[target.AppHtml] {
 	return &Runner{newRuntime: newRuntime}
 }
 
-func NewRun(newRuntime target.NewRuntime) target.Run[target.AppHtml] {
+func NewRun(newRuntime bind.NewRuntime) target.Run[target.AppHtml] {
 	return NewRunner(newRuntime).Run
 }
 
@@ -37,8 +38,8 @@ func (r *Runner) Run(ctx context.Context, app target.AppHtml) (err error) {
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Println("start", app.Manifest().Package, app.Abs())
 	defer log.Println("exit", app.Manifest().Package, app.Abs())
-	api := r.newRuntime(ctx, app)
-	opt := AppOptions(api)
+	runtime := r.newRuntime(ctx, app)
+	opt := AppOptions(runtime)
 	opt.OnStartup = func(ctx context.Context) { r.frontCtx = ctx }
 	SetupOptions(app, opt)
 	if err = application.NewWithOptions(opt).Run(); err != nil {
@@ -47,14 +48,14 @@ func (r *Runner) Run(ctx context.Context, app target.AppHtml) (err error) {
 	return
 }
 
-func AppOptions(app target.Runtime) *options.App {
+func AppOptions(runtime bind.Runtime) *options.App {
 	return &options.App{
 		Width:            1024,
 		Height:           768,
 		BackgroundColour: options.NewRGB(27, 38, 54),
-		Bind:             []interface{}{app},
+		Bind:             []interface{}{runtime},
 		OnBeforeClose: func(ctx context.Context) (prevent bool) {
-			app.Interrupt()
+			runtime.Interrupt()
 			return false
 		},
 	}

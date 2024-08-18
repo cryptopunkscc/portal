@@ -1,7 +1,7 @@
 package webview
 
 import (
-	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/api/bind"
 	"github.com/webview/webview"
 )
 
@@ -13,38 +13,38 @@ func New(debug bool) *WebView {
 	return &WebView{WebView: webview.New(debug)}
 }
 
-func (view *WebView) BindApphost(astral target.Apphost) {
-	if err := view.Bind(target.Log, astral.Log); err != nil {
+func (view *WebView) BindApphost(runtime bind.Runtime) {
+	if err := view.Bind(bind.Log, runtime.Log); err != nil {
 		return
 	}
-	if err := view.Bind(target.ServiceRegister, astral.ServiceRegister); err != nil {
+	if err := view.Bind(bind.ServiceRegister, runtime.ServiceRegister); err != nil {
 		return
 	}
-	if err := view.Bind(target.ServiceClose, astral.ServiceClose); err != nil {
+	if err := view.Bind(bind.ServiceClose, runtime.ServiceClose); err != nil {
 		return
 	}
-	if err := view.Bind(target.ConnAccept, astral.ConnAccept); err != nil {
+	if err := view.Bind(bind.ConnAccept, runtime.ConnAccept); err != nil {
 		return
 	}
-	if err := view.Bind(target.ConnClose, astral.ConnClose); err != nil {
+	if err := view.Bind(bind.ConnClose, runtime.ConnClose); err != nil {
 		return
 	}
-	if err := view.Bind(target.ConnWrite, astral.ConnWrite); err != nil {
+	if err := view.Bind(bind.ConnWrite, runtime.ConnWrite); err != nil {
 		return
 	}
-	if err := view.Bind(target.ConnRead, astral.ConnRead); err != nil {
+	if err := view.Bind(bind.ConnRead, runtime.ConnRead); err != nil {
 		return
 	}
-	if err := view.Bind(target.Query, astral.Query); err != nil {
+	if err := view.Bind(bind.Query, runtime.Query); err != nil {
 		return
 	}
-	if err := view.Bind(target.QueryName, astral.QueryName); err != nil {
+	if err := view.Bind(bind.QueryName, runtime.QueryName); err != nil {
 		return
 	}
-	if err := view.Bind(target.GetNodeInfo, astral.NodeInfo); err != nil {
+	if err := view.Bind(bind.GetNodeInfo, runtime.NodeInfo); err != nil {
 		return
 	}
-	if err := view.Bind(target.ResolveId, astral.Resolve); err != nil {
+	if err := view.Bind(bind.ResolveId, runtime.Resolve); err != nil {
 		return
 	}
 }
