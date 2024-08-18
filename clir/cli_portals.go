@@ -1,7 +1,7 @@
 package clir
 
 import (
-	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/api/target"
 	"log"
 	"os"
 	"reflect"

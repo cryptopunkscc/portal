@@ -2,10 +2,10 @@ package npm_build
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/dist"
 	"github.com/cryptopunkscc/portal/runner/npm"
-	"github.com/cryptopunkscc/portal/target"
 )
 
 type runner struct {

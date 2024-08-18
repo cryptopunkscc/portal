@@ -2,13 +2,13 @@ package go_dev
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	golang "github.com/cryptopunkscc/portal/pkg/go"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/go_build"
 	"github.com/cryptopunkscc/portal/runtime/bind"
-	"github.com/cryptopunkscc/portal/target"
 	"time"
 )
 

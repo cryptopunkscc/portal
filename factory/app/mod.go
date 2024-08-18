@@ -1,8 +1,8 @@
 package app
 
 import (
+	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/resolve/apps"
-	. "github.com/cryptopunkscc/portal/target"
 )
 
 type Module[T App_] struct{}

@@ -1,6 +1,7 @@
 package build
 
 import (
+	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/feat/build"
 	"github.com/cryptopunkscc/portal/resolve/npm"
 	"github.com/cryptopunkscc/portal/resolve/source"
@@ -10,7 +11,6 @@ import (
 	"github.com/cryptopunkscc/portal/runner/npm_build"
 	"github.com/cryptopunkscc/portal/runner/pack"
 	js "github.com/cryptopunkscc/portal/runtime/js/embed"
-	. "github.com/cryptopunkscc/portal/target"
 )
 
 func Create() *build.Feat {

@@ -1,8 +1,8 @@
 package test
 
 import (
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/resolve/source"
-	"github.com/cryptopunkscc/portal/target"
 	"io"
 	"io/fs"
 	"os"

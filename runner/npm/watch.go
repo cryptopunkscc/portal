@@ -2,8 +2,8 @@ package npm
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/deps"
-	"github.com/cryptopunkscc/portal/target"
 	"os"
 	"os/exec"
 )

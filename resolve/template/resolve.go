@@ -3,7 +3,7 @@ package template
 import (
 	"encoding/json"
 	"errors"
-	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/api/target"
 	"io/fs"
 	"path/filepath"
 )

@@ -3,9 +3,9 @@ package open
 import (
 	"context"
 	"errors"
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/source"
-	"github.com/cryptopunkscc/portal/target"
 )
 
 type Deps[T target.Portal_] interface {

@@ -1,10 +1,10 @@
 package npm
 
 import (
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/dec/all"
 	"github.com/cryptopunkscc/portal/pkg/dec/json"
 	"github.com/cryptopunkscc/portal/resolve/dist"
-	"github.com/cryptopunkscc/portal/target"
 )
 
 type nodeModule struct {

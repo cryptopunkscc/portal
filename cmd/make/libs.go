@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/api/target"
 	npm2 "github.com/cryptopunkscc/portal/resolve/npm"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/npm"
-	"github.com/cryptopunkscc/portal/target"
 	"log"
 )
 

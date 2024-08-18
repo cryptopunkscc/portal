@@ -3,8 +3,8 @@ package npm
 import (
 	"context"
 	"fmt"
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/target"
 	"io"
 	"io/fs"
 	"os"

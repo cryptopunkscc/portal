@@ -1,11 +1,11 @@
 package sources
 
 import (
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/resolve/exec"
 	golang "github.com/cryptopunkscc/portal/resolve/go"
 	"github.com/cryptopunkscc/portal/resolve/html"
 	"github.com/cryptopunkscc/portal/resolve/js"
-	"github.com/cryptopunkscc/portal/target"
 )
 
 func Resolver[A target.Portal_]() target.Resolve[A] {

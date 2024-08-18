@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/clir"
 	"github.com/cryptopunkscc/portal/factory/app"
 	"github.com/cryptopunkscc/portal/factory/bind"
@@ -10,7 +11,6 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/runner/goja"
-	. "github.com/cryptopunkscc/portal/target"
 )
 
 func main() {

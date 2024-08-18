@@ -1,10 +1,10 @@
 package apps
 
 import (
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/resolve/exec"
 	"github.com/cryptopunkscc/portal/resolve/html"
 	"github.com/cryptopunkscc/portal/resolve/js"
-	"github.com/cryptopunkscc/portal/target"
 )
 
 var ResolveAll = Resolver[target.App_]()

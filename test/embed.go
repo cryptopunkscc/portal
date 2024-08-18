@@ -2,9 +2,9 @@ package test
 
 import (
 	"embed"
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/resolve/zip"
-	"github.com/cryptopunkscc/portal/target"
 	"log"
 )
 

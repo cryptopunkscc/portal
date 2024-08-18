@@ -3,7 +3,7 @@ package bind
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/bind"
-	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/api/target"
 )
 
 type NewRuntime func(ctx context.Context, portal target.Portal_) Runtime

@@ -1,9 +1,9 @@
 package find
 
 import (
+	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/mock/appstore"
 	"github.com/cryptopunkscc/portal/resolve/source"
-	. "github.com/cryptopunkscc/portal/target"
 )
 
 func Create[T Portal_](

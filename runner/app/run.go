@@ -2,7 +2,7 @@ package app
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/api/target"
 )
 
 func Run[T target.Portal_](run target.Run[T]) target.Run[target.Portal_] {

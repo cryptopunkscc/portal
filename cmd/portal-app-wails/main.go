@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/clir"
 	"github.com/cryptopunkscc/portal/factory/app"
 	factory "github.com/cryptopunkscc/portal/factory/bind"
@@ -11,7 +12,6 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/runner/wails"
 	"github.com/cryptopunkscc/portal/runtime/bind"
-	. "github.com/cryptopunkscc/portal/target"
 )
 
 func main() {

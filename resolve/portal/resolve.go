@@ -1,8 +1,8 @@
 package portal
 
 import (
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/dec/all"
-	"github.com/cryptopunkscc/portal/target"
 )
 
 type of[T any] struct{ target.Portal_ }

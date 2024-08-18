@@ -1,8 +1,8 @@
 package app
 
 import (
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/resolve/portal"
-	"github.com/cryptopunkscc/portal/target"
 )
 
 type app[T any] struct{ target.Portal[T] }

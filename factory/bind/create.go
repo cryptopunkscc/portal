@@ -2,9 +2,9 @@ package bind
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/bind"
-	"github.com/cryptopunkscc/portal/target"
 )
 
 var ApphostDefault = apphost.Default

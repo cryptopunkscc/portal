@@ -3,11 +3,11 @@ package go_build
 import (
 	"context"
 	"fmt"
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/dist"
-	"github.com/cryptopunkscc/portal/target"
 	"os"
 	"path/filepath"
 	"runtime"

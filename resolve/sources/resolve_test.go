@@ -2,8 +2,8 @@ package sources
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/resolve/source"
-	"github.com/cryptopunkscc/portal/target"
 	"github.com/cryptopunkscc/portal/test"
 	"github.com/stretchr/testify/assert"
 	"os"
