@@ -10,7 +10,7 @@ import (
 	"github.com/cryptopunkscc/portal/feat/start"
 	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	portalPort "github.com/cryptopunkscc/portal/pkg/port"
+	"github.com/cryptopunkscc/portal/pkg/port"
 	signal "github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/request/query"
 	"github.com/cryptopunkscc/portal/resolve/sources"
@@ -32,7 +32,7 @@ func main() {
 	log := plog.New().D().Scope("dev").Set(&ctx)
 	log.Println("starting portal development", os.Args)
 	defer log.Println("closing portal development")
-	portalPort.InitPrefix("dev")
+	port.InitPrefix("dev")
 	cli := clir.NewCli(ctx, manifest.NameDev, manifest.DescriptionDev, version.Run)
 	cli.Dev(start.Feat(&mod))
 	if err := cli.Run(); err != nil {

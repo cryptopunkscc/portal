@@ -233,7 +233,7 @@ func (r *Router) Handle(ctx context.Context, query any, remoteId id.Identity, co
 }
 
 func (r *Router) Conn(conn io.ReadWriteCloser) *Router {
-	r.rpc = NewFlow(conn)
+	r.rpc = NewFlow().Conn(conn)
 	if r.logger != nil {
 		r.rpc.Logger(r.logger)
 	}
