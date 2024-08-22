@@ -12,7 +12,7 @@ type Manifest struct {
 	Version     string `json:"version,omitempty" yaml:"version,omitempty"`
 	Icon        string `json:"icon,omitempty" yaml:"icon,omitempty"`
 	Exec        string `json:"exec,omitempty" yaml:"exec,omitempty"`
-	Env         Env    `json:"env,omitempty" yaml:"env,omitempty"`
+	Env         *Env   `json:"env,omitempty" yaml:"env,omitempty"`
 }
 
 func (m Manifest) Match(id string) bool {

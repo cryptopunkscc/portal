@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+    <application
+        android:name=".AgentApp"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@android:style/Theme.Material.NoActionBar"
+        android:usesCleartextTraffic="true">
+
+        <service
+            android:name=".main.MainService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="cc.cryptopunks.portal.main.AstraldService" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+        </service>
+
+        <activity
+            android:name="cc.cryptopunks.portal.main.MainActivity"
+            android:exported="true"
+            android:launchMode="singleInstance"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <data
+                    android:host="main"
+                    android:scheme="astral" />
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".permission.PermissionActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.Material.NoActionBar">
+            <intent-filter>
+                <data
+                    android:host="permissions"
+                    android:scheme="astral" />
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id0"
+            android:taskAffinity=".js.JsAppActivitd0" />
+        <activity
+            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id1"
+            android:taskAffinity=".js.JsAppActivitd1" />
+        <activity
+            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id2"
+            android:taskAffinity=".js.JsAppActivitd2" />
+        <activity
+            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id3"
+            android:taskAffinity=".js.JsAppActivitd3" />
+        <activity
+            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id4"
+            android:taskAffinity=".js.JsAppActivitd4" />
+        <activity
+            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id5"
+            android:taskAffinity=".js.JsAppActivitd5" />
+        <activity
+            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id6"
+            android:taskAffinity=".js.JsAppActivitd6" />
+        <activity
+            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id7"
+            android:taskAffinity=".js.JsAppActivitd7" />
+        <activity
+            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id8"
+            android:taskAffinity=".js.JsAppActivitd8" />
+        <activity
+            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id9"
+            android:taskAffinity=".js.JsAppActivitd9" />
+        <activity
+            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id10"
+            android:taskAffinity=".js.JsAppActivity10" />
+        <activity
+            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id11"
+            android:taskAffinity=".js.JsAppActivity11" />
+        <activity
+            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id12"
+            android:taskAffinity=".js.JsAppActivity12" />
+        <activity
+            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id13"
+            android:taskAffinity=".js.JsAppActivity13" />
+        <activity
+            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id14"
+            android:taskAffinity=".js.JsAppActivity14" />
+        <activity
+            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id15"
+            android:taskAffinity=".js.JsAppActivity15" />
+        <activity
+            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id16"
+            android:taskAffinity=".js.JsAppActivity16" />
+        <activity
+            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id17"
+            android:taskAffinity=".js.JsAppActivity17" />
+        <activity
+            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id18"
+            android:taskAffinity=".js.JsAppActivity18" />
+        <activity
+            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id19"
+            android:taskAffinity=".js.JsAppActivity19" />
+    </application>
+
+</manifest>

@@ -8,9 +8,7 @@ import (
 	"io"
 )
 
-func Apphost(client apphost.Client) mobile.Apphost {
-	return &apphostAdapter{client}
-}
+func Apphost(client apphost.Client) mobile.Apphost { return &apphostAdapter{client} }
 
 type apphostAdapter struct{ i apphost.Client }
 
@@ -23,7 +21,6 @@ func (a *apphostAdapter) Resolve(name string) (s string, err error) {
 	s = i.String()
 	return
 }
-
 func (a *apphostAdapter) Register(name string) (mobile.ApphostListener, error) {
 	listener, err := a.i.Register(name)
 	if err != nil {
@@ -31,47 +28,24 @@ func (a *apphostAdapter) Register(name string) (mobile.ApphostListener, error) {
 	}
 	return &apphostListenerAdapter{listener}, err
 }
-
 func (a *apphostAdapter) Query(nodeID string, query string) (c mobile.Conn, err error) {
 	i, err := id.ParsePublicKeyHex(nodeID)
 	if err != nil {
 		return
 	}
-	cc := &apphostConnAdapter{}
-	cc.Conn, err = a.i.Query(i, query)
-	c = cc
+	conn, err := a.i.Query(i, query)
+	c = &apphostConnAdapter{conn, reader{conn}}
 	return
 }
-
-var _ io.ReadWriteCloser = &apphostConnAdapter{}
 
 type apphostConnAdapter struct {
-	Conn io.ReadWriteCloser
-}
-
-func (c *apphostConnAdapter) ReadN(n int) (b []byte, err error) {
-	var l int
-	b = make([]byte, n)
-	if l, err = c.Conn.Read(b); err == nil {
-		b = b[:l]
-	}
-	return
-}
-
-func (c *apphostConnAdapter) Read(p []byte) (n int, err error) {
-	return c.Conn.Read(p)
-}
-
-func (c *apphostConnAdapter) Write(p []byte) (n int, err error) {
-	return c.Conn.Write(p)
-}
-
-func (c *apphostConnAdapter) Close() error {
-	return c.Conn.Close()
+	io.WriteCloser
+	mobile.Reader
 }
 
 type apphostListenerAdapter struct{ apphost.Listener }
 
+func (a *apphostListenerAdapter) Close() error { return a.Listener.Close() }
 func (a *apphostListenerAdapter) Next() (query mobile.QueryData, err error) {
 	var q apphost.QueryData
 	q, err = a.Listener.Next()
@@ -82,29 +56,15 @@ func (a *apphostListenerAdapter) Next() (query mobile.QueryData, err error) {
 	return
 }
 
-func (a *apphostListenerAdapter) Close() error {
-	return a.Listener.Close()
-}
-
 type queryDataAdapter struct{ query apphost.QueryData }
 
-func (q *queryDataAdapter) Caller() string {
-	return q.query.RemoteIdentity().String()
-}
-
+func (q *queryDataAdapter) Query() string  { return q.query.Query() }
+func (q *queryDataAdapter) Caller() string { return q.query.RemoteIdentity().String() }
+func (q *queryDataAdapter) Reject() error  { return q.query.Reject() }
 func (q *queryDataAdapter) Accept() (c mobile.Conn, err error) {
-	cc := &apphostConnAdapter{}
-	cc.Conn, err = q.query.Accept()
-	c = cc
+	conn, err := q.query.Accept()
+	c = &apphostConnAdapter{conn, reader{conn}}
 	return
-}
-
-func (q *queryDataAdapter) Reject() error {
-	return q.query.Reject()
-}
-
-func (q *queryDataAdapter) Query() string {
-	return q.query.Query()
 }
 
 func init() {
