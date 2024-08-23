@@ -14,7 +14,7 @@
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <application
-        android:name=".AgentApp"
+        android:name=".app.PortalApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -70,65 +70,65 @@
         </activity>
 
         <activity
-            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id0"
-            android:taskAffinity=".js.JsAppActivitd0" />
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot0"
+            android:taskAffinity=".html.HtmlAppActivity0" />
         <activity
-            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id1"
-            android:taskAffinity=".js.JsAppActivitd1" />
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot1"
+            android:taskAffinity=".html.HtmlAppActivity1" />
         <activity
-            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id2"
-            android:taskAffinity=".js.JsAppActivitd2" />
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot2"
+            android:taskAffinity=".html.HtmlAppActivity2" />
         <activity
-            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id3"
-            android:taskAffinity=".js.JsAppActivitd3" />
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot3"
+            android:taskAffinity=".html.HtmlAppActivity3" />
         <activity
-            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id4"
-            android:taskAffinity=".js.JsAppActivitd4" />
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot4"
+            android:taskAffinity=".html.HtmlAppActivity4" />
         <activity
-            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id5"
-            android:taskAffinity=".js.JsAppActivitd5" />
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot5"
+            android:taskAffinity=".html.HtmlAppActivity5" />
         <activity
-            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id6"
-            android:taskAffinity=".js.JsAppActivitd6" />
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot6"
+            android:taskAffinity=".html.HtmlAppActivity6" />
         <activity
-            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id7"
-            android:taskAffinity=".js.JsAppActivitd7" />
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot7"
+            android:taskAffinity=".html.HtmlAppActivity7" />
         <activity
-            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id8"
-            android:taskAffinity=".js.JsAppActivitd8" />
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot8"
+            android:taskAffinity=".html.HtmlAppActivity8" />
         <activity
-            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id9"
-            android:taskAffinity=".js.JsAppActivitd9" />
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot9"
+            android:taskAffinity=".html.HtmlAppActivity9" />
         <activity
-            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id10"
-            android:taskAffinity=".js.JsAppActivity10" />
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot10"
+            android:taskAffinity=".html.HtmlAppActivity10" />
         <activity
-            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id11"
-            android:taskAffinity=".js.JsAppActivity11" />
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot11"
+            android:taskAffinity=".html.HtmlAppActivity11" />
         <activity
-            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id12"
-            android:taskAffinity=".js.JsAppActivity12" />
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot12"
+            android:taskAffinity=".html.HtmlAppActivity12" />
         <activity
-            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id13"
-            android:taskAffinity=".js.JsAppActivity13" />
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot13"
+            android:taskAffinity=".html.HtmlAppActivity13" />
         <activity
-            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id14"
-            android:taskAffinity=".js.JsAppActivity14" />
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot14"
+            android:taskAffinity=".html.HtmlAppActivity14" />
         <activity
-            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id15"
-            android:taskAffinity=".js.JsAppActivity15" />
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot15"
+            android:taskAffinity=".html.HtmlAppActivity15" />
         <activity
-            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id16"
-            android:taskAffinity=".js.JsAppActivity16" />
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot16"
+            android:taskAffinity=".html.HtmlAppActivity16" />
         <activity
-            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id17"
-            android:taskAffinity=".js.JsAppActivity17" />
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot17"
+            android:taskAffinity=".html.HtmlAppActivity17" />
         <activity
-            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id18"
-            android:taskAffinity=".js.JsAppActivity18" />
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot18"
+            android:taskAffinity=".html.HtmlAppActivity18" />
         <activity
-            android:name="cc.cryptopunks.portal.js.JsAppActivity$Id19"
-            android:taskAffinity=".js.JsAppActivity19" />
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot19"
+            android:taskAffinity=".html.HtmlAppActivity19" />
     </application>
 
 </manifest>

@@ -1,4 +1,4 @@
-package cc.cryptopunks.portal.api
+package cc.cryptopunks.portal
 
 import android.content.Context
 import android.content.Intent

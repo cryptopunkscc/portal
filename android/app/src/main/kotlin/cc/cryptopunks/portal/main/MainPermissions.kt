@@ -7,8 +7,8 @@ import android.os.PowerManager
 import android.provider.Settings
 import androidx.core.content.getSystemService
 import androidx.lifecycle.ViewModel
-import cc.cryptopunks.portal.api.Permissions
-import cc.cryptopunks.portal.api.hasPermissions
+import cc.cryptopunks.portal.Permissions
+import cc.cryptopunks.portal.hasPermissions
 
 internal class MainPermissions : ViewModel() {
 

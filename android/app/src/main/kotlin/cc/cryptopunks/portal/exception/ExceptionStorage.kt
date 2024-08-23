@@ -1,8 +1,8 @@
 package cc.cryptopunks.portal.exception
 
 import android.content.Context
-import cc.cryptopunks.portal.util.FileDateFormat
-import cc.cryptopunks.portal.util.md5
+import cc.cryptopunks.astral.agent.util.FileDateFormat
+import cc.cryptopunks.astral.agent.util.md5
 import java.util.Date
 
 class ExceptionStorage(context: Context) {

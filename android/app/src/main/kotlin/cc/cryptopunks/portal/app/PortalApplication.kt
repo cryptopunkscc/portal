@@ -1,4 +1,4 @@
-package cc.cryptopunks.portal
+package cc.cryptopunks.portal.app
 
 import android.app.Application
 import cc.cryptopunks.portal.compose.composeModule
@@ -9,7 +9,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import java.lang.Thread.setDefaultUncaughtExceptionHandler
 
-class AgentApp : Application() {
+class PortalApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()

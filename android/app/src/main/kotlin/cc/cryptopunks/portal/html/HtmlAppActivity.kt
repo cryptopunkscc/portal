@@ -1,8 +1,6 @@
 package cc.cryptopunks.portal.html
 
 import android.annotation.SuppressLint
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.webkit.WebChromeClient
@@ -13,19 +11,11 @@ import cc.cryptopunks.portal.core.mobile.App
 import cc.cryptopunks.portal.core.mobile.Runtime
 import org.koin.android.ext.android.inject
 
-internal fun Context.startHtmlAppActivity(src: String, slot: Int) {
-    val intent = Intent()
-    val activity = "$packageName.js.JsAppActivity\$Id$slot"
-    intent.component = ComponentName(packageName, activity)
-    intent.putExtra("src", src)
-    startActivity(intent)
-}
-
-sealed class HtmlAppActivity : ComponentActivity() {
+sealed class HtmlAppActivity(val slot: Int) : ComponentActivity() {
 
     private val webView: WebView by lazy { WebView(this) }
     private val runtime: Runtime by inject()
-    private val registry: HtmlAppsRegistry by inject()
+    private val registry: HtmlAppRegistry by inject()
     private var app: App? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -92,25 +82,29 @@ sealed class HtmlAppActivity : ComponentActivity() {
         app?.run { runtime().close() }
     }
 
-    class Id0 : HtmlAppActivity()
-    class Id1 : HtmlAppActivity()
-    class Id2 : HtmlAppActivity()
-    class Id3 : HtmlAppActivity()
-    class Id4 : HtmlAppActivity()
-    class Id5 : HtmlAppActivity()
-    class Id6 : HtmlAppActivity()
-    class Id7 : HtmlAppActivity()
-    class Id8 : HtmlAppActivity()
-    class Id9 : HtmlAppActivity()
-    class Id10 : HtmlAppActivity()
-    class Id11 : HtmlAppActivity()
-    class Id12 : HtmlAppActivity()
-    class Id13 : HtmlAppActivity()
-    class Id14 : HtmlAppActivity()
-    class Id15 : HtmlAppActivity()
-    class Id16 : HtmlAppActivity()
-    class Id17 : HtmlAppActivity()
-    class Id18 : HtmlAppActivity()
-    class Id19 : HtmlAppActivity()
+    companion object {
+        val slots: List<Int> = (0..<HtmlAppActivity::class.nestedClasses.size).toList()
+    }
+
+    class Slot0 : HtmlAppActivity(0)
+    class Slot1 : HtmlAppActivity(1)
+    class Slot2 : HtmlAppActivity(2)
+    class Slot3 : HtmlAppActivity(3)
+    class Slot4 : HtmlAppActivity(4)
+    class Slot5 : HtmlAppActivity(5)
+    class Slot6 : HtmlAppActivity(6)
+    class Slot7 : HtmlAppActivity(7)
+    class Slot8 : HtmlAppActivity(8)
+    class Slot9 : HtmlAppActivity(9)
+    class Slot10 : HtmlAppActivity(10)
+    class Slot11 : HtmlAppActivity(11)
+    class Slot12 : HtmlAppActivity(12)
+    class Slot13 : HtmlAppActivity(13)
+    class Slot14 : HtmlAppActivity(14)
+    class Slot15 : HtmlAppActivity(15)
+    class Slot16 : HtmlAppActivity(16)
+    class Slot17 : HtmlAppActivity(17)
+    class Slot18 : HtmlAppActivity(18)
+    class Slot19 : HtmlAppActivity(19)
 }
 

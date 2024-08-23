@@ -8,7 +8,6 @@ import android.webkit.WebViewClient
 import cc.cryptopunks.portal.core.mobile.Assets
 import cc.cryptopunks.portal.ext.mobile.inputStream
 
-
 internal class PortalWebViewClient(
     private val assets: Assets
 ) : WebViewClient() {
