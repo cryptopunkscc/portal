@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"github.com/cryptopunkscc/astrald/auth/id"
+	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/port"
 	"io"
@@ -10,12 +11,18 @@ import (
 type Request struct {
 	*Serializer
 	service string
+	client  apphost.Client
+}
+
+func (r *Request) Client(client apphost.Client) {
+	r.client = client
 }
 
 func newRequest(identity id.Identity, service string) Conn {
 	return &Request{
 		Serializer: &Serializer{remoteID: identity},
 		service:    service,
+		client:     Apphost,
 	}
 }
 
@@ -71,7 +78,7 @@ func (r *Request) Call(method string, value any) (err error) {
 
 	// query stream
 	var conn io.ReadWriteCloser
-	if conn, err = Apphost.Query(r.RemoteIdentity(), query); err != nil {
+	if conn, err = r.client.Query(r.RemoteIdentity(), query); err != nil {
 		return err
 	}
 

@@ -16,7 +16,7 @@ type Client struct {
 func (c *Client) Connect() (err error) {
 	conn, err := astral.Query(c.Identity, android.ContentPort)
 	if err == nil {
-		c.Conn = rpc.NewFlow(conn)
+		c.Conn = rpc.NewFlow().Conn(conn)
 	}
 	return
 }
