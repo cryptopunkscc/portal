@@ -7,16 +7,23 @@ import (
 
 type App struct {
 	Router
+	client apphost.Client
 }
 
 func NewApp(port string) (s *App) {
 	s = &App{Router: *NewRouter(port)}
+	s.client = Apphost
 	s.Router.RegisterRoute = s.registerRoute
 	return
 }
 
+func (s *App) Client(client apphost.Client) *App {
+	s.client = client
+	return s
+}
+
 func (s *App) registerRoute(route string) (await func(ctx context.Context), err error) {
-	listener, err := Apphost.Register(route)
+	listener, err := s.client.Register(route)
 	if err != nil {
 		return
 	}

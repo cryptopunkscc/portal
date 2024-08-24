@@ -3,10 +3,11 @@ package serve
 import (
 	"context"
 	"fmt"
+	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runtime/apphost"
-	"github.com/cryptopunkscc/portal/runtime/portal"
+	astral "github.com/cryptopunkscc/portal/runtime/apphost"
+	api "github.com/cryptopunkscc/portal/runtime/portal"
 	"github.com/cryptopunkscc/portal/runtime/rpc"
 	"maps"
 )
@@ -22,7 +23,7 @@ type (
 )
 
 // CheckAstral is a default implementation of Astral function. Returns error if astral is not started.
-func CheckAstral(_ context.Context) error { return apphost.Check() }
+func CheckAstral(_ context.Context) error { return astral.Check() }
 
 type Deps interface {
 	Port() target.Port
@@ -31,10 +32,12 @@ type Deps interface {
 	Handlers() Handlers
 	Observe() Observe
 	Shutdown() context.CancelFunc
+	Client() apphost.Client
 }
 
 func Feat(d Deps) target.Request {
 	astral := d.Astral()
+	client := d.Client()
 	port := d.Port()
 	handlers := d.Handlers()
 	maps.Copy(handlers, Handlers{
@@ -50,7 +53,7 @@ func Feat(d Deps) target.Request {
 		if err = check(port); err != nil {
 			return plog.Err(err)
 		}
-		if err = serve(ctx, port, handlers); err != nil {
+		if err = serve(ctx, client, port, handlers); err != nil {
 			return plog.Err(err)
 		}
 		return
@@ -58,7 +61,7 @@ func Feat(d Deps) target.Request {
 }
 
 func check(port target.Port) (err error) {
-	if err = portal.Client(port.String()).Ping(); err == nil {
+	if err = api.Client(port.String()).Ping(); err == nil {
 		err = fmt.Errorf("port already registered or astral not running: %v", err)
 	}
 	return nil
@@ -66,6 +69,7 @@ func check(port target.Port) (err error) {
 
 func serve(
 	ctx context.Context,
+	client apphost.Client,
 	port target.Port,
 	handlers Handlers,
 ) (err error) {
@@ -73,6 +77,7 @@ func serve(
 	log.Printf("serve start at port:%s", port)
 	defer log.Printf("serve exit:%s", port)
 	if err = rpc.NewApp(port.String()).
+		Client(client).
 		Routes("*").
 		RouteMap(rpc.Handlers(handlers)).
 		Run(ctx); err != nil {
