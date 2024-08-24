@@ -1,7 +1,8 @@
-package bind
+package apphost
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/target"
 	sig2 "github.com/cryptopunkscc/portal/pkg/sig"
 	"log"
@@ -10,24 +11,28 @@ import (
 
 var ConnectionsThreshold = -1
 
-func ApphostTimeout(ctx context.Context, apphost Apphost, portal target.Portal_) Apphost {
-	manifest := portal.Manifest()
-	if manifest.Env.Timeout > -1 && ConnectionsThreshold >= 0 {
-		go func() {
-			duration := 5 * time.Second
-			if manifest.Env.Timeout > 0 {
-				duration = time.Duration(manifest.Env.Timeout) * time.Millisecond
-			}
-			t := newTimout(duration, func() {
-				_ = sig2.Interrupt()
-			})
-			t.Enable(true)
-			for range apphost.Events().Subscribe(ctx) {
-				t.Enable(apphost.Connections().Size() <= ConnectionsThreshold)
-			}
-		}()
+func Timeout(ctx context.Context, apphost apphost.Cache, portal target.Portal_) {
+	if ConnectionsThreshold < 0 {
+		return
 	}
-	return apphost
+	timeout := portal.Manifest().Env.Timeout
+	if timeout < 0 {
+		return
+	}
+	go func() {
+		duration := 5 * time.Second
+		if timeout > 0 {
+			duration = time.Duration(timeout) * time.Millisecond
+		}
+		t := newTimout(duration, func() {
+			_ = sig2.Interrupt()
+		})
+		t.Enable(true)
+		for e := range apphost.Events().Subscribe(ctx) {
+			log.Println("apphost event", e.Type, e.Port, e.Ref)
+			t.Enable(apphost.Connections().Size() <= ConnectionsThreshold)
+		}
+	}()
 }
 
 type timout struct {
@@ -46,6 +51,7 @@ func newTimout(timeout time.Duration, onTimeout func()) *timout {
 }
 
 func (t *timout) Enable(value bool) {
+	log.Println("timeout", value)
 	if value {
 		go t.Start()
 	} else {
@@ -60,6 +66,7 @@ func (t *timout) Start() {
 	select {
 	case <-t.c:
 	case <-t.ticker.C:
+		log.Println("timout!!!")
 		t.onTimeout()
 	}
 }

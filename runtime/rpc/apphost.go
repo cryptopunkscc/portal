@@ -1,8 +1,8 @@
 package rpc
 
 import (
-	api "github.com/cryptopunkscc/portal/api/apphost"
-	runtime "github.com/cryptopunkscc/portal/runtime/apphost"
+	"github.com/cryptopunkscc/astrald/lib/astral"
+	"github.com/cryptopunkscc/portal/runtime/apphost"
 )
 
-var Apphost api.Client = runtime.Default()
+var Apphost = apphost.Adapter(astral.Client)
