@@ -1,6 +1,7 @@
 package mobile
 
 type Runtime interface {
+	Install() error
 	Start()
 	Stop()
 	Apphost() Apphost

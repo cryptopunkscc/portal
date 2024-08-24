@@ -47,6 +47,14 @@ func (s *source) Sub(src string) (t target.Source, err error) {
 	return
 }
 
+func (s *source) File() fs.File {
+	f, err := s.Files().Open(s.Path())
+	if err != nil {
+		panic(err)
+	}
+	return f
+}
+
 func Embed(files embed.FS) target.Source {
 	return &source{
 		scheme:   "embed",

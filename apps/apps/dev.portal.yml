@@ -1,0 +1,9 @@
+name: apps
+package: cc.cryptopunks.portal.apps
+title: Portal Apps
+description: Portal applications repository.
+version: 0.0.0
+build:
+  default:
+    exec: main
+    cmd: go build -o dist/main

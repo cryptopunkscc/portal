@@ -21,7 +21,7 @@ func TestFeat_Run(t *testing.T) {
 			return nil
 		},
 	)
-	err := feat.Run(context.TODO(), "../../example")
+	err := feat.Run(context.TODO(), "../../test/data")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -3,10 +3,13 @@ package runtime
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/apphost"
+	"github.com/cryptopunkscc/portal/api/apps"
 	"github.com/cryptopunkscc/portal/api/bind"
 	"github.com/cryptopunkscc/portal/api/mobile"
 	"github.com/cryptopunkscc/portal/api/target"
+	embed "github.com/cryptopunkscc/portal/apps"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/resolve/source"
 	apphostRuntime "github.com/cryptopunkscc/portal/runtime/apphost"
 	bindRuntime "github.com/cryptopunkscc/portal/runtime/bind"
 )
@@ -17,8 +20,10 @@ type Mobile struct {
 	Serve  mobile.Serve
 	Client apphost.Client
 	Find   target.Find[target.App_]
+	Apps   apps.Apps
 }
 
+func (m *Mobile) Install() error          { return m.Apps.InstallSources(m.Ctx, source.Embed(embed.FS)) }
 func (m *Mobile) Stop()                   { m.Cancel() }
 func (m *Mobile) Start()                  { m.Serve() }
 func (m *Mobile) Apphost() mobile.Apphost { return Apphost(m.Client) }

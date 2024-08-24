@@ -30,7 +30,6 @@ type Deps interface {
 	Open() target.Request
 	Astral() Astral
 	Handlers() Handlers
-	Observe() Observe
 	Shutdown() context.CancelFunc
 	Client() apphost.Client
 }
@@ -41,10 +40,9 @@ func Feat(d Deps) target.Request {
 	port := d.Port()
 	handlers := d.Handlers()
 	maps.Copy(handlers, Handlers{
-		"ping":    func() {},
-		"open":    d.Open(),
-		"observe": d.Observe(),
-		"close":   d.Shutdown(),
+		"ping":  func() {},
+		"open":  d.Open(),
+		"close": d.Shutdown(),
 	})
 	return func(ctx context.Context, src string, args ...string) (err error) {
 		if err = astral(ctx); err != nil {

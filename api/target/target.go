@@ -7,6 +7,7 @@ import (
 type Source interface {
 	Abs() string
 	Path() string
+	File() fs.File
 	Files() fs.FS
 	Sub(dir string) (Source, error)
 	IsDir() bool
@@ -21,6 +22,7 @@ type Template interface {
 type Portal_ interface {
 	Source
 	Manifest() *Manifest
+	MarshalJSON() ([]byte, error)
 }
 
 type Portal[T any] interface {

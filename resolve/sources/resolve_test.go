@@ -3,6 +3,7 @@ package sources
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/pkg/require"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/test"
 	"github.com/stretchr/testify/assert"
@@ -95,7 +96,7 @@ func TestByPath(t *testing.T) {
 		Resolver[target.Portal_](),
 	)
 
-	portals := test.Assert(find(context.Background(), src.Abs()))
+	portals := require.NoErr(find(context.Background(), src.Abs()))
 
 	for _, portal := range portals {
 		key := strings.TrimPrefix(portal.Abs(), wd)
