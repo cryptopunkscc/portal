@@ -5,4 +5,4 @@ import (
 )
 
 //go:embed */build */**/build
-var LauncherSvelteFS embed.FS
+var FS embed.FS

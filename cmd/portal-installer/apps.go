@@ -1,13 +1,17 @@
 package main
 
 import (
-	"github.com/cryptopunkscc/portal/apps"
-	"github.com/cryptopunkscc/portal/mock/appstore"
+	"context"
+	. "github.com/cryptopunkscc/portal/apps"
+	"github.com/cryptopunkscc/portal/factory/apps"
 	"github.com/cryptopunkscc/portal/resolve/source"
 )
 
 func installApps() {
-	if err := appstore.InstallSource(source.Embed(apps.LauncherSvelteFS)); err != nil {
+	if err := apps.Default().InstallSources(
+		context.TODO(),
+		source.Embed(FS),
+	); err != nil {
 		panic(err)
 	}
 }

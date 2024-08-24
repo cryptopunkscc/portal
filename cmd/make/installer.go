@@ -38,7 +38,6 @@ func (d *Install) buildInstallerFor() {
 	buildAnc()
 	goPortal.Build()
 	goPortalApp.Build()
-	goPortalApps.Build()
 	goPortalAppGoja.Build()
 	goPortalAppWails.Build()
 	goPortalNew.Build()

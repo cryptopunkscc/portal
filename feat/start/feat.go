@@ -43,6 +43,7 @@ func (f feat) Request(
 	if src == "" {
 		err = f.portal.Ping()
 	} else {
+		//TODO if src is relative path to exiting dir convert it to abs
 		err = f.request(ctx, src, args...)
 	}
 

@@ -1,6 +1,8 @@
 package clir
 
-type Install func(string) error
+import "context"
+
+type Install func(context.Context, string) error
 
 func (c Cli) Install(handle Install) {
 	flags := struct {
@@ -9,7 +11,7 @@ func (c Cli) Install(handle Install) {
 	cmd := c.clir.NewSubCommand("i", "Install app from a given portal app bundle path.")
 	cmd.AddFlags(&flags)
 	cmd.Action(func() error {
-		return handle(flags.Path)
+		return handle(c.ctx, flags.Path)
 	})
 	return
 }

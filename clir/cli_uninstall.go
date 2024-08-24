@@ -1,6 +1,8 @@
 package clir
 
-type Uninstall func(string) error
+import "context"
+
+type Uninstall func(context.Context, string) error
 
 func (c Cli) Uninstall(handle Uninstall) {
 	flags := struct {
@@ -9,7 +11,7 @@ func (c Cli) Uninstall(handle Uninstall) {
 	cmd := c.clir.NewSubCommand("u", "Uninstall app by given id. The id can by app name or package name")
 	cmd.AddFlags(&flags)
 	cmd.Action(func() error {
-		return handle(flags.Id)
+		return handle(c.ctx, flags.Id)
 	})
 	return
 }
