@@ -21,7 +21,7 @@ func Adapter(ctx context.Context, cached apphost.Cached, pkg string) Apphost {
 	a := &adapter{}
 	a.Cached = cached
 	a.port = port.New(pkg)
-	a.log = plog.Get(ctx).Type(a).Set(&ctx)
+	a.log = plog.Get(ctx).Type(a)
 	return a
 }
 

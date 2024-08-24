@@ -7,6 +7,7 @@ import (
 	"os"
 	"reflect"
 	"runtime/debug"
+	"slices"
 	"strings"
 	"time"
 )
@@ -15,6 +16,12 @@ type logger struct {
 	out    Output
 	module string
 	Log
+}
+
+func (l logger) Copy() Logger {
+	ll := l
+	ll.Scopes = slices.Clone(l.Scopes)
+	return ll
 }
 
 var Default = New()
@@ -36,7 +43,7 @@ func Printf(format string, args ...any) {
 }
 
 func New() Logger {
-	return &logger{
+	return logger{
 		out:    DefaultOutput,
 		module: portal.Module,
 		Log: Log{
@@ -51,7 +58,7 @@ const key = "plog"
 func Get(ctx context.Context) Logger {
 	if ctx != nil {
 		if l, ok := ctx.Value(key).(Logger); ok {
-			return l
+			return l.Copy()
 		}
 	}
 	return New().Scope("detached")
@@ -69,22 +76,22 @@ func (l logger) Out(output Output) Logger {
 
 func (l logger) Scope(format string, args ...any) Logger {
 	if args != nil {
-		l.Scopes = append(l.Scopes, fmt.Sprintf(format, args...))
+		l.Scopes = append(l.Scopes[:], fmt.Sprintf(format, args...))
 		return l
 	}
-	l.Scopes = append(l.Scopes, format)
+	l.Scopes = append(l.Scopes[:], format)
 	return l
 }
 
 func (l logger) Type(a any) Logger {
 	t := reflect.TypeOf(a)
 	s := strings.Replace(t.String(), l.module, "", -1)
-	l.Scopes = append(l.Scopes, s)
+	l.Scopes = append(l.Scopes[:], s)
 	return l
 }
 
 func (l logger) Any(a any) Logger {
-	l.Scopes = append(l.Scopes, fmt.Sprint(a))
+	l.Scopes = append(l.Scopes[:], fmt.Sprint(a))
 	return l
 }
 
@@ -146,7 +153,7 @@ func (l logger) Flush() {
 func (l logger) appendErrors(args ...any) logger {
 	for _, arg := range args {
 		if e, ok := arg.(error); ok {
-			l.Errors = append(l.Errors, e)
+			l.Errors = append(l.Errors[:], e)
 		}
 	}
 	return l

@@ -20,6 +20,7 @@ type Logger interface {
 	Flush()
 	Printf(string, ...any)
 	Println(...any)
+	Copy() Logger
 }
 
 type Output func(Log)
