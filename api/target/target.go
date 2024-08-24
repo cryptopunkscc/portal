@@ -22,6 +22,7 @@ type Template interface {
 type Portal_ interface {
 	Source
 	Manifest() *Manifest
+	MarshalJSON() ([]byte, error)
 }
 
 type Portal[T any] interface {

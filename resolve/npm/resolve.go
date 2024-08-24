@@ -1,6 +1,7 @@
 package npm
 
 import (
+	json2 "encoding/json"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/dec/all"
 	"github.com/cryptopunkscc/portal/pkg/dec/json"
@@ -40,6 +41,7 @@ type project[T any] struct {
 	resolveDist target.Resolve[target.Dist[T]]
 }
 
+func (p *project[T]) MarshalJSON() ([]byte, error) { return json2.Marshal(p.Manifest()) }
 func (p *project[T]) Manifest() *target.Manifest   { return &p.manifest }
 func (p *project[T]) Target() T                    { return p.Dist().Target() }
 func (p *project[T]) Build() target.Builds         { return p.build }

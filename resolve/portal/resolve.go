@@ -1,6 +1,7 @@
 package portal
 
 import (
+	"encoding/json"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/dec/all"
 )
@@ -28,9 +29,11 @@ type unknown struct {
 func (p *unknown) Manifest() *target.Manifest {
 	return &p.manifest
 }
-
 func (p *unknown) LoadManifest() error {
 	return all.Unmarshalers.Load(&p.manifest, p.Files(), target.ManifestFilename)
+}
+func (p *unknown) MarshalJSON() ([]byte, error) {
+	return json.Marshal(p.manifest)
 }
 
 func resolve(src target.Source) (t target.Portal_, err error) {
