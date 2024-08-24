@@ -1,33 +1,22 @@
 package portal
 
-import "github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
+import (
+	"context"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
+)
+
+type Service interface {
+	Query(ctx context.Context, query string) error
+}
 
 func Handler(service Service) cmd.Handler {
 	return cmd.Handler{
-		Name:   "portald",
-		Desc:   "Portal daemon.",
-		Params: nil,
-		Sub: cmd.Handlers{
-			{
-				Func: ping,
-				Name: "ping",
-			},
-			{
-				Func: service.Open(),
-				Name: "open",
-				Desc: "Open portal app.",
-				Params: cmd.Params{
-					{Type: "string", Desc: "Absolute path to app bundle or directory."},
-					{Type: "string", Desc: "Optional command to run on opened app."},
-				},
-			},
-			{
-				Func: service.Shutdown(),
-				Name: "close",
-				Desc: "Shutdown portal environment and close all running apps.",
-			},
-		},
+		Func: service.Query,
+		Name: "portal",
+		Desc: "Portal command line.",
+		Params: cmd.Params{{
+			Type: "string",
+			Desc: "Portal app query. Accepted formats are CLI or URL with query or JSON args",
+		}},
 	}
 }
-
-func ping() {}

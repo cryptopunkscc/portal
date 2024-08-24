@@ -2,6 +2,7 @@ package apphost
 
 import (
 	"context"
+	"errors"
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/target"
@@ -25,6 +26,7 @@ func (i Invoker) Query(identity id.Identity, query string) (conn apphost.Conn, e
 		return
 	}
 	if identity != id.Anyone {
+		err = errors.New("cannot invoke app on foreign identity")
 		return
 	}
 

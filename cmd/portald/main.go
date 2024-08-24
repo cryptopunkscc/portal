@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/astrald/sig"
-	"github.com/cryptopunkscc/portal/api/portal"
+	"github.com/cryptopunkscc/portal/api/portald"
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/factory/request"
+	"github.com/cryptopunkscc/portal/pkg/fs2"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/port"
 	singal "github.com/cryptopunkscc/portal/pkg/sig"
@@ -23,6 +24,8 @@ import (
 
 func main() {
 	d := &deps[Portal_]{}
+	unlock := d.lock()
+	defer unlock()
 	d.check()
 	ctx, cancel := context.WithCancel(context.Background())
 	log := plog.New().D().Scope("portald").Set(&ctx)
@@ -45,31 +48,41 @@ func (d *deps[T]) check() {
 	if err := apphost.Check(); err != nil {
 		panic(err)
 	}
-	if err := runtime.Client(d.Port().String()).Ping(); err == nil {
+	if err := runtime.Rpc(d.Port().String()).Ping(); err == nil {
 		err = fmt.Errorf("port already registered or astral not running: %v", err)
 		panic(err)
 	}
 }
-func (d *deps[T]) Executable() string             { return "portal" }
+func (d *deps[T]) name() string                   { return "portal" }
 func (d *deps[T]) WaitGroup() *sync.WaitGroup     { return &d.wg }
 func (d *deps[T]) Processes() *sig.Map[string, T] { return &d.processes }
 func (d *deps[T]) Shutdown() context.CancelFunc   { return d.CancelFunc }
 func (d *deps[T]) Resolve() Resolve[T]            { return sources.Resolver[T]() }
 func (d *deps[T]) Open() Request                  { return request.Create[T](d) }
-func (d *deps[T]) Port() port.Port                { return port.New(d.Executable()) }
-func (d *deps[T]) Handler() cmd.Handler           { return portal.Handler(d) }
+func (d *deps[T]) Port() port.Port                { return port.New(d.name()) }
+func (d *deps[T]) Handler() cmd.Handler           { return portald.Handler(d) }
 func (d *deps[T]) Router() *apphost2.Router       { return apphost2.NewRouter(d.Handler(), d.Port()) }
+func (d *deps[T]) CacheDir() string               { return CacheDir(d.name()) }
 func (d *deps[T]) Run() Run[T] {
 	return multi.Runner[T](
 		app.Run(exec.Portal[AppJs]("portal-app-goja", "o").Run),
 		app.Run(exec.Portal[AppHtml]("portal-app-wails", "o").Run),
-		app.Run(exec.Bundle(CacheDir(d.Executable())).Run),
+		app.Run(exec.Bundle(d.CacheDir()).Run),
 	)
 }
+
 func (d *deps[T]) Priority() Priority {
 	return []Matcher{
 		Match[Project_],
 		Match[Dist_],
 		Match[Bundle_],
 	}
+}
+
+func (d *deps[T]) lock() func() {
+	lock, err := fs2.Lock(d.CacheDir(), d.name()+".lock")
+	if err != nil {
+		panic(err)
+	}
+	return lock
 }
