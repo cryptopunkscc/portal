@@ -7,6 +7,7 @@ import (
 type Source interface {
 	Abs() string
 	Path() string
+	File() fs.File
 	Files() fs.FS
 	Sub(dir string) (Source, error)
 	IsDir() bool

@@ -45,6 +45,7 @@ type testSource struct{}
 
 func (t testSource) Abs() (v string)                  { return }
 func (t testSource) Path() (v string)                 { return }
+func (t testSource) File() (v fs.File)                { return }
 func (t testSource) Files() (v fs.FS)                 { return }
 func (t testSource) IsDir() (v bool)                  { return }
 func (t testSource) Sub(string) (v Source, err error) { return }
