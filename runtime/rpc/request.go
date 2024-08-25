@@ -14,11 +14,12 @@ type Request struct {
 	client  apphost.Client
 }
 
-func (r *Request) Client(client apphost.Client) {
+func (r *Request) Client(client apphost.Client) *Request {
 	r.client = client
+	return r
 }
 
-func newRequest(identity id.Identity, service string) Conn {
+func newRequest(identity id.Identity, service string) *Request {
 	return &Request{
 		Serializer: &Serializer{remoteID: identity},
 		service:    service,
@@ -26,12 +27,13 @@ func newRequest(identity id.Identity, service string) Conn {
 	}
 }
 
-func NewRequest(identity id.Identity, service string, path ...string) Conn {
-	return newRequest(identity, port.Format(service, path...))
+func NewRequest(identity id.Identity, path ...string) *Request {
+	return newRequest(identity, port.New(path...).String())
 }
 
 func (r *Request) Copy() Conn {
 	rr := newRequest(r.remoteID, r.service)
+	rr.client = r.client
 	if r.logger != nil {
 		rr.Logger(r.logger.Logger)
 	}

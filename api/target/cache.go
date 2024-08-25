@@ -1,8 +1,8 @@
 package target
 
 import (
-	"fmt"
-	"log"
+	"context"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"sync"
 )
 
@@ -27,9 +27,9 @@ func (c *Cache[T]) Add(portals []T) {
 		c.portals()[portal.Manifest().Package] = portal
 	}
 }
-func (c *Cache[T]) Get(src string) (portal T, ok bool) {
+func (c *Cache[T]) Get(ctx context.Context, src string) (portal T, ok bool) {
 	defer func() {
-		log.Println("get from cache:", src, ok, portal, c.portals())
+		plog.Get(ctx).Type(c).Println("get from cache:", src, ok, portal, c.portals())
 	}()
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -39,15 +39,6 @@ func (c *Cache[T]) Get(src string) (portal T, ok bool) {
 			portal = p
 			return
 		}
-	}
-	return
-}
-
-func (c *Cache[T]) Path(src string) (path string, err error) {
-	if portal, ok := c.Get(src); ok {
-		path = portal.Abs()
-	} else {
-		err = fmt.Errorf("no entry for %v", src)
 	}
 	return
 }

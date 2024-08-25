@@ -20,7 +20,7 @@ func main() {
 	mod.Deps = &mod
 	ctx, cancel := context.WithCancel(context.Background())
 	mod.CancelFunc = cancel
-	log := plog.New().D().Scope("app").Set(&ctx)
+	log := plog.New().D().Scope("portal").Set(&ctx)
 	cli := clir.NewCli(ctx,
 		"Portal-app",
 		"Portal applications service.",

@@ -20,6 +20,7 @@ func main() {
 		//"method1",
 	)
 	app.Interface(srv)
+	app.Logger(plog.New().Type(srv))
 	//app.Logger(log.New(log.Writer(), "service ", 0))
 	//rpc.Func("method", srv.Method)
 	//rpc.Func("method1", srv.Method1)
@@ -27,8 +28,8 @@ func main() {
 	//rpc.Func("method2B", srv.Method2B)
 	//rpc.Func("methodC", srv.MethodC
 	//rpc.Func("method2S", srv.Method2S)
-	plog.New().Type(srv).Set(&ctx)
-	if err := app.Run(ctx); err != nil {
+	//plog.New().Type(srv).Set(&ctx)
+	if err := app.Start(ctx); err != nil {
 		panic(err)
 	}
 

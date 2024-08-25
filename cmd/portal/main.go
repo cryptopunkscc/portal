@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/clir"
+	"github.com/cryptopunkscc/portal/factory/apphost"
 	"github.com/cryptopunkscc/portal/feat/start"
 	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -14,7 +15,7 @@ import (
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
-	log := plog.New().D().Scope("app").Set(&ctx)
+	log := plog.New().D().Scope("portal-cli").Set(&ctx)
 
 	go sig.OnShutdown(cancel)
 
@@ -35,4 +36,4 @@ type deps struct{}
 
 func (m deps) Port() target.Port       { return target.PortPortal }
 func (m deps) Serve() target.Request   { return exec.Request("portal-app") }
-func (m deps) Request() target.Request { return query.Request.Run }
+func (m deps) Request() target.Request { return query.Command(apphost.Invoker).Request }

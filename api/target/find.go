@@ -8,7 +8,7 @@ import (
 type (
 	Find[T Portal_] func(ctx context.Context, src string) (portals Portals[T], err error)
 	File            func(path ...string) (source Source, err error)
-	Path            func(src string) (path string, err error)
+	Path            func(ctx context.Context, src string) (path string, err error)
 )
 
 func FindByPath[T Portal_](file File, resolve Resolve[T]) Find[T] {
@@ -27,7 +27,7 @@ func (find Find[T]) Call(ctx context.Context, src string) (portals Portals[T], e
 
 func (find Find[T]) ById(path Path) Find[T] {
 	return func(ctx context.Context, src string) (portals Portals[T], err error) {
-		if resolved, err := path(src); err == nil {
+		if resolved, err := path(ctx, src); err == nil {
 			src = resolved
 		}
 		return find(ctx, src)
@@ -46,7 +46,7 @@ func (find Find[T]) Reduced(priority ...Matcher) Find[T] {
 
 func (find Find[T]) Cached(cache *Cache[T]) Find[T] {
 	return func(ctx context.Context, src string) (portals Portals[T], err error) {
-		if t, ok := cache.Get(src); ok {
+		if t, ok := cache.Get(ctx, src); ok {
 			portals = append(portals, t)
 			return
 		}

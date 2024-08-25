@@ -29,8 +29,8 @@ type Deps[T Portal_] interface {
 }
 
 func (d *Module[T]) Port() Port                     { return PortPortal }
-func (d *Module[T]) Open() Request                  { return request.Create[T](d) }
-func (d *Module[T]) Client() apphost.Client         { return create.Default() }
+func (d *Module[T]) Open() Open                     { return request.Create[T](d) }
+func (d *Module[T]) Client() apphost.Client         { return create.Cached() }
 func (d *Module[T]) Shutdown() context.CancelFunc   { return d.CancelFunc }
 func (d *Module[T]) Observe() serve.Observe         { return appstore.Observe }
 func (d *Module[T]) Handlers() serve.Handlers       { return serve.Handlers{} }

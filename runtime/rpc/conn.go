@@ -36,6 +36,15 @@ func Await(conn Conn) (err error) {
 	return
 }
 
+func Done(conn Conn) <-chan struct{} {
+	done := make(chan struct{})
+	go func() {
+		_ = Await(conn)
+		close(done)
+	}()
+	return done
+}
+
 func Command(conn Conn, method string, args ...any) (err error) {
 	conn = conn.Copy()
 	defer conn.Flush()
