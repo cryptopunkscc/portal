@@ -8,7 +8,6 @@ import (
 	"github.com/cryptopunkscc/portal/feat/open"
 	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/pkg/port"
 	"github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/go_dev"
@@ -22,7 +21,6 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	log := plog.New().D().Scope("dev-go").Set(&ctx)
 	go sig.OnShutdown(cancel)
-	port.InitPrefix("dev")
 	cli := clir.NewCli(ctx,
 		"Portal-dev-goja",
 		"Portal js development driven by goja.",
