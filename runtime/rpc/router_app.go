@@ -2,7 +2,7 @@ package rpc
 
 import (
 	"context"
-	"github.com/cryptopunkscc/astrald/lib/astral"
+	"github.com/cryptopunkscc/portal/api/apphost"
 )
 
 type App struct {
@@ -16,7 +16,7 @@ func NewApp(port string) (s *App) {
 }
 
 func (s *App) registerRoute(route string) (await func(ctx context.Context), err error) {
-	listener, err := astral.Register(route)
+	listener, err := Apphost.Register(route)
 	if err != nil {
 		return
 	}
@@ -37,7 +37,7 @@ func (s *App) registerRoute(route string) (await func(ctx context.Context), err 
 	return
 }
 
-func (s *App) routeQuery(ctx context.Context, query *astral.QueryData) (err error) {
+func (s *App) routeQuery(ctx context.Context, query apphost.QueryData) (err error) {
 	if s.logger != nil {
 		s.logger.Println("<~", query.Query())
 	}

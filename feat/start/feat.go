@@ -6,8 +6,8 @@ import (
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"github.com/cryptopunkscc/portal/runtime/apphost"
+	"github.com/cryptopunkscc/portal/runtime/rpc"
 	"time"
 )
 

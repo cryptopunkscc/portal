@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/android"
-	"github.com/cryptopunkscc/portal/pkg/rpc"
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/runtime/rpc"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"testing"
@@ -24,7 +25,7 @@ func ConnectTestClient(t *testing.T) (ApiClient, func()) {
 	if err := c.Connect(); err != nil {
 		t.Fatal(err)
 	}
-	c.Logger(log.Default())
+	c.Logger(plog.Default)
 	return c, func() {
 		if err := c.Close(); err != nil {
 			t.Fatal(err)
