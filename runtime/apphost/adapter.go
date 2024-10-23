@@ -108,12 +108,8 @@ func (api *adapter) Interrupt() {
 	}
 }
 
-func (api *adapter) Log(arg ...any) {
-	api.log.Scope("js").Println(arg...)
-}
-
-func (api *adapter) LogArr(arg []any) {
-	api.log.Scope("js").Println(arg...)
+func (api *adapter) Log(arg any) {
+	api.log.Scope("js").Println(arg)
 }
 
 func (api *adapter) Sleep(duration int64) {

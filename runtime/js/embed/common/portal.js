@@ -518,7 +518,8 @@ var portal = (function (exports) {
     return query
   }
 
-  const {log, sleep, platform} = bindings;
+  const log = any => bindings.log(typeof any == 'object' ? JSON.stringify(any) : any);
+  const {sleep, platform} = bindings;
   const apphost = new ApphostClient();
   const rpc = new RpcClient();
 

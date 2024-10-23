@@ -38,7 +38,7 @@ const adapter$2 = () => ({
   astral_interrupt: wails['go']['main']['Adapter']['Interrupt'],
   // runtime
   sleep: wails['go']['main']['Adapter']['Sleep'],
-  log: async (...arg) => await wails['go']['main']['Adapter']['LogArr'](arg),
+  log: wails['go']['main']['Adapter']['Log'],
 });
 
 inject(platform$3, adapter$2);
@@ -82,7 +82,7 @@ const adapter$1 = () => {
     astral_interrupt: () => _promise(() => _app_host.interrupt()),
     // runtime
     sleep: (arg1) => _promise(() => _app_host.sleep(arg1)),
-    log: (arg1) => _app_host.logArr(JSON.stringify(arg1)),
+    log: (arg1) => _app_host.log(arg1),
   }
 };
 
@@ -594,7 +594,8 @@ function formatQuery(port, params) {
   return query
 }
 
-const {log, sleep, platform} = bindings;
+const log = any => bindings.log(typeof any == 'object' ? JSON.stringify(any) : any);
+const {sleep, platform} = bindings;
 const apphost = new ApphostClient();
 const rpc = new RpcClient();
 

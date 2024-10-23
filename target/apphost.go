@@ -31,8 +31,7 @@ type NewApphost func(ctx context.Context, portal Portal_) Apphost
 type ApphostApi interface {
 	Close() error
 	Interrupt()
-	Log(arg ...any)
-	LogArr(arg []any)
+	Log(arg any)
 	Sleep(duration int64)
 	ServiceRegister(service string) (err error)
 	ServiceClose(service string) (err error)

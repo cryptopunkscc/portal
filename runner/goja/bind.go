@@ -61,8 +61,8 @@ type adapter struct {
 	queue  chan func()
 }
 
-func (a *adapter) Log(arg ...any) {
-	a.astral.LogArr(arg)
+func (a *adapter) Log(arg any) {
+	a.astral.Log(arg)
 }
 func (a *adapter) Sleep(millis int64) *goja.Promise {
 	return a.promise0(func() { a.astral.Sleep(millis) })

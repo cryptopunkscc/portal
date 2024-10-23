@@ -38,7 +38,7 @@ const adapter = () => {
     astral_interrupt: () => _promise(() => _app_host.interrupt()),
     // runtime
     sleep: (arg1) => _promise(() => _app_host.sleep(arg1)),
-    log: (arg1) => _app_host.logArr(JSON.stringify(arg1)),
+    log: (arg1) => _app_host.log(arg1),
   }
 }
 
