@@ -3,28 +3,29 @@ package main
 import (
 	"context"
 	"errors"
+	"github.com/cryptopunkscc/portal/api/portal"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/getlantern/systray"
 )
 
-func newRunner(api portalApi) *runner {
-	return &runner{api: api}
+func newRunner(client portal.Client) *runner {
+	return &runner{portal: client}
 }
 
 type runner struct {
-	api portalApi
-	log plog.Logger
+	portal portal.Client
+	log    plog.Logger
 }
 
 func (t *runner) Run(ctx context.Context) (err error) {
-	if err = t.api.Ping(); err != nil {
+	if err = t.portal.Ping(); err != nil {
 		return errors.New("portal-tray requires portal-app running")
 	}
 
 	t.log = plog.Get(ctx).Type(t).Set(&ctx)
 
 	go func() {
-		t.api.Await()
+		t.portal.Join()
 		systray.Quit()
 	}()
 	go func() {
@@ -46,12 +47,12 @@ func (t *runner) onReady() {
 			select {
 			case <-launcher.ClickedCh:
 				go func() {
-					if err := t.api.Open("launcher"); err != nil {
+					if err := t.portal.Open("launcher"); err != nil {
 						t.log.Println("launcher:", err)
 					}
 				}()
 			case <-quit.ClickedCh:
-				if err := t.api.Close(); err != nil {
+				if err := t.portal.Close(); err != nil {
 					t.log.Println("quit:", err)
 					systray.Quit()
 				}
