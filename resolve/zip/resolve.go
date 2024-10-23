@@ -4,8 +4,8 @@ import (
 	"archive/zip"
 	"bytes"
 	"errors"
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/resolve/source"
-	"github.com/cryptopunkscc/portal/target"
 	"io/fs"
 )
 

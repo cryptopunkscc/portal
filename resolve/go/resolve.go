@@ -1,9 +1,9 @@
 package golang
 
 import (
+	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/dec/all"
 	"github.com/cryptopunkscc/portal/resolve/exec"
-	. "github.com/cryptopunkscc/portal/target"
 	"io/fs"
 )
 

@@ -3,9 +3,9 @@ package template
 import (
 	"context"
 	"fmt"
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/git"
 	"github.com/cryptopunkscc/portal/resolve/template"
-	"github.com/cryptopunkscc/portal/target"
 	"io/fs"
 	"os"
 	"path/filepath"

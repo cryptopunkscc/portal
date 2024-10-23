@@ -2,6 +2,7 @@ package goja_pro
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	npm2 "github.com/cryptopunkscc/portal/resolve/npm"
@@ -11,7 +12,6 @@ import (
 	"github.com/cryptopunkscc/portal/runner/npm_build"
 	"github.com/cryptopunkscc/portal/runtime/bind"
 	jsEmbed "github.com/cryptopunkscc/portal/runtime/js/embed"
-	"github.com/cryptopunkscc/portal/target"
 	"time"
 )
 

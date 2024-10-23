@@ -1,8 +1,8 @@
 package bundle
 
 import (
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/resolve/zip"
-	"github.com/cryptopunkscc/portal/target"
 )
 
 type of[T any] struct {

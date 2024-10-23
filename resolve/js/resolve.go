@@ -2,10 +2,10 @@ package js
 
 import (
 	"errors"
+	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/resolve/bundle"
 	"github.com/cryptopunkscc/portal/resolve/dist"
 	"github.com/cryptopunkscc/portal/resolve/npm"
-	. "github.com/cryptopunkscc/portal/target"
 	"io/fs"
 )
 

@@ -2,9 +2,9 @@ package watcher
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/fs2"
-	"github.com/cryptopunkscc/portal/target"
 	"github.com/fsnotify/fsnotify"
 	"time"
 )

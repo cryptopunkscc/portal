@@ -1,8 +1,8 @@
 package dev
 
 import (
+	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/resolve/sources"
-	. "github.com/cryptopunkscc/portal/target"
 )
 
 type Module[T Portal_] struct{}

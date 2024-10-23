@@ -2,7 +2,7 @@ package exec
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/api/target"
 	"os"
 	"os/exec"
 )

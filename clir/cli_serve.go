@@ -1,7 +1,7 @@
 package clir
 
 import (
-	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/api/target"
 )
 
 func (c Cli) Serve(handle target.Request) {

@@ -3,10 +3,10 @@ package srv
 import (
 	"context"
 	"github.com/cryptopunkscc/astrald/sig"
+	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/factory/request"
 	"github.com/cryptopunkscc/portal/feat/serve"
 	"github.com/cryptopunkscc/portal/mock/appstore"
-	. "github.com/cryptopunkscc/portal/target"
 	"sync"
 )
 

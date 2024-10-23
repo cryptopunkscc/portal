@@ -3,7 +3,7 @@ package source
 import (
 	"embed"
 	"errors"
-	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/api/target"
 	"io/fs"
 	"os"
 	"path"

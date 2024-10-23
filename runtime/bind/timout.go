@@ -2,8 +2,8 @@ package bind
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/api/target"
 	sig2 "github.com/cryptopunkscc/portal/pkg/sig"
-	"github.com/cryptopunkscc/portal/target"
 	"log"
 	"time"
 )

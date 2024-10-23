@@ -3,9 +3,9 @@ package msg
 import (
 	"context"
 	"github.com/cryptopunkscc/astrald/sig"
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
-	"github.com/cryptopunkscc/portal/target"
 )
 
 type Broadcast struct {

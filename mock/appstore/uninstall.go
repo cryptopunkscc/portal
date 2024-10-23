@@ -2,8 +2,8 @@ package appstore
 
 import (
 	"fmt"
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/resolve/apps"
-	"github.com/cryptopunkscc/portal/target"
 	"log"
 	"os"
 )

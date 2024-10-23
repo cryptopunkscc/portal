@@ -35,9 +35,6 @@ func Skip(names ...string) func(source Source) (result Source, err error) {
 	}
 }
 
-// List all Source from a given dir.
-func List[T any](resolve Resolve[T], from ...Source) (out []T) { return resolve.List(from...) }
-
 func (resolve Resolve[T]) Resolve(src Source) (result T, err error) { return resolve(src) }
 
 // List all Source from a given dir.

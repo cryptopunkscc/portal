@@ -3,10 +3,10 @@ package build
 import (
 	"context"
 	"fmt"
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/resolve/sources"
-	"github.com/cryptopunkscc/portal/target"
 	"log"
 	"path/filepath"
 )
