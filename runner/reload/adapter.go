@@ -2,11 +2,12 @@ package reload
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/runtime/bind"
 	"github.com/cryptopunkscc/portal/target"
 )
 
-func Adapter[T target.Portal_](runner target.Runner[T]) func(target.NewRuntime) target.Runner[T] {
-	return func(newRuntime target.NewRuntime) target.Runner[T] {
+func Adapter[T target.Portal_](runner target.Runner[T]) func(bind.NewRuntime) target.Runner[T] {
+	return func(newRuntime bind.NewRuntime) target.Runner[T] {
 		return adapter[T]{
 			newRuntime: newRuntime,
 			inner:      runner,
@@ -15,7 +16,7 @@ func Adapter[T target.Portal_](runner target.Runner[T]) func(target.NewRuntime) 
 }
 
 type adapter[T target.Portal_] struct {
-	newRuntime target.NewRuntime
+	newRuntime bind.NewRuntime
 	inner      target.Runner[T]
 }
 

@@ -1,13 +1,6 @@
-package target
-
-import (
-	"context"
-	"github.com/cryptopunkscc/astrald/sig"
-)
+package bind
 
 const (
-	Log             = "_log"
-	Sleep           = "_sleep"
 	ServiceRegister = "_astral_service_register"
 	ServiceClose    = "_astral_service_close"
 	ConnAccept      = "_astral_conn_accept"
@@ -16,23 +9,12 @@ const (
 	ConnRead        = "_astral_conn_read"
 	Query           = "_astral_query"
 	QueryName       = "_astral_query_name"
-	GetNodeInfo     = "_astral_node_info"
 	ResolveId       = "_astral_resolve"
+	GetNodeInfo     = "_astral_node_info"
 	Interrupt       = "_astral_interrupt"
 )
 
 type Apphost interface {
-	ApphostCache
-	ApphostApi
-}
-
-type NewApphost func(ctx context.Context, portal Portal_) Apphost
-
-type ApphostApi interface {
-	Close() error
-	Interrupt()
-	Log(arg any)
-	Sleep(duration int64)
 	ServiceRegister(service string) (err error)
 	ServiceClose(service string) (err error)
 	ConnAccept(service string) (data string, err error)
@@ -42,40 +24,12 @@ type ApphostApi interface {
 	Query(identity string, query string) (data string, err error)
 	QueryName(name string, query string) (data string, err error)
 	Resolve(name string) (id string, err error)
-	NodeInfo(identity string) (info NodeInfo, err error)
+	NodeInfo(identity string) (info *NodeInfo, err error)
+	Close() error
+	Interrupt()
 }
-
-type ApphostCache interface {
-	Connections() []ApphostConn
-	Listeners() []ApphostListener
-	Events() *sig.Queue[ApphostEvent]
-}
-
-type ApphostEvent struct {
-	Type ApphostEventType
-	Port string
-	Ref  string
-}
-
-type ApphostEventType int
-
-const (
-	ApphostConnect ApphostEventType = iota
-	ApphostDisconnect
-	ApphostRegister
-	ApphostUnregister
-)
 
 type NodeInfo struct {
 	Identity string
 	Name     string
-}
-
-type ApphostConn struct {
-	Query string
-	In    bool
-}
-
-type ApphostListener struct {
-	Port string
 }

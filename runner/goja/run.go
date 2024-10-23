@@ -3,20 +3,21 @@ package goja
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/runtime/bind"
 	"github.com/cryptopunkscc/portal/target"
 )
 
 type Runner struct {
-	newRuntime target.NewRuntime
+	newRuntime bind.NewRuntime
 	backend    *Backend
 	app        target.AppJs
 }
 
-func NewRunner(newRuntime target.NewRuntime) target.Runner[target.AppJs] {
+func NewRunner(newRuntime bind.NewRuntime) target.Runner[target.AppJs] {
 	return &Runner{newRuntime: newRuntime}
 }
 
-func NewRun(newRuntime target.NewRuntime) target.Run[target.AppJs] {
+func NewRun(newRuntime bind.NewRuntime) target.Run[target.AppJs] {
 	return NewRunner(newRuntime).Run
 }
 

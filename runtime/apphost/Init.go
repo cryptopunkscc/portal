@@ -11,7 +11,7 @@ import (
 
 // Based on github.com/cryptopunkscc/astrald/lib/astral/client.go
 
-const defaultApphostAddr = "tcp:127.0.0.1:8625"
+var defaultApphostAddrs = []string{"unix:~/.apphost.sock", "tcp:127.0.0.1:8625"}
 
 // Check if astral.Client is successfully initialized.
 func Check() (err error) {
@@ -33,7 +33,7 @@ func Init() error {
 	if len(envAddr) > 0 {
 		addrs = strings.Split(envAddr, ";")
 	} else {
-		addrs = []string{defaultApphostAddr}
+		addrs = defaultApphostAddrs
 	}
 
 	for _, addr := range addrs {

@@ -2,6 +2,7 @@ package msg
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/mem"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target"
@@ -11,7 +12,7 @@ import (
 
 type Handler struct {
 	reloader Reloader
-	apphost  target.ApphostCache
+	cache    apphost.Cache
 	changes  mem.Cache[time.Time]
 }
 
@@ -21,11 +22,11 @@ type Reloader interface {
 
 func NewHandler(
 	reloader Reloader,
-	apphost target.ApphostCache,
+	cache apphost.Cache,
 ) *Handler {
 	return &Handler{
 		reloader: reloader,
-		apphost:  apphost,
+		cache:    cache,
 		changes:  mem.NewCache[time.Time](),
 	}
 }
@@ -35,11 +36,11 @@ func (s *Handler) HandleMsg(ctx context.Context, msg target.Msg) {
 	log.Println("received broadcast message:", msg)
 	switch msg.Event {
 	case target.DevChanged:
-		for _, c := range s.apphost.Connections() {
-			if c.In {
+		for _, c := range s.cache.Connections().Copy() {
+			if c.In() {
 				continue
 			}
-			query := strings.TrimPrefix(c.Query, "dev.")
+			query := strings.TrimPrefix(c.Query(), "dev.")
 			if strings.HasPrefix(query, msg.Pkg) {
 				s.changes.Set(msg.Pkg, msg.Time)
 			}

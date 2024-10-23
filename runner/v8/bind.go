@@ -1,55 +1,55 @@
 package v8
 
 import (
-	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/api/bind"
 	"log"
 	v8 "rogchap.com/v8go"
 )
 
-func Bind(iso *v8.Isolate, astral target.Apphost) (template *v8.ObjectTemplate, err error) {
+func Bind(iso *v8.Isolate, runtime bind.Runtime) (template *v8.ObjectTemplate, err error) {
 	template = v8.NewObjectTemplate(iso)
-	a := adapter{astral}
-	if err = template.Set(target.Log, v8.NewFunctionTemplate(iso, a.Log)); err != nil {
+	a := adapter{runtime}
+	if err = template.Set(bind.Log, v8.NewFunctionTemplate(iso, a.Log)); err != nil {
 		return
 	}
-	if err = template.Set(target.Sleep, v8.NewFunctionTemplate(iso, a.Sleep)); err != nil {
+	if err = template.Set(bind.Sleep, v8.NewFunctionTemplate(iso, a.Sleep)); err != nil {
 		return
 	}
-	if err = template.Set(target.ServiceRegister, v8.NewFunctionTemplate(iso, a.ServiceRegister)); err != nil {
+	if err = template.Set(bind.ServiceRegister, v8.NewFunctionTemplate(iso, a.ServiceRegister)); err != nil {
 		return
 	}
-	if err = template.Set(target.ServiceClose, v8.NewFunctionTemplate(iso, a.ServiceClose)); err != nil {
+	if err = template.Set(bind.ServiceClose, v8.NewFunctionTemplate(iso, a.ServiceClose)); err != nil {
 		return
 	}
-	if err = template.Set(target.ConnAccept, v8.NewFunctionTemplate(iso, a.ConnAccept)); err != nil {
+	if err = template.Set(bind.ConnAccept, v8.NewFunctionTemplate(iso, a.ConnAccept)); err != nil {
 		return
 	}
-	if err = template.Set(target.ConnClose, v8.NewFunctionTemplate(iso, a.ConnClose)); err != nil {
+	if err = template.Set(bind.ConnClose, v8.NewFunctionTemplate(iso, a.ConnClose)); err != nil {
 		return
 	}
-	if err = template.Set(target.ConnWrite, v8.NewFunctionTemplate(iso, a.ConnWrite)); err != nil {
+	if err = template.Set(bind.ConnWrite, v8.NewFunctionTemplate(iso, a.ConnWrite)); err != nil {
 		return
 	}
-	if err = template.Set(target.ConnRead, v8.NewFunctionTemplate(iso, a.ConnRead)); err != nil {
+	if err = template.Set(bind.ConnRead, v8.NewFunctionTemplate(iso, a.ConnRead)); err != nil {
 		return
 	}
-	if err = template.Set(target.Query, v8.NewFunctionTemplate(iso, a.Query)); err != nil {
+	if err = template.Set(bind.Query, v8.NewFunctionTemplate(iso, a.Query)); err != nil {
 		return
 	}
-	if err = template.Set(target.QueryName, v8.NewFunctionTemplate(iso, a.QueryName)); err != nil {
+	if err = template.Set(bind.QueryName, v8.NewFunctionTemplate(iso, a.QueryName)); err != nil {
 		return
 	}
-	if err = template.Set(target.GetNodeInfo, v8.NewFunctionTemplate(iso, a.NodeInfo)); err != nil {
+	if err = template.Set(bind.GetNodeInfo, v8.NewFunctionTemplate(iso, a.NodeInfo)); err != nil {
 		return
 	}
-	if err = template.Set(target.ResolveId, v8.NewFunctionTemplate(iso, a.Resolve)); err != nil {
+	if err = template.Set(bind.ResolveId, v8.NewFunctionTemplate(iso, a.Resolve)); err != nil {
 		return
 	}
 	return
 }
 
 type adapter struct {
-	astral target.Apphost
+	runtime bind.Runtime
 }
 
 func (a *adapter) Log(info *v8.FunctionCallbackInfo) *v8.Value {
@@ -62,7 +62,7 @@ func (a *adapter) Sleep(info *v8.FunctionCallbackInfo) *v8.Value {
 	t := info.Args()[0].Integer()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		a.astral.Sleep(t)
+		a.runtime.Sleep(t)
 		resolver.Resolve(v8.Undefined(iso))
 	}()
 	return resolver.GetPromise().Value
@@ -73,7 +73,7 @@ func (a *adapter) ServiceRegister(info *v8.FunctionCallbackInfo) *v8.Value {
 	port := info.Args()[0].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		err := a.astral.ServiceRegister(port)
+		err := a.runtime.ServiceRegister(port)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {
@@ -91,7 +91,7 @@ func (a *adapter) ServiceClose(info *v8.FunctionCallbackInfo) *v8.Value {
 	port := info.Args()[0].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		err := a.astral.ServiceClose(port)
+		err := a.runtime.ServiceClose(port)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {
@@ -109,7 +109,7 @@ func (a *adapter) ConnAccept(info *v8.FunctionCallbackInfo) *v8.Value {
 	port := info.Args()[0].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		id, err := a.astral.ConnAccept(port)
+		id, err := a.runtime.ConnAccept(port)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {
@@ -132,7 +132,7 @@ func (a *adapter) ConnClose(info *v8.FunctionCallbackInfo) *v8.Value {
 	id := info.Args()[0].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		err := a.astral.ConnClose(id)
+		err := a.runtime.ConnClose(id)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {
@@ -151,7 +151,7 @@ func (a *adapter) ConnWrite(info *v8.FunctionCallbackInfo) *v8.Value {
 	data := info.Args()[1].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		err := a.astral.ConnWrite(id, data)
+		err := a.runtime.ConnWrite(id, data)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {
@@ -169,7 +169,7 @@ func (a *adapter) ConnRead(info *v8.FunctionCallbackInfo) *v8.Value {
 	id := info.Args()[0].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		data, err := a.astral.ConnRead(id)
+		data, err := a.runtime.ConnRead(id)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {
@@ -193,7 +193,7 @@ func (a *adapter) Query(info *v8.FunctionCallbackInfo) *v8.Value {
 	query := info.Args()[1].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		connId, err := a.astral.Query(id, query)
+		connId, err := a.runtime.Query(id, query)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {
@@ -217,7 +217,7 @@ func (a *adapter) QueryName(info *v8.FunctionCallbackInfo) *v8.Value {
 	query := info.Args()[1].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		connId, err := a.astral.QueryName(name, query)
+		connId, err := a.runtime.QueryName(name, query)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {
@@ -240,7 +240,7 @@ func (a *adapter) NodeInfo(info *v8.FunctionCallbackInfo) *v8.Value {
 	id := info.Args()[0].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		nodeInfo, err := a.astral.NodeInfo(id)
+		nodeInfo, err := a.runtime.NodeInfo(id)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {
@@ -263,7 +263,7 @@ func (a *adapter) Resolve(info *v8.FunctionCallbackInfo) *v8.Value {
 	name := info.Args()[0].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		nodeInfo, err := a.astral.Resolve(name)
+		nodeInfo, err := a.runtime.Resolve(name)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {

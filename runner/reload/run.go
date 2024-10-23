@@ -3,14 +3,15 @@ package reload
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/runtime/bind"
 	"github.com/cryptopunkscc/portal/runtime/msg"
 	"github.com/cryptopunkscc/portal/target"
 )
 
 func Mutable[T target.Portal_](
-	newRuntime target.NewRuntime,
+	newRuntime bind.NewRuntime,
 	portMsg target.Port,
-	newRunner func(target.NewRuntime, target.MsgSend) target.Runner[T],
+	newRunner func(bind.NewRuntime, target.MsgSend) target.Runner[T],
 ) target.Run[target.Portal_] {
 	return runner[T]{
 		portMsg:    portMsg,
@@ -20,14 +21,14 @@ func Mutable[T target.Portal_](
 }
 
 func Immutable[T target.Portal_](
-	newRuntime target.NewRuntime,
+	newRuntime bind.NewRuntime,
 	portMsg target.Port,
-	newRunner func(target.NewRuntime) target.Runner[T],
+	newRunner func(bind.NewRuntime) target.Runner[T],
 ) target.Run[target.Portal_] {
 	return runner[T]{
 		portMsg:    portMsg,
 		newRuntime: newRuntime,
-		newRunner: func(api target.NewRuntime, _ target.MsgSend) target.Runner[T] {
+		newRunner: func(api bind.NewRuntime, _ target.MsgSend) target.Runner[T] {
 			return newRunner(api)
 		},
 	}.Run
@@ -35,8 +36,8 @@ func Immutable[T target.Portal_](
 
 type runner[T target.Portal_] struct {
 	portMsg    target.Port
-	newRuntime target.NewRuntime
-	newRunner  func(target.NewRuntime, target.MsgSend) target.Runner[T]
+	newRuntime bind.NewRuntime
+	newRunner  func(bind.NewRuntime, target.MsgSend) target.Runner[T]
 }
 
 func (r runner[T]) Run(ctx context.Context, portal target.Portal_) (err error) {
@@ -48,15 +49,15 @@ func (r runner[T]) Run(ctx context.Context, portal target.Portal_) (err error) {
 	var reloader msg.Reloader
 	client := msg.NewClient(r.portMsg)
 	sendMsg := client.Send
-	newRuntime := func(ctx context.Context, portal target.Portal_) target.Runtime {
-		api := r.newRuntime(ctx, portal)
-		if api != nil {
-			client.Init(reloader, api)
+	newRuntime := func(ctx context.Context, portal target.Portal_) bind.Runtime {
+		runtime := r.newRuntime(ctx, portal)
+		if runtime != nil {
+			client.Init(reloader, runtime)
 		}
 		if err = client.Connect(ctx, t); err != nil {
 			plog.Get(ctx).Type(r).P().Println(err)
 		}
-		return api
+		return runtime
 	}
 	_runner := r.newRunner(newRuntime, sendMsg)
 	reloader = _runner

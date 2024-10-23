@@ -2,8 +2,8 @@ package v8
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/api/bind"
 	"github.com/cryptopunkscc/portal/runtime/js/embed/common"
-	"github.com/cryptopunkscc/portal/target"
 	"log"
 	"rogchap.com/v8go"
 )
@@ -13,9 +13,9 @@ func Run(ctx context.Context, file, src string) (err error) {
 	defer iso.Dispose()
 
 	// bind apphost adapter to js env
-	var ah target.Apphost
+	var runtime bind.Runtime
 	//ah = apphost.NewFactory(nil).WithTimeout(ctx, "src") // FIXME
-	global, err := Bind(iso, ah)
+	global, err := Bind(iso, runtime)
 	if err != nil {
 		log.Fatal(err)
 	}

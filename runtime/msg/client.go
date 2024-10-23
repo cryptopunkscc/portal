@@ -3,6 +3,7 @@ package msg
 import (
 	"context"
 	"github.com/cryptopunkscc/astrald/auth/id"
+	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"github.com/cryptopunkscc/portal/target"
@@ -19,8 +20,8 @@ func NewClient(port target.Port) (sender *Client) {
 	return
 }
 
-func (s *Client) Init(reloader Reloader, apphost target.ApphostCache) *Client {
-	s.handler = NewHandler(reloader, apphost)
+func (s *Client) Init(reloader Reloader, cache apphost.Cache) *Client {
+	s.handler = NewHandler(reloader, cache)
 	return s
 }
 

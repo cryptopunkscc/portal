@@ -4,12 +4,13 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/clir"
 	"github.com/cryptopunkscc/portal/factory/app"
-	"github.com/cryptopunkscc/portal/factory/runtime"
+	factory "github.com/cryptopunkscc/portal/factory/bind"
 	"github.com/cryptopunkscc/portal/feat/open"
 	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/runner/wails"
+	"github.com/cryptopunkscc/portal/runtime/bind"
 	. "github.com/cryptopunkscc/portal/target"
 )
 
@@ -32,9 +33,9 @@ func main() {
 }
 
 type Module struct{ app.Module[AppHtml] }
-type Adapter struct{ Runtime }
+type Adapter struct{ bind.Runtime }
 
 func (d *Module) Runner() Run[AppHtml] { return wails.NewRun(d.runtime) }
-func (d *Module) runtime(ctx context.Context, portal Portal_) Runtime {
-	return &Adapter{runtime.Frontend(ctx, portal)}
+func (d *Module) runtime(ctx context.Context, portal Portal_) bind.Runtime {
+	return &Adapter{factory.FrontendRuntime()(ctx, portal)}
 }

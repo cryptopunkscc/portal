@@ -5,26 +5,25 @@ import (
 	"sync"
 )
 
-type Cache[T any] struct {
+type cache[T any] struct {
 	entries  map[string]T
 	mutex    sync.RWMutex
 	onChange func(string, T, bool)
 }
 
-func (c *Cache[T]) Size() int {
+func (c *cache[T]) Size() int {
 	return len(c.entries)
 }
 
 func NewCache[T any]() Cache[T] {
-	return Cache[T]{entries: make(map[string]T)}
+	return &cache[T]{entries: make(map[string]T)}
 }
 
-func (c *Cache[T]) OnChange(onChange func(string, T, bool)) *Cache[T] {
+func (c *cache[T]) OnChange(onChange func(string, T, bool)) {
 	c.onChange = onChange
-	return c
 }
 
-func (c *Cache[T]) Release() (entries map[string]T) {
+func (c *cache[T]) Release() (entries map[string]T) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	entries = c.entries
@@ -32,13 +31,13 @@ func (c *Cache[T]) Release() (entries map[string]T) {
 	return
 }
 
-func (c *Cache[T]) Set(id string, t T) {
+func (c *cache[T]) Set(id string, t T) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	c.SetUnsafe(id, t)
 }
 
-func (c *Cache[T]) SetUnsafe(id string, t T) {
+func (c *cache[T]) SetUnsafe(id string, t T) {
 	add := any(t) != nil
 	ok := true
 	if add {
@@ -52,13 +51,13 @@ func (c *Cache[T]) SetUnsafe(id string, t T) {
 	}
 }
 
-func (c *Cache[T]) Delete(id string) bool {
+func (c *cache[T]) Delete(id string) bool {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	return c.DeleteUnsafe(id)
 }
 
-func (c *Cache[T]) DeleteUnsafe(id string) (ok bool) {
+func (c *cache[T]) DeleteUnsafe(id string) (ok bool) {
 	t, ok := c.entries[id]
 	if !ok {
 		return
@@ -71,14 +70,14 @@ func (c *Cache[T]) DeleteUnsafe(id string) (ok bool) {
 	return
 }
 
-func (c *Cache[T]) Get(id string) (t T, ok bool) {
+func (c *cache[T]) Get(id string) (t T, ok bool) {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 	t, ok = c.entries[id]
 	return
 }
 
-func (c *Cache[T]) Copy() map[string]T {
+func (c *cache[T]) Copy() map[string]T {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 	return maps.Clone(c.entries)

@@ -1,54 +1,54 @@
 package goja
 
 import (
-	"github.com/cryptopunkscc/portal/target"
+	"github.com/cryptopunkscc/portal/api/bind"
 	"github.com/dop251/goja"
 )
 
-func Bind(vm *goja.Runtime, astral target.Apphost) (err error) {
-	var a = adapter{astral: astral, vm: vm, queue: make(chan func(), 1024)}
+func Bind(vm *goja.Runtime, astral bind.Runtime) (err error) {
+	var a = adapter{runtime: astral, vm: vm, queue: make(chan func(), 1024)}
 
-	if err = vm.Set(target.Log, a.Log); err != nil {
+	if err = vm.Set(bind.Log, a.Log); err != nil {
 		return
 	}
-	if err = vm.Set(target.Sleep, a.Sleep); err != nil {
+	if err = vm.Set(bind.Sleep, a.Sleep); err != nil {
 		return
 	}
-	if err = vm.Set(target.ServiceRegister, a.ServiceRegister); err != nil {
+	if err = vm.Set(bind.ServiceRegister, a.ServiceRegister); err != nil {
 		return
 	}
-	if err = vm.Set(target.ServiceClose, a.ServiceClose); err != nil {
+	if err = vm.Set(bind.ServiceClose, a.ServiceClose); err != nil {
 		return
 	}
-	if err = vm.Set(target.ConnAccept, a.ConnAccept); err != nil {
+	if err = vm.Set(bind.ConnAccept, a.ConnAccept); err != nil {
 		return
 	}
-	if err = vm.Set(target.ConnClose, a.ConnClose); err != nil {
+	if err = vm.Set(bind.ConnClose, a.ConnClose); err != nil {
 		return
 	}
-	if err = vm.Set(target.ConnWrite, a.ConnWrite); err != nil {
+	if err = vm.Set(bind.ConnWrite, a.ConnWrite); err != nil {
 		return
 	}
-	if err = vm.Set(target.ConnRead, a.ConnRead); err != nil {
+	if err = vm.Set(bind.ConnRead, a.ConnRead); err != nil {
 		return
 	}
-	if err = vm.Set(target.Query, a.Query); err != nil {
+	if err = vm.Set(bind.Query, a.Query); err != nil {
 		return
 	}
-	if err = vm.Set(target.QueryName, a.QueryName); err != nil {
+	if err = vm.Set(bind.QueryName, a.QueryName); err != nil {
 		return
 	}
-	if err = vm.Set(target.GetNodeInfo, a.NodeInfo); err != nil {
+	if err = vm.Set(bind.GetNodeInfo, a.NodeInfo); err != nil {
 		return
 	}
-	if err = vm.Set(target.ResolveId, a.Resolve); err != nil {
+	if err = vm.Set(bind.ResolveId, a.Resolve); err != nil {
 		return
 	}
-	if err = vm.Set(target.Interrupt, a.Interrupt); err != nil {
+	if err = vm.Set(bind.Interrupt, a.Interrupt); err != nil {
 		return
 	}
 	go func() {
-		for f := range a.queue {
+		for f := range a.queue { // FIXME close queue on interrupt
 			f()
 		}
 	}()
@@ -56,49 +56,49 @@ func Bind(vm *goja.Runtime, astral target.Apphost) (err error) {
 }
 
 type adapter struct {
-	astral target.Apphost
-	vm     *goja.Runtime
-	queue  chan func()
+	runtime bind.Runtime
+	vm      *goja.Runtime
+	queue   chan func()
 }
 
-func (a *adapter) Log(arg any) {
-	a.astral.Log(arg)
+func (a *adapter) Log(arg string) {
+	a.runtime.Log(arg)
 }
 func (a *adapter) Sleep(millis int64) *goja.Promise {
-	return a.promise0(func() { a.astral.Sleep(millis) })
+	return a.promise0(func() { a.runtime.Sleep(millis) })
 }
 func (a *adapter) ServiceRegister(port string) *goja.Promise {
-	return a.promise1(func() error { return a.astral.ServiceRegister(port) })
+	return a.promise1(func() error { return a.runtime.ServiceRegister(port) })
 }
 func (a *adapter) ServiceClose(port string) *goja.Promise {
-	return a.promise1(func() error { return a.astral.ServiceClose(port) })
+	return a.promise1(func() error { return a.runtime.ServiceClose(port) })
 }
 func (a *adapter) ConnAccept(port string) *goja.Promise {
-	return a.promise2(func() (any, error) { return a.astral.ConnAccept(port) })
+	return a.promise2(func() (any, error) { return a.runtime.ConnAccept(port) })
 }
 func (a *adapter) ConnClose(id string) *goja.Promise {
-	return a.promise1(func() error { return a.astral.ConnClose(id) })
+	return a.promise1(func() error { return a.runtime.ConnClose(id) })
 }
 func (a *adapter) ConnWrite(id string, data string) *goja.Promise {
-	return a.promise1(func() error { return a.astral.ConnWrite(id, data) })
+	return a.promise1(func() error { return a.runtime.ConnWrite(id, data) })
 }
 func (a *adapter) ConnRead(id string) *goja.Promise {
-	return a.promise2(func() (any, error) { return a.astral.ConnRead(id) })
+	return a.promise2(func() (any, error) { return a.runtime.ConnRead(id) })
 }
 func (a *adapter) Query(identity string, query string) *goja.Promise {
-	return a.promise2(func() (any, error) { return a.astral.Query(identity, query) })
+	return a.promise2(func() (any, error) { return a.runtime.Query(identity, query) })
 }
 func (a *adapter) QueryName(name string, query string) *goja.Promise {
-	return a.promise2(func() (any, error) { return a.astral.QueryName(name, query) })
+	return a.promise2(func() (any, error) { return a.runtime.QueryName(name, query) })
 }
 func (a *adapter) Resolve(name string) *goja.Promise {
-	return a.promise2(func() (any, error) { return a.astral.Resolve(name) })
+	return a.promise2(func() (any, error) { return a.runtime.Resolve(name) })
 }
 func (a *adapter) NodeInfo(identity string) *goja.Promise {
-	return a.promise2(func() (any, error) { return a.astral.NodeInfo(identity) })
+	return a.promise2(func() (any, error) { return a.runtime.NodeInfo(identity) })
 }
 func (a *adapter) Interrupt() *goja.Promise {
-	return a.promise0(a.astral.Interrupt)
+	return a.promise0(a.runtime.Interrupt)
 }
 
 func (a *adapter) promise0(f func()) *goja.Promise {
