@@ -5,7 +5,7 @@
 Targets
 
 ```shell
-go test ./runner/... ./resolve/...
+go test ./resolve/... $(go list ./runner/... | grep -v /runner/webview)
 ```
 
 RPC
