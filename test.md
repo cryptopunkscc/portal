@@ -25,5 +25,9 @@ RPC
 JS runtime lib
 
 ```shell
-./make 8 && portal-dev -type 0 ./runtime/js/test
+./make 8 && portal-dev ./runtime/js/test/common
+```
+
+```shell
+./make 8 && portal-dev ./runtime/js/test/wails
 ```

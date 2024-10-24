@@ -12,10 +12,10 @@ var ResolveAll = Resolver[target.App_]()
 func Resolver[T target.App_]() target.Resolve[T] {
 	return target.Any[T](
 		target.Skip("node_modules"),
-		target.Try(js.ResolveBundle),
-		target.Try(js.ResolveDist),
 		target.Try(html.ResolveBundle),
 		target.Try(html.ResolveDist),
+		target.Try(js.ResolveBundle),
+		target.Try(js.ResolveDist),
 		target.Try(exec.ResolveBundle),
 		target.Try(exec.ResolveDist),
 	)

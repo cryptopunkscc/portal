@@ -29,10 +29,10 @@ func (view *WebView) BindApphost(runtime bind.Runtime) {
 	if err := view.Bind(bind.ConnClose, runtime.ConnClose); err != nil {
 		return
 	}
-	if err := view.Bind(bind.ConnWrite, runtime.ConnWrite); err != nil {
+	if err := view.Bind(bind.ConnWrite, runtime.ConnWriteLn); err != nil {
 		return
 	}
-	if err := view.Bind(bind.ConnRead, runtime.ConnRead); err != nil {
+	if err := view.Bind(bind.ConnRead, runtime.ConnReadLn); err != nil {
 		return
 	}
 	if err := view.Bind(bind.Query, runtime.Query); err != nil {

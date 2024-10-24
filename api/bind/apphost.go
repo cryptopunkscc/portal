@@ -7,6 +7,8 @@ const (
 	ConnClose       = "_astral_conn_close"
 	ConnWrite       = "_astral_conn_write"
 	ConnRead        = "_astral_conn_read"
+	ConnWriteLn     = "_astral_conn_write_ln"
+	ConnReadLn      = "_astral_conn_read_ln"
 	Query           = "_astral_query"
 	QueryName       = "_astral_query_name"
 	ResolveId       = "_astral_resolve"
@@ -19,8 +21,10 @@ type Apphost interface {
 	ServiceClose(service string) (err error)
 	ConnAccept(service string) (data string, err error)
 	ConnClose(id string) (err error)
-	ConnWrite(id string, data string) (err error)
-	ConnRead(id string) (data string, err error)
+	ConnWrite(id string, data []byte) (l int, err error)
+	ConnRead(id string, n int) (data []byte, err error)
+	ConnWriteLn(id string, data string) (err error)
+	ConnReadLn(id string) (data string, err error)
 	Query(identity string, query string) (data string, err error)
 	QueryName(name string, query string) (data string, err error)
 	Resolve(name string) (id string, err error)

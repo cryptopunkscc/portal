@@ -108,6 +108,7 @@ type queryData struct {
 }
 
 func (api *adapter) ConnClose(id string) (err error) {
+	api.log.Printf("close <%s>", id)
 	conn, ok := api.Connections().Get(id)
 	if !ok {
 		err = errors.New("[ConnClose] not found connection with id: " + id)
@@ -117,29 +118,53 @@ func (api *adapter) ConnClose(id string) (err error) {
 	return
 }
 
-func (api *adapter) ConnWrite(id string, data string) (err error) {
-	api.log.Printf("> %s <%s>", strings.TrimRight(data, "\r\n"), id)
+func (api *adapter) ConnWrite(id string, data []byte) (n int, err error) {
+	api.log.Printf("> [%v]byte <%s>", len(data), id)
+	//api.log.Printf("> [%v]byte <%s>", data, id)
 	conn, ok := api.Connections().Get(id)
 	if !ok {
 		err = errors.New("[ConnWrite] not found connection with id: " + id)
 		return
 	}
-	if _, err = conn.Write([]byte(data)); err != nil {
-		_ = conn.Close()
-	}
+	n, err = conn.Write(data)
 	return
 }
 
-func (api *adapter) ConnRead(id string) (data string, err error) {
+func (api *adapter) ConnRead(id string, n int) (data []byte, err error) {
 	conn, ok := api.Connections().Get(id)
 	if !ok {
 		err = errors.New("[ConnRead] not found connection with id: " + id)
 		return
 	}
-	data, err = conn.ReadString('\n')
-	if err != nil {
+	buf := make([]byte, n)
+	n, err = conn.Read(buf)
+	data = buf[:n]
+	api.log.Printf("< [%v]byte <%s>", n, id)
+	//api.log.Printf("< [%v]byte <%s> %v", data, id, err)
+	return
+}
+
+func (api *adapter) ConnWriteLn(id string, data string) (err error) {
+	api.log.Printf("> %s <%s>", strings.TrimRight(data, "\r\n"), id)
+	conn, ok := api.Connections().Get(id)
+	if !ok {
+		err = errors.New("[ConnWriteLn] not found connection with id: " + id)
 		return
 	}
+	if !strings.HasSuffix(data, "\n") {
+		data += "\n"
+	}
+	_, err = conn.Write([]byte(data))
+	return
+}
+
+func (api *adapter) ConnReadLn(id string) (data string, err error) {
+	conn, ok := api.Connections().Get(id)
+	if !ok {
+		err = errors.New("[ConnReadLn] not found connection with id: " + id)
+		return
+	}
+	data, err = conn.ReadString('\n')
 	data = strings.TrimSuffix(data, "\n")
 	api.log.Printf("< %s <%s>", data, id)
 	return

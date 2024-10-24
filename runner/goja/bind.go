@@ -32,6 +32,12 @@ func Bind(vm *goja.Runtime, astral bind.Runtime) (err error) {
 	if err = vm.Set(bind.ConnRead, a.ConnRead); err != nil {
 		return
 	}
+	if err = vm.Set(bind.ConnWriteLn, a.ConnWriteLn); err != nil {
+		return
+	}
+	if err = vm.Set(bind.ConnReadLn, a.ConnReadLn); err != nil {
+		return
+	}
 	if err = vm.Set(bind.Query, a.Query); err != nil {
 		return
 	}
@@ -79,11 +85,17 @@ func (a *adapter) ConnAccept(port string) *goja.Promise {
 func (a *adapter) ConnClose(id string) *goja.Promise {
 	return a.promise1(func() error { return a.runtime.ConnClose(id) })
 }
-func (a *adapter) ConnWrite(id string, data string) *goja.Promise {
-	return a.promise1(func() error { return a.runtime.ConnWrite(id, data) })
+func (a *adapter) ConnWrite(id string, data []byte) *goja.Promise {
+	return a.promise2(func() (any, error) { return a.runtime.ConnWrite(id, data) })
 }
-func (a *adapter) ConnRead(id string) *goja.Promise {
-	return a.promise2(func() (any, error) { return a.runtime.ConnRead(id) })
+func (a *adapter) ConnRead(id string, n int) *goja.Promise {
+	return a.promise2(func() (any, error) { return a.runtime.ConnRead(id, n) })
+}
+func (a *adapter) ConnWriteLn(id string, data string) *goja.Promise {
+	return a.promise1(func() error { return a.runtime.ConnWriteLn(id, data) })
+}
+func (a *adapter) ConnReadLn(id string) *goja.Promise {
+	return a.promise2(func() (any, error) { return a.runtime.ConnReadLn(id) })
 }
 func (a *adapter) Query(identity string, query string) *goja.Promise {
 	return a.promise2(func() (any, error) { return a.runtime.Query(identity, query) })
@@ -113,7 +125,7 @@ func (a *adapter) promise2(f func() (any, error)) *goja.Promise {
 		val, err := f()
 		a.queue <- func() {
 			if err != nil {
-				reject(err)
+				reject(err.Error())
 			} else {
 				resolve(val)
 			}

@@ -19,10 +19,10 @@ async function listenHello() {
 }
 
 async function handle(conn) {
-  let data = await conn.read()
+  let data = await conn.readLn()
   log("blocking " + conn.id)
   await sleep(3000)
   log(data)
-  await conn.write("Hello I am backend\n")
+  await conn.writeLn("Hello I am backend")
   await conn.close()
 }

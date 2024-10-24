@@ -151,7 +151,7 @@ func (a *adapter) ConnWrite(info *v8.FunctionCallbackInfo) *v8.Value {
 	data := info.Args()[1].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		err := a.runtime.ConnWrite(id, data)
+		err := a.runtime.ConnWriteLn(id, data)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {
@@ -169,7 +169,7 @@ func (a *adapter) ConnRead(info *v8.FunctionCallbackInfo) *v8.Value {
 	id := info.Args()[0].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		data, err := a.runtime.ConnRead(id)
+		data, err := a.runtime.ConnReadLn(id)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {

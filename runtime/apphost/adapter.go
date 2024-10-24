@@ -136,10 +136,27 @@ type conn struct {
 	in  bool
 }
 
-func (c *conn) Read(b []byte) (n int, err error)      { return c.buf.Read(b) }
-func (c *conn) ReadString(delim byte) (string, error) { return c.buf.ReadString(delim) }
-func (c *conn) Ref() string                           { return c.ref }
-func (c *conn) In() bool                              { return c.in }
+func (c *conn) Write(b []byte) (n int, err error) {
+	if n, err = c.Conn.Write(b); err != nil {
+		_ = c.Close()
+	}
+	return
+}
+
+func (c *conn) Read(b []byte) (n int, err error) {
+	if n, err = c.buf.Read(b); err != nil {
+		_ = c.Close()
+	}
+	return
+}
+func (c *conn) ReadString(delim byte) (s string, err error) {
+	if s, err = c.buf.ReadString(delim); err != nil {
+		_ = c.Close()
+	}
+	return
+}
+func (c *conn) Ref() string { return c.ref }
+func (c *conn) In() bool    { return c.in }
 func (c *conn) Close() error {
 	c.cache.deleteConn(c)
 	return c.Conn.Close()

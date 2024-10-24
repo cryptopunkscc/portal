@@ -44,18 +44,18 @@ export class RpcConn extends ApphostConn {
       if (cmd) cmd += '?'
       cmd += JSON.stringify(params)
     }
-    if (cmd) await this.write(cmd + '\n')
+    if (cmd) await this.writeLn(cmd)
     return this
   }
 
   async encode(data) {
     let json = JSON.stringify(data)
     if (json === undefined) json = '{}'
-    return await super.write(json + '\n')
+    return await super.writeLn(json)
   }
 
   async decode() {
-    const resp = await this.read()
+    const resp = await this.readLn()
     const parsed = JSON.parse(resp)
     if (parsed === null) return null
     if (parsed.error) throw parsed.error

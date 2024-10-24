@@ -7,8 +7,18 @@ const adapter = () => ({
   // apphost
   astral_conn_accept: _astral_conn_accept,
   astral_conn_close: _astral_conn_close,
-  astral_conn_read: _astral_conn_read,
+  astral_conn_read: async (id, buffer) => {
+    const array = await _astral_conn_read(id, buffer.byteLength);
+    const len = array.length;
+    const view = new Uint8Array(buffer);
+    for (let i = 0; i < len; i++) {
+      view[i] = array[i];
+    }
+    return len;
+  },
   astral_conn_write: _astral_conn_write,
+  astral_conn_read_ln: _astral_conn_read_ln,
+  astral_conn_write_ln: _astral_conn_write_ln,
   astral_node_info: _astral_node_info,
   astral_query: _astral_query,
   astral_query_name: _astral_query_name,

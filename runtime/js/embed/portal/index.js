@@ -27,8 +27,19 @@ const adapter$2 = () => ({
   // apphost
   astral_conn_accept: wails['go']['main']['Adapter']['ConnAccept'],
   astral_conn_close: wails['go']['main']['Adapter']['ConnClose'],
-  astral_conn_read: wails['go']['main']['Adapter']['ConnRead'],
+  astral_conn_read: async (id, buffer) => {
+    const base64 = await wails['go']['main']['Adapter']['ConnRead'](id, buffer.byteLength);
+    const binary = atob(base64);
+    const len = binary.length;
+    const view = new Uint8Array(buffer);
+    for (let i = 0; i < len; i++) {
+      view[i] = binary.charCodeAt(i);
+    }
+    return len
+  },
   astral_conn_write: wails['go']['main']['Adapter']['ConnWrite'],
+  astral_conn_read_ln: wails['go']['main']['Adapter']['ConnReadLn'],
+  astral_conn_write_ln: wails['go']['main']['Adapter']['ConnWriteLn'],
   astral_node_info: wails['go']['main']['Adapter']['NodeInfo'],
   astral_query: wails['go']['main']['Adapter']['Query'],
   astral_query_name: wails['go']['main']['Adapter']['QueryName'],
@@ -72,8 +83,13 @@ const adapter$1 = () => {
     astral_node_info: (arg1) => _promise(() => _app_host.nodeInfo(arg1)).then(v => JSON.parse(v)),
     astral_conn_accept: (arg1) => _promise(() => _app_host.connAccept(arg1)),
     astral_conn_close: (arg1) => _promise(() => _app_host.connClose(arg1)),
-    astral_conn_read: (arg1) => _promise(() => _app_host.connRead(arg1)),
+    astral_conn_read: (arg1, arg2) => _promise(() => {
+      // TODO write result to byte array
+      return _app_host.connRead(arg1, arg2);
+    }),
     astral_conn_write: (arg1, arg2) => _promise(() => _app_host.connWrite(arg1, arg2)),
+    astral_conn_read_ln: (arg1) => _promise(() => _app_host.connReadLn(arg1)),
+    astral_conn_write_ln: (arg1, arg2) => _promise(() => _app_host.connWriteLn(arg1, arg2)),
     astral_query: (arg1, arg2) => _promise(() => _app_host.query(arg1, arg2)),
     astral_query_name: (arg1, arg2) => _promise(() => _app_host.queryName(arg1, arg2)),
     astral_resolve: (arg1) => _promise(() => _app_host.resolve(arg1)),
@@ -95,8 +111,18 @@ const adapter = () => ({
   // apphost
   astral_conn_accept: _astral_conn_accept,
   astral_conn_close: _astral_conn_close,
-  astral_conn_read: _astral_conn_read,
+  astral_conn_read: async (id, buffer) => {
+    const array = await _astral_conn_read(id, buffer.byteLength);
+    const len = array.length;
+    const view = new Uint8Array(buffer);
+    for (let i = 0; i < len; i++) {
+      view[i] = array[i];
+    }
+    return len;
+  },
   astral_conn_write: _astral_conn_write,
+  astral_conn_read_ln: _astral_conn_read_ln,
+  astral_conn_write_ln: _astral_conn_write_ln,
   astral_node_info: _astral_node_info,
   astral_query: _astral_query,
   astral_query_name: _astral_query_name,
@@ -168,11 +194,14 @@ class ApphostConn {
     this.remoteId = data.remoteId;
   }
 
-  async read() {
+  async read(buffer) {
     try {
-      return await bindings.astral_conn_read(this.id)
+      return await bindings.astral_conn_read(this.id, buffer)
     } catch (e) {
       this.done = true;
+      if (e === "EOF") {
+        return -1
+      }
       throw e
     }
   }
@@ -186,9 +215,29 @@ class ApphostConn {
     }
   }
 
+  async readLn() {
+    try {
+      return await bindings.astral_conn_read_ln(this.id)
+    } catch (e) {
+      this.done = true;
+      throw e
+    }
+  }
+
+  async writeLn(data) {
+    try {
+      return await bindings.astral_conn_write_ln(this.id, data)
+    } catch (e) {
+      this.done = true;
+      throw e
+    }
+  }
+
   async close() {
-    this.done = true;
-    await bindings.astral_conn_close(this.id);
+    if (!this.done) {
+      this.done = true;
+      await bindings.astral_conn_close(this.id);
+    }
   }
 }
 
@@ -362,18 +411,18 @@ class RpcConn extends ApphostConn {
       if (cmd) cmd += '?';
       cmd += JSON.stringify(params);
     }
-    if (cmd) await this.write(cmd + '\n');
+    if (cmd) await this.writeLn(cmd);
     return this
   }
 
   async encode(data) {
     let json = JSON.stringify(data);
     if (json === undefined) json = '{}';
-    return await super.write(json + '\n')
+    return await super.writeLn(json)
   }
 
   async decode() {
-    const resp = await this.read();
+    const resp = await this.readLn();
     const parsed = JSON.parse(resp);
     if (parsed === null) return null
     if (parsed.error) throw parsed.error
@@ -510,10 +559,13 @@ async function handle(ctx, conn) {
       } catch (e) {
         result = {error: e};
       }
+      if (conn.done) {
+        return
+      }
       await conn.encode(result);
       handle = handlers;
     }
-    params = await conn.read();
+    params = await conn.readLn();
     if (typeof handle === "object") {
       [handle, params] = unfold(handle, params);
     }
@@ -594,7 +646,7 @@ function formatQuery(port, params) {
   return query
 }
 
-const log = any => bindings.log(typeof any == 'object' ? JSON.stringify(any) : any);
+const log = async any => await bindings.log(typeof any == 'object' ? JSON.stringify(any) : any);
 const {sleep, platform} = bindings;
 const apphost = new ApphostClient();
 const rpc = new RpcClient();

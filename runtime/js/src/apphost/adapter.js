@@ -57,11 +57,14 @@ export class ApphostConn {
     this.remoteId = data.remoteId
   }
 
-  async read() {
+  async read(buffer) {
     try {
-      return await bindings.astral_conn_read(this.id)
+      return await bindings.astral_conn_read(this.id, buffer)
     } catch (e) {
       this.done = true
+      if (e === "EOF") {
+        return -1
+      }
       throw e
     }
   }
@@ -75,8 +78,28 @@ export class ApphostConn {
     }
   }
 
+  async readLn() {
+    try {
+      return await bindings.astral_conn_read_ln(this.id)
+    } catch (e) {
+      this.done = true
+      throw e
+    }
+  }
+
+  async writeLn(data) {
+    try {
+      return await bindings.astral_conn_write_ln(this.id, data)
+    } catch (e) {
+      this.done = true
+      throw e
+    }
+  }
+
   async close() {
-    this.done = true
-    await bindings.astral_conn_close(this.id)
+    if (!this.done) {
+      this.done = true
+      await bindings.astral_conn_close(this.id)
+    }
   }
 }

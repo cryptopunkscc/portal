@@ -39,10 +39,13 @@ async function handle(ctx, conn) {
       } catch (e) {
         result = {error: e}
       }
+      if (conn.done) {
+        return
+      }
       await conn.encode(result)
       handle = handlers
     }
-    params = await conn.read();
+    params = await conn.readLn();
     if (typeof handle === "object") {
       [handle, params] = unfold(handle, params)
     }
