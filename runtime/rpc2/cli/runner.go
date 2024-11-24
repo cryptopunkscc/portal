@@ -59,12 +59,8 @@ func (c *Runner) Run(ctx context.Context) error {
 
 		rr := c.Query(query)
 		rr.Dependencies = append([]any{ctx}, rr.Dependencies...)
-		result := rr.Call()
-		if result != nil {
-			err = c.conn.Encode(result)
-			if err != nil {
-				return err
-			}
+		if err = rr.Respond(&c.conn); err != nil {
+			return err
 		}
 
 		// interactive mode check

@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
@@ -40,19 +41,24 @@ type Marshaler interface {
 	MarshalCLI() string
 }
 
-func Marshal(a any) ([]byte, error) {
+func Marshal(a any) (result []byte, err error) {
+	if a == rpc.End {
+		return
+	}
 	switch t := a.(type) {
 	case Marshaler:
-		return []byte(t.MarshalCLI()), nil
+		result = []byte(t.MarshalCLI())
 	case string:
-		return []byte(t), nil
+		result = []byte(t)
 	case []byte:
-		return t, nil
+		result = t
 	case error:
-		return fmt.Appendf(nil, "%e", t), nil
+		result = fmt.Appendf(nil, "%e", t)
 	case rpc.Failure:
-		return fmt.Appendf(nil, "API: %s", t.Error), nil
+		result = fmt.Appendf(nil, "API: %s", t.Error)
 	default:
-		return json.Marshal(a)
+		result, err = json.Marshal(a)
 	}
+	result = bytes.TrimSuffix(result, []byte("\n"))
+	return
 }

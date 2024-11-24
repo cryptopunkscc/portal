@@ -17,6 +17,13 @@ type Conn interface {
 	Flush()
 }
 
+var End = end{}
+
+type end struct{}
+
+func (e end) Error() string                { return "end" }
+func (e end) MarshalJSON() ([]byte, error) { return nil, e }
+
 func Call(conn Conn, name string, args ...any) (err error) {
 	var payload any
 	if len(args) > 0 {

@@ -5,6 +5,8 @@ import (
 	"github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
+	"math"
+	"time"
 )
 
 func main() {
@@ -29,6 +31,9 @@ func main() {
 				{Func: bar, Name: "bar b"},
 				{Func: baz, Name: "baz"},
 			}},
+			{Func: ticker, Name: "ticker t", Desc: "Start ticker.", Params: cmd.Params{
+				{Type: "int", Desc: "Counter limit."},
+			}},
 			apphost.Serve(),
 		},
 	}
@@ -36,6 +41,21 @@ func main() {
 	if err := cli.New(handler).Run(ctx); err != nil {
 		panic(err)
 	}
+}
+
+func ticker(amount int) <-chan int {
+	ch := make(chan int)
+	if amount == 0 {
+		amount = math.MaxInt
+	}
+	go func() {
+		defer close(ch)
+		for i := 1; i < amount+1; i++ {
+			ch <- i
+			time.Sleep(1 * time.Second)
+		}
+	}()
+	return ch
 }
 
 func add(a int, b int) int {

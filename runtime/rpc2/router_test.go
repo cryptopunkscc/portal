@@ -50,11 +50,11 @@ func TestRouter_Call(t *testing.T) {
 		caller    *cmd.Handler
 		unmarshal caller.Unmarshaler
 		deps      []any
-		expected  any
+		expected  []any
 	}{
 		{
 			name:     "function should be called",
-			expected: 1,
+			expected: []any{1},
 			caller:   &cmd.Handler{Func: func() int { return 1 }},
 		},
 		{
@@ -76,24 +76,20 @@ func TestRouter_Call(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			actual := Router{
+			c := Router{
 				Registry:     registry.New[*cmd.Handler]().Add(tt.route, tt.caller),
 				Unmarshalers: []caller.Unmarshaler{tt.unmarshal},
 				Dependencies: tt.deps,
 				args:         tt.args,
 			}.Call()
+			var actual []any
+			for a := range c {
+				actual = append(actual, a)
+			}
 
 			if !reflect.DeepEqual(tt.expected, actual) {
 				t.Errorf("expected %v, actual %v", tt.expected, actual)
 			}
 		})
 	}
-}
-
-type Foo struct {
-	i int
-}
-
-type Bar struct {
-	f []Foo
 }

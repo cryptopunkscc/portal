@@ -12,7 +12,6 @@ import (
 	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/clir"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/json"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
-	"log"
 	"regexp"
 	"strings"
 	"sync"
@@ -64,11 +63,9 @@ func (r *Router) Run(ctx context.Context) error {
 	if len(routes) == 0 {
 		handler := *r.Router.Registry.Get()
 		handler.Name = ""
-		log.Println("registering port:", r.Port.String(), handler.Names()[0])
 		routes = getRoutes(nil, handler)
 	}
 
-	log.Println(routes)
 	wg := sync.WaitGroup{}
 	errs := make(chan error, len(routes))
 	wg.Add(len(routes))
@@ -154,8 +151,7 @@ func (r *Router) routeQuery(q api.QueryData) {
 	flow := NewClient(conn)
 	scanner := bufio.NewScanner(conn)
 	for {
-		result := rr.Router.Call()
-		if err = flow.Encode(result); err != nil {
+		if err = rr.Respond(flow.Serializer); err != nil {
 			return
 		}
 		if !scanner.Scan() {
@@ -176,5 +172,5 @@ func (r *Router) setup(query string) {
 }
 
 func (r *Router) authorize() bool {
-	return r.Router.Query("!").Call() != false
+	return <-r.Router.Query("!").Call() != false
 }

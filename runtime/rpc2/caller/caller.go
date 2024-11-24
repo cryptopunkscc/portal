@@ -176,7 +176,13 @@ func (c *Func) runNested(values []reflect.Value, data []byte) (r []reflect.Value
 func extractResult(values []reflect.Value) (result []any) {
 	// filter out error for values
 	for _, value := range values {
-		result = append(result, value.Interface())
+		var add any
+		if value.Kind() == reflect.Chan {
+			add = valueToChan(value)
+		} else {
+			add = value.Interface()
+		}
+		result = append(result, add)
 	}
 
 	// trim nil values
@@ -184,4 +190,20 @@ func extractResult(values []reflect.Value) (result []any) {
 		result = result[0:n]
 	}
 	return
+}
+
+func valueToChan(value reflect.Value) <-chan any {
+	out := make(chan any)
+	go func() {
+		sel := []reflect.SelectCase{{Dir: reflect.SelectRecv, Chan: value}}
+		defer close(out)
+		for {
+			if _, v, b := reflect.Select(sel); b {
+				out <- v.Interface()
+			} else {
+				return
+			}
+		}
+	}()
+	return out
 }
