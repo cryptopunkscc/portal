@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 )
@@ -12,7 +13,12 @@ func main() {
 	handler := cmd.Handler{
 		Name: "test-cli",
 		Desc: "Test cli",
+		Func: apphost.ServeFunc,
 		Sub: cmd.Handlers{
+			{Func: add, Name: "sum s", Desc: "Sum given values.", Params: cmd.Params{
+				{Type: "int", Desc: "a."},
+				{Type: "int", Desc: "b."},
+			}},
 			{Func: inc, Name: "inc i", Desc: "Increment given value.", Params: cmd.Params{
 				{Type: "int", Desc: "value to decrement."},
 			}},
@@ -23,12 +29,17 @@ func main() {
 				{Func: bar, Name: "bar b"},
 				{Func: baz, Name: "baz"},
 			}},
+			apphost.Serve(),
 		},
 	}
 
 	if err := cli.New(handler).Run(ctx); err != nil {
 		panic(err)
 	}
+}
+
+func add(a int, b int) int {
+	return a + b
 }
 
 func inc(a int) int {

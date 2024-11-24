@@ -41,7 +41,7 @@ func Test_injectHelp(t *testing.T) {
 }
 
 var helpName = "help h"
-var helpType = func() {}
+var helpType = func() (h Help) { return }
 
 func assertHasHelp(t *testing.T, handler cmd.Handler) {
 	assert.NotEmpty(t, handler.Sub)
@@ -93,11 +93,11 @@ func TestHelp_MarshalCLI(t *testing.T) {
 foo, f - Foo description
 
 Parameters
-	-i	int - Integer
-	-b	bool - Boolean
-			string - String
+	-i int - Integer
+	-b bool - Boolean
+	 string - String
 
-Subcommands
+Commands
 	bar, b - Bar description
 	baz
 `)

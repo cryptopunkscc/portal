@@ -2,7 +2,7 @@ package rpc
 
 import (
 	"bufio"
-	"errors"
+	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 )
@@ -89,7 +89,7 @@ func (s *Serializer) Decode(value any) (err error) {
 	// try decode as failure
 	f := Failure{}
 	if err = s.Unmarshal(bytes, &f); err == nil && f.Error != "" {
-		return errors.New(f.Error)
+		return fmt.Errorf("RPC: %s", f.Error)
 	}
 
 	// decode value

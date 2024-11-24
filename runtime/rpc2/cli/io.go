@@ -2,6 +2,7 @@ package cli
 
 import (
 	"encoding/json"
+	"fmt"
 	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
 	"io"
 	"os"
@@ -47,6 +48,10 @@ func Marshal(a any) ([]byte, error) {
 		return []byte(t), nil
 	case []byte:
 		return t, nil
+	case error:
+		return fmt.Appendf(nil, "%e", t), nil
+	case rpc.Failure:
+		return fmt.Appendf(nil, "API: %s", t.Error), nil
 	default:
 		return json.Marshal(a)
 	}

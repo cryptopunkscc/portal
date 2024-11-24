@@ -4,6 +4,7 @@ import (
 	"strings"
 )
 
+type Root Handler
 type Handlers []Handler
 type Params []Param
 
