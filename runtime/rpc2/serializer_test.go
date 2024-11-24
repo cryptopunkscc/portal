@@ -59,12 +59,12 @@ func TestSerializer_Encode(t *testing.T) {
 	}{
 		{
 			name:     "1",
-			expected: `[1,2,3]`,
+			expected: `[1,2,3]` + "\n",
 			payload:  []float64{1, 2, 3},
 		},
 		{
 			name:     "2",
-			expected: `{"b":true,"f":1.1,"s":"s"}`,
+			expected: `{"b":true,"f":1.1,"s":"s"}` + "\n",
 			payload:  map[string]any{"s": "s", "f": 1.1, "b": true},
 		},
 	}

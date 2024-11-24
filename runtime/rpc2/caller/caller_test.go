@@ -1,6 +1,7 @@
 package caller
 
 import (
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"reflect"
 	"testing"
@@ -14,8 +15,11 @@ func TestStruct_Call(t *testing.T) {
 		data       []byte
 		wantResult []any
 		wantErr    bool
+		assert     func(t assert.TestingT, expected, actual interface{}, msgAndArgs ...interface{}) bool
 	}{
 		{
+			name:       "1",
+			assert:     assert.Equal,
 			wantResult: []any{1, "foo", true},
 			unmarshal: func(bytes []byte, args []any) error {
 				reflect.ValueOf(args[0]).Elem().SetInt(1)
@@ -29,6 +33,34 @@ func TestStruct_Call(t *testing.T) {
 				return i, s, b
 			},
 		},
+		{
+			name: "2",
+			function: func() <-chan int {
+				c := make(chan int, 10)
+				for i := 0; i < 10; i++ {
+					c <- i
+				}
+				close(c)
+				return c
+			},
+			assert: func(t assert.TestingT, expected, actual interface{}, msgAndArgs ...interface{}) bool {
+				args := actual.([]any)
+				assert.Len(t, args, 1)
+				actual = args[0]
+				if !assert.IsType(t, make(<-chan any), actual) {
+					return false
+				}
+				c := actual.(<-chan any)
+				i := 0
+				for a := range c {
+					if !assert.Equal(t, i, a) {
+						return false
+					}
+					i++
+				}
+				return true
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -38,9 +70,7 @@ func TestStruct_Call(t *testing.T) {
 				t.Errorf("Call() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(gotResult, tt.wantResult) {
-				t.Errorf("Call() gotResult = %v, want %v", gotResult, tt.wantResult)
-			}
+			tt.assert(t, tt.wantResult, gotResult)
 		})
 	}
 }

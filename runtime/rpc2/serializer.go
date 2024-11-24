@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
@@ -55,27 +56,22 @@ func (s *Serializer) init() {
 func (s *Serializer) Encode(value any) (err error) {
 	s.init()
 	r := value
-	switch v := value.(type) {
-	case error:
-		r = Failure{v.Error()}
+	if value != End {
+		switch v := value.(type) {
+		case error:
+			r = Failure{v.Error()}
+		}
 	}
-	data, err := s.Marshal(r)
-	if err != nil {
-		return
+	var data []byte
+	data, err = s.Marshal(r)
+	if err != nil || data == nil {
+		if !errors.Is(err, End) {
+			return
+		}
 	}
-	data = withSuffix(data, '\n')
+	data = append(data, '\n')
 	_, err = s.Write(data)
 	return
-}
-
-func withSuffix(bytes []byte, suffix byte) []byte {
-	if len(bytes) == 0 {
-		return []byte{suffix}
-	}
-	if bytes[len(bytes)-1] == suffix {
-		return bytes
-	}
-	return append(bytes, suffix)
 }
 
 func (s *Serializer) Decode(value any) (err error) {
@@ -84,6 +80,9 @@ func (s *Serializer) Decode(value any) (err error) {
 	bytes, err := s.Bytes()
 	if err != nil {
 		return
+	}
+	if len(bytes) == 0 {
+		return End
 	}
 
 	// try decode as failure

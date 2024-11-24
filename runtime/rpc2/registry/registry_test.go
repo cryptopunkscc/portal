@@ -2,6 +2,8 @@ package registry
 
 import (
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/exp/maps"
+	"slices"
 	"testing"
 )
 
@@ -33,12 +35,13 @@ func TestRegistry_All(t *testing.T) {
 	r.Add("aaa", "aaa")
 	r.Add("bbb", "bbb")
 
-	expected := map[string]any{
-		"a":   "a",
-		"aaa": "aaa",
-		"bbb": "bbb",
+	expected := []string{
+		"a",
+		"aaa",
+		"bbb",
 	}
-	actual := r.All()
+	actual := maps.Keys(r.All())
+	slices.Sort(actual)
 	assert.Equal(t, expected, actual)
 }
 
@@ -48,11 +51,12 @@ func TestRegistry_Children(t *testing.T) {
 	r.Add("aaa", "aaa")
 	r.Add("bbb", "bbb")
 
-	expected := map[string]any{
-		"a":   "a",
-		"bbb": "bbb",
+	expected := []string{
+		"a",
+		"bbb",
 	}
-	actual := r.Children()
+	actual := maps.Keys(r.Children())
+	slices.Sort(actual)
 	assert.Equal(t, expected, actual)
 }
 

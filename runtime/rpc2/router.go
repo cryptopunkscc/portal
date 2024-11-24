@@ -1,10 +1,12 @@
 package rpc
 
 import (
+	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/caller"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/registry"
+	"io"
 	"strings"
 )
 
@@ -44,9 +46,23 @@ func (r Router) Query(query string) Router {
 	return r
 }
 
-func (r Router) Call() (result any) {
+func (r Router) Respond(conn *Serializer) (err error) {
+	for item := range r.Call() {
+		if err = conn.Encode(item); err != nil {
+			return
+		}
+	}
+	err = conn.Encode(End)
+	return
+}
+
+func (r Router) Call() (o <-chan any) {
+	c := make(chan any, 1)
+	o = c
 	if r.err != nil {
-		return r.err
+		c <- r.err
+		close(c)
+		return c
 	}
 	in := []byte(r.args)
 	out, err := r.caller().
@@ -54,15 +70,34 @@ func (r Router) Call() (result any) {
 		Defaults(r.Dependencies...).
 		Defaults(r.Registry.Get()).
 		Call(in)
+
+	go respond(c, err, out...)
+	return o
+}
+
+func respond(c chan any, err error, out ...any) {
+	defer close(c)
 	switch {
 	case err != nil:
-		return err
+		if errors.Is(err, io.EOF) {
+			return
+		}
+		c <- err
 	case len(out) == 0:
-		return nil
 	case len(out) == 1:
-		return out[0]
+		r := out[0]
+		switch v := r.(type) {
+		case <-chan any:
+			for a := range v {
+				c <- a
+			}
+		default:
+			c <- out[0]
+		}
 	default:
-		return out
+		for _, a := range out {
+			c <- a
+		}
 	}
 }
 

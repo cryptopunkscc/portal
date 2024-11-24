@@ -17,13 +17,11 @@ func main() {
 	if len(os.Args) > 2 {
 		args = append(args, strings.Join(os.Args[2:], " "))
 	}
-	err := rpc.Call(request, "", args...)
+	c, err := rpc.Subscribe[any](request, "", args...)
 	if err != nil {
 		panic(err)
 	}
-	bytes, err := request.Bytes()
-	if err != nil {
-		panic(err)
+	for a := range c {
+		log.Println(a)
 	}
-	log.Println(string(bytes))
 }
