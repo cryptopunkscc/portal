@@ -5,35 +5,73 @@ import (
 	"context"
 	"errors"
 	api "github.com/cryptopunkscc/portal/api/apphost"
-	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/pkg/port"
 	runtime "github.com/cryptopunkscc/portal/runtime/apphost"
 	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
-	"golang.org/x/exp/maps"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/caller"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/clir"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/json"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
+	"log"
+	"regexp"
+	"strings"
 	"sync"
 )
+
+func Serve() cmd.Handler {
+	return cmd.Handler{
+		Name: "-s", Desc: "Serves rpc handler API via apphost interface.",
+		Func: ServeFunc,
+	}
+}
+
+func ServeFunc(ctx context.Context, root *cmd.Root) error {
+	handler := cmd.Handler(*root)
+	r := NewRouter(handler, nil)
+	return r.Run(ctx)
+}
 
 var Client api.Client = runtime.Default()
 
 type Router struct {
 	rpc.Router
-	target.Port
+	Port   port.Port
 	routes []string
 }
 
 var ErrUnauthorized = errors.New("unauthorized")
 
-func NewRouter(router rpc.Router, port target.Port, routes ...string) *Router {
-	return &Router{Router: router, Port: port, routes: routes}
+func NewRouter(handler cmd.Handler, port port.Port, routes ...string) *Router {
+	if len(port) == 0 && handler.Name != "" {
+		name := strings.ReplaceAll(handler.Names()[0], "-", ".")
+		port = port.Add(name)
+	}
+	return &Router{
+		routes: routes,
+		Port:   port,
+		Router: rpc.Router{
+			Registry: rpc.CreateRegistry(handler),
+			Unmarshalers: []caller.Unmarshaler{
+				json.Unmarshaler{},
+				clir.Unmarshaler{},
+			},
+		},
+	}
 }
 
 func (r *Router) Run(ctx context.Context) error {
 	routes := r.routes
 	if len(routes) == 0 {
-		routes = maps.Keys(r.Router.Registry.All())
+		handler := *r.Router.Registry.Get()
+		handler.Name = ""
+		log.Println("registering port:", r.Port.String(), handler.Names()[0])
+		routes = getRoutes(nil, handler)
 	}
 
+	log.Println(routes)
 	wg := sync.WaitGroup{}
 	errs := make(chan error, len(routes))
+	wg.Add(len(routes))
 	for _, route := range routes {
 		port := r.formatPort(route)
 		go func() {
@@ -52,12 +90,31 @@ func (r *Router) Run(ctx context.Context) error {
 	return errors.Join(errsArr...)
 }
 
+func getRoutes(port port.Port, handler cmd.Handler) (r []string) {
+	if name := handler.Names()[0]; name != "" {
+		port = port.Add(name)
+	}
+	if handler.Func != nil {
+		r = append(r, port.String())
+	}
+	for _, h := range handler.Sub {
+		if b, _ := regexp.MatchString(`^[a-z]+`, h.Name); !b {
+			continue
+		}
+		if strings.HasPrefix(h.Name, "help") {
+			continue
+		}
+		r = append(r, getRoutes(port, h)...)
+	}
+	return
+}
+
 func (r *Router) formatPort(route string) (port string) {
 	switch route {
 	case "*":
 		port = r.Port.String() + "*"
 	default:
-		port = r.Port.Route(route).String()
+		port = r.Port.Add(route).String()
 	}
 	return
 }
@@ -84,7 +141,8 @@ func (r *Router) register(ctx context.Context, port string) (err error) {
 
 func (r *Router) routeQuery(q api.QueryData) {
 	rr := *r
-	rr.setup(q.Query())
+	command := rr.Port.ParseCmd(q.Query())
+	rr.setup(command)
 	if !rr.authorize() {
 		_ = q.Reject()
 		return

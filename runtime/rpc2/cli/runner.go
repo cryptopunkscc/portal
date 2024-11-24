@@ -17,6 +17,7 @@ type Runner struct {
 }
 
 func New(handler cmd.Handler) (runner *Runner) {
+	root := cmd.Root(handler)
 
 	handler.AddSub(cmd.Handlers{
 		{Name: "-i", Desc: "Run interactive mode", Func: func() { runner.interactive = true }},
@@ -25,12 +26,13 @@ func New(handler cmd.Handler) (runner *Runner) {
 
 	injectHelp(&handler)
 	router := rpc.Router{
-		Registry: rpc.CreateRegistry(handler),
 		Unmarshalers: []caller.Unmarshaler{
 			json.Unmarshaler{},
 			clir.Unmarshaler{},
 		},
 	}
+	router.Dependencies = []any{&root, &router}
+	router.Registry = rpc.CreateRegistry(handler)
 
 	runner = &Runner{
 		Router: router,
@@ -40,7 +42,7 @@ func New(handler cmd.Handler) (runner *Runner) {
 	return
 }
 
-func (c *Runner) Run(_ context.Context) error {
+func (c *Runner) Run(ctx context.Context) error {
 	for {
 		// read query
 		bytes, err := c.conn.Bytes()
@@ -54,7 +56,10 @@ func (c *Runner) Run(_ context.Context) error {
 		query := string(bytes)
 
 		// handle query
-		result := c.Query(query).Call()
+
+		rr := c.Query(query)
+		rr.Dependencies = append([]any{ctx}, rr.Dependencies...)
+		result := rr.Call()
 		if result != nil {
 			err = c.conn.Encode(result)
 			if err != nil {

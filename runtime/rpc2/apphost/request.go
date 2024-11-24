@@ -16,15 +16,22 @@ type rpcRequest struct {
 	logger   plog.Logger
 }
 
+func (r *rpcRequest) Logger(logger plog.Logger) {
+	r.logger = logger
+}
+
 func RpcRequest(identity id.Identity, service string, path ...string) rpc.Conn {
 	return newRequest(identity, port.Format(service, path...))
 }
 
 func newRequest(identity id.Identity, service string) rpc.Conn {
 	return &rpcRequest{
-		Serializer: &rpc.Serializer{},
-		service:    service,
-		remoteID:   identity,
+		Serializer: &rpc.Serializer{
+			Marshal:   json.Marshal,
+			Unmarshal: json.Unmarshal,
+		},
+		service:  service,
+		remoteID: identity,
 	}
 }
 
@@ -84,6 +91,9 @@ func (r *rpcRequest) Call(method string, value any) (err error) {
 	if r.logger != nil {
 		conn = rpc.NewConnLogger(conn, r.logger)
 	}
-	r.Serializer = rpc.NewSerializer(conn)
+	serializer := rpc.NewSerializer(conn)
+	serializer.Marshal = r.Marshal
+	serializer.Unmarshal = r.Unmarshal
+	r.Serializer = serializer
 	return
 }

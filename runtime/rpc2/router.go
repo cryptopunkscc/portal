@@ -18,17 +18,19 @@ type Router struct {
 }
 
 func CreateRegistry(handler cmd.Handler) *registry.Node[*cmd.Handler] {
-	handler.Name = ""
-	r := registry.New[*cmd.Handler]('.', ' ')
-	InjectHandler(r, handler)
+	r := registry.New[*cmd.Handler]('.', ' ', '?')
+	rr := r.Add("", &handler)
+	for _, h := range handler.Sub {
+		injectHandler(rr, h)
+	}
 	return r
 }
 
-func InjectHandler(registry *registry.Node[*cmd.Handler], handler cmd.Handler) {
+func injectHandler(registry *registry.Node[*cmd.Handler], handler cmd.Handler) {
 	for _, name := range handler.Names() {
 		r := registry.Add(name, &handler)
 		for _, h := range handler.Sub {
-			InjectHandler(r, h)
+			injectHandler(r, h)
 		}
 	}
 }
@@ -49,8 +51,8 @@ func (r Router) Call() (result any) {
 	in := []byte(r.args)
 	out, err := r.caller().
 		Unmarshalers(r.Unmarshalers...).
-		Defaults(r).
 		Defaults(r.Dependencies...).
+		Defaults(r.Registry.Get()).
 		Call(in)
 	switch {
 	case err != nil:

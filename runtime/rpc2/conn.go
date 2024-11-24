@@ -11,6 +11,7 @@ type Conn interface {
 	Logger(logger plog.Logger)
 	Copy() Conn
 	Call(method string, value any) (err error)
+	Bytes() ([]byte, error)
 	Encode(value any) (err error)
 	Decode(value any) (err error)
 	Flush()
