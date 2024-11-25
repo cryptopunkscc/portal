@@ -4,7 +4,7 @@ import (
 	"context"
 	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/caller"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/clir"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/json"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 	"io"
@@ -28,7 +28,7 @@ func New(handler cmd.Handler) (runner *Runner) {
 	router := rpc.Router{
 		Unmarshalers: []caller.Unmarshaler{
 			json.Unmarshaler{},
-			clir.Unmarshaler{},
+			cli.Unmarshaler{},
 		},
 	}
 	router.Dependencies = []any{&root, &router}
