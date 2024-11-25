@@ -34,6 +34,14 @@ func main() {
 			{Func: ticker, Name: "ticker t", Desc: "Start ticker.", Params: cmd.Params{
 				{Type: "int", Desc: "Counter limit."},
 			}},
+			{
+				Func: func(str string) string { return str },
+				Name: "echo e",
+				Desc: "Echo command.",
+				Params: cmd.Params{
+					{Type: "string"},
+				},
+			},
 			apphost.Serve(),
 		},
 	}

@@ -9,7 +9,7 @@ import (
 	runtime "github.com/cryptopunkscc/portal/runtime/apphost"
 	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/caller"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/clir"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/json"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 	"regexp"
@@ -52,7 +52,7 @@ func NewRouter(handler cmd.Handler, port port.Port, routes ...string) *Router {
 			Registry: rpc.CreateRegistry(handler),
 			Unmarshalers: []caller.Unmarshaler{
 				json.Unmarshaler{},
-				clir.Unmarshaler{},
+				cli.Unmarshaler{},
 			},
 		},
 	}
