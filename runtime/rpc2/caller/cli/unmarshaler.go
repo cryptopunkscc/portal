@@ -93,7 +93,7 @@ func (p *values) set(offset int, fields []string) (err error) {
 	field := fields[offset]
 	var value reflect.Value
 	if field[0] == '-' {
-		value = p.named[field]
+		value = p.named[field[1:]]
 		offset++
 		if value.Kind() == reflect.Bool {
 			value.SetBool(true)
