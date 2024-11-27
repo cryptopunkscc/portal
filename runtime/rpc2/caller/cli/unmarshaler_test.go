@@ -33,11 +33,11 @@ func TestUnmarshaler_Unmarshal(t *testing.T) {
 
 type testOptions struct {
 	nestedOptions
-	I int  `cli:"-i"`
-	B bool `cli:"-b"`
+	I int  `cli:"i"`
+	B bool `cli:"b"`
 }
 
 type nestedOptions struct {
-	S string `cli:"-s"`
+	S string `cli:"s"`
 	T *testOptions
 }

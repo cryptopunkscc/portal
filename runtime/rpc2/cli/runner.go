@@ -28,9 +28,9 @@ func New(handler cmd.Handler) (runner *Runner) {
 	injectHelp(&handler)
 	router := rpc.Router{
 		Unmarshalers: []caller.Unmarshaler{
+			cli.Unmarshaler{},
 			json.Unmarshaler{},
 			query.Unmarshaler{},
-			cli.Unmarshaler{},
 		},
 	}
 	router.Dependencies = []any{&root, &router}
@@ -55,11 +55,9 @@ func (c *Runner) Run(ctx context.Context) error {
 			}
 			return err
 		}
-		query := string(bytes)
 
 		// handle query
-
-		rr := c.Query(query)
+		rr := c.Query(string(bytes))
 		rr.Dependencies = append([]any{ctx}, rr.Dependencies...)
 		if err = rr.Respond(&c.conn); err != nil {
 			return err
