@@ -31,6 +31,35 @@ func TestUnmarshaler_Unmarshal(t *testing.T) {
 	assert.Equal(t, rest, `lorem ipsum`)
 }
 
+func TestUnmarshaler_Unmarshal_2(t *testing.T) {
+	var opts *testOptions
+	var params = []any{&opts}
+	var data = `-s "a b c"`
+
+	err := Unmarshal([]byte(data), params)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, opts, &testOptions{
+		nestedOptions: nestedOptions{S: "a b c"},
+	})
+}
+
+func TestUnmarshaler_Unmarshal_3(t *testing.T) {
+	var opts *testOptions
+	var params = []any{&opts}
+
+	err := Unmarshal([]byte{}, params)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, opts, &testOptions{
+		nestedOptions: nestedOptions{},
+	})
+}
+
 type testOptions struct {
 	nestedOptions
 	I int  `cli:"i"`

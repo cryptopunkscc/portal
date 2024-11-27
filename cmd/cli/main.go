@@ -51,9 +51,9 @@ func main() {
 					Options{}.CmdParams(),
 					cmd.Param{Type: "string"},
 				),
-				Func: func(o Options, str string) string {
+				Func: func(o Options, o2 *Options2, str string) string {
 					log.Println(o)
-					return fmt.Sprintf("%v %d %s %s", o.B, o.I, o.S, str)
+					return fmt.Sprintf("%v %d %s %f %s", o.B, o.I, o.S, o2.F, str)
 				},
 			},
 			apphost.Serve(),
@@ -116,4 +116,8 @@ func (o Options) CmdParams() cmd.Params {
 		{Name: "i", Type: "int"},
 		{Name: "b", Type: "bool"},
 	}
+}
+
+type Options2 struct {
+	F float64 `cli:"f" json:"f"`
 }
