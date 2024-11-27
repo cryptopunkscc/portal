@@ -52,9 +52,9 @@ func NewRouter(handler cmd.Handler, port port.Port, routes ...string) *Router {
 		Router: rpc.Router{
 			Registry: rpc.CreateRegistry(handler),
 			Unmarshalers: []caller.Unmarshaler{
+				cli.Unmarshaler{},
 				json.Unmarshaler{},
 				query.Unmarshaler{},
-				cli.Unmarshaler{},
 			},
 		},
 	}

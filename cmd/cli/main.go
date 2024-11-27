@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
+	"log"
 	"math"
 	"time"
 )
@@ -35,11 +37,23 @@ func main() {
 				{Type: "int", Desc: "Counter limit."},
 			}},
 			{
-				Func: func(str string) string { return str },
 				Name: "echo e",
 				Desc: "Echo command.",
 				Params: cmd.Params{
 					{Type: "string"},
+				},
+				Func: func(str string) string { return str },
+			},
+			{
+				Name: "test",
+				Desc: "Test command.",
+				Params: append(
+					Options{}.CmdParams(),
+					cmd.Param{Type: "string"},
+				),
+				Func: func(o Options, str string) string {
+					log.Println(o)
+					return fmt.Sprintf("%v %d %s %s", o.B, o.I, o.S, str)
 				},
 			},
 			apphost.Serve(),
@@ -88,4 +102,18 @@ func bar() string {
 
 func baz() string {
 	return "baz"
+}
+
+type Options struct {
+	S string `cli:"s" json:"s"`
+	I int    `cli:"i" json:"i"`
+	B bool   `cli:"b" json:"b"`
+}
+
+func (o Options) CmdParams() cmd.Params {
+	return cmd.Params{
+		{Name: "s", Type: "string"},
+		{Name: "i", Type: "int"},
+		{Name: "b", Type: "bool"},
+	}
 }

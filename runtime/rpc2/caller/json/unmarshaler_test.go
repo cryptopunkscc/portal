@@ -29,6 +29,11 @@ func TestUnmarshaler_Unmarshal(t *testing.T) {
 			expected: []any{map[string]interface{}{"foo": "bar"}},
 			actual:   []any{map[string]interface{}{}},
 		},
+		{
+			data:     `[{"foo": "bar"}]`,
+			expected: []any{&Options{Foo: "bar"}},
+			actual:   []any{&Options{}},
+		},
 	}
 	u := Unmarshaler{}
 	for n, tt := range tests {
@@ -39,4 +44,8 @@ func TestUnmarshaler_Unmarshal(t *testing.T) {
 			assert.ElementsMatch(t, tt.expected, tt.actual)
 		})
 	}
+}
+
+type Options struct {
+	Foo string `json:"foo"`
 }

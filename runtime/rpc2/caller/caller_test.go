@@ -22,12 +22,13 @@ func TestStruct_Call(t *testing.T) {
 			assert:     assert.Equal,
 			wantResult: []any{1, "foo", true},
 			unmarshal: func(bytes []byte, args []any) error {
-				reflect.ValueOf(args[0]).Elem().SetInt(1)
-				reflect.ValueOf(args[1]).Elem().SetString("foo")
-				reflect.ValueOf(args[2]).Elem().SetBool(true)
+				reflect.ValueOf(args[0]).Elem().FieldByName("I").SetInt(1)
+				reflect.ValueOf(args[1]).Elem().SetInt(1)
+				reflect.ValueOf(args[2]).Elem().SetString("foo")
+				reflect.ValueOf(args[3]).Elem().SetBool(true)
 				return nil
 			},
-			function: func(t *testing.T, i int, s string, b bool, n any) (int, string, bool) {
+			function: func(t *testing.T, o testOptions, i int, s string, b bool, n any) (int, string, bool) {
 				require.NotNil(t, t)
 				require.Nil(t, n)
 				return i, s, b
@@ -73,4 +74,10 @@ func TestStruct_Call(t *testing.T) {
 			tt.assert(t, tt.wantResult, gotResult)
 		})
 	}
+}
+
+type testOptions struct {
+	I int    `cli:"i"`
+	B bool   `cli:"b"`
+	S string `cli:"s"`
 }

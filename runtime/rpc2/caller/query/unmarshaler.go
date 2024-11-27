@@ -2,6 +2,7 @@ package query
 
 import (
 	"fmt"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/param"
 	"net/url"
 	"reflect"
 	"strings"
@@ -13,13 +14,23 @@ func (u Unmarshaler) Unmarshal(data []byte, params []any) (err error) {
 	return Unmarshal(data, params)
 }
 
+func (u Unmarshaler) Score(data []byte) (score uint) {
+	for _, r := range string(data) {
+		switch r {
+		case '&', '=':
+			score++
+		}
+	}
+	return
+}
+
 func Unmarshal(data []byte, params []any) (err error) {
 	e, err := parseArgs(string(data))
 	if err != nil {
 		return
 	}
-	p := newValues(params)
-	err = p.set(0, e)
+	p := param.NewValues(params)
+	err = set(p, 0, e)
 	return
 }
 
@@ -65,49 +76,7 @@ func parseArgs(query string) (args []arg, err error) {
 	return
 }
 
-type values struct {
-	named      map[string]reflect.Value
-	positional []reflect.Value
-}
-
-func newValues(args []any) (p *values) {
-	p = &values{}
-	p.named = make(map[string]reflect.Value)
-	for _, arg := range args {
-		v := reflect.ValueOf(arg)
-		p.add("", v)
-	}
-	return
-}
-
-func (p *values) add(name string, v reflect.Value) {
-	kind := v.Kind()
-	switch kind {
-	case reflect.Pointer:
-		if !v.IsZero() { // TODO verify
-			p.add(name, v.Elem())
-		}
-	case reflect.Struct:
-		for i := 0; i < v.NumField(); i++ {
-			fv := v.Field(i)
-			sf := v.Type().Field(i)
-			tag := sf.Tag.Get("cli")
-			if tag == "" && fv.Kind() != reflect.Struct {
-				return
-			}
-			p.add(tag, fv)
-		}
-	default:
-		if name != "" {
-			p.named[name] = v
-		} else {
-			p.positional = append(p.positional, v)
-		}
-	}
-	return
-}
-
-func (p *values) set(offset int, elements []arg) (err error) {
+func set(p *param.Values, offset int, elements []arg) (err error) {
 	if offset == len(elements) {
 		return
 	}
@@ -119,22 +88,22 @@ func (p *values) set(offset int, elements []arg) (err error) {
 	var field string
 	var value reflect.Value
 	if len(args) > 0 && args[0] != "" {
-		value = p.named[key]
+		value = p.Named[key]
 		field = args[0]
 	} else {
-		if v, ok := p.named[key]; ok {
+		if v, ok := p.Named[key]; ok {
 			if v.Kind() == reflect.Bool {
 				v.SetBool(true)
-				return p.set(offset, elements)
+				return set(p, offset, elements)
 			}
 		}
 
-		if len(p.positional) == 0 {
+		if len(p.Positional) == 0 {
 			return
 		}
 		field = key
-		value = p.positional[0]
-		p.positional = p.positional[1:]
+		value = p.Positional[0]
+		p.Positional = p.Positional[1:]
 	}
 	if value.Kind() == reflect.String {
 		value.SetString(field)
@@ -147,5 +116,5 @@ func (p *values) set(offset int, elements []arg) (err error) {
 			return
 		}
 	}
-	return p.set(offset, elements)
+	return set(p, offset, elements)
 }

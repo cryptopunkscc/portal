@@ -133,10 +133,19 @@ func (c *Func) unmarshal(data []byte, args []any) error {
 	if len(c.unmarshalers) == 0 {
 		panic("no unmarshalers specified")
 	}
-	for _, unmarshaler := range c.unmarshalers {
-		if unmarshaler.Unmarshal(data, args) == nil {
-			return nil
+	chosen := c.unmarshalers[0]
+	score := chosen.Score(data)
+	for i := 1; i < len(c.unmarshalers); i++ {
+		n := c.unmarshalers[i]
+		s := n.Score(data)
+		if score < s {
+			chosen = n
+			score = s
 		}
+	}
+	err := chosen.Unmarshal(data, args)
+	if err == nil {
+		return nil
 	}
 	return fmt.Errorf("cannot unmarshal data %s", data)
 }
