@@ -3,6 +3,7 @@ package caller
 import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"log"
 	"reflect"
 	"testing"
 )
@@ -60,6 +61,17 @@ func TestStruct_Call(t *testing.T) {
 					i++
 				}
 				return true
+			},
+		},
+		{
+			name:       "3",
+			assert:     assert.Equal,
+			wantResult: []any(nil),
+			unmarshal: func(bytes []byte, args []any) error {
+				return nil
+			},
+			function: func(o *testOptions) {
+				log.Println(o)
 			},
 		},
 	}

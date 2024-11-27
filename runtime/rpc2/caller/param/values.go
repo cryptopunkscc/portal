@@ -27,9 +27,12 @@ func (vs *Values) add(name string, v reflect.Value) {
 	kind := v.Kind()
 	switch kind {
 	case reflect.Pointer:
-		if !v.IsZero() { // TODO verify
-			vs.add(name, v.Elem())
+		e := v.Elem()
+		if e.Kind() == reflect.Pointer && e.IsZero() {
+			n := reflect.New(e.Type().Elem())
+			e.Set(n)
 		}
+		vs.add(name, e)
 	case reflect.Struct:
 		for i := 0; i < v.NumField(); i++ {
 			fv := v.Field(i)
@@ -47,5 +50,4 @@ func (vs *Values) add(name string, v reflect.Value) {
 			vs.Positional = append(vs.Positional, v)
 		}
 	}
-	return
 }
