@@ -95,9 +95,7 @@ func respond(c chan any, err error, out ...any) {
 			c <- out[0]
 		}
 	default:
-		for _, a := range out {
-			c <- a
-		}
+		c <- out
 	}
 }
 
