@@ -12,7 +12,7 @@ func TestGoRpc(t *testing.T) {
 	log := plog.New().Set(&ctx)
 	srv := NewTestGoService("test.go")
 
-	if err := srv.Start(ctx); err != nil {
+	if err := srv.Router.Start(ctx); err != nil {
 		log.P().Println()
 	}
 

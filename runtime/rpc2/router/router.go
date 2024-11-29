@@ -21,7 +21,7 @@ type Base struct {
 }
 
 func CreateRegistry(handler cmd.Handler) *registry.Node[*cmd.Handler] {
-	r := registry.New[*cmd.Handler]('.', ' ', '?')
+	r := registry.New[*cmd.Handler]('.', ' ', '?', '*')
 	rr := r.Add("", &handler)
 	for _, h := range handler.Sub {
 		injectHandler(rr, h)
@@ -53,7 +53,7 @@ func (r Base) Respond(conn *rpc.Serializer) (err error) {
 			return
 		}
 	}
-	err = conn.Encode(End)
+	//err = conn.Encode(End) //Fixme interferes with test/rpc/go_test.go and cmd/cli
 	return
 }
 
@@ -96,9 +96,7 @@ func respond(c chan any, err error, out ...any) {
 			c <- out[0]
 		}
 	default:
-		for _, a := range out {
-			c <- a
-		}
+		c <- out
 	}
 }
 

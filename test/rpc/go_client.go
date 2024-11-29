@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runtime/rpc"
+	"github.com/cryptopunkscc/portal/runtime/rpc2"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
 	"github.com/stretchr/testify/assert"
+	"log"
 	"testing"
 )
 
@@ -23,7 +25,7 @@ func NewTestClient(port string, services ...string) *TestClient {
 }
 
 func (c TestClient) Run(t *testing.T) {
-	t.Log("Starting test client")
+	log.Println("Starting test client")
 
 	tests := []struct {
 		name    string
@@ -34,14 +36,14 @@ func (c TestClient) Run(t *testing.T) {
 			//skip: true,
 			name: "request",
 			getConn: func(srv string, t *testing.T) rpc.Conn {
-				return rpc.NewRequest(id.Anyone, fmt.Sprintf(c.port, srv), "request")
+				return apphost.RpcRequest(id.Anyone, fmt.Sprintf(c.port, srv), "request")
 			},
 		},
 		{
 			//skip: true,
 			name: "flow",
 			getConn: func(srv string, t *testing.T) (conn rpc.Conn) {
-				conn, err := rpc.QueryFlow(id.Anyone, fmt.Sprintf(c.port, srv), "flow")
+				conn, err := apphost.RpcClient(id.Anyone, fmt.Sprintf(c.port, srv), "flow")
 				if err != nil {
 					t.Skip(err)
 				}
@@ -69,7 +71,7 @@ func (c TestClient) Run(t *testing.T) {
 					t.Run("b", func(t *testing.T) {
 						str, err := rpc.Query[string](request, "func1", "text", true)
 						assert.Equal(t, "", str)
-						assert.Equal(t, errors.New("text"), err)
+						assert.Equal(t, errors.New("RPC: text"), err)
 					})
 				})
 
@@ -79,7 +81,6 @@ func (c TestClient) Run(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					t.Log(actual)
 					assert.Equal(t, expected, actual)
 				})
 
@@ -120,7 +121,6 @@ func (c TestClient) Run(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					t.Log(actual)
 					assert.Equal(t, expected, actual)
 				})
 			})
