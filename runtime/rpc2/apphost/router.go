@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	api "github.com/cryptopunkscc/portal/api/apphost"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/port"
 	runtime "github.com/cryptopunkscc/portal/runtime/apphost"
 	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
@@ -58,6 +59,15 @@ func NewRouter(handler cmd.Handler, port port.Port, routes ...string) *Router {
 			},
 		},
 	}
+}
+
+func (r *Router) Start(ctx context.Context) (err error) {
+	go func() {
+		if err = r.Run(ctx); err != nil {
+			plog.Get(ctx).Type(r).E().Println(err)
+		}
+	}()
+	return nil
 }
 
 func (r *Router) Run(ctx context.Context) error {
