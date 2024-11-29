@@ -6,17 +6,19 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
+	"strings"
 )
 
 type Serializer struct {
 	io.Reader
 	io.Writer
 	io.Closer
-	Marshal
-	Unmarshal
+	Marshal   Marshal
+	Unmarshal Unmarshal
 
 	scanner *bufio.Scanner
 	reader  io.Reader
+	logger  plog.Logger
 }
 
 type Marshal func(v any) ([]byte, error)
@@ -103,11 +105,29 @@ func (s *Serializer) Bytes() (bytes []byte, err error) {
 		}
 		return
 	}
-	s.scanner.Bytes()
 	bytes = s.scanner.Bytes()
+	if s.logger != nil {
+		s.logger.Println("<", strings.Trim(string(bytes), "\n"))
+	}
+	return
+}
+
+func (s *Serializer) Read(b []byte) (n int, err error) {
+	n, err = s.Reader.Read(b)
+	if s.logger != nil {
+		s.logger.Println("<", strings.Trim(string(b[:n]), "\n"))
+	}
+	return
+}
+
+func (s *Serializer) Write(b []byte) (n int, err error) {
+	n, err = s.Writer.Write(b)
+	if s.logger != nil {
+		s.logger.Println(">", strings.Trim(string(b[:n]), "\n"))
+	}
 	return
 }
 
 func (s *Serializer) Logger(logger plog.Logger) {
-
+	s.logger = logger
 }

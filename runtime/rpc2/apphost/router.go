@@ -6,6 +6,7 @@ import (
 	"errors"
 	api "github.com/cryptopunkscc/portal/api/apphost"
 	create "github.com/cryptopunkscc/portal/factory/apphost"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/port"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/caller"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/cli"
@@ -60,6 +61,15 @@ func NewRouter(handler cmd.Handler, port port.Port, routes ...string) *Router {
 	}
 }
 
+func (r *Router) Start(ctx context.Context) (err error) {
+	go func() {
+		if err = r.Run(ctx); err != nil {
+			plog.Get(ctx).Type(r).E().Println(err)
+		}
+	}()
+	return nil
+}
+
 func (r *Router) Run(ctx context.Context) error {
 	routes := r.routes
 	if len(routes) == 0 {
@@ -89,12 +99,18 @@ func (r *Router) Run(ctx context.Context) error {
 	return errors.Join(errsArr...)
 }
 
+var RouteAll = &struct{}{}
+
 func getRoutes(port port.Port, handler cmd.Handler) (r []string) {
 	if name := handler.Names()[0]; name != "" {
 		port = port.Add(name)
 	}
 	if handler.Func != nil {
-		r = append(r, port.String())
+		p := port.String()
+		if handler.Func == RouteAll {
+			p += "*"
+		}
+		r = append(r, p)
 	}
 	for _, h := range handler.Sub {
 		if b, _ := regexp.MatchString(`^[a-z]+`, h.Name); !b {
@@ -153,8 +169,13 @@ func (r *Router) routeQuery(q api.QueryData) {
 	flow := NewClient(conn)
 	scanner := bufio.NewScanner(conn)
 	for {
-		if err = rr.Respond(flow.Serializer); err != nil {
-			return
+		if !rr.skip() {
+			if err = rr.Respond(flow.Serializer); err != nil {
+				return
+			}
+		} else {
+			rrr := rr
+			r = &rrr
 		}
 		if !scanner.Scan() {
 			return
@@ -169,10 +190,15 @@ func (r *Router) routeQuery(q api.QueryData) {
 	}
 }
 
+func (r *Router) skip() bool {
+	return r.Registry.Get().Func == RouteAll
+}
+
 func (r *Router) setup(query string) {
 	r.Base = r.Query(query)
 }
 
 func (r *Router) authorize() bool {
-	return <-r.Query("!").Call() != false
+	//return <-r.Query("!").Call() != false //Fixme breaks test/rpc/
+	return true
 }

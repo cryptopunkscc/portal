@@ -54,8 +54,8 @@ func TestRouter_Call(t *testing.T) {
 	}{
 		{
 			name:     "function should be called",
-			expected: []any{1},
-			caller:   &cmd.Handler{Func: func() int { return 1 }},
+			expected: []any{[]any{1, true}},
+			caller:   &cmd.Handler{Func: func() (int, bool) { return 1, true }},
 		},
 		{
 			name:   "unmarshaler should be called",
