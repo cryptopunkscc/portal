@@ -2,30 +2,38 @@ package rpc
 
 import (
 	"errors"
-	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runtime/rpc"
+	api "github.com/cryptopunkscc/portal/api/apphost"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 )
 
 type TestGoService struct {
-	*rpc.App
+	*apphost.Router
 }
 
-func NewTestGoService(port string) *TestGoService {
-	app := rpc.NewApp(port)
-	app.Logger(plog.New().Type(app))
-
-	app.RouteFunc("request.func1", Function1)
-	app.RouteFunc("request.func2", Function2)
-	app.RouteFunc("request.func3", Function3)
-	app.RouteFunc("request.func4", Function4)
-
-	app.Routes("flow*")
-	app.Func("flow.func1", Function1)
-	app.Func("flow.func2", Function2)
-	app.Func("flow.func3", Function3)
-	app.Func("flow.func4", Function4)
-
-	return &TestGoService{App: app}
+func NewTestGoService(p string) *TestGoService {
+	handlers := cmd.Handlers{
+		{Func: Function1, Name: "func1"},
+		{Func: Function2, Name: "func2"},
+		{Func: Function3, Name: "func3"},
+		{Func: Function4, Name: "func4"},
+	}
+	root := cmd.Handler{
+		Sub: cmd.Handlers{
+			{
+				Name: "request",
+				Sub:  handlers,
+			},
+			{
+				Name: "flow",
+				Sub:  handlers,
+				Func: apphost.RouteAll,
+			},
+		},
+	}
+	return &TestGoService{
+		Router: apphost.NewRouter(root, api.NewPort(p)),
+	}
 }
 
 func Function1(msg string, fail bool) (s string, err error) {
