@@ -3,13 +3,11 @@ package rpc
 import (
 	"errors"
 	"github.com/cryptopunkscc/portal/pkg/port"
-	"github.com/cryptopunkscc/portal/runtime/rpc"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 )
 
 type TestGoService struct {
-	*rpc.App
 	*apphost.Router
 }
 
@@ -22,8 +20,15 @@ func NewTestGoService(p string) *TestGoService {
 	}
 	root := cmd.Handler{
 		Sub: cmd.Handlers{
-			{Name: "request", Sub: handlers},
-			{Name: "flow*", Sub: handlers},
+			{
+				Name: "request",
+				Sub:  handlers,
+			},
+			{
+				Name: "flow",
+				Sub:  handlers,
+				Func: apphost.RouteAll,
+			},
 		},
 	}
 	return &TestGoService{
