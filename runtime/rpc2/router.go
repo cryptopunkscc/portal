@@ -20,7 +20,7 @@ type Router struct {
 }
 
 func CreateRegistry(handler cmd.Handler) *registry.Node[*cmd.Handler] {
-	r := registry.New[*cmd.Handler]('.', ' ', '?')
+	r := registry.New[*cmd.Handler]('.', ' ', '?', '*')
 	rr := r.Add("", &handler)
 	for _, h := range handler.Sub {
 		injectHandler(rr, h)
@@ -52,7 +52,7 @@ func (r Router) Respond(conn *Serializer) (err error) {
 			return
 		}
 	}
-	err = conn.Encode(End)
+	//err = conn.Encode(End) //Fixme interferes with test/rpc/go_test.go and cmd/cli
 	return
 }
 

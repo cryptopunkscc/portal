@@ -8,6 +8,7 @@ import (
 	"github.com/cryptopunkscc/portal/runtime/rpc2"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
 	"github.com/stretchr/testify/assert"
+	"log"
 	"testing"
 )
 
@@ -24,7 +25,7 @@ func NewTestClient(port string, services ...string) *TestClient {
 }
 
 func (c TestClient) Run(t *testing.T) {
-	t.Log("Starting test client")
+	log.Println("Starting test client")
 
 	tests := []struct {
 		name    string
@@ -80,7 +81,6 @@ func (c TestClient) Run(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					t.Log(actual)
 					assert.Equal(t, expected, actual)
 				})
 
@@ -121,7 +121,6 @@ func (c TestClient) Run(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					t.Log(actual)
 					assert.Equal(t, expected, actual)
 				})
 			})
