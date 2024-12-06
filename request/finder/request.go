@@ -7,7 +7,7 @@ import (
 )
 
 func Requester[T target.Portal_](find target.Find[T], run target.Run[T]) target.Request {
-	return func(ctx context.Context, src string, args ...string) (err error) {
+	return func(ctx context.Context, src string) (err error) {
 		log := plog.Get(ctx)
 		portals, err := find(ctx, src)
 		if err != nil {

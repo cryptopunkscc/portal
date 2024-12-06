@@ -46,7 +46,7 @@ func Feat(d Deps) target.Request {
 		"observe": d.Observe(),
 		"close":   d.Shutdown(),
 	})
-	return func(ctx context.Context, src string, args ...string) (err error) {
+	return func(ctx context.Context, src string) (err error) {
 		if err = astral(ctx); err != nil {
 			return plog.Err(err)
 		}

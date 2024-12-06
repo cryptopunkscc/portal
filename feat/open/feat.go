@@ -18,7 +18,7 @@ func Feat[T target.Portal_](
 ) target.Request {
 	resolve := deps.Resolver()
 	run := deps.Runner()
-	return func(ctx context.Context, path string, _ ...string) (err error) {
+	return func(ctx context.Context, path string) (err error) {
 		plog.Get(ctx)
 		file, err := source.File(path)
 		if err != nil {

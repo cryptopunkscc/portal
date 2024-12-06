@@ -36,14 +36,13 @@ type feat struct {
 func (f feat) Request(
 	ctx context.Context,
 	src string,
-	args ...string,
 ) (err error) {
 	log := plog.Get(ctx).Type(f).Set(&ctx)
 
 	if src == "" {
 		err = f.portal.Ping()
 	} else {
-		err = f.request(ctx, src, args...)
+		err = f.request(ctx, src)
 	}
 
 	if err == nil || ctx.Err() != nil {
@@ -65,7 +64,7 @@ func (f feat) Request(
 	}
 
 	if src != "" {
-		return f.request(ctx, src, args...)
+		return f.request(ctx, src)
 	}
 	return
 }

@@ -19,7 +19,7 @@ go test ./runtime/rpc
 RPC
 
 ```shell
-./make 8 && portal-dev -type 0 ./test/rpc
+./make 8 && portal-dev ./test/rpc
 ```
 
 JS runtime lib
