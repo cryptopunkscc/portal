@@ -90,16 +90,18 @@ var handler = cmd.Handler{
 
 func TestHelp_MarshalCLI(t *testing.T) {
 	expected := strings.TrimSpace(`
-foo, f - Foo description
+foo f - Foo description
 
-Parameters
-	-i int - Integer
-	-b bool - Boolean
-	 string - String
+Parameters:
 
-Commands
-	bar, b - Bar description
-	baz
+    -i  [int]     - Integer
+    -b  [bool]    - Boolean
+    $0  [string]  - String
+
+Subcommands:
+
+    bar b  - Bar description
+    baz    -
 `)
 	actual := Help{handler}.MarshalCLI()
 	assert.Equal(t, expected, strings.TrimSpace(actual))

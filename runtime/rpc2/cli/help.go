@@ -1,9 +1,12 @@
 package cli
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
+	"strconv"
 	"strings"
+	"text/tabwriter"
 )
 
 func injectHelp(handler *cmd.Handler) {
@@ -28,34 +31,46 @@ func newHelpFunc(handler *cmd.Handler) func() Help { return func() Help { return
 
 type Help struct{ cmd.Handler }
 
+//goland:noinspection GoUnhandledErrorResult
 func (h Help) MarshalCLI() (help string) {
-	help += strings.Join(h.Names(), ", ")
+	buffer := &bytes.Buffer{}
+	w := tabwriter.NewWriter(buffer, 4, 4, 2, ' ', 0)
+
+	name := formatName(h.Names())
 	if h.Desc != "" {
-		help += " - " + h.Desc
+		name += " - " + h.Desc
 	}
 
-	help += "\n\n"
+	fmt.Fprintln(w, name)
+	fmt.Fprintln(w)
+
 	if len(h.Params) > 0 {
-		help += "Parameters\n"
+		fmt.Fprintln(w, "Parameters:")
+		fmt.Fprintln(w)
+		i := 0
 		for _, p := range h.Params {
 			n := ""
 			if p.Name != "" {
 				n = "-" + p.Name
+			} else {
+				n = "$" + strconv.Itoa(i)
+				i++
 			}
-			help += fmt.Sprintf("\t%s %s - %s\n", n, p.Type, p.Desc)
+			fmt.Fprintf(w, "\t%s\t[%s]\t- %s\n", n, p.Type, p.Desc)
 		}
-		help += "\n"
+		fmt.Fprintln(w)
 	}
 	if len(h.Sub) > 0 {
-		help += "Commands\n"
+		fmt.Fprintln(w, "Subcommands:")
+		fmt.Fprintln(w)
 		for _, sub := range h.Sub {
-			help += "\t" + strings.Join(sub.Names(), ", ")
-			if sub.Desc != "" {
-				help += " - " + sub.Desc
-			}
-			help += "\n"
+			fmt.Fprintf(w, "\t%s\t- %s\n", formatName(sub.Names()), sub.Desc)
 		}
-		help += "\n"
+		fmt.Fprintln(w)
 	}
-	return
+	w.Flush()
+
+	return buffer.String()
 }
+
+func formatName(names []string) string { return strings.Join(names, " ") }
