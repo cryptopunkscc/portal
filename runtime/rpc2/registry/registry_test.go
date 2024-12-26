@@ -60,7 +60,7 @@ func TestRegistry_Children(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
-func TestRegistry_should_populate_dividers(t *testing.T) {
+func TestRegistry_Add_nodes_should_share_dividers(t *testing.T) {
 	r := New[any]('a')
 	r.Add("foo", struct{}{})
 	r.dividers[0] = 'b'
@@ -68,11 +68,11 @@ func TestRegistry_should_populate_dividers(t *testing.T) {
 	assert.ElementsMatch(t, r.dividers, rr.dividers)
 }
 
-func TestRegistry_should_not_populate_dividers(t *testing.T) {
+func TestRegistry_Fold_dividers_should_not_impact_args(t *testing.T) {
 	r := New[any]('.', ' ')
 	r.Add("foo", 0)
 	r.Add("foo.bar", 1)
-	rr, args := r.Fold("foo.bar asd")
+	rr, args := r.Fold("foo.bar .")
 	assert.Equal(t, 1, rr.Get())
-	assert.Equal(t, "asd", args)
+	assert.Equal(t, " .", args)
 }

@@ -64,18 +64,21 @@ func (n *Node[V]) Get() V {
 	return n.value
 }
 
-func (n *Node[V]) Fold(path string) (*Node[V], string) {
-	if len(path) == 0 {
-		return n, path
+func (n *Node[V]) Fold(path string) (*Node[V], string) { return n.fold(path, 0, 0) }
+
+func (n *Node[V]) fold(path string, offset int, skip int) (*Node[V], string) {
+	index := offset + skip
+	if len(path) == index {
+		return n, path[offset:]
 	}
-	if n.skip(path[0]) {
-		return n.Fold(path[1:])
+	if n.skip(path[index]) {
+		return n.fold(path, offset, skip+1)
 	}
-	nn, ok := n.next[path[0]]
+	nn, ok := n.next[path[index]]
 	if !ok {
-		return n, path
+		return n, path[offset:]
 	}
-	return nn.Fold(path[1:])
+	return nn.fold(path, index+1, 0)
 }
 
 func (n *Node[V]) filter(route string) (out string) {
