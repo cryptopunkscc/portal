@@ -21,7 +21,7 @@ type Base struct {
 }
 
 func CreateRegistry(handler cmd.Handler) *registry.Node[*cmd.Handler] {
-	r := registry.New[*cmd.Handler]('.', ' ', '?', '*')
+	r := registry.New[*cmd.Handler]('.', ' ')
 	rr := r.Add("", &handler)
 	for _, h := range handler.Sub {
 		injectHandler(rr, h)
@@ -40,6 +40,7 @@ func injectHandler(registry *registry.Node[*cmd.Handler], handler cmd.Handler) {
 
 func (r Base) Query(query string) Base {
 	r.Registry, r.args = r.Registry.Fold(query)
+	r.args = strings.TrimPrefix(r.args, "?")
 	if r.Registry.IsEmpty() {
 		r.err = fmt.Errorf("invalid query: %s", query)
 		return r
