@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	. "github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/clir"
 	factory "github.com/cryptopunkscc/portal/factory/bind"
 	"github.com/cryptopunkscc/portal/factory/dev"
 	"github.com/cryptopunkscc/portal/feat/open"
@@ -16,20 +15,33 @@ import (
 	"github.com/cryptopunkscc/portal/runner/wails_dist"
 	"github.com/cryptopunkscc/portal/runner/wails_pro"
 	"github.com/cryptopunkscc/portal/runtime/bind"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/cli"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 )
 
 func main() {
-	mod := Module{}
+	mod := &Module{}
 	ctx, cancel := context.WithCancel(context.Background())
 	log := plog.New().D().Scope("dev-wails").Set(&ctx)
 	go sig.OnShutdown(cancel)
-	cli := clir.NewCli(ctx,
-		"Portal-dev-wails",
-		"Portal html development driven by wails.",
-		version.Run,
-	)
-	cli.Open(open.Feat[PortalHtml](&mod))
-	if err := cli.Run(); err != nil {
+
+	err := cli.New(cmd.Handler{
+		Name: "portal-dev-wails",
+		Desc: "Portal html development driven by wails.",
+		Sub: cmd.Handlers{
+			{
+				Func: open.Feat[PortalHtml](mod),
+				Name: "o",
+				Desc: "Start portal js app development.",
+				Params: cmd.Params{
+					{Type: "string", Desc: "Absolute path to app bundle or directory."},
+				},
+			},
+			{Name: "v", Desc: "Print version", Func: version.Run},
+		},
+	}).Run(ctx)
+
+	if err != nil {
 		log.Println(err)
 	}
 	cancel()
