@@ -12,3 +12,8 @@ func Create() create.Run {
 		build.Create().Dist,
 	)
 }
+
+var Run = create.Feat(
+	template.Runner,
+	build.Create().Dist,
+)
