@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	. "github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/clir"
 	"github.com/cryptopunkscc/portal/factory/bind"
 	"github.com/cryptopunkscc/portal/factory/dev"
 	"github.com/cryptopunkscc/portal/feat/open"
@@ -13,6 +12,8 @@ import (
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/multi"
 	"github.com/cryptopunkscc/portal/runner/reload"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/cli"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 )
 
 func main() {
@@ -20,13 +21,24 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	log := plog.New().D().Scope("dev-exec").Set(&ctx)
 	go sig.OnShutdown(cancel)
-	cli := clir.NewCli(ctx,
-		"Portal-dev-exec",
-		"Portal js development runner for executables.",
-		version.Run,
-	)
-	cli.Open(open.Feat[AppExec](mod))
-	if err := cli.Run(); err != nil {
+
+	err := cli.New(cmd.Handler{
+		Name: "portal-dev-exec",
+		Desc: "Portal development runner for executables.",
+		Sub: cmd.Handlers{
+			{
+				Func: open.Feat[AppExec](mod),
+				Name: "o",
+				Desc: "Start portal app executable.",
+				Params: cmd.Params{
+					{Type: "string", Desc: "Absolute path to app bundle or directory."},
+				},
+			},
+			{Name: "v", Desc: "Print version", Func: version.Run},
+		},
+	}).Run(ctx)
+
+	if err != nil {
 		log.Println(err)
 	}
 	cancel()

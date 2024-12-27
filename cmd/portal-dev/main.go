@@ -2,13 +2,10 @@ package main
 
 import (
 	"context"
-	manifest "github.com/cryptopunkscc/portal"
 	. "github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/clir"
 	"github.com/cryptopunkscc/portal/factory/srv"
 	"github.com/cryptopunkscc/portal/feat/serve"
 	"github.com/cryptopunkscc/portal/feat/start"
-	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	signal "github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/request/query"
@@ -17,6 +14,8 @@ import (
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/multi"
 	"github.com/cryptopunkscc/portal/runtime/msg"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/cli"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 	"os"
 )
 
@@ -31,9 +30,17 @@ func main() {
 	log := plog.New().D().Scope("dev").Set(&ctx)
 	log.Println("starting portal development", os.Args)
 	defer log.Println("closing portal development")
-	cli := clir.NewCli(ctx, manifest.NameDev, manifest.DescriptionDev, version.Run)
-	cli.Dev(start.Feat(&mod))
-	if err := cli.Run(); err != nil {
+
+	err := cli.New(cmd.Handler{
+		Name: "portal-dev",
+		Desc: "Start portal project or app from a given source in development environment.",
+		Params: cmd.Params{
+			{Type: "string", Desc: "Application source. The source can be a app name, package name, app bundle path or app dir."},
+		},
+		Func: start.Feat(&mod),
+	}).Run(ctx)
+
+	if err != nil {
 		log.Println(err)
 	}
 	cancel()
