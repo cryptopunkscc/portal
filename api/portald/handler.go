@@ -13,12 +13,11 @@ type Service interface {
 
 func Handler(service Service) cmd.Handler {
 	return cmd.Handler{
-		Name:   "portald",
-		Desc:   "Portal daemon.",
-		Params: nil,
+		Name: "portald",
+		Desc: "Portal daemon.",
 		Sub: cmd.Handlers{
 			{
-				Func: ping,
+				Func: func() {},
 				Name: "ping",
 			},
 			{
@@ -38,5 +37,3 @@ func Handler(service Service) cmd.Handler {
 		},
 	}
 }
-
-func ping() {}
