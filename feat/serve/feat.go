@@ -26,7 +26,7 @@ type (
 func CheckAstral(_ context.Context) error { return astral.Check() }
 
 type Deps interface {
-	Port() target.Port
+	Port() apphost.Port
 	Open() target.Request
 	Astral() Astral
 	Handlers() Handlers
@@ -60,7 +60,7 @@ func Feat(d Deps) target.Request {
 	}
 }
 
-func check(port target.Port) (err error) {
+func check(port apphost.Port) (err error) {
 	if err = api.Client(port.String()).Ping(); err == nil {
 		err = fmt.Errorf("port already registered or astral not running: %v", err)
 	}
@@ -70,7 +70,7 @@ func check(port target.Port) (err error) {
 func serve(
 	ctx context.Context,
 	client apphost.Client,
-	port target.Port,
+	port apphost.Port,
 	handlers Handlers,
 ) (err error) {
 	log := plog.Get(ctx)

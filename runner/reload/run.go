@@ -2,6 +2,7 @@ package reload
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runtime/bind"
@@ -10,7 +11,7 @@ import (
 
 func Mutable[T target.Portal_](
 	newRuntime bind.NewRuntime,
-	portMsg target.Port,
+	portMsg apphost.Port,
 	newRunner func(bind.NewRuntime, target.MsgSend) target.Runner[T],
 ) target.Run[target.Portal_] {
 	return runner[T]{
@@ -22,7 +23,7 @@ func Mutable[T target.Portal_](
 
 func Immutable[T target.Portal_](
 	newRuntime bind.NewRuntime,
-	portMsg target.Port,
+	portMsg apphost.Port,
 	newRunner func(bind.NewRuntime) target.Runner[T],
 ) target.Run[target.Portal_] {
 	return runner[T]{
@@ -35,7 +36,7 @@ func Immutable[T target.Portal_](
 }
 
 type runner[T target.Portal_] struct {
-	portMsg    target.Port
+	portMsg    apphost.Port
 	newRuntime bind.NewRuntime
 	newRunner  func(bind.NewRuntime, target.MsgSend) target.Runner[T]
 }

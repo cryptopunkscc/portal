@@ -10,12 +10,12 @@ import (
 )
 
 type Client struct {
-	port    target.Port
+	port    apphost.Port
 	flow    rpc.Conn
 	handler *Handler
 }
 
-func NewClient(port target.Port) (sender *Client) {
+func NewClient(port apphost.Port) (sender *Client) {
 	sender = &Client{port: port}
 	return
 }

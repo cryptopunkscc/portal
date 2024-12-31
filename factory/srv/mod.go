@@ -28,7 +28,7 @@ type Deps[T Portal_] interface {
 	Processes() *sig.Map[string, T]
 }
 
-func (d *Module[T]) Port() Port                     { return PortPortal }
+func (d *Module[T]) Port() apphost.Port             { return PortPortal }
 func (d *Module[T]) Open() Request                  { return request.Create[T](d) }
 func (d *Module[T]) Client() apphost.Client         { return create.Default() }
 func (d *Module[T]) Shutdown() context.CancelFunc   { return d.CancelFunc }

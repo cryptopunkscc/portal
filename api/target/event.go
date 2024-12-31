@@ -1,6 +1,7 @@
 package target
 
 import (
+	"github.com/cryptopunkscc/portal/api/apphost"
 	"time"
 )
 
@@ -23,4 +24,4 @@ func NewMsg(pkg string, event Event) Msg {
 
 type MsgSend func(msg Msg) error
 
-type MsgSender func(port Port) MsgSend
+type MsgSender func(apphost.Port) MsgSend

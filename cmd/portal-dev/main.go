@@ -48,7 +48,7 @@ func (d *deps[T]) Serve() Request       { return serve.Feat(d).Start }
 func (d *deps[T]) Astral() serve.Astral { return serve.CheckAstral }
 func (d *deps[T]) Handlers() serve.Handlers {
 	return serve.Handlers{
-		PortMsg.Name: msg.NewBroadcast(PortMsg, d.Processes()).BroadcastMsg,
+		PortMsg.Name(): msg.NewBroadcast(PortMsg, d.Processes()).BroadcastMsg,
 	}
 }
 func (d *deps[T]) Resolve() Resolve[T] { return sources.Resolver[T]() }

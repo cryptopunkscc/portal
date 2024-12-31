@@ -7,7 +7,6 @@ import (
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/pkg/port"
 	"strings"
 	"time"
 )
@@ -30,7 +29,7 @@ func (i Invoker) Query(identity id.Identity, query string) (conn apphost.Conn, e
 
 	i.Log.Println("invoking app for:", query)
 	src := strings.Split(query, "?")[0]
-	src = strings.TrimPrefix(src, port.New("").String()) // hacky way to handle (remove) dev prefix FIXME
+	src = strings.TrimPrefix(src, apphost.NewPort("").String()) // hacky way to handle (remove) dev prefix FIXME
 	if err = i.Invoke(i.Ctx, src); err != nil {
 		return
 	}
