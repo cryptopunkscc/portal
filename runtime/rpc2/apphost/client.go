@@ -3,7 +3,7 @@ package apphost
 import (
 	"encoding/json"
 	"github.com/cryptopunkscc/astrald/auth/id"
-	"github.com/cryptopunkscc/portal/pkg/port"
+	"github.com/cryptopunkscc/portal/api/apphost"
 	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
 	"io"
 )
@@ -13,7 +13,7 @@ func RpcClient(
 	service string,
 	path ...string,
 ) (s rpc.Conn, err error) {
-	conn, err := Client.Query(identity, port.Format(service, path...))
+	conn, err := Client.Query(identity, apphost.FormatPort(service, path...))
 	if err != nil {
 		return
 	}

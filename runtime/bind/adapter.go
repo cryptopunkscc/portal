@@ -10,7 +10,6 @@ import (
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/bind"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/pkg/port"
 	"strings"
 )
 
@@ -20,7 +19,7 @@ func Adapter(ctx context.Context, cached apphost.Cached, pkg string) Apphost {
 	}
 	a := &adapter{}
 	a.Cached = cached
-	a.port = port.New(pkg)
+	a.port = apphost.NewPort(pkg)
 	a.log = plog.Get(ctx).Type(a)
 	return a
 }
@@ -28,11 +27,11 @@ func Adapter(ctx context.Context, cached apphost.Cached, pkg string) Apphost {
 type adapter struct {
 	apphost.Cached
 	log  plog.Logger
-	port port.Port
+	port apphost.Port
 }
 
 func (api *adapter) Port(service ...string) string {
-	return port.New(service...).String()
+	return apphost.NewPort(service...).String()
 }
 
 func (api *adapter) Close() error {

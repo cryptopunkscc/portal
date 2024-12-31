@@ -7,7 +7,6 @@ import (
 	api "github.com/cryptopunkscc/portal/api/apphost"
 	create "github.com/cryptopunkscc/portal/factory/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/pkg/port"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/caller"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/json"
@@ -36,13 +35,13 @@ var Client api.Client = create.Default()
 
 type Router struct {
 	router.Base
-	Port   port.Port
+	Port   api.Port
 	routes []string
 }
 
 var ErrUnauthorized = errors.New("unauthorized")
 
-func NewRouter(handler cmd.Handler, port port.Port, routes ...string) *Router {
+func NewRouter(handler cmd.Handler, port api.Port, routes ...string) *Router {
 	if len(port) == 0 && handler.Name != "" {
 		name := strings.ReplaceAll(handler.Names()[0], "-", ".")
 		port = port.Add(name)
@@ -102,7 +101,7 @@ func (r *Router) Run(ctx context.Context) error {
 
 var RouteAll = &struct{}{}
 
-func getRoutes(port port.Port, handler cmd.Handler) (r []string) {
+func getRoutes(port api.Port, handler cmd.Handler) (r []string) {
 	if name := handler.Names()[0]; name != "" {
 		port = port.Add(name)
 	}

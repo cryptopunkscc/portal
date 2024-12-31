@@ -4,25 +4,26 @@ import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/astrald/auth/id"
+	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runtime/rpc"
 )
 
-type Requester target.Port
+type Requester struct{ apphost.Port }
 
-var Request = Requester(target.PortOpen)
+var Request = Requester{target.PortOpen}
 
 func (port Requester) Run(ctx context.Context, src string) (err error) {
 	log := plog.Get(ctx).Type(port)
 	log.Println("Running query", port, src)
-	flow, err := rpc.QueryFlow(id.Anyone, port.Base)
+	flow, err := rpc.QueryFlow(id.Anyone, port.Base())
 	if err != nil {
 		return
 	}
 	flow.Logger(log)
 	defer flow.Close()
-	err = rpc.Command(flow, port.Name, src)
+	err = rpc.Command(flow, port.Name(), src)
 	if err != nil {
 		log.E().Printf("cannot query %s %s: %v", port, src, err)
 		return fmt.Errorf("cannot query %s: %w", src, err)
@@ -41,8 +42,8 @@ func (port Requester) Run(ctx context.Context, src string) (err error) {
 
 func (port Requester) Start(ctx context.Context, src string) (err error) {
 	plog.Get(ctx).Type(port).Println("starting query", port, src)
-	request := rpc.NewRequest(id.Anyone, port.Base)
-	err = rpc.Command(request, port.Name, src)
+	request := rpc.NewRequest(id.Anyone, port.Base())
+	err = rpc.Command(request, port.Name(), src)
 	if err != nil {
 		plog.Get(ctx).Type(port).E().Printf("cannot query %s: %v", src, err)
 		return fmt.Errorf("cannot query %s: %w", src, err)

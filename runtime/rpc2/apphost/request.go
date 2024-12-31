@@ -3,8 +3,8 @@ package apphost
 import (
 	"encoding/json"
 	"github.com/cryptopunkscc/astrald/auth/id"
+	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/pkg/port"
 	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
 	"io"
 )
@@ -21,7 +21,7 @@ func (r *rpcRequest) Logger(logger plog.Logger) {
 }
 
 func RpcRequest(identity id.Identity, service string, path ...string) rpc.Conn {
-	return newRequest(identity, port.Format(service, path...))
+	return newRequest(identity, apphost.FormatPort(service, path...))
 }
 
 func newRequest(identity id.Identity, service string) rpc.Conn {
