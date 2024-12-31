@@ -4,18 +4,18 @@ import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/astrald/sig"
+	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/portald"
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/factory/request"
 	"github.com/cryptopunkscc/portal/pkg/fs2"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/pkg/port"
 	singal "github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/resolve/sources"
 	"github.com/cryptopunkscc/portal/runner/app"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/multi"
-	"github.com/cryptopunkscc/portal/runtime/apphost"
+	apphostRuntime "github.com/cryptopunkscc/portal/runtime/apphost"
 	runtime "github.com/cryptopunkscc/portal/runtime/portal"
 	apphost2 "github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
@@ -52,7 +52,7 @@ func (d *deps[T]) lock() func() {
 	return lock
 }
 func (d *deps[T]) check() {
-	if err := apphost.Check(); err != nil {
+	if err := apphostRuntime.Check(); err != nil {
 		panic(err)
 	}
 	if err := runtime.Client(d.port().String()).Ping(); err == nil {
@@ -61,7 +61,7 @@ func (d *deps[T]) check() {
 	}
 }
 func (d *deps[T]) name() string             { return "portal" }
-func (d *deps[T]) port() port.Port          { return port.New(d.name()) }
+func (d *deps[T]) port() apphost.Port       { return apphost.NewPort(d.name()) }
 func (d *deps[T]) cacheDir() string         { return CacheDir(d.name()) }
 func (d *deps[T]) handler() cmd.Handler     { return portald.Handler(d) }
 func (d *deps[T]) router() *apphost2.Router { return apphost2.NewRouter(d.handler(), d.port()) }

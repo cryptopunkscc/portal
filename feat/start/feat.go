@@ -2,17 +2,18 @@ package start
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/portal"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runtime/apphost"
+	apphostRuntime "github.com/cryptopunkscc/portal/runtime/apphost"
 	runtime "github.com/cryptopunkscc/portal/runtime/portal"
 	"time"
 )
 
 type Deps interface {
-	Port() target.Port
+	Port() apphost.Port
 	Serve() target.Request
 	Request() target.Request
 }
@@ -22,12 +23,12 @@ func Feat(deps Deps) target.Request {
 		port:    deps.Port(),
 		serve:   deps.Serve(),
 		request: deps.Request(),
-		portal:  runtime.Client(deps.Port().Base),
+		portal:  runtime.Client(deps.Port().Base()),
 	}.Request
 }
 
 type feat struct {
-	port    target.Port
+	port    apphost.Port
 	serve   target.Request
 	request target.Request
 	portal  portal.Client
@@ -55,7 +56,7 @@ func (f feat) Request(
 
 	if err = flow.Retry(ctx, 8*time.Second, func(i int, n int, d time.Duration) (err error) {
 		log.Printf("%d/%d attempt %v: retry after %v", i+1, n, err, d)
-		if err = apphost.Init(); err != nil {
+		if err = apphostRuntime.Init(); err != nil {
 			return
 		}
 		return f.portal.Ping()

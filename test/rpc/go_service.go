@@ -2,7 +2,7 @@ package rpc
 
 import (
 	"errors"
-	"github.com/cryptopunkscc/portal/pkg/port"
+	api "github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 )
@@ -32,7 +32,7 @@ func NewTestGoService(p string) *TestGoService {
 		},
 	}
 	return &TestGoService{
-		Router: apphost.NewRouter(root, port.New(p)),
+		Router: apphost.NewRouter(root, api.NewPort(p)),
 	}
 }
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/feat/start"
 	"github.com/cryptopunkscc/portal/feat/version"
@@ -38,6 +39,6 @@ func main() {
 
 type deps struct{}
 
-func (m deps) Port() target.Port       { return target.PortPortal }
+func (m deps) Port() apphost.Port      { return target.PortPortal }
 func (m deps) Serve() target.Request   { return exec.Request("portal-app") }
 func (m deps) Request() target.Request { return query.Request.Run }
