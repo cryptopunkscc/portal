@@ -147,7 +147,7 @@ func (c *Func) unmarshal(data []byte, args []any) error {
 	if err == nil {
 		return nil
 	}
-	return fmt.Errorf("cannot unmarshal data %s", data)
+	return fmt.Errorf("cannot unmarshal data %s %v", data, err)
 }
 
 func getError(values []reflect.Value) (err error) {

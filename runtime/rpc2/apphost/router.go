@@ -70,6 +70,7 @@ func (r *Router) Start(ctx context.Context) (err error) {
 }
 
 func (r *Router) Run(ctx context.Context) error {
+	r.Dependencies = append([]any{ctx}, r.Dependencies)
 	routes := r.routes
 	if len(routes) == 0 {
 		handler := *r.Registry.Get()
@@ -166,6 +167,8 @@ func (r *Router) routeQuery(q api.QueryData) {
 		return
 	}
 	flow := NewClient(conn)
+	r.Dependencies = append(r.Dependencies, flow)
+	rr.Dependencies = r.Dependencies
 	scanner := bufio.NewScanner(conn)
 	for {
 		if !rr.skip() {
