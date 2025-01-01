@@ -11,7 +11,7 @@ go test ./resolve/... $(go list ./runner/... | grep -v /runner/webview)
 RPC
 
 ```shell
-go test ./runtime/rpc
+go test ./runtime/rpc2
 ```
 
 ## Cross integration

@@ -7,14 +7,14 @@ import (
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	runtime "github.com/cryptopunkscc/portal/runtime/portal"
-	"github.com/cryptopunkscc/portal/runtime/rpc"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
 )
 
 func main() {
 	mod := module{}
 	ctx := context.Background()
 	log := plog.New().Type(mod).Set(&ctx)
-	conn := rpc.NewRequest(id.Anyone, PortPortal.String())
+	conn := apphost.RpcRequest(id.Anyone, PortPortal.String())
 	conn.Logger(log)
 	mod.Client = runtime.ClientRpc{Conn: conn}
 	r := newRunner(mod)

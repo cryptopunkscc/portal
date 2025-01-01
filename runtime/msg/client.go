@@ -6,7 +6,8 @@ import (
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runtime/rpc"
+	"github.com/cryptopunkscc/portal/runtime/rpc2"
+	apphost2 "github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
 )
 
 type Client struct {
@@ -29,7 +30,7 @@ func (s *Client) Connect(ctx context.Context, portal target.Portal_) (err error)
 	if s.flow != nil {
 		return
 	}
-	if s.flow, err = rpc.QueryFlow(id.Anyone, s.port.String()); err != nil {
+	if s.flow, err = apphost2.RpcClient(id.Anyone, s.port.String()); err != nil {
 		return
 	}
 	if err = s.flow.Encode(portal.Manifest().Package); err != nil {
