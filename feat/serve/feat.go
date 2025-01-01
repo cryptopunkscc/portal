@@ -8,8 +8,9 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	astral "github.com/cryptopunkscc/portal/runtime/apphost"
 	api "github.com/cryptopunkscc/portal/runtime/portal"
-	"github.com/cryptopunkscc/portal/runtime/rpc"
-	"maps"
+	"github.com/cryptopunkscc/portal/runtime/rpc2"
+	apphost2 "github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 )
 
 type (
@@ -29,23 +30,17 @@ type Deps interface {
 	Port() apphost.Port
 	Open() target.Request
 	Astral() Astral
-	Handlers() Handlers
-	Observe() Observe
+	Handlers() cmd.Handlers
+	Observe() func(ctx context.Context, conn rpc.Conn) (err error)
 	Shutdown() context.CancelFunc
-	Client() apphost.Client
 }
 
 func Feat(d Deps) target.Request {
 	astral := d.Astral()
-	client := d.Client()
 	port := d.Port()
-	handlers := d.Handlers()
-	maps.Copy(handlers, Handlers{
-		"ping":    func() {},
-		"open":    d.Open(),
-		"observe": d.Observe(),
-		"close":   d.Shutdown(),
-	})
+	handler := Handler(d)
+	handler.AddSub(d.Handlers()...)
+
 	return func(ctx context.Context, src string) (err error) {
 		if err = astral(ctx); err != nil {
 			return plog.Err(err)
@@ -53,7 +48,7 @@ func Feat(d Deps) target.Request {
 		if err = check(port); err != nil {
 			return plog.Err(err)
 		}
-		if err = serve(ctx, client, port, handlers); err != nil {
+		if err = serve(ctx, port, handler); err != nil {
 			return plog.Err(err)
 		}
 		return
@@ -69,18 +64,16 @@ func check(port apphost.Port) (err error) {
 
 func serve(
 	ctx context.Context,
-	client apphost.Client,
 	port apphost.Port,
-	handlers Handlers,
+	handler cmd.Handler,
 ) (err error) {
 	log := plog.Get(ctx)
 	log.Printf("serve start at port:%s", port)
 	defer log.Printf("serve exit:%s", port)
-	if err = rpc.NewApp(port.String()).
-		Client(client).
-		Routes("*").
-		RouteMap(rpc.Handlers(handlers)).
-		Run(ctx); err != nil {
+
+	err = apphost2.NewRouter(handler, port).Run(ctx)
+
+	if err != nil {
 		log.Printf("serve error: %v\n", err)
 		return plog.Err(err)
 	}
