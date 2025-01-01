@@ -53,9 +53,9 @@ func (d *deps[T]) Executable() string   { return "portal-dev" }
 func (d *deps[T]) Request() Request     { return query.Request.Run }
 func (d *deps[T]) Serve() Request       { return serve.Feat(d).Start }
 func (d *deps[T]) Astral() serve.Astral { return serve.CheckAstral }
-func (d *deps[T]) Handlers() serve.Handlers {
-	return serve.Handlers{
-		PortMsg.Name(): msg.NewBroadcast(PortMsg, d.Processes()).BroadcastMsg,
+func (d *deps[T]) Handlers() cmd.Handlers {
+	return cmd.Handlers{
+		{Name: PortMsg.Name(), Func: msg.NewBroadcast(PortMsg, d.Processes()).BroadcastMsg},
 	}
 }
 func (d *deps[T]) Resolve() Resolve[T] { return sources.Resolver[T]() }
