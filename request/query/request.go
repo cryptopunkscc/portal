@@ -7,7 +7,8 @@ import (
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runtime/rpc"
+	"github.com/cryptopunkscc/portal/runtime/rpc2"
+	apphost2 "github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
 )
 
 type Requester struct{ apphost.Port }
@@ -17,7 +18,7 @@ var Request = Requester{target.PortOpen}
 func (port Requester) Run(ctx context.Context, src string) (err error) {
 	log := plog.Get(ctx).Type(port)
 	log.Println("Running query", port, src)
-	flow, err := rpc.QueryFlow(id.Anyone, port.Base())
+	flow, err := apphost2.RpcClient(id.Anyone, port.Base())
 	if err != nil {
 		return
 	}
@@ -42,7 +43,7 @@ func (port Requester) Run(ctx context.Context, src string) (err error) {
 
 func (port Requester) Start(ctx context.Context, src string) (err error) {
 	plog.Get(ctx).Type(port).Println("starting query", port, src)
-	request := rpc.NewRequest(id.Anyone, port.Base())
+	request := apphost2.RpcRequest(id.Anyone, port.Base())
 	err = rpc.Command(request, port.Name(), src)
 	if err != nil {
 		plog.Get(ctx).Type(port).E().Printf("cannot query %s: %v", src, err)
