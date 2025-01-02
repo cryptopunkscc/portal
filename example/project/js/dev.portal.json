@@ -5,6 +5,7 @@
   "title": "Example Project JS",
   "author": "yang",
   "email": "cryptopunkyang@pm.me",
+  "schema": "js",
   "env": {
     "timeout": 3000
   }

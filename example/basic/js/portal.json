@@ -2,5 +2,6 @@
   "name": "example-basic-js",
   "package": "example.basic.js",
   "title": "Example basic js",
-  "version": "0.0.0"
+  "version": "0.0.0",
+  "schema": "js"
 }

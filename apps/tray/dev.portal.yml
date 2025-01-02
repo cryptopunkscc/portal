@@ -3,6 +3,7 @@ package: cc.cryptopunks.portal.tray
 title: Portal Tray
 description: Tray icon for Portal.
 version: 0.0.0
+schema: go
 build:
   default:
     exec: main

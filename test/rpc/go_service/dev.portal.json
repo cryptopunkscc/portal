@@ -3,6 +3,7 @@
   "package": "test.go",
   "title": "test go service",
   "version": "0.0.0",
+  "schema": "go",
   "build": {
     "cmd": "go build -o dist/main",
     "exec": "main"
