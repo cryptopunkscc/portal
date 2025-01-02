@@ -37,6 +37,10 @@ func (p *unknown) MarshalJSON() ([]byte, error) {
 }
 
 func resolve(src target.Source) (t target.Portal_, err error) {
+	t, ok := src.(target.Portal_)
+	if ok {
+		return
+	}
 	p := unknown{Source: src}
 	if err = p.LoadManifest(); err != nil {
 		return

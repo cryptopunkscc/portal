@@ -5,6 +5,7 @@
   "title": "Portal JS common test",
   "author": "yang",
   "email": "cryptopunkyang@pm.me",
+  "schema": "js",
   "env": {
     "timeout": -1
   }

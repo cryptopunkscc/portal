@@ -9,7 +9,9 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	signal "github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/request/query"
+	exec2 "github.com/cryptopunkscc/portal/resolve/exec"
 	"github.com/cryptopunkscc/portal/resolve/sources"
+	"github.com/cryptopunkscc/portal/resolve/unknown"
 	"github.com/cryptopunkscc/portal/runner/app"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/multi"
@@ -58,13 +60,9 @@ func (d *deps[T]) Handlers() cmd.Handlers {
 		{Name: PortMsg.Name(), Func: msg.NewBroadcast(PortMsg, d.Processes()).BroadcastMsg},
 	}
 }
-func (d *deps[T]) Resolve() Resolve[T] { return sources.Resolver[T]() }
 func (d *deps[T]) Run() Run[T] {
 	return multi.Runner[T](
-		app.Run(exec.Portal[PortalJs]("portal-dev-goja", "o").Run),
-		app.Run(exec.Portal[PortalHtml]("portal-dev-wails", "o").Run),
-		app.Run(exec.Portal[ProjectGo]("portal-dev-go", "o").Run),
-		app.Run(exec.Portal[AppExec]("portal-dev-exec", "o").Run),
+		app.Run(exec.Any(d.runner).Run),
 	)
 }
 func (d *deps[T]) Priority() Priority {
@@ -73,4 +71,26 @@ func (d *deps[T]) Priority() Priority {
 		Match[Dist_],
 		Match[Bundle_],
 	}
+}
+func (d *deps[T]) Resolve2() Resolve[T] { return sources.Resolver[T]() }
+
+func (d *deps[T]) Resolve() Resolve[T] {
+	return Any[T](
+		Skip("node_modules"),
+		Try(exec2.ResolveDist),
+		Try(exec2.ResolveBundle),
+		Try(unknown.ResolveDist),
+		Try(unknown.ResolveBundle),
+		Try(unknown.ResolveProject),
+	)
+}
+
+// TODO resolve dynamically
+func (d *deps[T]) runner(script string) string {
+	return map[string]string{
+		"js":   "portal-dev-goja",
+		"html": "portal-dev-wails",
+		"go":   "portal-dev-go",
+		"exec": "portal-dev-exec",
+	}[script]
 }

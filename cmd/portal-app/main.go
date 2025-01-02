@@ -8,7 +8,8 @@ import (
 	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	singal "github.com/cryptopunkscc/portal/pkg/sig"
-	"github.com/cryptopunkscc/portal/resolve/apps"
+	exec2 "github.com/cryptopunkscc/portal/resolve/exec"
+	"github.com/cryptopunkscc/portal/resolve/unknown"
 	"github.com/cryptopunkscc/portal/runner/app"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/multi"
@@ -45,12 +46,12 @@ type Module[T App_] struct{ srv.Module[T] }
 func (d *Module[T]) Executable() string   { return "portal" }
 func (d *Module[T]) Serve() Request       { return serve.Feat(d) }
 func (d *Module[T]) Astral() serve.Astral { return exec.Astral }
-func (d *Module[T]) Resolve() Resolve[T]  { return apps.Resolver[T]() }
+
 func (d *Module[T]) Run() Run[T] {
 	return multi.Runner[T](
-		app.Run(exec.Portal[AppJs]("portal-app-goja", "o").Run),
-		app.Run(exec.Portal[AppHtml]("portal-app-wails", "o").Run),
 		app.Run(exec.Bundle(CacheDir(d.Executable())).Run),
+		app.Run(exec.Dist().Run),
+		app.Run(exec.Any(d.runner).Run),
 	)
 }
 func (d *Module[T]) Priority() Priority {
@@ -58,4 +59,21 @@ func (d *Module[T]) Priority() Priority {
 		Match[Bundle_],
 		Match[Dist_],
 	}
+}
+func (d *Module[T]) Resolve() Resolve[T] {
+	return Any[T](
+		Skip("node_modules"),
+		Try(exec2.ResolveBundle),
+		Try(exec2.ResolveDist),
+		Try(unknown.ResolveBundle),
+		Try(unknown.ResolveDist),
+	)
+}
+
+// TODO resolve dynamically
+func (d *Module[T]) runner(script string) string {
+	return map[string]string{
+		"js":   "portal-app-goja",
+		"html": "portal-app-wails",
+	}[script]
 }

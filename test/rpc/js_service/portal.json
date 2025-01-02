@@ -3,6 +3,7 @@
   "package": "test.js",
   "title": "test js service",
   "version": "0.0.0",
+  "schema": "js",
   "env": {
     "timeout": -1
   }

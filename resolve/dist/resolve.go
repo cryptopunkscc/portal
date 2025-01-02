@@ -22,7 +22,7 @@ func Resolver[T any](resolve target.Resolve[T]) target.Resolve[target.Dist[T]] {
 		if err != nil {
 			return
 		}
-		t, err := resolve(src)
+		t, err := resolve(a)
 		if err != nil {
 			return
 		}
