@@ -13,15 +13,17 @@ type bundle struct {
 	ctx      context.Context
 	bundle   target.BundleExec
 	cancel   context.CancelFunc
+	args     []string
 }
 
 func Bundle(cacheDir string) target.Runner[target.BundleExec] {
 	return &bundle{cacheDir: cacheDir}
 }
 
-func (r *bundle) Run(ctx context.Context, bundle target.BundleExec) error {
+func (r *bundle) Run(ctx context.Context, bundle target.BundleExec, args ...string) error {
 	r.ctx = ctx
 	r.bundle = bundle
+	r.args = args
 	return r.Reload()
 }
 
@@ -56,7 +58,7 @@ func (r *bundle) Reload() error {
 
 	var ctx context.Context
 	ctx, r.cancel = context.WithCancel(r.ctx)
-	err = Portal[target.Portal_](execFile.Name()).Run(ctx, r.bundle)
+	err = Portal[target.Portal_](execFile.Name()).Run(ctx, r.bundle, r.args...)
 	if err != nil {
 		return err
 	}

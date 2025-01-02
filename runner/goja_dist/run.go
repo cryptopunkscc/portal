@@ -26,7 +26,7 @@ func (r *Runner) Reload() (err error) {
 	return r.backend.RunFs(r.dist.Files())
 }
 
-func (r *Runner) Run(ctx context.Context, dist target.DistJs) (err error) {
+func (r *Runner) Run(ctx context.Context, dist target.DistJs, args ...string) (err error) {
 	if !filepath.IsAbs(dist.Abs()) {
 		return plog.Errorf("Runner needs absolute path: %s", dist.Abs())
 	}
@@ -41,7 +41,7 @@ func (r *Runner) Run(ctx context.Context, dist target.DistJs) (err error) {
 		log.E().Println(err.Error())
 	}
 	pkg := dist.Manifest().Package
-	watch := watcher.Runner[target.DistJs](func() error {
+	watch := watcher.Runner[target.DistJs](func(...string) error {
 		if err := r.send(target.NewMsg(pkg, target.DevChanged)); err != nil {
 			log.E().Println(err)
 		}
@@ -56,5 +56,5 @@ func (r *Runner) Run(ctx context.Context, dist target.DistJs) (err error) {
 		}
 		return nil
 	})
-	return watch.Run(ctx, dist)
+	return watch.Run(ctx, dist, args...)
 }

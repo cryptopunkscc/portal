@@ -26,11 +26,11 @@ func (p *portal[T]) Reload() (err error) {
 	return p.Run(p.ctx, p.src)
 }
 
-func (p *portal[T]) Run(ctx context.Context, src T) (err error) {
+func (p *portal[T]) Run(ctx context.Context, src T, args ...string) (err error) {
 	p.ctx = ctx
 	p.src = src
 	cmd := p.command[0]
-	args := append(p.command[1:], src.Abs())
+	args = append(append(p.command[1:], src.Abs()), args...)
 	var c *exec.Cmd
 	if ctx != nil {
 		c = exec.CommandContext(ctx, cmd, args...)

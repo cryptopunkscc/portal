@@ -34,7 +34,8 @@ func (r *Runner) Reload() (err error) {
 	return
 }
 
-func (r *Runner) Run(ctx context.Context, app target.AppHtml) (err error) {
+func (r *Runner) Run(ctx context.Context, app target.AppHtml, args ...string) (err error) {
+	// TODO pass args to js
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Println("start", app.Manifest().Package, app.Abs())
 	defer log.Println("exit", app.Manifest().Package, app.Abs())

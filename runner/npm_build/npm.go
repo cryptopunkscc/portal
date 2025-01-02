@@ -16,7 +16,7 @@ func Runner(dependencies ...target.NodeModule) target.Run[target.ProjectNpm_] {
 	return runner{dependencies: dependencies}.Run
 }
 
-func (r runner) Run(ctx context.Context, project target.ProjectNpm_) (err error) {
+func (r runner) Run(ctx context.Context, project target.ProjectNpm_, _ ...string) (err error) {
 	plog.Get(ctx).Type(r).Set(&ctx)
 	if err = r.prepare(ctx, project); err != nil {
 		return

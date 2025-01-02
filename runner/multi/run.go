@@ -18,9 +18,9 @@ func Runner[T target.Portal_](
 	return runner[T]{runners: runners}.Run
 }
 
-func (r runner[T]) Run(ctx context.Context, portal T) (err error) {
-	for _, runner := range r.runners {
-		err = runner(ctx, portal)
+func (r runner[T]) Run(ctx context.Context, portal T, args ...string) (err error) {
+	for _, run := range r.runners {
+		err = run(ctx, portal, args...)
 		if !errors.Is(err, target.ErrNotTarget) {
 			return
 		}
