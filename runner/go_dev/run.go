@@ -19,6 +19,7 @@ type runner struct {
 	dist    target.DistExec
 	ctx     context.Context
 	cancel  context.CancelFunc
+	args    []string
 }
 
 func Runner(
@@ -37,9 +38,9 @@ func Adapter(run target.Run[target.DistExec]) func(
 	send target.MsgSend,
 ) target.Runner[target.ProjectGo] {
 	return func(newRuntime bind.NewRuntime, send target.MsgSend) target.Runner[target.ProjectGo] {
-		run := func(ctx context.Context, src target.DistExec) (err error) {
+		run := func(ctx context.Context, src target.DistExec, args ...string) (err error) {
 			newRuntime(ctx, src) // initiate connection
-			return run(ctx, src)
+			return run(ctx, src, args...)
 		}
 		return Runner(run, send)
 	}
@@ -52,14 +53,15 @@ func (r *runner) Reload() (err error) {
 	ctx := r.ctx
 	ctx, r.cancel = context.WithCancel(r.ctx)
 	go func() {
-		if err := r.run(ctx, r.dist); err != nil {
+		if err := r.run(ctx, r.dist, r.args...); err != nil {
 			plog.Get(ctx).E().Println("reload", err)
 		}
 	}()
 	return
 }
 
-func (r *runner) Run(ctx context.Context, project target.ProjectGo) (err error) {
+func (r *runner) Run(ctx context.Context, project target.ProjectGo, args ...string) (err error) {
+	r.args = args
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Println("Running project Go")
 	if err = deps.RequireBinary("go"); err != nil {

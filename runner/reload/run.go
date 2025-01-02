@@ -41,7 +41,7 @@ type runner[T target.Portal_] struct {
 	newRunner  func(bind.NewRuntime, target.MsgSend) target.Runner[T]
 }
 
-func (r runner[T]) Run(ctx context.Context, portal target.Portal_) (err error) {
+func (r runner[T]) Run(ctx context.Context, portal target.Portal_, args ...string) (err error) {
 	t, ok := portal.(T)
 	if !ok {
 		return target.ErrNotTarget
@@ -62,5 +62,5 @@ func (r runner[T]) Run(ctx context.Context, portal target.Portal_) (err error) {
 	}
 	_runner := r.newRunner(newRuntime, sendMsg)
 	reloader = _runner
-	return _runner.Run(ctx, t)
+	return _runner.Run(ctx, t, args...)
 }

@@ -26,7 +26,7 @@ type runner[T target.Portal_] struct {
 	run     target.Run[T]
 }
 
-func (r runner[T]) Run(ctx context.Context, portal T) (err error) {
+func (r runner[T]) Run(ctx context.Context, portal T, args ...string) (err error) {
 	log := plog.Get(ctx)
 	id := portal.Manifest().Package
 	log.Println("setting", id)
@@ -37,7 +37,7 @@ func (r runner[T]) Run(ctx context.Context, portal T) (err error) {
 	}
 	r.wait.Add(1)
 	log.Printf("start %T %s %s", portal, portal.Manifest().Package, portal.Abs())
-	err = r.run(ctx, portal)
+	err = r.run(ctx, portal, args...)
 	log.Printf("exit %T %s %s", portal, portal.Manifest().Package, portal.Abs())
 	r.running.Delete(id)
 	r.wait.Done()

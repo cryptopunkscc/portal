@@ -29,7 +29,8 @@ type Runner struct {
 	bind.NewRuntime
 }
 
-func (r *Runner) Run(ctx context.Context, projectHtml target.ProjectHtml) (err error) {
+func (r *Runner) Run(ctx context.Context, projectHtml target.ProjectHtml, args ...string) (err error) {
+	// TODO pass args to js
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Println("start", projectHtml.Manifest().Package, projectHtml.Abs())
 	defer log.Println("exit", projectHtml.Manifest().Package, projectHtml.Abs())

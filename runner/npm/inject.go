@@ -19,7 +19,7 @@ func Injector(deps []target.NodeModule) target.Run[target.NodeModule] {
 	return injector{deps: deps}.Run
 }
 
-func (i injector) Run(ctx context.Context, m target.NodeModule) (err error) {
+func (i injector) Run(ctx context.Context, m target.NodeModule, _ ...string) (err error) {
 	log := plog.Get(ctx).Type(i).Set(&ctx)
 	for _, module := range i.deps {
 		if err = inject(log, m, module); err != nil {

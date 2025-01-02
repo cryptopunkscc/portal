@@ -28,7 +28,7 @@ func (r *runner) Reload() (err error) {
 	return r.distRunner.Reload()
 }
 
-func (r *runner) Run(ctx context.Context, projectJs target.ProjectJs) (err error) {
+func (r *runner) Run(ctx context.Context, projectJs target.ProjectJs, args ...string) (err error) {
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Println("start", projectJs.Manifest().Package, projectJs.Abs())
 	defer log.Println("exit", projectJs.Manifest().Package, projectJs.Abs())
@@ -58,5 +58,5 @@ func (r *runner) Run(ctx context.Context, projectJs target.ProjectJs) (err error
 	// Wait 1 sec for npm.Watch finish initial build otherwise runner can restart on first launch.
 	time.Sleep(1 * time.Second)
 
-	return r.distRunner.Run(ctx, projectJs.Dist())
+	return r.distRunner.Run(ctx, projectJs.Dist(), args...)
 }

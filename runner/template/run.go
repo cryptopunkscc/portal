@@ -35,7 +35,7 @@ func Runner(dir string, templates map[string]string) target.Run[target.Template]
 	return r.Run
 }
 
-func (r *runner) Run(_ context.Context, t target.Template) (err error) {
+func (r *runner) Run(_ context.Context, t target.Template, _ ...string) (err error) {
 	name := r.templates[t.Name()]
 	dir := filepath.Join(r.dir, name)
 
@@ -63,7 +63,8 @@ func (r *runner) Run(_ context.Context, t target.Template) (err error) {
 
 // check if already exist
 func (r *runner) checkTargetDir(dir, name string) (err error) {
-	if _, err := os.Stat(dir); err == nil {
+	_, err = os.Stat(dir)
+	if err == nil {
 		err = fmt.Errorf("cannot create project %s: %s already exists", name, dir)
 	} else if !os.IsNotExist(err) {
 		err = fmt.Errorf("cannot create project %s: %v", name, err)

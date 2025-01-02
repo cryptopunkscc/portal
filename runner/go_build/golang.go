@@ -19,7 +19,7 @@ func Runner(platforms ...string) target.Run[target.ProjectGo] {
 	return runner{platforms}.Run
 }
 
-func (g runner) Run(ctx context.Context, project target.ProjectGo) (err error) {
+func (g runner) Run(ctx context.Context, project target.ProjectGo, _ ...string) (err error) {
 	log := plog.Get(ctx).Type(g).Set(&ctx)
 	if err = deps.RequireBinary("go"); err != nil {
 		return
