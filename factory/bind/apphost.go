@@ -12,16 +12,17 @@ type NewApphost func(ctx context.Context, portal target.Portal_) bind.Apphost
 
 var DefaultApphost = FrontendApphost
 
-func FrontendApphost(apphost func(ctx context.Context) api.Cached) NewApphost {
+func FrontendApphost(create func(ctx context.Context) api.Cached) NewApphost {
 	return func(ctx context.Context, portal target.Portal_) bind.Apphost {
-		return bind.Adapter(ctx, apphost(ctx), portal.Manifest().Package)
+		return bind.Adapter(ctx, create(ctx), portal.Manifest().Package)
 	}
 }
 
-func BackendApphost(apphost func(ctx context.Context) api.Cached) NewApphost {
+func BackendApphost(create func(ctx context.Context) api.Cached) NewApphost {
 	return func(ctx context.Context, portal target.Portal_) bind.Apphost {
+		apphost := create(ctx)
 		apphost2.ConnectionsThreshold = 0
-		apphost2.Timeout(ctx, apphost(ctx), portal)
-		return bind.Adapter(ctx, apphost(ctx), portal.Manifest().Package)
+		apphost2.Timeout(ctx, apphost, portal)
+		return bind.Adapter(ctx, apphost, portal.Manifest().Package)
 	}
 }
