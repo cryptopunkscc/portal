@@ -9,6 +9,8 @@ import (
 	"github.com/cryptopunkscc/portal/runtime/apphost"
 )
 
+var Basic = apphost.Adapter(astral.Client)
+
 func Default() Cached {
 	return apphost.Cached(apphost.Adapter(astral.Client))
 }

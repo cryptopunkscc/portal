@@ -15,10 +15,10 @@ type Deps[T target.Portal_] interface {
 
 func Feat[T target.Portal_](
 	deps Deps[T],
-) target.Request {
+) target.Run[string] {
 	resolve := deps.Resolver()
 	run := deps.Runner()
-	return func(ctx context.Context, path string) (err error) {
+	return func(ctx context.Context, path string, args ...string) (err error) {
 		file, err := source.File(path)
 		if err != nil {
 			return err
@@ -31,6 +31,6 @@ func Feat[T target.Portal_](
 			return errors.New("cannot resolve portal for path: " + path)
 		}
 		plog.Get(ctx).Scope(portal.Manifest().Package).Set(&ctx)
-		return run(ctx, portal)
+		return run(ctx, portal, args...)
 	}
 }

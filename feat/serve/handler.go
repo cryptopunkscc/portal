@@ -9,7 +9,7 @@ import (
 )
 
 type Service interface {
-	Open() target.Request
+	Open() target.Run[string]
 	Shutdown() context.CancelFunc
 	Observe() func(ctx context.Context, conn rpc.Conn) (err error)
 }
@@ -30,7 +30,7 @@ func Handler(service Service) cmd.Handler {
 				Desc: "Open portal app.",
 				Params: cmd.Params{
 					{Type: "string", Desc: "Absolute path to app bundle or directory."},
-					{Type: "string", Desc: "Optional command to run on opened app."},
+					{Type: "...string", Desc: "Optional arguments."},
 				},
 			},
 			{

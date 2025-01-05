@@ -34,7 +34,7 @@ func (p *runner[T]) Run(ctx context.Context, src T, args ...string) (err error) 
 		return err
 	}
 	cmd := command[0]
-	args = append(append(command[1:], src.Abs()), args...)
+	args = append(command[1:], args...)
 	var c *exec.Cmd
 	if ctx != nil {
 		c = exec.CommandContext(ctx, cmd, args...)

@@ -1,0 +1,11 @@
+name: test
+package: portal.test
+title: Portal test
+version: 0.0.0
+schema: go
+build:
+  default:
+    exec: main
+    cmd: go build -o dist/main
+  windows:
+    exec: main.exe

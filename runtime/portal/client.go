@@ -11,7 +11,13 @@ func Client(pkg string) portal.Client { return ClientRpc{apphost.RpcRequest(id.A
 
 type ClientRpc struct{ rpc.Conn }
 
-func (p ClientRpc) Join()                 { _ = rpc.Command(p, "") }
-func (p ClientRpc) Ping() error           { return rpc.Command(p, "ping") }
-func (p ClientRpc) Open(src string) error { return rpc.Command(p, "open", src) }
-func (p ClientRpc) Close() error          { return rpc.Command(p, "close") }
+func (p ClientRpc) Join()        { _ = rpc.Command(p, "") }
+func (p ClientRpc) Ping() error  { return rpc.Command(p, "ping") }
+func (p ClientRpc) Close() error { return rpc.Command(p, "close") }
+func (p ClientRpc) Open(args ...string) error {
+	argv := make([]any, len(args))
+	for i, arg := range args {
+		argv[i] = arg
+	}
+	return rpc.Command(p, "open", argv...)
+}

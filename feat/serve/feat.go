@@ -28,7 +28,7 @@ func CheckAstral(_ context.Context) error { return astral.Check() }
 
 type Deps interface {
 	Port() apphost.Port
-	Open() target.Request
+	Open() target.Run[string]
 	Astral() Astral
 	Handlers() cmd.Handlers
 	Observe() func(ctx context.Context, conn rpc.Conn) (err error)
@@ -41,7 +41,7 @@ func Feat(d Deps) target.Request {
 	handler := Handler(d)
 	handler.AddSub(d.Handlers()...)
 
-	return func(ctx context.Context, src string) (err error) {
+	return func(ctx context.Context, _ string) (err error) {
 		if err = astral(ctx); err != nil {
 			return plog.Err(err)
 		}

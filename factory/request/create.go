@@ -17,7 +17,7 @@ type Deps[T target.Portal_] interface {
 	Priority() target.Priority
 }
 
-func Create[T target.Portal_](d Deps[T]) target.Request {
+func Create[T target.Portal_](d Deps[T]) target.Run[string] {
 	return finder.Requester[T](
 		find.Create[T](
 			&target.Cache[T]{},

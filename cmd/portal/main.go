@@ -2,12 +2,12 @@ package main
 
 import (
 	"github.com/cryptopunkscc/portal/api/apphost"
-	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/feat/start"
+	"github.com/cryptopunkscc/portal/api/portal"
+	apphost2 "github.com/cryptopunkscc/portal/factory/apphost"
 	"github.com/cryptopunkscc/portal/feat/version"
-	"github.com/cryptopunkscc/portal/request/exec"
-	"github.com/cryptopunkscc/portal/request/query"
 	"github.com/cryptopunkscc/portal/runner/cli"
+	"github.com/cryptopunkscc/portal/runner/start"
+	runtime "github.com/cryptopunkscc/portal/runtime/portal"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 )
 
@@ -15,9 +15,11 @@ func main() {
 	cli.Run(cmd.Handler{
 		Name: "portal",
 		Desc: "Portal command line.",
-		Func: start.Feat(deps{}),
+		Func: start.Create(deps{}).Run,
 		Params: cmd.Params{
+			{Name: "query q", Type: "string", Desc: "Optional query to execute on invoked service"},
 			{Type: "string", Desc: "Application source. The source can be a app name, package name, app bundle path or app dir."},
+			{Type: "...string", Desc: "Optional application arguments."},
 		},
 		Sub: cmd.Handlers{
 			{Name: "v", Desc: "Print version", Func: version.Run},
@@ -27,6 +29,5 @@ func main() {
 
 type deps struct{}
 
-func (m deps) Port() apphost.Port      { return target.PortPortal }
-func (m deps) Serve() target.Request   { return exec.Request("portal-app") }
-func (m deps) Request() target.Request { return query.Request.Run }
+func (m deps) Apphost() apphost.Client { return apphost2.Basic }
+func (m deps) Portal() portal.Client   { return runtime.Client("portal") }
