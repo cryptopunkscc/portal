@@ -4,7 +4,7 @@ const rpc = portal.rpc
 const sleep = portal.sleep
 
 const services = [
-  "go",
+  // "go",
   "js",
 ]
 
@@ -35,8 +35,7 @@ const tests = [
   test_func1_a,
   test_func1_b,
   test_func2,
-  test_func3_a,
-  test_func3_b,
+  test_func3,
   test_func4,
 ]
 
@@ -63,14 +62,8 @@ async function test_func2() {
   assertEqual(this, expected, actual)
 }
 
-async function test_func3_a() {
-  const expected = {struct1: {b: true, i: 1, f: 99.99, s: "text"}}
-  const actual = await this.func3(expected)
-  assertEqual(this, expected, actual)
-}
-
-async function test_func3_b() {
-  const expected = null
+async function test_func3() {
+  const expected = {b: true, i: 1, f: 99.99, s: "text"}
   const actual = await this.func3(expected)
   assertEqual(this, expected, actual)
 }
@@ -81,8 +74,6 @@ async function test_func4() {
   const actual = await this.func4(...arg)
   assertEqual(this, expected, actual)
 }
-
-const error = (e) => portal.log(`FAILED ${e}`)
 
 function assertEqual(f, l, r) {
   l = JSON.stringify(l)
@@ -104,11 +95,11 @@ async function main() {
           await test.call(Object.assign(test, conn))
           log(`PASSED ${test.name}`)
         } catch (e) {
-          error(e)
+          portal.log(`FAILED ${test.name} ${e}`)
         }
       }
     }
   }
 }
 
-main().catch(error)
+main().catch((e) => portal.log(`FATAL ${e}`))

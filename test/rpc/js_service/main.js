@@ -3,22 +3,23 @@ const log = portal.log
 
 class Service {
 
-  async func1(msg, fail) {
+  async func1(_, msg, fail) {
     if (fail) {
       throw msg
     }
     return msg
   }
 
-  async func2(b, i, f, s) {
+  async func2(_, b, i, f, s) {
     return [b, i, f, s]
   }
 
   async func3(struct) {
+    delete struct.$
     return struct
   }
 
-  async func4(b, i, f, s) {
+  async func4(_, b, i, f, s) {
     return {b: b, i: i, f: f, s: s}
   }
 }

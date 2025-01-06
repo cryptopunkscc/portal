@@ -3,6 +3,7 @@ import {RpcConn} from "./conn.js";
 import {serve} from "./serve.js";
 import {call} from "./call";
 import {bind} from "./bind";
+import {formatQueryParams} from "./params";
 
 export class RpcClient extends ApphostClient {
 
@@ -37,8 +38,7 @@ export class RpcClient extends ApphostClient {
 function formatQuery(port, params) {
   let query = port
   if (params.length > 0) {
-    query += '?' + JSON.stringify(params)
+    query += '?' + formatQueryParams(params)
   }
   return query
 }
-

@@ -2,6 +2,7 @@ import {ApphostConn} from "../apphost/adapter.js";
 import {bind} from "./bind";
 import {call} from "./call";
 import {hasParams} from "./query";
+import {formatQueryParams} from "./params";
 
 export class RpcConn extends ApphostConn {
 
@@ -42,7 +43,7 @@ export class RpcConn extends ApphostConn {
     let cmd = method ? method : ""
     if (params.length > 0) {
       if (cmd) cmd += '?'
-      cmd += JSON.stringify(params)
+      cmd += formatQueryParams(params)
     }
     if (cmd) await this.writeLn(cmd)
     return this

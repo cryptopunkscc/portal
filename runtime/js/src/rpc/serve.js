@@ -1,7 +1,7 @@
 import {bindings} from "../bindings.js";
 import {RpcConn} from "./conn.js";
 import {prepareRoutes} from "./route.js";
-import {splitQuery} from "./query";
+import {parseQueryParams} from "./params";
 
 export async function serve(client, ctx) {
   const routes = prepareRoutes(ctx)
@@ -56,34 +56,36 @@ async function invoke(ctx, handle, params) {
   const type = typeof handle
   switch (type) {
     case "function":
-      if (!params) return await handle(ctx)
-      const args = JSON.parse(params)
-      if (Array.isArray(args)) return await handle(...args, ctx)
-      return await handle(args, ctx)
+      if (!params) return await handle({$:ctx})
+      const [opts, args] = preparePayload(ctx, params)
+      return await handle(opts, ...args)
 
     case "object":
       return // skip nested router
 
     default:
       throw `invalid handler type ${type}`
-
   }
 }
 
+function preparePayload(ctx, params) {
+  const opts = parseQueryParams(params)
+  const args = opts._ ? opts._ : []
+  delete opts._
+  opts.$ = ctx
+  return [opts, args]
+}
+
 function unfold(handlers, query) {
-  if (query === "") {
-    return [handlers]
+  if (!query) return [handlers, query]
+  let [service, args] = query.split("?")
+  let chunks = service.split(".")
+
+  for (const chunk of chunks) {
+    handlers = handlers[chunk]
+    if (typeof handlers === "undefined") {
+      throw `cannot find handler for ${query}`
+    }
   }
-  const [next, rest] = splitQuery(query)
-  const nested = handlers[next]
-  if (rest === undefined) {
-    return [nested]
-  }
-  if (typeof nested !== "undefined") {
-    return unfold(nested, rest)
-  }
-  if (typeof handlers === "function") {
-    return [handlers, rest]
-  }
-  throw "cannot unfold"
+  return [handlers, args]
 }

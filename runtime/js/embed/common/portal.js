@@ -260,22 +260,76 @@ var portal = (function (exports) {
     }
   }
 
-  function splitQuery(query) {
-    const index = query.search(/[?.{\[]/);
-    if (index === -1) {
-      return [query]
-    }
-    const left = query.slice(0, index);
-    let right = query.slice(index, query.length);
-    if (/^[.?]/.test(right)) {
-      right = right.slice(1);
-    }
-    return [left, right]
+  function hasParams(query) {
+    return query.search(/[?]/) > -1
   }
 
+  /**
+   * Formats an array of query parameters into a single query string.
+   *
+   * @param {Array} params - An array of query parameter objects and primitive type to format.
+   * @return {string} A formatted query string by joining all formatted parameters with '&'.
+   * @throws {TypeError} If the input is not an array.
+   */
+  function formatQueryParams(params) {
+    if (!Array.isArray(params)) throw new TypeError('Expected an array of parameters.');
+    return params.map(formatQueryParam).join('&')
+  }
 
-  function hasParams(query) {
-    return query.search(/[?{\[]/) > -1
+  function formatQueryParam(param) {
+    if (param === null) return `_=null`
+    if (param === undefined) return `_=undefined`
+    if (!param) return `_=${encodeURIComponent(param)}`
+    if (Array.isArray(param)) throw new TypeError('Expected a non-array.');
+    if (typeof param === 'object') return Object.entries(param).map(e =>
+      e.map(encodeURIComponent).join('=')
+    ).join('&')
+
+    return `_=${encodeURIComponent(param)}`
+  }
+
+  /**
+   * Parses a query string into an object where keys map to their corresponding values.
+   *
+   * @param {string} query - The query string to be parsed. It should be in the format of key=value pairs separated by '&'.
+   * @return {Object} - An object representing the parsed query parameters. Keys are strings, and values are strings or arrays of strings for repeated keys.
+   */
+  function parseQueryParams(query) {
+    if (typeof query !== 'string') throw new TypeError('Expected a string.');
+    let acc = {};
+    query.split('&').map(parseQueryParam).forEach(([key, value]) => {
+      if (key in acc) {
+        value = Array.isArray(acc[key]) ? acc[key].concat(value) : [acc[key], value];
+      }
+      acc[key] = value;
+    });
+    return acc
+  }
+
+  function parseQueryParam(param) {
+    if (typeof param !== 'string') throw new TypeError('Expected a string.');
+    let [key, value] = param.split('=');
+    key = decodeURIComponent(key);
+    value = decodeURIComponent(value);
+    value = parseToPrimitive(value);
+    return [key, value];
+  }
+
+  function parseToPrimitive(value) {
+    if (value === null || value === undefined) return value;
+    if (value === "") return value;
+
+    const num = Number(value);
+    if (!isNaN(num)) return num;
+
+    const lower = value.toLowerCase();
+    if (lower === "true") return true;
+    if (lower === "false") return false;
+    if (lower === "null") return null;
+    if (lower === "undefined") return undefined;
+
+    return value;
+
   }
 
   class RpcConn extends ApphostConn {
@@ -317,7 +371,7 @@ var portal = (function (exports) {
       let cmd = method ? method : "";
       if (params.length > 0) {
         if (cmd) cmd += '?';
-        cmd += JSON.stringify(params);
+        cmd += formatQueryParams(params);
       }
       if (cmd) await this.writeLn(cmd);
       return this
@@ -484,36 +538,38 @@ var portal = (function (exports) {
     const type = typeof handle;
     switch (type) {
       case "function":
-        if (!params) return await handle(ctx)
-        const args = JSON.parse(params);
-        if (Array.isArray(args)) return await handle(...args, ctx)
-        return await handle(args, ctx)
+        if (!params) return await handle({$:ctx})
+        const [opts, args] = preparePayload(ctx, params);
+        return await handle(opts, ...args)
 
       case "object":
         return // skip nested router
 
       default:
         throw `invalid handler type ${type}`
-
     }
   }
 
+  function preparePayload(ctx, params) {
+    const opts = parseQueryParams(params);
+    const args = opts._ ? opts._ : [];
+    delete opts._;
+    opts.$ = ctx;
+    return [opts, args]
+  }
+
   function unfold(handlers, query) {
-    if (query === "") {
-      return [handlers]
+    if (!query) return [handlers, query]
+    let [service, args] = query.split("?");
+    let chunks = service.split(".");
+
+    for (const chunk of chunks) {
+      handlers = handlers[chunk];
+      if (typeof handlers === "undefined") {
+        throw `cannot find handler for ${query}`
+      }
     }
-    const [next, rest] = splitQuery(query);
-    const nested = handlers[next];
-    if (rest === undefined) {
-      return [nested]
-    }
-    if (typeof nested !== "undefined") {
-      return unfold(nested, rest)
-    }
-    if (typeof handlers === "function") {
-      return [handlers, rest]
-    }
-    throw "cannot unfold"
+    return [handlers, args]
   }
 
   class RpcClient extends ApphostClient {
@@ -549,7 +605,7 @@ var portal = (function (exports) {
   function formatQuery(port, params) {
     let query = port;
     if (params.length > 0) {
-      query += '?' + JSON.stringify(params);
+      query += '?' + formatQueryParams(params);
     }
     return query
   }
