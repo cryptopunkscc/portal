@@ -7,6 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/stream"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/stream/query"
 	"io"
 )
 
@@ -18,13 +19,14 @@ func (r RpcBase) Request(identity id.Identity, query string) rpc.Conn {
 	return newRequest(r.client, identity, query)
 }
 
-func newRequest(client apphost.Client, identity id.Identity, query string) rpc.Conn {
+func newRequest(client apphost.Client, identity id.Identity, q string) rpc.Conn {
 	return &rpcRequest{
 		Serializer: &stream.Serializer{
-			Marshal:   json.Marshal,
-			Unmarshal: json.Unmarshal,
+			MarshalArgs: query.Marshal,
+			Marshal:     json.Marshal,
+			Unmarshal:   json.Unmarshal,
 		},
-		query:    query,
+		query:    q,
 		remoteID: identity,
 		client:   client,
 	}
@@ -58,39 +60,39 @@ func (r *rpcRequest) Flush() {
 
 func (r *rpcRequest) Call(method string, value any) (err error) {
 	// build base query
-	query := ""
+	q := ""
 	switch {
 	case r.query == "":
-		query = method
+		q = method
 	case method == "":
-		query = r.query
+		q = r.query
 	default:
-		query = r.query + "." + method
+		q = r.query + "." + method
 	}
 
 	// marshal args
 	if value != nil {
-		if query != "" {
-			query += "?"
+		if q != "" {
+			q += "?"
 		}
-		if r.Marshal == nil {
-			r.Marshal = json.Marshal
+		if r.MarshalArgs == nil {
+			r.MarshalArgs = query.Marshal
 		}
-		args, err := r.Marshal(value)
+		args, err := r.MarshalArgs(value)
 		if err != nil {
 			return plog.Err(err)
 		}
-		query += string(args)
+		q += string(args)
 	}
 
 	// log query
 	if r.logger != nil {
-		r.logger.Println("~>", query)
+		r.logger.Println("~>", q)
 	}
 
 	// query stream
 	var conn io.ReadWriteCloser
-	if conn, err = r.client.Query(r.remoteID, query); err != nil {
+	if conn, err = r.client.Query(r.remoteID, q); err != nil {
 		return err
 	}
 
@@ -99,6 +101,7 @@ func (r *rpcRequest) Call(method string, value any) (err error) {
 		conn = rpc.NewConnLogger(conn, r.logger)
 	}
 	serializer := stream.NewSerializer(conn)
+	serializer.MarshalArgs = r.MarshalArgs
 	serializer.Marshal = r.Marshal
 	serializer.Unmarshal = r.Unmarshal
 	r.Serializer = serializer

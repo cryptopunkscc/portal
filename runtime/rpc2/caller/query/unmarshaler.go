@@ -1,11 +1,11 @@
 package query
 
 import (
-	"fmt"
+	"errors"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/param"
 	"net/url"
 	"reflect"
-	"strings"
+	"strconv"
 )
 
 type Unmarshaler struct{}
@@ -25,100 +25,169 @@ func (u Unmarshaler) Score(data []byte) (score uint) {
 }
 
 func Unmarshal(data []byte, params []any) (err error) {
-	e, err := parseArgs(string(data))
+	q, err := url.ParseQuery(string(data))
 	if err != nil {
-		return
+		return err
 	}
-	p := param.NewValues(params)
-	err = set(p, 0, e)
+	p := param.NewValues("query", params)
+	err = setData(p, q)
 	return
 }
 
-type arg struct {
-	key    string
-	values []string
+func setData(p *param.Values, v url.Values) (err error) {
+	if positional, ok := v["_"]; ok {
+		l := len(p.Positional)
+		for i, s := range positional {
+			if i == l {
+				break
+			}
+			if err = setValue(p.Positional[i], s); err != nil {
+				return
+			}
+		}
+	}
+
+	for key, values := range v {
+		if value, ok := p.Named[key]; ok {
+			err = setValue(value, values...)
+			if err != nil {
+				return
+			}
+		}
+	}
+	return nil
 }
 
-func parseArgs(query string) (args []arg, err error) {
-	indexes := make(map[string]int)
-	for query != "" {
-		var key string
-		key, query, _ = strings.Cut(query, "&")
-		if strings.Contains(key, ";") {
-			err = fmt.Errorf("invalid semicolon separator in query")
-			continue
+func setValue(val reflect.Value, strs ...string) error {
+	switch val.Kind() {
+	case reflect.String:
+		if len(strs) > 0 {
+			val.SetString(strs[0])
 		}
-		if key == "" {
-			continue
-		}
-		key, value, _ := strings.Cut(key, "=")
-		key, err1 := url.QueryUnescape(key)
-		if err1 != nil {
-			if err == nil {
-				err = err1
+	case reflect.Int:
+		if len(strs) > 0 {
+			i, err := strconv.Atoi(strs[0])
+			if err != nil {
+				return err
 			}
-			continue
+			val.SetInt(int64(i))
 		}
-		value, err1 = url.QueryUnescape(value)
-		if err1 != nil {
-			if err == nil {
-				err = err1
+	case reflect.Int8:
+		if len(strs) > 0 {
+			i, err := strconv.ParseInt(strs[0], 10, 8)
+			if err != nil {
+				return err
 			}
-			continue
+			val.SetInt(i)
 		}
-		if i, b := indexes[key]; !b {
-			indexes[key] = len(args)
-			args = append(args, arg{key, []string{value}})
-		} else {
-			args[i].values = append(args[i].values, value)
+	case reflect.Int16:
+		if len(strs) > 0 {
+			i, err := strconv.ParseInt(strs[0], 10, 16)
+			if err != nil {
+				return err
+			}
+			val.SetInt(i)
 		}
-	}
-	return
-}
-
-func set(p *param.Values, offset int, elements []arg) (err error) {
-	if offset == len(elements) {
-		return
-	}
-
-	entry := elements[offset]
-	key := entry.key
-	args := entry.values
-	offset++
-	var field string
-	var value reflect.Value
-	if len(args) > 0 && args[0] != "" {
-		ok := false
-		value, ok = p.Named[key]
-		if !ok {
-			return fmt.Errorf("unrecognized option '%s'", key)
+	case reflect.Int32:
+		if len(strs) > 0 {
+			i, err := strconv.ParseInt(strs[0], 10, 32)
+			if err != nil {
+				return err
+			}
+			val.SetInt(i)
 		}
-		field = args[0]
-	} else {
-		if v, ok := p.Named[key]; ok {
-			if v.Kind() == reflect.Bool {
-				v.SetBool(true)
-				return set(p, offset, elements)
+	case reflect.Int64:
+		if len(strs) > 0 {
+			i, err := strconv.ParseInt(strs[0], 10, 64)
+			if err != nil {
+				return err
+			}
+			val.SetInt(i)
+		}
+	case reflect.Uint:
+		if len(strs) > 0 {
+			i, err := strconv.ParseUint(strs[0], 10, 0)
+			if err != nil {
+				return err
+			}
+			val.SetUint(i)
+		}
+	case reflect.Uint8:
+		if len(strs) > 0 {
+			i, err := strconv.ParseUint(strs[0], 10, 8)
+			if err != nil {
+				return err
+			}
+			val.SetUint(i)
+		}
+	case reflect.Uint16:
+		if len(strs) > 0 {
+			i, err := strconv.ParseUint(strs[0], 10, 16)
+			if err != nil {
+				return err
+			}
+			val.SetUint(i)
+		}
+	case reflect.Uint32:
+		if len(strs) > 0 {
+			i, err := strconv.ParseUint(strs[0], 10, 32)
+			if err != nil {
+				return err
+			}
+			val.SetUint(i)
+		}
+	case reflect.Uint64:
+		if len(strs) > 0 {
+			i, err := strconv.ParseUint(strs[0], 10, 64)
+			if err != nil {
+				return err
+			}
+			val.SetUint(i)
+		}
+	case reflect.Float32:
+		if len(strs) > 0 {
+			f, err := strconv.ParseFloat(strs[0], 32)
+			if err != nil {
+				return err
+			}
+			val.SetFloat(f)
+		}
+	case reflect.Float64:
+		if len(strs) > 0 {
+			f, err := strconv.ParseFloat(strs[0], 64)
+			if err != nil {
+				return err
+			}
+			val.SetFloat(f)
+		}
+	case reflect.Bool:
+		if len(strs) > 0 {
+			if strs[0] == "" {
+				val.SetBool(true)
+				return nil
+			}
+			b, err := strconv.ParseBool(strs[0])
+			if err != nil {
+				return err
+			}
+			val.SetBool(b)
+		}
+	case reflect.Slice:
+		newSlice := reflect.MakeSlice(val.Type(), len(strs), len(strs))
+		for i := 0; i < len(strs); i++ {
+			if err := setValue(newSlice.Index(i), strs[i]); err != nil {
+				return err
 			}
 		}
-
-		if len(p.Positional) == 0 {
-			return
+		val.Set(newSlice)
+	case reflect.Array:
+		for i := 0; i < val.Len() && i < len(strs); i++ {
+			if err := setValue(val.Index(i), strs[i]); err != nil {
+				return err
+			}
 		}
-		field = key
-		value = p.Positional[0]
-		p.Positional = p.Positional[1:]
+	default:
+		return errors.New("unsupported type")
 	}
-	if value.Kind() == reflect.String {
-		value.SetString(field)
-	} else {
-		if value.CanAddr() {
-			value = value.Addr()
-		}
-		_, err = fmt.Sscan(field, value.Interface())
-		if err != nil {
-			return
-		}
-	}
-	return set(p, offset, elements)
+	return nil
 }

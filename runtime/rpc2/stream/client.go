@@ -1,20 +1,24 @@
 package stream
 
-import rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
+import (
+	"bytes"
+	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
+)
 
 type Client struct{ *Serializer }
 
 func (conn *Client) Call(method string, value any) (err error) {
-	query := []byte(method)
+	query := bytes.NewBufferString(method)
 	if value != nil {
-		var bytes []byte
-		if bytes, err = conn.Marshal(value); err != nil {
+		var args []byte
+		if args, err = conn.MarshalArgs(value); err != nil {
 			return
 		}
-		query = append(query, bytes...)
+		query.WriteByte('?')
+		query.Write(args)
 	}
-	query = append(query, []byte("\n")...)
-	_, err = conn.Write(query)
+	query.WriteByte('\n')
+	_, err = query.WriteTo(conn)
 	return
 }
 

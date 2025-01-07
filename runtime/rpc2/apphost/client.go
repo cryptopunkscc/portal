@@ -5,6 +5,7 @@ import (
 	"github.com/cryptopunkscc/astrald/auth/id"
 	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/stream"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/stream/query"
 	"io"
 )
 
@@ -28,6 +29,7 @@ func (r RpcBase) Client(
 
 func NewClient(conn io.ReadWriteCloser) *stream.Client {
 	s := stream.Client{Serializer: stream.NewSerializer(conn)}
+	s.MarshalArgs = query.Marshal
 	s.Marshal = json.Marshal
 	s.Unmarshal = json.Unmarshal
 	return &s

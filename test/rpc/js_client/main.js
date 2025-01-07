@@ -4,7 +4,7 @@ const rpc = portal.rpc
 const sleep = portal.sleep
 
 const services = [
-  // "go",
+  "go",
   "js",
 ]
 

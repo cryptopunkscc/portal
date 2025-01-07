@@ -2,41 +2,140 @@ package query
 
 import (
 	"github.com/stretchr/testify/assert"
+	"reflect"
 	"testing"
 )
 
-func TestUnmarshaler_Unmarshal(t *testing.T) {
-	var opts testOptions
-	var b bool
-	var i int
-	var s string
-	var rest string
-	var params = []any{&opts, &b, &i, &s, &rest}
-	var data = `s=a b c&int=10&b=true&true&1&s t r&lorem ipsum`
+func TestUnmarshal(t *testing.T) {
 
-	err := Unmarshal([]byte(data), params)
-	if err != nil {
-		t.Fatal(err)
+	tests := []struct {
+		name    string
+		data    string
+		params  []any
+		expect  []any
+		wantErr bool
+	}{
+		{
+			name: "test1",
+			data: `s=a b c&int=10&b=true`,
+			params: func() []any {
+				var opts testOptions
+				return []any{&opts}
+			}(),
+			expect: []any{
+				testOptions{
+					nestedOptions: nestedOptions{S: "a b c"},
+					I:             10,
+					B:             true,
+				},
+			},
+		},
+		{
+			name: "test2",
+			data: `_=1&_=2&_=3`,
+			params: func() []any {
+				var i1 int
+				var i2 int
+				var i3 int
+				return []any{&i1, &i2, &i3}
+			}(),
+			expect: []any{1, 2, 3},
+		},
+		{
+			name: "test3",
+			data: `s=a b c&int=10&b=&_=true&_=1&_=s t r&_=lorem ipsum`,
+			params: func() []any {
+				var opts testOptions
+				var b bool
+				var i int
+				var s string
+				var rest string
+				return []any{&opts, &b, &i, &s, &rest}
+			}(),
+			expect: []any{
+				testOptions{
+					nestedOptions: nestedOptions{S: "a b c"},
+					I:             10,
+					B:             true,
+				},
+				true,
+				1,
+				"s t r",
+				"lorem ipsum",
+			},
+		},
+		{
+			name: "test4",
+			data: `_=1&_=2`,
+			params: func() []any {
+				var i1 int
+				var i2 int
+				var i3 int
+				return []any{&i1, &i2, &i3}
+			}(),
+			expect: []any{1, 2, 0},
+		},
+		{
+			name: "test5",
+			data: `_=1&_=2&_=3`,
+			params: func() []any {
+				var i1 int
+				var i2 int
+				return []any{&i1, &i2}
+			}(),
+			expect: []any{1, 2},
+		},
+		{
+			name: "test6",
+			data: "_=.%2Ffoo%2Fbar%2Fbaz%2F",
+			params: func() []any {
+				var path string
+				return []any{&path}
+			}(),
+			expect: []any{"./foo/bar/baz/"},
+		},
+		{
+			name:   "test7",
+			data:   `a=1&a=2&a=3`,
+			params: func() []any { return []any{&testSlice{}} }(),
+			expect: []any{testSlice{[]int{1, 2, 3}}},
+		},
+		{
+			name:   "test8",
+			data:   `a=1&a=2&a=3`,
+			params: func() []any { return []any{&testArray{}} }(),
+			expect: []any{testArray{[3]int{1, 2, 3}}},
+		},
 	}
-
-	assert.Equal(t, opts, testOptions{
-		nestedOptions: nestedOptions{S: "a b c"},
-		I:             10,
-		B:             true,
-	})
-	assert.Equal(t, b, true)
-	assert.Equal(t, i, 1)
-	assert.Equal(t, s, `s t r`)
-	assert.Equal(t, rest, `lorem ipsum`)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := Unmarshal([]byte(tt.data), tt.params); (err != nil) != tt.wantErr {
+				t.Errorf("Unmarshal() error = %v, wantErr %v", err, tt.wantErr)
+			} else {
+				for i, param := range tt.params {
+					tt.params[i] = reflect.ValueOf(param).Elem().Interface()
+				}
+				assert.Equal(t, tt.expect, tt.params)
+			}
+		})
+	}
 }
 
 type testOptions struct {
 	nestedOptions
-	I int  `cli:"int i"`
-	B bool `cli:"b"`
+	I int  `query:"int i"`
+	B bool `query:"b"`
 }
 
 type nestedOptions struct {
-	S string `cli:"s"`
+	S string `query:"s"`
 	T *testOptions
+}
+
+type testSlice struct {
+	A []int `query:"a"`
+}
+
+type testArray struct {
+	A [3]int `query:"a"`
 }

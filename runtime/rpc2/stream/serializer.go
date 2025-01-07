@@ -13,8 +13,9 @@ type Serializer struct {
 	io.Reader
 	io.Writer
 	io.Closer
-	Marshal   Marshal
-	Unmarshal Unmarshal
+	MarshalArgs Marshal
+	Marshal     Marshal
+	Unmarshal   Unmarshal
 
 	scanner *bufio.Scanner
 	reader  io.Reader

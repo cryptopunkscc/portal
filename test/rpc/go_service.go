@@ -58,7 +58,7 @@ func Function2(
 	return b, i, f, s
 }
 
-func Function3(struct1 *TestStruct2) *TestStruct2 {
+func Function3(struct1 *TestStruct1) *TestStruct1 {
 	return struct1
 }
 
@@ -72,12 +72,8 @@ func Function4(
 }
 
 type TestStruct1 struct {
-	B bool    `json:"b"`
-	I int     `json:"i"`
-	F float64 `json:"f"`
-	S string  `json:"s"`
-}
-
-type TestStruct2 struct {
-	TestStruct1 `json:"struct1"`
+	B bool    `query:"b" json:"b"`
+	I int     `query:"i" json:"i"`
+	F float64 `query:"f" json:"f"`
+	S string  `query:"s" json:"s"`
 }

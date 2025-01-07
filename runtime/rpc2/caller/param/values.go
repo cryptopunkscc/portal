@@ -6,19 +6,15 @@ import (
 )
 
 type Values struct {
+	Type       string
 	Named      map[string]reflect.Value
 	Positional []reflect.Value
 }
 
-func NewValues(args []any) (p *Values) {
+func NewValues(typ string, args []any) (p *Values) {
 	p = &Values{}
+	p.Type = typ
 	p.Named = make(map[string]reflect.Value)
-	//va := reflect.ValueOf(args)
-	//for i := 0; i < va.Len(); i++ {
-	//	v := va.Index(i)
-	//	p.add("", v.Elem())
-	//
-	//}
 	for _, arg := range args {
 		v := reflect.ValueOf(arg)
 		p.add("", v)
@@ -40,7 +36,7 @@ func (vs *Values) add(name string, v reflect.Value) {
 		for i := 0; i < v.NumField(); i++ {
 			fv := v.Field(i)
 			sf := v.Type().Field(i)
-			tag := sf.Tag.Get("cli")
+			tag := sf.Tag.Get(vs.Type)
 			if tag == "" && fv.Kind() != reflect.Struct {
 				return
 			}

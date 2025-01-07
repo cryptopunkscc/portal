@@ -7,6 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runtime/rpc2"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/stream/query"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"testing"
@@ -88,14 +89,14 @@ func (c TestClient) Run(t *testing.T) {
 
 				t.Run("func3", func(t *testing.T) {
 					t.Run("a", func(t *testing.T) {
-						expected := TestStruct2{TestStruct1{
+						expected := TestStruct1{
 							B: false,
 							I: 1,
 							F: 0,
 							S: "",
-						}}
+						}
 
-						actual, err := rpc.Query[TestStruct2](request, "func3", expected)
+						actual, err := rpc.Query[TestStruct1](request, "func3", expected)
 						if err != nil {
 							t.Fatal(err)
 						}
@@ -103,11 +104,9 @@ func (c TestClient) Run(t *testing.T) {
 					})
 
 					t.Run("b", func(t *testing.T) {
-						actual, err := rpc.Query[*TestStruct2](request, "func3", nil)
-						if err != nil {
-							t.Fatal(err)
-						}
+						actual, err := rpc.Query[*TestStruct1](request, "func3", []byte{})
 						assert.Zero(t, actual)
+						assert.Equal(t, query.ErrorEmptyValue, err)
 					})
 				})
 

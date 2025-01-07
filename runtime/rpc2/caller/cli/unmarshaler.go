@@ -24,7 +24,7 @@ func (u Unmarshaler) Score(data []byte) (score uint) {
 }
 
 func Unmarshal(data []byte, args []any) (err error) {
-	p := param.NewValues(args)
+	p := param.NewValues("cli", args)
 	f := parseFields(data)
 	err = set(p, 0, f)
 	return
