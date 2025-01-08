@@ -5,14 +5,14 @@ import (
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/factory/bind"
 	"github.com/cryptopunkscc/portal/factory/dev"
-	"github.com/cryptopunkscc/portal/feat/open"
-	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/go_dev"
 	"github.com/cryptopunkscc/portal/runner/multi"
+	"github.com/cryptopunkscc/portal/runner/open"
 	"github.com/cryptopunkscc/portal/runner/reload"
+	"github.com/cryptopunkscc/portal/runner/version"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 )
@@ -28,7 +28,7 @@ func main() {
 		Desc: "Portal go development.",
 		Sub: cmd.Handlers{
 			{
-				Func: open.Feat[ProjectGo](mod),
+				Func: open.Runner[ProjectGo](mod),
 				Name: "o",
 				Desc: "Start portal golang app development.",
 				Params: cmd.Params{

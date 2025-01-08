@@ -15,7 +15,7 @@ type (
 	Factory func(dir string, templates map[string]string) target.Run[target.Template]
 )
 
-func Feat(factory Factory, dist Dist) Run {
+func Runner(factory Factory, dist Dist) Run {
 	return func(ctx context.Context, dir string, targets map[string]string) (err error) {
 		log := plog.Get(ctx)
 		create := factory(dir, targets)

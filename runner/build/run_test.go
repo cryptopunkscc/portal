@@ -12,11 +12,11 @@ func TestFeat_Run(t *testing.T) {
 			t.Logf("clean %s", s)
 			return nil
 		},
-		func(ctx context.Context, src target.Project_) (err error) {
+		func(ctx context.Context, src target.Project_, _ ...string) (err error) {
 			t.Logf("run dist %T %s %s", src, src.Manifest().Package, src.Abs())
 			return nil
 		},
-		func(ctx context.Context, src target.Dist_) (err error) {
+		func(ctx context.Context, src target.Dist_, _ ...string) (err error) {
 			t.Logf("run pack %T %s %s", src, src.Manifest().Package, src.Abs())
 			return nil
 		},

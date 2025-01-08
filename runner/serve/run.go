@@ -19,8 +19,6 @@ type (
 
 	// Observe on installed applications.
 	Observe func(ctx context.Context, conn rpc.Conn) (err error)
-
-	Handlers map[string]any
 )
 
 // CheckAstral is a default implementation of Astral function. Returns error if astral is not started.
@@ -35,17 +33,17 @@ type Deps interface {
 	Shutdown() context.CancelFunc
 }
 
-func Feat(d Deps) target.Request {
-	astral := d.Astral()
+func Runner(d Deps) target.Run[string] {
+	startAstral := d.Astral()
 	port := d.Port()
 	handler := Handler(d)
 	handler.AddSub(d.Handlers()...)
 
-	return func(ctx context.Context, _ string) (err error) {
-		if err = astral(ctx); err != nil {
+	return func(ctx context.Context, _ string, _ ...string) (err error) {
+		if err = startAstral(ctx); err != nil {
 			return plog.Err(err)
 		}
-		if err = check(port); err != nil {
+		if err = checkPortald(port); err != nil {
 			return plog.Err(err)
 		}
 		if err = serve(ctx, port, handler); err != nil {
@@ -55,7 +53,7 @@ func Feat(d Deps) target.Request {
 	}
 }
 
-func check(port apphost.Port) (err error) {
+func checkPortald(port apphost.Port) (err error) {
 	if err = api.Client(port.String()).Ping(); err == nil {
 		err = fmt.Errorf("port already registered or astral not running: %v", err)
 	}

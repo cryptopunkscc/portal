@@ -13,7 +13,7 @@ import (
 
 type Invoker struct {
 	apphost.Client
-	Invoke target.Request
+	Invoke target.Run[string]
 	Log    plog.Logger
 	Ctx    context.Context
 }

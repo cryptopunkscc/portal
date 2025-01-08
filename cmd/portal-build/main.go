@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/factory/build"
-	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/clean"
+	"github.com/cryptopunkscc/portal/runner/version"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 	"log"

@@ -4,8 +4,6 @@ import (
 	"context"
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/factory/srv"
-	"github.com/cryptopunkscc/portal/feat/serve"
-	"github.com/cryptopunkscc/portal/feat/start"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	signal "github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/request/query"
@@ -15,6 +13,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/app"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/multi"
+	"github.com/cryptopunkscc/portal/runner/serve"
 	"github.com/cryptopunkscc/portal/runtime/msg"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
@@ -23,7 +22,7 @@ import (
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
-	mod := deps[Portal_]{}
+	mod := Application[Portal_]{}
 	mod.Deps = &mod
 	mod.CancelFunc = cancel
 	go signal.OnShutdown(cancel)
@@ -39,7 +38,7 @@ func main() {
 		Params: cmd.Params{
 			{Type: "string", Desc: "Application source. The source can be a app name, package name, app bundle path or app dir."},
 		},
-		Func: start.Feat(&mod),
+		Func: Start(&mod),
 	}).Run(ctx)
 
 	if err != nil {
@@ -49,32 +48,32 @@ func main() {
 	mod.WaitGroup().Wait()
 }
 
-type deps[T Portal_] struct{ srv.Module[T] }
+type Application[T Portal_] struct{ srv.Module[T] }
 
-func (d *deps[T]) Executable() string   { return "portal-dev" }
-func (d *deps[T]) Request() Request     { return query.Request.Run }
-func (d *deps[T]) Serve() Request       { return serve.Feat(d).Start }
-func (d *deps[T]) Astral() serve.Astral { return serve.CheckAstral }
-func (d *deps[T]) Handlers() cmd.Handlers {
+func (d *Application[T]) Executable() string   { return "portal-dev" }
+func (d *Application[T]) Request() Run[string] { return query.Request.Run }
+func (d *Application[T]) Serve() Run[string]   { return serve.Runner(d).Start }
+func (d *Application[T]) Astral() serve.Astral { return serve.CheckAstral }
+func (d *Application[T]) Handlers() cmd.Handlers {
 	return cmd.Handlers{
 		{Name: PortMsg.Name(), Func: msg.NewBroadcast(PortMsg, d.Processes()).BroadcastMsg},
 	}
 }
-func (d *deps[T]) Run() Run[T] {
+func (d *Application[T]) Run() Run[T] {
 	return multi.Runner[T](
 		app.Run(exec.Any(d.runner).Run),
 	)
 }
-func (d *deps[T]) Priority() Priority {
+func (d *Application[T]) Priority() Priority {
 	return Priority{
 		Match[Project_],
 		Match[Dist_],
 		Match[Bundle_],
 	}
 }
-func (d *deps[T]) Resolve2() Resolve[T] { return sources.Resolver[T]() }
+func (d *Application[T]) Resolve2() Resolve[T] { return sources.Resolver[T]() }
 
-func (d *deps[T]) Resolve() Resolve[T] {
+func (d *Application[T]) Resolve() Resolve[T] {
 	return Any[T](
 		Skip("node_modules"),
 		Try(exec2.ResolveDist),
@@ -86,7 +85,7 @@ func (d *deps[T]) Resolve() Resolve[T] {
 }
 
 // TODO resolve dynamically
-func (d *deps[T]) runner(script string) string {
+func (d *Application[T]) runner(script string) string {
 	return map[string]string{
 		"js":   "portal-dev-goja",
 		"html": "portal-dev-wails",

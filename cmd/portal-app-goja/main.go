@@ -5,11 +5,11 @@ import (
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/factory/app"
 	"github.com/cryptopunkscc/portal/factory/bind"
-	"github.com/cryptopunkscc/portal/feat/open"
-	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/runner/goja"
+	"github.com/cryptopunkscc/portal/runner/open"
+	"github.com/cryptopunkscc/portal/runner/version"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 )
@@ -25,7 +25,7 @@ func main() {
 		Desc: "Portal js runner driven by goja.",
 		Sub: cmd.Handlers{
 			{
-				Func: open.Feat[AppJs](mod),
+				Func: open.Runner[AppJs](mod),
 				Name: "o",
 				Desc: "Start portal app in goja runner.",
 				Params: cmd.Params{

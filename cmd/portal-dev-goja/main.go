@@ -5,15 +5,15 @@ import (
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/factory/bind"
 	"github.com/cryptopunkscc/portal/factory/dev"
-	"github.com/cryptopunkscc/portal/feat/open"
-	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/runner/goja"
 	"github.com/cryptopunkscc/portal/runner/goja_dist"
 	"github.com/cryptopunkscc/portal/runner/goja_pro"
 	"github.com/cryptopunkscc/portal/runner/multi"
+	"github.com/cryptopunkscc/portal/runner/open"
 	"github.com/cryptopunkscc/portal/runner/reload"
+	"github.com/cryptopunkscc/portal/runner/version"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 )
@@ -29,7 +29,7 @@ func main() {
 		Desc: "Portal js development driven by goja.",
 		Sub: cmd.Handlers{
 			{
-				Func: open.Feat[PortalJs](mod),
+				Func: open.Runner[PortalJs](mod),
 				Name: "o",
 				Desc: "Start portal js app development.",
 				Params: cmd.Params{

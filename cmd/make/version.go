@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/cryptopunkscc/portal/feat/version"
+	"github.com/cryptopunkscc/portal/runner/version"
 	"os"
 )
 
 func resolveVersion() {
-	file, err := os.Create("./feat/version/name")
+	file, err := os.Create("./runner/version/name")
 	if err != nil {
 		return
 	}
@@ -18,7 +18,7 @@ func resolveVersion() {
 }
 
 func clearVersion() {
-	file, err := os.Create("./feat/version/name")
+	file, err := os.Create("./runner/version/name")
 	if err != nil {
 		panic(err)
 	}

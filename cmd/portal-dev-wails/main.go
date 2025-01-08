@@ -5,12 +5,12 @@ import (
 	. "github.com/cryptopunkscc/portal/api/target"
 	factory "github.com/cryptopunkscc/portal/factory/bind"
 	"github.com/cryptopunkscc/portal/factory/dev"
-	"github.com/cryptopunkscc/portal/feat/open"
-	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/runner/multi"
+	"github.com/cryptopunkscc/portal/runner/open"
 	"github.com/cryptopunkscc/portal/runner/reload"
+	"github.com/cryptopunkscc/portal/runner/version"
 	"github.com/cryptopunkscc/portal/runner/wails"
 	"github.com/cryptopunkscc/portal/runner/wails_dist"
 	"github.com/cryptopunkscc/portal/runner/wails_pro"
@@ -30,7 +30,7 @@ func main() {
 		Desc: "Portal html development driven by wails.",
 		Sub: cmd.Handlers{
 			{
-				Func: open.Feat[PortalHtml](mod),
+				Func: open.Runner[PortalHtml](mod),
 				Name: "o",
 				Desc: "Start portal js app development.",
 				Params: cmd.Params{

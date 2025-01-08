@@ -1,4 +1,4 @@
-package start
+package main
 
 import (
 	"context"
@@ -14,11 +14,11 @@ import (
 
 type Deps interface {
 	Port() apphost.Port
-	Serve() target.Request
-	Request() target.Request
+	Serve() target.Run[string]
+	Request() target.Run[string]
 }
 
-func Feat(deps Deps) target.Request {
+func Start(deps Deps) target.Request {
 	return feat{
 		port:    deps.Port(),
 		serve:   deps.Serve(),
@@ -29,8 +29,8 @@ func Feat(deps Deps) target.Request {
 
 type feat struct {
 	port    apphost.Port
-	serve   target.Request
-	request target.Request
+	serve   target.Run[string]
+	request target.Run[string]
 	portal  portal.Client
 }
 

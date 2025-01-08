@@ -65,7 +65,7 @@ func startPortald(ctx context.Context, client portal.Client) (err error) {
 }
 
 func startPortaldProcess(ctx context.Context) error {
-	c := exec.CommandContext(ctx, "portal-app", "s")
+	c := exec.CommandContext(ctx, "portald", "s")
 	c.Stdout = os.Stdout
 	c.Stderr = os.Stderr
 	return c.Start()

@@ -4,8 +4,6 @@ import (
 	"context"
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/factory/srv"
-	"github.com/cryptopunkscc/portal/feat/serve"
-	"github.com/cryptopunkscc/portal/feat/version"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	singal "github.com/cryptopunkscc/portal/pkg/sig"
 	exec2 "github.com/cryptopunkscc/portal/resolve/exec"
@@ -13,54 +11,57 @@ import (
 	"github.com/cryptopunkscc/portal/runner/app"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/multi"
+	"github.com/cryptopunkscc/portal/runner/serve"
+	"github.com/cryptopunkscc/portal/runner/version"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 )
 
 func main() {
-	mod := Module[App_]{}
-	mod.Deps = &mod
 	ctx, cancel := context.WithCancel(context.Background())
-	mod.CancelFunc = cancel
-	log := plog.New().D().Scope("app").Set(&ctx)
+	application := portald[App_]{}
+	application.Deps = &application
+	application.CancelFunc = cancel
+	log := plog.New().D().Scope("portald").Set(&ctx)
 	go singal.OnShutdown(cancel)
 
-	err := cli.New(cmd.Handler{
-		Name: "portal-app",
-		Desc: "Portal applications service",
-		Sub: cmd.Handlers{
-			{Name: "serve s", Desc: "Start portal daemon", Func: mod.Serve()},
-			{Name: "v", Desc: "Print version", Func: version.Run},
-		},
-	}).Run(ctx)
-
+	err := cli.New(application.Handler()).Run(ctx)
 	if err != nil {
 		log.Println(err)
 	}
 	cancel()
-	mod.WaitGroup().Wait()
+	application.WaitGroup().Wait()
 }
 
-type Module[T App_] struct{ srv.Module[T] }
+type portald[T App_] struct{ srv.Module[T] }
 
-func (d *Module[T]) Executable() string   { return "portal" }
-func (d *Module[T]) Serve() Request       { return serve.Feat(d) }
-func (d *Module[T]) Astral() serve.Astral { return exec.Astral }
+func (d *portald[T]) Handler() cmd.Handler {
+	return cmd.Handler{
+		Name: "portald",
+		Desc: "Start portal applications service",
+		Func: serve.Runner(d),
+		Sub: cmd.Handlers{
+			{Name: "v", Desc: "Print version", Func: version.Run},
+		},
+	}
+}
 
-func (d *Module[T]) Run() Run[T] {
+func (d *portald[T]) Astral() serve.Astral { return exec.Astral }
+
+func (d *portald[T]) Run() Run[T] {
 	return multi.Runner[T](
-		app.Run(exec.Bundle(CacheDir(d.Executable())).Run),
+		app.Run(exec.Bundle(CacheDir("portal")).Run),
 		app.Run(exec.Dist().Run),
 		app.Run(exec.Any(d.runner).Run),
 	)
 }
-func (d *Module[T]) Priority() Priority {
+func (d *portald[T]) Priority() Priority {
 	return []Matcher{
 		Match[Bundle_],
 		Match[Dist_],
 	}
 }
-func (d *Module[T]) Resolve() Resolve[T] {
+func (d *portald[T]) Resolve() Resolve[T] {
 	return Any[T](
 		Skip("node_modules"),
 		Try(exec2.ResolveBundle),
@@ -71,7 +72,7 @@ func (d *Module[T]) Resolve() Resolve[T] {
 }
 
 // TODO resolve dynamically
-func (d *Module[T]) runner(script string) string {
+func (d *portald[T]) runner(script string) string {
 	return map[string]string{
 		"js":   "portal-app-goja",
 		"html": "portal-app-wails",

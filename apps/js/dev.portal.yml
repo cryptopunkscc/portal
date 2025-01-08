@@ -1,0 +1,13 @@
+name: js
+package: portal.js
+title: Portal JS
+description: Portal JS runner
+version: 0.0.0
+schema: go
+build:
+  default:
+    exec: main
+    cmd: go build -o dist/main
+  windows:
+    exec: main.exe
+    cmd: go build dist/main.exe
