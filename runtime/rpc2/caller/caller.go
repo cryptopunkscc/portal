@@ -135,7 +135,7 @@ func (c *Func) unmarshal(data []byte, args []any) error {
 	}
 	chosen := c.unmarshalers[0]
 	score := chosen.Score(data)
-	for i := 1; i < len(c.unmarshalers); i++ {
+	for i := 0; i < len(c.unmarshalers); i++ {
 		n := c.unmarshalers[i]
 		s := n.Score(data)
 		if score < s {

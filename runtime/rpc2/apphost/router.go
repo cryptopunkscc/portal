@@ -7,8 +7,6 @@ import (
 	api "github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/caller"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/cli"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/json"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/query"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/router"
@@ -45,8 +43,8 @@ func (r RpcBase) Router(handler cmd.Handler, port api.Port, routes ...string) *R
 		Base: router.Base{
 			Registry: router.CreateRegistry(handler),
 			Unmarshalers: []caller.Unmarshaler{
-				cli.Unmarshaler{},
-				json.Unmarshaler{},
+				//cli.Unmarshaler{},
+				//json.Unmarshaler{},
 				query.Unmarshaler{},
 			},
 		},
