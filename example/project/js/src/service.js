@@ -7,12 +7,12 @@ class Service {
   }
 
   // Example link for
-  async link(ctx) {
-    await ctx.conn.encode()
+  async link({$}) {
+    await $.conn.encode()
   }
 
   // Example observable handler
-  async ticker(limit, delay, {conn}) {
+  async ticker({$:{conn}}, limit, delay) {
 
     // Example validation
     const l = Number(limit)

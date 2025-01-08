@@ -33,9 +33,12 @@ export function parseQueryParams(query) {
   let acc = {};
   query.split('&').map(parseQueryParam).forEach(([key, value]) => {
     if (key in acc) {
-      value = Array.isArray(acc[key]) ? acc[key].concat(value) : [acc[key], value];
+      acc[key] = Array.isArray(acc[key]) ? acc[key].concat(value) : [acc[key], value];
+    } else if (key === '_') {
+      acc[key] = [value];
+    } else {
+      acc[key] = value;
     }
-    acc[key] = [value];
   })
   return acc
 }

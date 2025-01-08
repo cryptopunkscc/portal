@@ -1,13 +1,14 @@
 class Service {
 
-    async get(arg) {
+    async get(_, arg) {
         return {
             arg: arg,
             val: "Hello RPC"
         }
     }
 
-    async sum(a, b) {
+    async sum(_, a, b) {
+        await portal.log(JSON.stringify(a))
         return a + b
     }
 }

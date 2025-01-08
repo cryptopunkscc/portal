@@ -124,7 +124,7 @@
 
   setTimeout(() => portal.rpc.serve({
     handlers: {
-      message: (message, ctx) => displayMessage(ctx.conn.remoteId, message)
+      message: ({$}, message) => displayMessage($.conn.remoteId, message)
     },
   }).catch(portal.log), 300)
 </script>
