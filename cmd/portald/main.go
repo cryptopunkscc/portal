@@ -23,7 +23,7 @@ func main() {
 	application.Deps = &application
 	application.CancelFunc = cancel
 	log := plog.New().D().Scope("portald").Set(&ctx)
-	go singal.OnShutdown(cancel)
+	go singal.OnShutdown(log, cancel)
 
 	err := cli.New(application.Handler()).Run(ctx)
 	if err != nil {

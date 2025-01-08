@@ -73,6 +73,13 @@ func TestRouter_Call(t *testing.T) {
 				assert.NotNil(tt, t)
 			}},
 		},
+		{
+			name: "nil error should be omitted",
+			caller: &cmd.Handler{Func: func() error {
+				return nil
+			}},
+			expected: []any(nil),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

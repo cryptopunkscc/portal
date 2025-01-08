@@ -2,6 +2,7 @@ package install
 
 import (
 	"context"
+	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/apps"
@@ -37,12 +38,11 @@ func (i Install) All(ctx context.Context, source target.Source, _ ...string) err
 	return nil
 }
 
-func (i Install) Bundle(ctx context.Context, bundle target.Bundle_, _ ...string) error {
-	log := plog.Get(ctx).Type(i)
+func (i Install) Bundle(_ context.Context, bundle target.Bundle_, _ ...string) error {
 	pkg := bundle.Package()
 	name := filepath.Base(bundle.Abs())
 	dstPath := filepath.Join(i.appsDir, name)
-	log.Printf("* copying %s to %s [DONE]", name, dstPath)
+	_, _ = fmt.Fprintf(os.Stdout, "* copying %s to %s [DONE]\n", name, dstPath)
 	dst, err := os.Create(dstPath)
 	if err != nil {
 		return err

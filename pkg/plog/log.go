@@ -44,4 +44,5 @@ const (
 	Warning
 	Info
 	Debug
+	all
 )

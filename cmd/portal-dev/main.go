@@ -25,11 +25,11 @@ func main() {
 	mod := Application[Portal_]{}
 	mod.Deps = &mod
 	mod.CancelFunc = cancel
-	go signal.OnShutdown(cancel)
 	println("...")
 	plog.ErrorStackTrace = true
 	log := plog.New().D().Scope("dev").Set(&ctx)
 	log.Println("starting portal development", os.Args)
+	go signal.OnShutdown(log, cancel)
 	defer log.Println("closing portal development")
 
 	err := cli.New(cmd.Handler{

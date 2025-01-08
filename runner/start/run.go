@@ -30,7 +30,6 @@ type Opt struct {
 }
 
 func (s Start) Run(ctx context.Context, opt Opt, args ...string) (err error) {
-	plog.Get(ctx).Type(s).Set(&ctx)
 	if err = s.portal.Ping(); err != nil {
 		if err = startPortald(ctx, s.portal); err != nil {
 			return

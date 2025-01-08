@@ -56,7 +56,7 @@ func (c *Func) invoke(data []byte) (out []reflect.Value, err error) {
 		return
 	}
 	values = c.function.Call(values)
-	err = getError(values)
+	values, err = getError(values)
 	if err != nil {
 		return
 	}
@@ -150,12 +150,15 @@ func (c *Func) unmarshal(data []byte, args []any) error {
 	return fmt.Errorf("cannot unmarshal data %s %v", data, err)
 }
 
-func getError(values []reflect.Value) (err error) {
-	if len(values) == 0 {
+func getError(returned []reflect.Value) (rest []reflect.Value, err error) {
+	if len(returned) == 0 {
 		return
 	}
-	last := values[len(values)-1]
+	lastIndex := len(returned) - 1
+	last := returned[lastIndex]
+	rest = returned
 	if last.Type().Implements(errorInterface) {
+		rest = returned[:lastIndex]
 		if i := last.Interface(); i != nil {
 			err, _ = i.(error)
 		}

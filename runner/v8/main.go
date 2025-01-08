@@ -21,7 +21,7 @@ func main() {
 
 	// prepare context
 	ctx, cancel := context.WithCancel(context.Background())
-	sig.OnShutdown(cancel)
+	sig.OnShutdown(nil, cancel)
 
 	if err = Run(ctx, file, src); err != nil {
 		log.Fatalln(err)

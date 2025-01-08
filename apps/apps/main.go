@@ -1,19 +1,19 @@
 package main
 
 import (
-	"context"
 	"github.com/cryptopunkscc/portal/mock/appstore"
-	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/cli"
+	"github.com/cryptopunkscc/portal/runner/cli"
+	"github.com/cryptopunkscc/portal/runner/install"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 )
 
-func main() {
-	ctx := context.Background()
-	plog.New().D().Set(&ctx)
+func main() { cli.Run(Application{}.Handler()) }
 
-	err := cli.New(cmd.Handler{
-		Name: "portal-apps",
+type Application struct{}
+
+func (a Application) Handler() cmd.Handler {
+	return cmd.Handler{
+		Name: "apps",
 		Desc: "Portal applications management.",
 		Sub: cmd.Handlers{
 			{
@@ -22,7 +22,7 @@ func main() {
 				Desc: "List installed apps.",
 			},
 			{
-				Func: appstore.Install,
+				Func: install.Runner(a.dir()).Run,
 				Name: "install i",
 				Desc: "Install app from a given portal app bundle path.",
 				Params: cmd.Params{
@@ -38,9 +38,7 @@ func main() {
 				},
 			},
 		},
-	}).Run(ctx)
-
-	if err != nil {
-		panic(err)
 	}
 }
+
+func (a Application) dir() string { return PortalAppsDir }

@@ -23,7 +23,7 @@ func main() {
 	mod := &Module{}
 	ctx, cancel := context.WithCancel(context.Background())
 	log := plog.New().D().Scope("dev-wails").Set(&ctx)
-	go sig.OnShutdown(cancel)
+	go sig.OnShutdown(log, cancel)
 
 	err := cli.New(cmd.Handler{
 		Name: "portal-dev-wails",

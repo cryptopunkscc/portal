@@ -10,8 +10,8 @@ import (
 
 func Run(handler cmd.Handler) {
 	ctx, cancel := context.WithCancel(context.Background())
-	go sig.OnShutdown(cancel)
 	log := plog.New().D().Scope(handler.Name).Set(&ctx)
+	go sig.OnShutdown(log, cancel)
 	err := cli.New(handler).Run(ctx)
 	if err != nil {
 		log.Println(err)

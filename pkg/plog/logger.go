@@ -12,6 +12,10 @@ import (
 	"time"
 )
 
+var Verbosity = Panic
+
+//var Verbosity = all
+
 type logger struct {
 	out    Output
 	module string
@@ -61,7 +65,7 @@ func Get(ctx context.Context) Logger {
 			return l.Copy()
 		}
 	}
-	return New().Scope("detached")
+	return Default.Scope("detached")
 }
 
 func (l logger) Set(ctx *context.Context) Logger {
@@ -140,6 +144,9 @@ func (l logger) Println(a ...any) {
 }
 
 func (l logger) Flush() {
+	if l.Level > Verbosity {
+		return
+	}
 	l.Time = time.Now()
 	if l.Level <= Fatal {
 		l.Stack = debug.Stack()

@@ -9,7 +9,6 @@ import (
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 	"log"
 	"os"
-	"time"
 )
 
 func main() {
@@ -18,7 +17,7 @@ func main() {
 	cli.Run(cmd.Handler{
 		Name: "test",
 		Desc: "Portal test app",
-		Func: echo,
+		Func: func() error { return nil },
 		Sub: cmd.Handlers{
 			{
 				Name: "echo e",
@@ -41,7 +40,7 @@ func main() {
 		},
 	})
 
-	time.Sleep(10 * time.Second)
+	//time.Sleep(10 * time.Second)
 }
 
 func echo(args ...string) []string {

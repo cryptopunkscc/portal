@@ -94,7 +94,7 @@ func respond(c chan any, err error, out ...any) {
 				c <- a
 			}
 		default:
-			c <- out[0]
+			c <- r
 		}
 	default:
 		c <- out
