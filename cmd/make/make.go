@@ -80,7 +80,7 @@ func (d *Install) Run(make Make, goos []string) {
 		log.Println(" * portal")
 		goPortal.Install()
 		goPortalApp.Install()
-		goPortalApps.Install()
+		//goPortalApps.Install()
 		goPortalAppGoja.Install()
 		goPortalAppWails.Install()
 	}

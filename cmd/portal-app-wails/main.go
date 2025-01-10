@@ -22,17 +22,13 @@ func main() {
 	go sig.OnShutdown(log, cancel)
 
 	err := cli.New(cmd.Handler{
+		Func: open.Runner[AppHtml](mod),
 		Name: "portal-app-wails",
-		Desc: "Portal html runner driven by wails.",
+		Desc: "Start html app in portal wails runner.",
+		Params: cmd.Params{
+			{Type: "string", Desc: "Absolute path to app bundle or directory."},
+		},
 		Sub: cmd.Handlers{
-			{
-				Func: open.Runner[AppHtml](mod),
-				Name: "o",
-				Desc: "Start portal app in wails runner.",
-				Params: cmd.Params{
-					{Type: "string", Desc: "Absolute path to app bundle or directory."},
-				},
-			},
 			{Name: "v", Desc: "Print version", Func: version.Run},
 		},
 	}).Run(ctx)

@@ -14,7 +14,9 @@ import (
 
 var Verbosity = Panic
 
-//var Verbosity = all
+func init() {
+	Verbosity = all
+}
 
 type logger struct {
 	out    Output

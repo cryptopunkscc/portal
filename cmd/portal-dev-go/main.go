@@ -24,17 +24,13 @@ func main() {
 	go sig.OnShutdown(log, cancel)
 
 	err := cli.New(cmd.Handler{
+		Func: open.Runner[ProjectGo](mod),
 		Name: "portal-dev-go",
-		Desc: "Portal go development.",
+		Desc: "Start portal golang app development.",
+		Params: cmd.Params{
+			{Type: "string", Desc: "Absolute path to app bundle or directory."},
+		},
 		Sub: cmd.Handlers{
-			{
-				Func: open.Runner[ProjectGo](mod),
-				Name: "o",
-				Desc: "Start portal golang app development.",
-				Params: cmd.Params{
-					{Type: "string", Desc: "Absolute path to app bundle or directory."},
-				},
-			},
 			{Name: "v", Desc: "Print version", Func: version.Run},
 		},
 	}).Run(ctx)

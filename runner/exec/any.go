@@ -12,6 +12,6 @@ func Any(runner func(string) string) target.Runner[target.Portal_] {
 		if r == "" {
 			return nil, fmt.Errorf("unknown schema %v", schema)
 		}
-		return []string{r, "o", portal.Abs()}, nil
+		return []string{r, portal.Abs()}, nil
 	})
 }

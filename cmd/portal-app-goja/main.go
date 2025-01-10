@@ -21,17 +21,13 @@ func main() {
 	go sig.OnShutdown(log, cancel)
 
 	err := cli.New(cmd.Handler{
+		Func: open.Runner[AppJs](mod),
 		Name: "portal-app-goja",
-		Desc: "Portal js runner driven by goja.",
+		Desc: "Start portal js app in goja runner.",
+		Params: cmd.Params{
+			{Type: "string", Desc: "Absolute path to app bundle or directory."},
+		},
 		Sub: cmd.Handlers{
-			{
-				Func: open.Runner[AppJs](mod),
-				Name: "o",
-				Desc: "Start portal app in goja runner.",
-				Params: cmd.Params{
-					{Type: "string", Desc: "Absolute path to app bundle or directory."},
-				},
-			},
 			{Name: "v", Desc: "Print version", Func: version.Run},
 		},
 	}).Run(ctx)
