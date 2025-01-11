@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	sig2 "github.com/cryptopunkscc/portal/pkg/sig"
-	"log"
 	"time"
 )
 
@@ -27,15 +27,18 @@ func Timeout(ctx context.Context, apphost apphost.Cache, portal target.Portal_) 
 		t := newTimout(duration, func() {
 			_ = sig2.Interrupt()
 		})
+		log := plog.Get(ctx)
+		t.log = log
 		t.Enable(true)
 		for e := range apphost.Events().Subscribe(ctx) {
-			log.Println("apphost event", e.Type, e.Port, e.Ref)
+			log.Printf("apphost event %v %s %s", e.Type, e.Port, e.Ref)
 			t.Enable(apphost.Connections().Size() <= ConnectionsThreshold)
 		}
 	}()
 }
 
 type timout struct {
+	log       plog.Logger
 	timeout   time.Duration
 	ticker    *time.Ticker
 	c         chan any
@@ -51,30 +54,29 @@ func newTimout(timeout time.Duration, onTimeout func()) *timout {
 }
 
 func (t *timout) Enable(value bool) {
-	log.Println("timeout", value)
+	t.log.Println("timeout", value)
+	t.stop()
 	if value {
-		go t.Start()
-	} else {
-		t.Stop()
+		go t.start()
 	}
 }
 
-func (t *timout) Start() {
-	t.Stop()
-	log.Println("timout after", t.timeout)
+func (t *timout) start() {
+	t.log.Println("timout after", t.timeout)
 	t.ticker.Reset(t.timeout)
+	t.c = make(chan any)
 	select {
 	case <-t.c:
 	case <-t.ticker.C:
-		log.Println("timout!!!")
+		t.log.Println("timout!!!")
 		t.onTimeout()
 	}
 }
 
-func (t *timout) Stop() {
+func (t *timout) stop() {
 	if t.c != nil {
 		close(t.c)
+		t.c = nil
+		t.ticker.Stop()
 	}
-	t.c = make(chan any)
-	t.ticker.Stop()
 }
