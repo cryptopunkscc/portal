@@ -42,12 +42,14 @@ func (port Requester) Run(ctx context.Context, src string, _ ...string) (err err
 }
 
 func (port Requester) Start(ctx context.Context, src string, _ ...string) (err error) {
-	plog.Get(ctx).Type(port).Println("starting query", port, src)
+	log := plog.Get(ctx).Type(port)
+	log.Println("starting query", port, src)
 	request := apphost2.RpcRequest(id.Anyone, port.Base())
 	err = rpc.Command(request, port.Name(), src)
 	if err != nil {
-		plog.Get(ctx).Type(port).E().Printf("cannot query %s: %v", src, err)
+		log.E().Printf("cannot query %s: %v", src, err)
 		return fmt.Errorf("cannot query %s: %w", src, err)
 	}
+	log.Println("started query", port, src)
 	return
 }

@@ -14,10 +14,6 @@ import (
 
 var Verbosity = Panic
 
-func init() {
-	Verbosity = all
-}
-
 type logger struct {
 	out    Output
 	module string

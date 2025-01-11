@@ -7,7 +7,7 @@ import (
 )
 
 func TestFeat_Run(t *testing.T) {
-	feat := NewFeat(
+	feat := NewRunner(
 		func(s string) error {
 			t.Logf("clean %s", s)
 			return nil

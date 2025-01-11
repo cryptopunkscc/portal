@@ -13,6 +13,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -27,29 +28,41 @@ type Start struct {
 
 type Opt struct {
 	Query string `cli:"query q"`
+	Open  bool   `cli:"open o"`
 }
 
-func (s Start) Run(ctx context.Context, opt Opt, args ...string) (err error) {
+func (s Start) Run(ctx context.Context, opt Opt, cmd ...string) (err error) {
+	s.portal.Logger(plog.Get(ctx).Type(s))
 	if err = s.portal.Ping(); err != nil {
 		if err = startPortald(ctx, s.portal); err != nil {
 			return
 		}
 	}
-	if len(args) > 0 {
-		args = fixArgs(args)
-		if err = s.startApp(args); err != nil {
-			return
-		}
-	}
+	wg := sync.WaitGroup{}
 	if opt.Query != "" {
-		time.Sleep(200 * time.Millisecond) // Fixme
-		if err = s.queryApp(ctx, opt.Query); err != nil {
-			return
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if len(cmd) > 0 {
+				time.Sleep(200 * time.Millisecond)
+			}
+			if ctx.Err() != nil {
+				return
+			}
+			if err = s.queryApp(ctx, opt.Query); err != nil {
+				return
+			}
+		}()
+	}
+	if len(cmd) > 0 {
+		cmd = fixCmd(cmd)
+		if opt.Open {
+			err = s.startApp(ctx, cmd)
+		} else {
+			err = s.runApp(ctx, cmd)
 		}
 	}
-	if len(args) > 0 || opt.Query != "" {
-		<-ctx.Done() // TODO exit automatically on portal or invoked app close
-	}
+	wg.Wait()
 	return
 }
 
@@ -63,11 +76,10 @@ func startPortald(ctx context.Context, client portal.Client) (err error) {
 	return
 }
 
-func startPortaldProcess(ctx context.Context) error {
-	c := exec.CommandContext(ctx, "portald", "s")
-	c.Stdout = os.Stdout
-	c.Stderr = os.Stderr
-	return c.Start()
+func startPortaldProcess(ctx context.Context) (err error) {
+	c := exec.Command("portald")
+	err = c.Start()
+	return
 }
 
 func awaitPortaldService(ctx context.Context, client portal.Client) error {
@@ -81,7 +93,7 @@ func awaitPortaldService(ctx context.Context, client portal.Client) error {
 	})
 }
 
-func fixArgs(args []string) []string {
+func fixCmd(args []string) []string {
 	for i, arg := range args {
 		args[i] = fixPath(arg)
 	}
@@ -99,8 +111,30 @@ func fixPath(str string) string {
 	return str
 }
 
-func (s Start) startApp(args []string) (err error) {
-	return s.portal.Open(args...)
+func (s Start) startApp(_ context.Context, cmd []string) (err error) {
+	return s.portal.Open(cmd...)
+}
+
+func (s Start) runApp(ctx context.Context, cmd []string) (err error) {
+	log := plog.Get(ctx)
+
+	conn, err := s.portal.Connect(cmd...)
+	if err != nil {
+		return
+	}
+	defer conn.Close()
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	go func() {
+		_, _ = io.Copy(conn, os.Stdin)
+		log.Println("runApp(): finish read")
+	}()
+
+	_, _ = io.Copy(os.Stdout, conn)
+	log.Println("runApp(): finish write")
+	return
 }
 
 func (s Start) queryApp(ctx context.Context, query string) (err error) {

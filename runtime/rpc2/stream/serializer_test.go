@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"io"
+	"log"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestSerializer_Decode(t *testing.T) {
@@ -82,4 +84,18 @@ func TestSerializer_Encode(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestTest(t *testing.T) {
+	reader, writer := io.Pipe()
+
+	go func() {
+		write, err := writer.Write([]byte{})
+		log.Println("write", write, err)
+	}()
+
+	b := make([]byte, 10)
+	read, err := reader.Read(b)
+	log.Println("read", read, err)
+	time.Sleep(100 * time.Millisecond)
 }

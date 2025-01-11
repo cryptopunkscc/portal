@@ -6,6 +6,8 @@ import (
 	"io"
 )
 
+var Close = errors.New("close")
+
 type Conn interface {
 	io.ReadWriteCloser
 	Logger(logger plog.Logger)
@@ -17,7 +19,7 @@ type Conn interface {
 	Flush()
 }
 
-func Call(conn Conn, name string, args ...any) (err error) {
+func Call[T any](conn Conn, name string, args ...T) (err error) {
 	var payload any
 	if len(args) > 0 {
 		payload = args
@@ -37,6 +39,18 @@ func Await(conn Conn) (err error) {
 }
 
 func Command(conn Conn, method string, args ...any) (err error) {
+	conn = conn.Copy()
+	defer conn.Flush()
+	if err = Call(conn, method, args...); err != nil {
+		return
+	}
+	if err = Await(conn); errors.Is(err, io.EOF) {
+		err = nil
+	}
+	return
+}
+
+func CommandT[T any](conn Conn, method string, args ...T) (err error) {
 	conn = conn.Copy()
 	defer conn.Flush()
 	if err = Call(conn, method, args...); err != nil {

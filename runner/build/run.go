@@ -11,25 +11,25 @@ import (
 	"path/filepath"
 )
 
-type Feat struct {
+type Runner struct {
 	clean   func(string) error
 	runDist target.Run[target.Project_]
 	runPack target.Run[target.Dist_]
 }
 
-func NewFeat(
+func NewRunner(
 	clean func(string) error,
 	runDist target.Run[target.Project_],
 	runPack target.Run[target.Dist_],
-) *Feat {
-	return &Feat{
+) *Runner {
+	return &Runner{
 		clean:   clean,
 		runDist: runDist,
 		runPack: runPack,
 	}
 }
 
-func (r Feat) Run(ctx context.Context, dir string) (err error) {
+func (r Runner) Run(ctx context.Context, dir string) (err error) {
 	if err = r.clean(dir); err != nil {
 		plog.Get(ctx).Type(r).W().Println(err)
 	}
@@ -41,17 +41,18 @@ func (r Feat) Run(ctx context.Context, dir string) (err error) {
 	} else {
 		plog.Get(ctx).Type(r).W().Printf("build skipped: %v", err)
 	}
+	log.Println("* done")
 	return
 }
 
-func (r Feat) Dist(ctx context.Context, dir ...string) (err error) {
+func (r Runner) Dist(ctx context.Context, dir ...string) (err error) {
 	if err = run[target.Project_](ctx, r.runDist, dir, target.Match[target.Project_]); err != nil {
 		err = fmt.Errorf("build.Dist: %w", err)
 	}
 	return
 }
 
-func (r Feat) Pack(ctx context.Context, dir ...string) (err error) {
+func (r Runner) Pack(ctx context.Context, dir ...string) (err error) {
 	if err = run[target.Dist_](ctx, r.runPack, dir,
 		target.Match[target.Dist_],
 	); err != nil {

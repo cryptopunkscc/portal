@@ -2,10 +2,11 @@ package exec
 
 import (
 	"context"
+	"github.com/google/shlex"
 	"io"
+	"log"
 	"os"
 	"os/exec"
-	"strings"
 )
 
 type Cmd struct {
@@ -35,7 +36,11 @@ func (c Cmd) AddEnv(env ...string) Cmd {
 func (c Cmd) Parse(cmd ...string) Cmd {
 	var chunks []string
 	for _, s := range cmd {
-		chunks = append(chunks, strings.Split(s, " ")...)
+		split, err := shlex.Split(s)
+		if err != nil {
+			panic(err)
+		}
+		chunks = append(chunks, split...)
 	}
 	c.Cmd = chunks[0]
 	c.Args = chunks[1:]
@@ -43,6 +48,7 @@ func (c Cmd) Parse(cmd ...string) Cmd {
 }
 
 func (c Cmd) Build() (cmd *exec.Cmd) {
+	log.Println(c.Cmd, c.Args)
 	if c.Ctx != nil {
 		cmd = exec.CommandContext(c.Ctx, c.Cmd, c.Args...)
 	} else {

@@ -61,7 +61,7 @@ func (d *Application[T]) Handlers() cmd.Handlers {
 }
 func (d *Application[T]) Run() Run[T] {
 	return multi.Runner[T](
-		app.Run(exec.Any(d.runner).Run),
+		app.Run(exec.RunAny(d.runner)),
 	)
 }
 func (d *Application[T]) Priority() Priority {

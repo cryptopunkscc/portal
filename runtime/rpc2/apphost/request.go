@@ -97,13 +97,13 @@ func (r *rpcRequest) Call(method string, value any) (err error) {
 	}
 
 	// setup
-	if r.logger != nil {
-		conn = rpc.NewConnLogger(conn, r.logger)
-	}
 	serializer := stream.NewSerializer(conn)
 	serializer.MarshalArgs = r.MarshalArgs
 	serializer.Marshal = r.Marshal
 	serializer.Unmarshal = r.Unmarshal
+	if r.logger != nil {
+		serializer.Logger(r.logger)
+	}
 	r.Serializer = serializer
 	return
 }

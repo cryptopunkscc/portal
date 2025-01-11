@@ -54,6 +54,7 @@ func (r RpcBase) Router(handler cmd.Handler, port api.Port, routes ...string) *R
 
 type Router struct {
 	router.Base
+	Logger plog.Logger
 	client api.Client
 	Port   api.Port
 	routes []string
@@ -98,7 +99,7 @@ func (r *Router) Run(ctx context.Context) error {
 	return errors.Join(errsArr...)
 }
 
-var RouteAll = &struct{}{}
+var RouteAll = "RouteAll"
 
 func getRoutes(port api.Port, handler cmd.Handler) (r []string) {
 	if name := handler.Names()[0]; name != "" {
@@ -165,7 +166,11 @@ func (r *Router) routeQuery(q api.QueryData) {
 	if err != nil {
 		return
 	}
+	defer conn.Close()
 	flow := NewClient(conn)
+	if r.Logger != nil {
+		flow.Logger(r.Logger.Scope(q.Query()))
+	}
 	r.Dependencies = append(r.Dependencies, flow)
 	rr.Dependencies = r.Dependencies
 	scanner := bufio.NewScanner(conn)

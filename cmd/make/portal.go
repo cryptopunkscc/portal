@@ -9,8 +9,9 @@ import (
 )
 
 var goWails = GoPortal{
-	Tags:    "desktop,wv2runtime.download,production,webkit2_41",
-	LdFlags: []string{"-w -s"},
+	//Tags:    "desktop,wv2runtime.download,production,webkit2_41",
+	//LdFlags: []string{"-w -s"},
+	Tags:    "dev,webkit2_41",
 	Prepare: func() error { return deps.AptInstallMissing(wailsDeps) },
 }
 
@@ -23,6 +24,7 @@ var goPortal = GoPortal{}.target("portal")
 var goPortalApp = GoPortal{}.target("portald")
 
 // var goPortalApps = GoPortal{}.target("portal-apps")
+var goHtml = goWails.target("html")
 var goPortalAppWails = goWails.target("portal-app-wails")
 var goPortalAppGoja = GoPortal{}.target("portal-app-goja")
 var goPortalNew = GoPortal{}.target("portal-new")

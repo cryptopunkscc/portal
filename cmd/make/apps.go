@@ -25,7 +25,7 @@ func (d *Install) buildEmbedApps(platforms ...string) {
 		target.Try(npm.Resolve),
 	).List(file)
 
-	feat := build.NewFeat(
+	feat := build.NewRunner(
 		clean.Runner(),
 		multi.Runner[target.Project_](
 			go_build.Runner(platforms...).Portal,

@@ -13,8 +13,8 @@ import (
 	js "github.com/cryptopunkscc/portal/runtime/js/embed"
 )
 
-func Create() *build.Feat {
-	return build.NewFeat(
+func Create() *build.Runner {
+	return build.NewRunner(
 		clean.Runner(),
 		multi.Runner[Project_](
 			go_build.Runner().Portal,

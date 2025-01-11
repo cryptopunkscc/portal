@@ -1,0 +1,13 @@
+name: build
+package: portal.build
+title: Build astral apps
+description: Universal astral apps builder.
+version: 0.0.0
+schema: go
+build:
+  default:
+    exec: main
+    cmd: go build -o dist/main
+  windows:
+    exec: main.exe
+    cmd: go build dist/main.exe

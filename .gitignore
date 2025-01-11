@@ -6,4 +6,5 @@ dist
 !resolve/dist
 !factory/build
 !runner/build
+!apps/build
 .idea/

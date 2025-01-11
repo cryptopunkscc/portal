@@ -1,4 +1,4 @@
-package request
+package open
 
 import (
 	"github.com/cryptopunkscc/astrald/sig"
@@ -17,7 +17,7 @@ type Deps[T target.Portal_] interface {
 	Priority() target.Priority
 }
 
-func Create[T target.Portal_](d Deps[T]) target.Run[string] {
+func CreateRun[T target.Portal_](d Deps[T]) target.Run[string] {
 	return finder.Requester[T](
 		find.Create[T](
 			&target.Cache[T]{},

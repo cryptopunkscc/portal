@@ -21,8 +21,8 @@ func (a Application) Handler() cmd.Handler {
 		Desc: "Portal command line.",
 		Func: start.Create(a).Run,
 		Params: cmd.Params{
+			{Name: "open o", Type: "bool", Desc: "Open portal tha app as background process without redirecting IO."},
 			{Name: "query q", Type: "string", Desc: "Optional query to execute on invoked service"},
-			{Name: "-v", Type: "bool", Desc: "Optional verbose level."},
 			{Type: "string", Desc: "Application source. The source can be a app name, package name, app bundle path or app dir."},
 			{Type: "...string", Desc: "Optional application arguments."},
 		},

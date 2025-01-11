@@ -2,7 +2,6 @@ package stream
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
@@ -67,11 +66,6 @@ func (s *Serializer) Encode(value any) (err error) {
 	}
 	var data []byte
 	data, err = s.Marshal(r)
-	if err != nil || data == nil {
-		if !errors.Is(err, End) {
-			return
-		}
-	}
 	data = append(data, '\n')
 	_, err = s.Write(data)
 	return
@@ -108,7 +102,7 @@ func (s *Serializer) Bytes() (bytes []byte, err error) {
 	}
 	bytes = s.scanner.Bytes()
 	if s.logger != nil {
-		s.logger.Println("<", strings.Trim(string(bytes), "\n"))
+		s.logger.Printf("< %s [%db]", strings.Trim(string(bytes), "\n"), len(bytes))
 	}
 	return
 }
@@ -116,7 +110,7 @@ func (s *Serializer) Bytes() (bytes []byte, err error) {
 func (s *Serializer) Read(b []byte) (n int, err error) {
 	n, err = s.Reader.Read(b)
 	if s.logger != nil {
-		s.logger.Println("<", strings.Trim(string(b[:n]), "\n"))
+		s.logger.Printf("< %s [%db]", strings.Trim(string(b[:n]), "\n"), n)
 	}
 	return
 }
@@ -124,7 +118,7 @@ func (s *Serializer) Read(b []byte) (n int, err error) {
 func (s *Serializer) Write(b []byte) (n int, err error) {
 	n, err = s.Writer.Write(b)
 	if s.logger != nil {
-		s.logger.Println(">", strings.Trim(string(b[:n]), "\n"))
+		s.logger.Printf("> %s [%db]", strings.Trim(string(b[:n]), "\n"), n)
 	}
 	return
 }

@@ -28,17 +28,17 @@ func (c *Func) Named(names ...string) *Func {
 }
 
 func (c *Func) Unmarshalers(unmarshalers ...Unmarshaler) *Func {
-	cc := &(*c)
+	cc := *c
 	if len(unmarshalers) > 0 {
 		cc.unmarshalers = unmarshalers
 	}
-	return cc
+	return &cc
 }
 
 func (c *Func) Defaults(defaults ...any) *Func {
-	cc := &(*c)
+	cc := *c
 	cc.defaults = append(cc.defaults, defaults...)
-	return cc
+	return &cc
 }
 
 func (c *Func) Call(data []byte) (result []any, err error) {
@@ -186,7 +186,7 @@ func (c *Func) runNested(values []reflect.Value, data []byte) (r []reflect.Value
 }
 
 func extractResult(values []reflect.Value) (result []any) {
-	// filter out error for values
+	// reflect.Value to any
 	for _, value := range values {
 		var add any
 		if value.Kind() == reflect.Chan {

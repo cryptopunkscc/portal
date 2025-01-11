@@ -27,7 +27,7 @@ type runner[T target.Portal_] struct {
 }
 
 func (r runner[T]) Run(ctx context.Context, portal T, args ...string) (err error) {
-	log := plog.Get(ctx)
+	log := plog.Get(ctx).Type(r)
 	id := portal.Manifest().Package
 	log.Println("setting", id)
 	if _, ok := r.running.Set(id, portal); !ok {

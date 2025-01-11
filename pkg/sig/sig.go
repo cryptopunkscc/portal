@@ -15,7 +15,7 @@ func OnShutdown(log plog.Logger, cancel func()) {
 	if log != nil {
 		log.Println(sig, os.Args)
 	}
-	go cancel()
+	cancel()
 	<-quitChannel
 	if log != nil {
 		log.Println("force shutdown")

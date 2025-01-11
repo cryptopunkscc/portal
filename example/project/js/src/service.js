@@ -29,7 +29,7 @@ class Service {
     log("start ticker")
     let counter = 0
     while (!conn.done && counter <= limit) {
-      await conn.encode(counter++)
+      await conn.encode(counter--)
       await sleep(delay)
     }
     return null

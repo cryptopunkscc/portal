@@ -1,20 +1,19 @@
 package main
 
 import (
-	"context"
 	"github.com/cryptopunkscc/portal/factory/build"
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/clean"
+	"github.com/cryptopunkscc/portal/runner/cli"
 	"github.com/cryptopunkscc/portal/runner/version"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 )
 
-func main() {
-	ctx := context.Background()
-	plog.New().D().Set(&ctx)
+func main() { cli.Run(Application{}.handler()) }
 
-	err := cli.New(cmd.Handler{
+type Application struct{}
+
+func (a Application) handler() cmd.Handler {
+	return cmd.Handler{
 		Func: build.Create().Run,
 		Name: "portal-build",
 		Desc: "Builds portal project and generates application bundle.",
@@ -32,9 +31,5 @@ func main() {
 			},
 			{Name: "v", Desc: "Print version", Func: version.Run},
 		},
-	}).Run(ctx)
-
-	if err != nil {
-		panic(err)
 	}
 }

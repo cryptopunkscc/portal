@@ -25,12 +25,10 @@ type (
 func CheckAstral(_ context.Context) error { return astral.Check() }
 
 type Deps interface {
-	Port() apphost.Port
-	Open() target.Run[string]
+	Service
 	Astral() Astral
+	Port() apphost.Port
 	Handlers() cmd.Handlers
-	Observe() func(ctx context.Context, conn rpc.Conn) (err error)
-	Shutdown() context.CancelFunc
 }
 
 func Runner(d Deps) target.Run[string] {
@@ -65,11 +63,13 @@ func serve(
 	port apphost.Port,
 	handler cmd.Handler,
 ) (err error) {
-	log := plog.Get(ctx)
+	log := plog.Get(ctx).Scope("serve")
 	log.Printf("serve start at port:%s", port)
 	defer log.Printf("serve exit:%s", port)
 
-	err = apphost2.NewRouter(handler, port).Run(ctx)
+	router := apphost2.NewRouter(handler, port)
+	router.Logger = log
+	err = router.Run(ctx)
 
 	if err != nil {
 		log.Printf("serve error: %v\n", err)

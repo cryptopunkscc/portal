@@ -3,6 +3,7 @@ package router
 import (
 	"errors"
 	"fmt"
+	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/caller"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/registry"
@@ -50,6 +51,10 @@ func (r Base) Query(query string) Base {
 
 func (r Base) Respond(conn *stream.Serializer) (err error) {
 	for item := range r.Call() {
+		if item == rpc.Close {
+			_ = conn.Close()
+			return rpc.Close
+		}
 		if err = conn.Encode(item); err != nil {
 			return
 		}
@@ -86,6 +91,7 @@ func respond(c chan any, err error, out ...any) {
 		}
 		c <- err
 	case len(out) == 0:
+		c <- stream.End
 	case len(out) == 1:
 		r := out[0]
 		switch v := r.(type) {
