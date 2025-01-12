@@ -10,4 +10,4 @@ build:
     cmd: go build -o dist/main
   windows:
     exec: main.exe
-    cmd: go build dist/main.exe
+    cmd: go build -o dist/main.exe
