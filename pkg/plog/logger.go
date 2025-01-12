@@ -128,15 +128,24 @@ func (l logger) D() Logger {
 }
 
 func (l logger) Msg(message string) Logger {
+	if l.Level > Verbosity {
+		return l
+	}
 	l.Message += message
 	return l
 }
 
 func (l logger) Printf(format string, args ...any) {
+	if l.Level > Verbosity {
+		return
+	}
 	l.Message += fmt.Sprintf(format, args...) + "\n"
 	l.appendErrors().Flush()
 }
 func (l logger) Println(a ...any) {
+	if l.Level > Verbosity {
+		return
+	}
 	l.Message += fmt.Sprintln(a...)
 	l.appendErrors(a...).Flush()
 }
