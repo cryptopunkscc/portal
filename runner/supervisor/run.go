@@ -29,12 +29,12 @@ type runner[T target.Portal_] struct {
 func (r runner[T]) Run(ctx context.Context, portal T, args ...string) (err error) {
 	log := plog.Get(ctx).Type(r)
 	id := portal.Manifest().Package
-	log.Println("setting", id)
-	if _, ok := r.running.Set(id, portal); !ok {
-		log.Println(r.running.Clone())
-		log.Printf("%s already started ", id)
-		return
-	}
+	//log.Println("setting", id)
+	//if _, ok := r.running.Set(id, portal); !ok {
+	//	log.Println(r.running.Clone())
+	//	log.Printf("%s already started ", id)
+	//	return
+	//}
 	r.wait.Add(1)
 	log.Printf("start %T %s %s", portal, portal.Manifest().Package, portal.Abs())
 	err = r.run(ctx, portal, args...)

@@ -32,7 +32,8 @@ type Opt struct {
 }
 
 func (s Start) Run(ctx context.Context, opt Opt, cmd ...string) (err error) {
-	s.portal.Logger(plog.Get(ctx).Type(s))
+	log := plog.Get(ctx).Type(s)
+	s.portal.Logger(log)
 	if err = s.portal.Ping(); err != nil {
 		if err = startPortald(ctx, s.portal); err != nil {
 			return
@@ -62,6 +63,7 @@ func (s Start) Run(ctx context.Context, opt Opt, cmd ...string) (err error) {
 			err = s.runApp(ctx, cmd)
 		}
 	}
+	log.Println("exit")
 	wg.Wait()
 	return
 }
@@ -111,13 +113,15 @@ func fixPath(str string) string {
 	return str
 }
 
-func (s Start) startApp(_ context.Context, cmd []string) (err error) {
+func (s Start) startApp(ctx context.Context, cmd []string) (err error) {
+	log := plog.Get(ctx)
+	log.Println("starting app:", cmd)
 	return s.portal.Open(cmd...)
 }
 
 func (s Start) runApp(ctx context.Context, cmd []string) (err error) {
 	log := plog.Get(ctx)
-
+	log.Println("running app:", cmd)
 	conn, err := s.portal.Connect(cmd...)
 	if err != nil {
 		return
@@ -129,21 +133,21 @@ func (s Start) runApp(ctx context.Context, cmd []string) (err error) {
 
 	go func() {
 		_, _ = io.Copy(conn, os.Stdin)
-		log.Println("runApp(): finish read")
+		log.Println("reading done.")
 	}()
 
 	_, _ = io.Copy(os.Stdout, conn)
-	log.Println("runApp(): finish write")
+	log.Println("writing done.")
 	return
 }
 
 func (s Start) queryApp(ctx context.Context, query string) (err error) {
-	log := plog.Get(ctx).Type(s)
-	log.Println("Running query", query)
+	log := plog.Get(ctx)
+	log.Println("running query:", query)
 
 	conn, err := s.apphost.Query(id.Anyone, query)
 	if err != nil {
-		log.E().Printf("cannot query %s: %v", query, err)
+		log.E().Printf("query (%s) FAILED: %v", query, err)
 		return err
 	}
 
