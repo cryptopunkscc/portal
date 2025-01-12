@@ -17,7 +17,7 @@ func (p ClientRpc) Join() { _ = rpc.Command(p, "") }
 func (p ClientRpc) Ping() error  { return rpc.Command(p, "ping") }
 func (p ClientRpc) Close() error { return rpc.Command(p, "close") }
 func (p ClientRpc) Open(args ...string) error {
-	return rpc.CommandT(p, "open", args...)
+	return rpc.Call(p.Copy(), "open", args...)
 }
 func (p ClientRpc) Connect(args ...string) (rwc io.ReadWriteCloser, err error) {
 	conn := p.Copy()
