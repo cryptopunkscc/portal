@@ -18,21 +18,19 @@ func main() {
 	plog.New().D().Set(&ctx)
 
 	err := cli.New(cmd.Handler{
-		Name: "portal-list",
-		Desc: "Print all targets in given directory.",
-		Params: cmd.Params{
-			{Type: "string", Desc: "Directory containing targets."},
+		Name: "tool",
+		Desc: "Various portal tools.",
+		Sub: cmd.Handlers{
+			{
+				Name: "list l",
+				Desc: "Print all portal targets in given directory.",
+				Params: cmd.Params{
+					{Type: "string", Desc: "Directory containing targets."},
+				},
+				Func: listPortals(find.Create[target.Portal_]()),
+			},
 		},
-		Func: listPortals(find.Create[target.Portal_]()),
 	}).Run(ctx)
-
-	//cli := clir.NewCli(ctx,
-	//	"portal-build",
-	//	"Builds portal project and generates application bundle.",
-	//	version.Run)
-	//cli.Portals(find.Create[target.Portal_]())
-	//err := cli.Run()
-
 	if err != nil {
 		panic(err)
 	}

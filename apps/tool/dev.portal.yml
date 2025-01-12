@@ -1,0 +1,13 @@
+name: new
+package: portal.new
+title: Create new astral app
+description: Command line tool for generating app project from template.
+version: 0.0.0
+schema: go
+build:
+  default:
+    exec: main
+    cmd: go build -o dist/main
+  windows:
+    exec: main.exe
+    cmd: go build -o dist/main.exe
