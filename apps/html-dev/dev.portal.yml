@@ -1,7 +1,7 @@
-name: html
-package: portal.html
+name: dev.html
+package: portal.dev.html
 title: Portal HTML
-description: Portal HTML runner
+description: Portal HTML development runner
 version: 0.0.0
 build:
   default:
