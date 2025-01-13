@@ -28,7 +28,7 @@ import (
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
-	application := Application[App_]{}
+	application := Application[Portal_]{}
 	application.CancelFunc = cancel
 	log := plog.New().D().Scope("portald").Set(&ctx)
 	go singal.OnShutdown(log, cancel)
@@ -41,7 +41,7 @@ func main() {
 	application.wg.Wait()
 }
 
-type Application[T App_] struct {
+type Application[T Portal_] struct {
 	CancelFunc context.CancelFunc
 	wg         sync.WaitGroup
 	processes  sig.Map[string, T]
@@ -80,6 +80,7 @@ func (d *Application[T]) Open() Run[portal.OpenOpt] {
 					Try(exec2.ResolveDist),
 					Try(unknown.ResolveBundle),
 					Try(unknown.ResolveDist),
+					Try(unknown.ResolveProject),
 				),
 			).ById(appstore.Path).Cached(&d.cache).Reduced(
 				Match[Bundle_],
