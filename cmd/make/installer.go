@@ -37,15 +37,7 @@ func (d *Install) buildInstallerFor() {
 	buildAstral()
 	buildAnc()
 	goPortal.Build()
-	goPortalApp.Build()
-	//goPortalApps.Build()
-	goPortalAppGoja.Build()
-	goPortalAppWails.Build()
-	goPortalDev.Build()
-	goPortalDevGo.Build()
-	goPortalDevGoja.Build()
-	goPortalDevExec.Build()
-	goPortalDevWails.Build()
+	goPortald.Build()
 	buildPortalInstaller()
 }
 

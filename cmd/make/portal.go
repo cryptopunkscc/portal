@@ -2,35 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	"log"
 	"strings"
 )
 
-var goWails = GoPortal{
-	//Tags:    "desktop,wv2runtime.download,production,webkit2_41",
-	//LdFlags: []string{"-w -s"},
-	Tags:    "dev,webkit2_41",
-	Prepare: func() error { return deps.AptInstallMissing(wailsDeps) },
-}
-
-var goWailsDev = GoPortal{
-	Tags:    "dev,webkit2_41",
-	Prepare: func() error { return deps.AptInstallMissing(wailsDeps) },
-}
-
 var goPortal = GoPortal{}.target("portal")
-var goPortalApp = GoPortal{}.target("portald")
-
-// var goPortalApps = GoPortal{}.target("portal-apps")
-var goPortalAppWails = goWails.target("portal-app-wails")
-var goPortalAppGoja = GoPortal{}.target("portal-app-goja")
-var goPortalDev = GoPortal{}.target("portal-dev")
-var goPortalDevExec = GoPortal{}.target("portal-dev-exec")
-var goPortalDevWails = goWailsDev.target("portal-dev-wails")
-var goPortalDevGoja = GoPortal{}.target("portal-dev-goja")
-var goPortalDevGo = GoPortal{}.target("portal-dev-go")
+var goPortald = GoPortal{}.target("portald")
 
 func buildPortalInstaller() { GoPortal{Out: "./bin/"}.target("portal-installer").Build() }
 
