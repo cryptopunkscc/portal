@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/mock/appstore"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/resolve/path"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/resolve/sources"
+	"github.com/cryptopunkscc/portal/runtime/apps"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 	"log"
@@ -42,7 +43,7 @@ func find[T target.Portal_]() target.Find[T] {
 	return target.FindByPath(
 		source.File,
 		sources.Resolver[T]()).
-		ById(appstore.Path)
+		ById(path.Resolver(apps.Source))
 }
 
 func listPortals(find target.Find[target.Portal_]) func(context.Context, string) error {

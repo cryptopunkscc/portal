@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/mock/appstore"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	exec2 "github.com/cryptopunkscc/portal/resolve/exec"
+	"github.com/cryptopunkscc/portal/resolve/path"
 	"github.com/cryptopunkscc/portal/resolve/source"
+	"github.com/cryptopunkscc/portal/runtime/apps"
 	"slices"
 	"strings"
 )
@@ -34,7 +35,11 @@ func AnyRun(cacheDir string, schemaPrefix ...string) target.Run[target.Portal_] 
 		}
 		schema := strings.Join(schemaArr, ".")
 		log.Println("run:", schema, manifest.Package, args)
-		runners, err := target.FindByPath(source.File, exec2.ResolveBundle).ById(appstore.Path).Call(ctx, schema)
+		runners, err := target.
+			FindByPath(source.File, exec2.ResolveBundle).
+			ById(path.Resolver(apps.Source)).
+			Call(ctx, schema)
+
 		if err != nil {
 			return
 		}

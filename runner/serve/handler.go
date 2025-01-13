@@ -9,12 +9,6 @@ import (
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 )
 
-type Service interface {
-	Open() target.Run[portal.OpenOpt]
-	Shutdown() context.CancelFunc
-	Observe() func(ctx context.Context, conn rpc.Conn) (err error)
-}
-
 func Handler(service Service) cmd.Handler {
 	open := service.Open()
 	return cmd.Handler{
@@ -53,10 +47,11 @@ func Handler(service Service) cmd.Handler {
 				Name: "close",
 				Desc: "Shutdown portal environment and close all running apps.",
 			},
-			{
-				Func: service.Observe(),
-				Name: "observe",
-			},
 		},
 	}
+}
+
+type Service interface {
+	Open() target.Run[portal.OpenOpt]
+	Shutdown() context.CancelFunc
 }

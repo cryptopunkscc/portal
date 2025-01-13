@@ -7,10 +7,10 @@ import (
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/portal"
 	. "github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/mock/appstore"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	singal "github.com/cryptopunkscc/portal/pkg/sig"
 	exec2 "github.com/cryptopunkscc/portal/resolve/exec"
+	"github.com/cryptopunkscc/portal/resolve/path"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/resolve/unknown"
 	"github.com/cryptopunkscc/portal/runner/app"
@@ -20,7 +20,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/serve"
 	"github.com/cryptopunkscc/portal/runner/supervisor"
 	"github.com/cryptopunkscc/portal/runner/version"
-	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
+	"github.com/cryptopunkscc/portal/runtime/apps"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 	"sync"
@@ -48,18 +48,18 @@ type Application[T Portal_] struct {
 	cache      Cache[T]
 }
 
-func (d *Application[T]) handler() cmd.Handler {
+func (a *Application[T]) handler() cmd.Handler {
 	return cmd.Handler{
 		Name: "portald",
 		Desc: "Start portal applications service",
-		Func: serve.Runner(d),
+		Func: serve.Runner(a),
 		Sub: cmd.Handlers{
 			{Name: "v", Desc: "Print version", Func: version.Run},
 		},
 	}
 }
 
-func (d *Application[T]) Open() Run[portal.OpenOpt] {
+func (a *Application[T]) Open() Run[portal.OpenOpt] {
 	return func(ctx context.Context, opt portal.OpenOpt, cmd ...string) (err error) {
 		if len(cmd) == 0 {
 			return errors.New("no command")
@@ -71,7 +71,7 @@ func (d *Application[T]) Open() Run[portal.OpenOpt] {
 		if opt.Schema != "" {
 			schemaPrefix = []string{opt.Schema}
 		}
-		plog.Get(ctx).Type(d).Println("open:", opt, cmd)
+		plog.Get(ctx).Type(a).Println("open:", opt, cmd)
 		return find.Runner[T](
 			FindByPath(
 				source.File, Any[T](
@@ -82,27 +82,25 @@ func (d *Application[T]) Open() Run[portal.OpenOpt] {
 					Try(unknown.ResolveDist),
 					Try(unknown.ResolveProject),
 				),
-			).ById(appstore.Path).Cached(&d.cache).Reduced(
+			).ById(path.Resolver(apps.Source)).Cached(&a.cache).Reduced(
 				Match[Bundle_],
 				Match[Dist_],
 				Match[Project_],
 			),
 			supervisor.Runner[T](
-				&d.wg,
-				&d.processes,
+				&a.wg,
+				&a.processes,
 				multi.Runner[T](
-					app.Run(exec.BundleRun(CacheDir("portal"))),
+					app.Run(exec.BundleRun(a.cacheDir())),
 					app.Run(exec.Dist().Run),
-					app.Run(exec.AnyRun(CacheDir("portal"), schemaPrefix...)),
+					app.Run(exec.AnyRun(a.cacheDir(), schemaPrefix...)),
 				),
 			),
 		).Call(ctx, src, args...)
 	}
 }
 
-func (d *Application[T]) Shutdown() context.CancelFunc                   { return d.CancelFunc }
-func (d *Application[T]) Observe() func(context.Context, rpc.Conn) error { return appstore.Observe }
-
-func (d *Application[T]) Port() apphost.Port     { return PortPortal }
-func (d *Application[T]) Astral() serve.Astral   { return exec.Astral }
-func (d *Application[T]) Handlers() cmd.Handlers { return cmd.Handlers{} }
+func (a *Application[T]) Shutdown() context.CancelFunc { return a.CancelFunc }
+func (a *Application[T]) Port() apphost.Port           { return PortPortal }
+func (a *Application[T]) Astral() serve.Astral         { return exec.Astral }
+func (a *Application[T]) cacheDir() string             { return CacheDir("portal") }

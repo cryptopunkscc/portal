@@ -1,4 +1,4 @@
-package appstore
+package observe
 
 import (
 	"context"
@@ -12,27 +12,28 @@ import (
 	"io"
 )
 
-func Observe(ctx context.Context, conn rpc.Conn) (err error) {
-	plog.Get(ctx).Println("Observing...")
-	resolve := apps.Resolver[target.Bundle_]()
-	if err = send(resolve, conn, portalAppsDir); err != nil {
-		return
-	}
-	watch, err := fs2.NotifyWatch(ctx, portalAppsDir, 0)
-	if err != nil {
-		return
-	}
-	for event := range watch {
-		err = send(resolve, conn, event.Name)
-		if errors.Is(err, io.EOF) {
+func NewRun(appsDir string) func(ctx context.Context, conn rpc.Conn) (err error) {
+	return func(ctx context.Context, conn rpc.Conn) (err error) {
+		plog.Get(ctx).Println("Observing...")
+		resolve := apps.Resolver[target.Bundle_]()
+		if err = send(resolve, conn, appsDir); err != nil {
 			return
 		}
+		watch, err := fs2.NotifyWatch(ctx, appsDir, 0)
 		if err != nil {
-			continue
+			return
 		}
+		for event := range watch {
+			err = send(resolve, conn, event.Name)
+			if errors.Is(err, io.EOF) {
+				return
+			}
+			if err != nil {
+				continue
+			}
+		}
+		return
 	}
-
-	return
 }
 
 func send(

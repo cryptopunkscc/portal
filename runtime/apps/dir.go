@@ -1,4 +1,4 @@
-package main
+package apps
 
 import (
 	"github.com/cryptopunkscc/portal/api/target"
@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 )
 
-var PortalAppsDir string
-var portalAppsSource target.Source
+var Dir string
+var Source target.Source
 
 func init() {
 	dir, err := os.UserCacheDir()
@@ -16,12 +16,12 @@ func init() {
 		panic(err)
 	}
 
-	PortalAppsDir = filepath.Join(dir, "portal", "apps")
-	err = os.MkdirAll(PortalAppsDir, 0755)
+	Dir = filepath.Join(dir, "portal", "apps")
+	err = os.MkdirAll(Dir, 0755)
 	if err != nil {
 		panic(err)
 	}
-	if portalAppsSource, err = source.File(PortalAppsDir); err != nil {
+	if Source, err = source.File(Dir); err != nil {
 		panic(err)
 	}
 
