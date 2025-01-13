@@ -1,4 +1,4 @@
-package query
+package request
 
 import (
 	"context"
@@ -13,33 +13,7 @@ import (
 
 type Requester struct{ apphost.Port }
 
-var Request = Requester{target.PortOpen}
-
-func (port Requester) Run(ctx context.Context, src string, _ ...string) (err error) {
-	log := plog.Get(ctx).Type(port)
-	log.Println("Running query", port, src)
-	flow, err := apphost2.RpcClient(id.Anyone, port.Base())
-	if err != nil {
-		return
-	}
-	flow.Logger(log)
-	defer flow.Close()
-	err = rpc.Command(flow, port.Name(), src)
-	if err != nil {
-		log.E().Printf("cannot query %s %s: %v", port, src, err)
-		return fmt.Errorf("cannot query %s: %w", src, err)
-	}
-	c := make(chan any)
-	go func() {
-		_ = rpc.Await(flow)
-		close(c)
-	}()
-	select {
-	case <-ctx.Done():
-	case <-c:
-	}
-	return
-}
+var Open = Requester{target.PortOpen}
 
 func (port Requester) Start(ctx context.Context, src string, _ ...string) (err error) {
 	log := plog.Get(ctx).Type(port)

@@ -3,7 +3,6 @@ package main
 import (
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/factory/bind"
-	"github.com/cryptopunkscc/portal/factory/dev"
 	"github.com/cryptopunkscc/portal/resolve/sources"
 	"github.com/cryptopunkscc/portal/runner/cli"
 	"github.com/cryptopunkscc/portal/runner/exec"
@@ -17,7 +16,7 @@ import (
 
 func main() { cli.Run(Application[ProjectGo]{}.handler()) }
 
-type Application[T ProjectGo] struct{ dev.Module[T] }
+type Application[T ProjectGo] struct{}
 
 func (a Application[T]) handler() cmd.Handler {
 	return cmd.Handler{

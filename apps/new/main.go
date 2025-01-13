@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"errors"
-	"github.com/cryptopunkscc/portal/factory/create"
+	"github.com/cryptopunkscc/portal/factory/build"
 	"github.com/cryptopunkscc/portal/runner/cli"
+	"github.com/cryptopunkscc/portal/runner/create"
 	"github.com/cryptopunkscc/portal/runner/template"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 	"log"
@@ -42,7 +43,11 @@ func createProject(ctx context.Context, targets string, dir string) (err error) 
 		dir = "."
 	}
 	parsedTargets := parseTargets(targets)
-	err = create.Run(ctx, dir, parsedTargets)
+
+	err = create.Runner(
+		template.Runner,
+		build.Create().Dist,
+	)(ctx, dir, parsedTargets)
 	if err != nil {
 		log.Println("* done")
 	}

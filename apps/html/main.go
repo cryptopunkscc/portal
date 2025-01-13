@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	. "github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/factory/app"
 	factory "github.com/cryptopunkscc/portal/factory/bind"
+	"github.com/cryptopunkscc/portal/resolve/apps"
+	"github.com/cryptopunkscc/portal/runner/app"
 	"github.com/cryptopunkscc/portal/runner/cli"
+	"github.com/cryptopunkscc/portal/runner/multi"
 	"github.com/cryptopunkscc/portal/runner/open"
 	"github.com/cryptopunkscc/portal/runner/version"
 	"github.com/cryptopunkscc/portal/runner/wails"
@@ -13,13 +15,13 @@ import (
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 )
 
-func main() { cli.Run(Application{}.Handler()) }
+func main() { cli.Run(Application[AppHtml]{}.Handler()) }
 
-type Application struct{ app.Module[AppHtml] }
+type Application[T AppHtml] struct{}
 
-func (a Application) Handler() cmd.Handler {
+func (a Application[T]) Handler() cmd.Handler {
 	return cmd.Handler{
-		Func: open.Runner[AppHtml](&a),
+		Func: open.Runner[T](&a),
 		Name: "wails",
 		Desc: "Start portal app in wails runner.",
 		Params: cmd.Params{
@@ -30,8 +32,9 @@ func (a Application) Handler() cmd.Handler {
 		},
 	}
 }
-func (a Application) Runner() Run[AppHtml] { return wails.NewRun(a.runtime) }
-func (a Application) runtime(ctx context.Context, portal Portal_) bind.Runtime {
+func (d Application[T]) Resolver() Resolve[T] { return apps.Resolver[T]() }
+func (a Application[T]) Runner() Run[T]       { return multi.Runner[T](app.Run(wails.NewRun(a.runtime))) }
+func (a Application[T]) runtime(ctx context.Context, portal Portal_) bind.Runtime {
 	return &Adapter{factory.FrontendRuntime()(ctx, portal)}
 }
 

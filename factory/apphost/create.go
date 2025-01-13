@@ -5,7 +5,7 @@ import (
 	"github.com/cryptopunkscc/astrald/lib/astral"
 	. "github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/request/query"
+	"github.com/cryptopunkscc/portal/runner/request"
 	"github.com/cryptopunkscc/portal/runtime/apphost"
 )
 
@@ -19,7 +19,7 @@ func Full(ctx context.Context) Cached {
 	return apphost.Cached(Invoker(ctx, apphost.Adapter(astral.Client)))
 }
 
-var Invoke = query.Request.Start
+var Invoke = request.Open.Start
 
 func Invoker(ctx context.Context, client Client) Client {
 	return apphost.Invoker{

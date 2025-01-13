@@ -2,8 +2,8 @@ package main
 
 import (
 	. "github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/factory/app"
 	"github.com/cryptopunkscc/portal/factory/bind"
+	"github.com/cryptopunkscc/portal/resolve/apps"
 	"github.com/cryptopunkscc/portal/runner/cli"
 	"github.com/cryptopunkscc/portal/runner/goja"
 	"github.com/cryptopunkscc/portal/runner/open"
@@ -13,7 +13,7 @@ import (
 
 func main() { cli.Run(Application{}.Handler()) }
 
-type Application struct{ app.Module[AppJs] }
+type Application struct{}
 
 func (a Application) Handler() cmd.Handler {
 	return cmd.Handler{
@@ -28,4 +28,5 @@ func (a Application) Handler() cmd.Handler {
 		},
 	}
 }
-func (a Application) Runner() Run[AppJs] { return goja.NewRun(bind.BackendRuntime()) }
+func (a Application) Runner() Run[AppJs]       { return goja.NewRun(bind.BackendRuntime()) }
+func (a Application) Resolver() Resolve[AppJs] { return apps.Resolver[AppJs]() }
