@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"errors"
 	"github.com/cryptopunkscc/astrald/sig"
 	"github.com/cryptopunkscc/portal/api/apphost"
+	"github.com/cryptopunkscc/portal/api/portal"
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/mock/appstore"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -57,30 +59,44 @@ func (d *Application[T]) handler() cmd.Handler {
 	}
 }
 
-func (d *Application[T]) Open() Run[string] {
-	return find.Runner[T](
-		FindByPath(
-			source.File, Any[T](
-				Skip("node_modules"),
-				Try(exec2.ResolveBundle),
-				Try(exec2.ResolveDist),
-				Try(unknown.ResolveBundle),
-				Try(unknown.ResolveDist),
+func (d *Application[T]) Open() Run[portal.OpenOpt] {
+	return func(ctx context.Context, opt portal.OpenOpt, cmd ...string) (err error) {
+		if len(cmd) == 0 {
+			return errors.New("no command")
+		}
+		src := cmd[0]
+		args := cmd[1:]
+
+		var schemaPrefix []string
+		if opt.Schema != "" {
+			schemaPrefix = []string{opt.Schema}
+		}
+		plog.Get(ctx).Type(d).Println("open:", opt, cmd)
+		return find.Runner[T](
+			FindByPath(
+				source.File, Any[T](
+					Skip("node_modules"),
+					Try(exec2.ResolveBundle),
+					Try(exec2.ResolveDist),
+					Try(unknown.ResolveBundle),
+					Try(unknown.ResolveDist),
+				),
+			).ById(appstore.Path).Cached(&d.cache).Reduced(
+				Match[Bundle_],
+				Match[Dist_],
+				Match[Project_],
 			),
-		).ById(appstore.Path).Cached(&d.cache).Reduced(
-			Match[Bundle_],
-			Match[Dist_],
-		),
-		supervisor.Runner[T](
-			&d.wg,
-			&d.processes,
-			multi.Runner[T](
-				app.Run(exec.BundleRun(CacheDir("portal"))),
-				app.Run(exec.Dist().Run),
-				app.Run(exec.AnyRun(CacheDir("portal"))),
+			supervisor.Runner[T](
+				&d.wg,
+				&d.processes,
+				multi.Runner[T](
+					app.Run(exec.BundleRun(CacheDir("portal"))),
+					app.Run(exec.Dist().Run),
+					app.Run(exec.AnyRun(CacheDir("portal"), schemaPrefix...)),
+				),
 			),
-		),
-	)
+		).Call(ctx, src, args...)
+	}
 }
 
 func (d *Application[T]) Shutdown() context.CancelFunc                   { return d.CancelFunc }

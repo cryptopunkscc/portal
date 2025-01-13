@@ -16,12 +16,26 @@ func (p ClientRpc) Join() { _ = rpc.Command(p, "") }
 
 func (p ClientRpc) Ping() error  { return rpc.Command(p, "ping") }
 func (p ClientRpc) Close() error { return rpc.Command(p, "close") }
-func (p ClientRpc) Open(args ...string) error {
-	return rpc.Call(p.Copy(), "open", args...)
+func (p ClientRpc) Open(opt *portal.OpenOpt, args ...string) error {
+	var argv []any
+	if opt != nil && opt.Schema != "" {
+		argv = []any{*opt}
+	}
+	for _, arg := range args {
+		argv = append(argv, arg)
+	}
+	return rpc.Call(p.Copy(), "open", argv...)
 }
-func (p ClientRpc) Connect(args ...string) (rwc io.ReadWriteCloser, err error) {
+func (p ClientRpc) Connect(opt *portal.OpenOpt, args ...string) (rwc io.ReadWriteCloser, err error) {
+	var argv []any
+	if opt != nil && opt.Schema != "" {
+		argv = []any{opt}
+	}
+	for _, arg := range args {
+		argv = append(argv, arg)
+	}
 	conn := p.Copy()
-	if err = rpc.Call(conn, "connect", args...); err != nil {
+	if err = rpc.Call(conn, "connect", argv...); err != nil {
 		return
 	}
 	rwc = conn

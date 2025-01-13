@@ -2,6 +2,7 @@ package serve
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/api/portal"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runtime/rpc2"
@@ -9,7 +10,7 @@ import (
 )
 
 type Service interface {
-	Open() target.Run[string]
+	Open() target.Run[portal.OpenOpt]
 	Shutdown() context.CancelFunc
 	Observe() func(ctx context.Context, conn rpc.Conn) (err error)
 }
@@ -35,9 +36,9 @@ func Handler(service Service) cmd.Handler {
 				},
 			},
 			{
-				Func: func(ctx context.Context, conn rpc.Conn, s string, args ...string) (err error) {
+				Func: func(ctx context.Context, conn rpc.Conn, opt portal.OpenOpt, args ...string) (err error) {
 					ctx = exec.WithReadWriter(ctx, conn)
-					_ = open(ctx, s, args...)
+					_ = open(ctx, opt, args...)
 					return rpc.Close
 				},
 				Name: "connect c",

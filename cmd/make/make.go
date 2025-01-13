@@ -83,7 +83,6 @@ func (d *Install) Run(make Make, goos []string) {
 		//goPortalApps.Install()
 		goPortalAppGoja.Install()
 		goPortalAppWails.Install()
-		goHtml.Install()
 	}
 	if make&Installer == Installer {
 		log.Println(" * installer")

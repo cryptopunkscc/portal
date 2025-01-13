@@ -3,5 +3,5 @@
   "package": "example.rpc.html",
   "title": "Example RPC frontend",
   "version": "0.0.0",
-  "schema": "dev.html"
+  "schema": "html"
 }

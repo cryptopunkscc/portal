@@ -9,7 +9,11 @@ type Client interface {
 	Logger(logger plog.Logger)
 	Join()
 	Ping() (err error)
-	Open(src ...string) error
-	Connect(src ...string) (io.ReadWriteCloser, error)
+	Open(opt *OpenOpt, src ...string) error
+	Connect(opt *OpenOpt, src ...string) (io.ReadWriteCloser, error)
 	Close() error
+}
+
+type OpenOpt struct {
+	Schema string `query:"s"`
 }

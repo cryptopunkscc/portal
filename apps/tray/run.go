@@ -47,7 +47,7 @@ func (t *runner) onReady() {
 			select {
 			case <-launcher.ClickedCh:
 				go func() {
-					if err := t.portal.Open("launcher"); err != nil {
+					if err := t.portal.Open(nil, "launcher"); err != nil {
 						t.log.Println("launcher:", err)
 					}
 				}()

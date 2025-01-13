@@ -23,6 +23,7 @@ func (a Application) Handler() cmd.Handler {
 		Params: cmd.Params{
 			{Name: "open o", Type: "bool", Desc: "Open portal tha app as background process without redirecting IO."},
 			{Name: "query q", Type: "string", Desc: "Optional query to execute on invoked service"},
+			{Name: "dev d", Type: "bool", Desc: "Development mode."},
 			{Type: "string", Desc: "Application source. The source can be a app name, package name, app bundle path or app dir."},
 			{Type: "...string", Desc: "Optional application arguments."},
 		},

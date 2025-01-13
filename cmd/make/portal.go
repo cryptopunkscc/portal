@@ -24,7 +24,6 @@ var goPortal = GoPortal{}.target("portal")
 var goPortalApp = GoPortal{}.target("portald")
 
 // var goPortalApps = GoPortal{}.target("portal-apps")
-var goHtml = goWails.target("html")
 var goPortalAppWails = goWails.target("portal-app-wails")
 var goPortalAppGoja = GoPortal{}.target("portal-app-goja")
 var goPortalNew = GoPortal{}.target("portal-new")

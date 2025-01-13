@@ -29,6 +29,7 @@ type Start struct {
 type Opt struct {
 	Query string `cli:"query q"`
 	Open  bool   `cli:"open o"`
+	Dev   bool   `cli:"dev d"`
 }
 
 func (s Start) Run(ctx context.Context, opt Opt, cmd ...string) (err error) {
@@ -57,10 +58,14 @@ func (s Start) Run(ctx context.Context, opt Opt, cmd ...string) (err error) {
 	}
 	if len(cmd) > 0 {
 		cmd = fixCmd(cmd)
+		openOpt := &portal.OpenOpt{}
+		if opt.Dev {
+			openOpt.Schema = "dev"
+		}
 		if opt.Open {
-			err = s.startApp(ctx, cmd)
+			err = s.startApp(ctx, openOpt, cmd)
 		} else {
-			err = s.runApp(ctx, cmd)
+			err = s.runApp(ctx, openOpt, cmd)
 		}
 	}
 	log.Println("exit")
@@ -113,16 +118,16 @@ func fixPath(str string) string {
 	return str
 }
 
-func (s Start) startApp(ctx context.Context, cmd []string) (err error) {
+func (s Start) startApp(ctx context.Context, opt *portal.OpenOpt, cmd []string) (err error) {
 	log := plog.Get(ctx)
 	log.Println("starting app:", cmd)
-	return s.portal.Open(cmd...)
+	return s.portal.Open(opt, cmd...)
 }
 
-func (s Start) runApp(ctx context.Context, cmd []string) (err error) {
+func (s Start) runApp(ctx context.Context, opt *portal.OpenOpt, cmd []string) (err error) {
 	log := plog.Get(ctx)
 	log.Println("running app:", cmd)
-	conn, err := s.portal.Connect(cmd...)
+	conn, err := s.portal.Connect(opt, cmd...)
 	if err != nil {
 		return
 	}

@@ -9,6 +9,7 @@ import (
 	exec2 "github.com/cryptopunkscc/portal/resolve/exec"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"slices"
+	"strings"
 )
 
 func RunAny(runner func(string) string) target.Run[target.Portal_] {
@@ -23,11 +24,15 @@ func RunAny(runner func(string) string) target.Run[target.Portal_] {
 	}
 }
 
-func AnyRun(cacheDir string) target.Run[target.Portal_] {
+func AnyRun(cacheDir string, schemaPrefix ...string) target.Run[target.Portal_] {
 	return func(ctx context.Context, src target.Portal_, args ...string) (err error) {
 		log := plog.Get(ctx).Scope("exec.AnyRun")
 		manifest := src.Manifest()
-		schema := manifest.Schema
+		schemaArr := schemaPrefix
+		if manifest.Schema != "" {
+			schemaArr = append(schemaArr, manifest.Schema)
+		}
+		schema := strings.Join(schemaArr, ".")
 		log.Println("run:", schema, manifest.Package, args)
 		runners, err := target.FindByPath(source.File, exec2.ResolveBundle).ById(appstore.Path).Call(ctx, schema)
 		if err != nil {
