@@ -6,7 +6,6 @@ import (
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runtime/bind"
-	"github.com/cryptopunkscc/portal/runtime/msg"
 )
 
 func Mutable[T target.Portal_](
@@ -47,8 +46,8 @@ func (r runner[T]) Run(ctx context.Context, portal target.Portal_, args ...strin
 		return target.ErrNotTarget
 	}
 
-	var reloader msg.Reloader
-	client := msg.NewClient(r.portMsg)
+	var reloader Reloader
+	client := NewClient(r.portMsg)
 	sendMsg := client.Send
 	newRuntime := func(ctx context.Context, portal target.Portal_) bind.Runtime {
 		runtime := r.newRuntime(ctx, portal)

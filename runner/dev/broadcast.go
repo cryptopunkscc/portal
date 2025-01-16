@@ -1,4 +1,4 @@
-package msg
+package dev
 
 import (
 	"context"
