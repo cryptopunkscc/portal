@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/resolve/apps"
 	"github.com/cryptopunkscc/portal/runner/cli"
@@ -9,6 +11,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/uninstall"
 	apps2 "github.com/cryptopunkscc/portal/runtime/apps"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
+	"text/tabwriter"
 )
 
 func main() { cli.Run(Application{}.cliHandler()) }
@@ -21,7 +24,7 @@ func (a Application) cliHandler() cmd.Handler {
 		Desc: "Portal applications management.",
 		Sub: cmd.Handlers{
 			{
-				Func: apps.ResolveAll.List(a.src()),
+				Func: a.listApps,
 				Name: "list l",
 				Desc: "List installed apps.",
 			},
@@ -61,3 +64,15 @@ func (a Application) apiHandler() cmd.Handler {
 
 func (a Application) dir() string        { return apps2.Dir }
 func (a Application) src() target.Source { return apps2.Source }
+
+func (a Application) listApps() (out string) {
+	buffer := &bytes.Buffer{}
+	w := tabwriter.NewWriter(buffer, 0, 0, 0, ' ', 0)
+	t := "\t"
+	for _, app := range apps.ResolveAll.List(a.src()) {
+		m := app.Manifest()
+		_, _ = fmt.Fprintln(w, m.Name, t, m.Title, t, m.Description, t, m.Package, t, m.Version)
+	}
+	w.Flush()
+	return buffer.String()
+}
