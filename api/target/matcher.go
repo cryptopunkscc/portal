@@ -9,11 +9,21 @@ func Match[T any](arg Portal_) (ok bool) {
 
 type Priority []Matcher
 
-func (priority Priority) Get(app Portal_) int {
-	for i, match := range priority {
+func (p Priority) Get(app Portal_) int {
+	for i, match := range p {
 		if match(app) {
 			return i
 		}
 	}
-	return len(priority)
+	return len(p)
+}
+
+func (p Priority) Sort(order []int) (out Priority) {
+	if len(order) != len(p) {
+		return p
+	}
+	for _, i := range order {
+		out = append(out, p[i])
+	}
+	return
 }

@@ -71,7 +71,7 @@ func (a *Application[T]) Open() Run[portal.OpenOpt] {
 		if opt.Schema != "" {
 			schemaPrefix = []string{opt.Schema}
 		}
-		plog.Get(ctx).Type(a).Println("open:", opt, cmd)
+		plog.Get(ctx).Type(a).Println("open:", opt, cmd, opt.Order)
 		return find.Runner[T](
 			FindByPath(
 				source.File, Any[T](
@@ -82,11 +82,9 @@ func (a *Application[T]) Open() Run[portal.OpenOpt] {
 					Try(unknown.ResolveDist),
 					Try(unknown.ResolveProject),
 				),
-			).ById(path.Resolver(apps.Source)).Cached(&a.cache).Reduced(
-				Match[Bundle_],
-				Match[Dist_],
-				Match[Project_],
-			),
+			).ById(path.Resolver(apps.Source)).
+				Cached(&a.cache).
+				Reduced(a.priority(opt.Order)...),
 			supervisor.Runner[T](
 				&a.wg,
 				&a.processes,
@@ -100,7 +98,14 @@ func (a *Application[T]) Open() Run[portal.OpenOpt] {
 	}
 }
 
-func (a *Application[T]) Shutdown() context.CancelFunc { return a.CancelFunc }
-func (a *Application[T]) Port() apphost.Port           { return PortPortal }
-func (a *Application[T]) Astral() serve.Astral         { return exec.Astral }
-func (a *Application[T]) cacheDir() string             { return CacheDir("portal") }
+func (a *Application[T]) Shutdown() context.CancelFunc        { return a.CancelFunc }
+func (a *Application[T]) Port() apphost.Port                  { return PortPortal }
+func (a *Application[T]) Astral() serve.Astral                { return exec.Astral }
+func (a *Application[T]) cacheDir() string                    { return CacheDir("portal") }
+func (a *Application[T]) priority(order []int) (out Priority) { return matchers.Sort(order) }
+
+var matchers = Priority{
+	Match[Bundle_],
+	Match[Dist_],
+	Match[Project_],
+}

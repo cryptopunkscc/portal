@@ -58,14 +58,15 @@ func (s Start) Run(ctx context.Context, opt Opt, cmd ...string) (err error) {
 	}
 	if len(cmd) > 0 {
 		cmd = fixCmd(cmd)
-		openOpt := &portal.OpenOpt{}
+		o := &portal.OpenOpt{}
 		if opt.Dev {
-			openOpt.Schema = "dev"
+			o.Schema = "dev"
+			o.Order = []int{2, 1, 0}
 		}
 		if opt.Open {
-			err = s.startApp(ctx, openOpt, cmd)
+			err = s.startApp(ctx, o, cmd)
 		} else {
-			err = s.runApp(ctx, openOpt, cmd)
+			err = s.runApp(ctx, o, cmd)
 		}
 	}
 	log.Println("exit")

@@ -16,4 +16,5 @@ type Client interface {
 
 type OpenOpt struct {
 	Schema string `query:"s"`
+	Order  []int  `query:"o"`
 }

@@ -40,7 +40,7 @@ type Astral func(ctx context.Context) (err error)
 
 func checkPortald(port apphost.Port) (err error) {
 	if err = api.Client(port.String()).Ping(); err == nil {
-		err = fmt.Errorf("port already registered or astral not running: %v", err)
+		err = fmt.Errorf("port already registered or astral is not running: %v", err)
 	}
 	return nil
 }
