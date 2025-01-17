@@ -4,6 +4,7 @@ import (
 	"github.com/cryptopunkscc/portal/runtime/rpc2/caller"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/registry"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/stream"
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
@@ -65,6 +66,7 @@ func TestRouter_Call(t *testing.T) {
 				assert.Equal(t, "foo", string(data))
 				return nil
 			}),
+			expected: []any{stream.End},
 		},
 		{
 			name: "dependencies should be passed",
@@ -72,13 +74,14 @@ func TestRouter_Call(t *testing.T) {
 			caller: &cmd.Handler{Func: func(tt *testing.T) {
 				assert.NotNil(tt, t)
 			}},
+			expected: []any{stream.End},
 		},
 		{
 			name: "nil error should be omitted",
 			caller: &cmd.Handler{Func: func() error {
 				return nil
 			}},
-			expected: []any(nil),
+			expected: []any{stream.End},
 		},
 	}
 	for _, tt := range tests {
