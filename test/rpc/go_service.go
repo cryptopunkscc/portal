@@ -2,7 +2,6 @@ package rpc
 
 import (
 	"errors"
-	api "github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 )
@@ -19,6 +18,7 @@ func NewTestGoService(p string) *TestGoService {
 		{Func: Function4, Name: "func4"},
 	}
 	root := cmd.Handler{
+		Name: p,
 		Sub: cmd.Handlers{
 			{
 				Name: "request",
@@ -32,7 +32,7 @@ func NewTestGoService(p string) *TestGoService {
 		},
 	}
 	return &TestGoService{
-		Router: apphost.NewRouter(root, api.NewPort(p)),
+		Router: apphost.NewRouter(root),
 	}
 }
 

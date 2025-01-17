@@ -12,7 +12,7 @@ import (
 func Handler(service Service) cmd.Handler {
 	open := service.Open()
 	return cmd.Handler{
-		Name: "portald",
+		Name: "portal",
 		Desc: "Portal daemon.",
 		Func: "RouteAll",
 		Sub: cmd.Handlers{

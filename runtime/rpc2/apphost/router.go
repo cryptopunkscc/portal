@@ -24,22 +24,22 @@ func Serve() cmd.Handler {
 
 func ServeFunc(ctx context.Context, root *cmd.Root) error {
 	handler := cmd.Handler(*root)
-	r := NewRouter(handler, nil)
+	r := NewRouter(handler)
 	return r.Run(ctx)
 }
 
-func NewRouter(handler cmd.Handler, port api.Port, routes ...string) *Router {
-	return Rpc(Client).Router(handler, port, routes...)
+func NewRouter(handler cmd.Handler, routes ...string) *Router {
+	return Rpc(Client).Router(handler, routes...)
 }
 
-func (r RpcBase) Router(handler cmd.Handler, port api.Port, routes ...string) *Router {
-	if len(port) == 0 && handler.Name != "" {
-		name := strings.ReplaceAll(handler.Names()[0], "-", ".")
-		port = port.Add(name)
+func (r RpcBase) Router(handler cmd.Handler, routes ...string) *Router {
+	name := handler.Name
+	if handler.Name != "" {
+		name = strings.ReplaceAll(handler.Names()[0], "-", ".")
 	}
 	return &Router{
 		routes: routes,
-		Port:   port,
+		Port:   api.NewPort(name),
 		Base: router.Base{
 			Registry: router.CreateRegistry(handler),
 			Unmarshalers: []caller.Unmarshaler{

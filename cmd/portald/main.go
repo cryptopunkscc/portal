@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"github.com/cryptopunkscc/astrald/sig"
-	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/portal"
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -99,7 +98,6 @@ func (a *Application[T]) Open() Run[portal.OpenOpt] {
 }
 
 func (a *Application[T]) Shutdown() context.CancelFunc        { return a.CancelFunc }
-func (a *Application[T]) Port() apphost.Port                  { return PortPortal }
 func (a *Application[T]) Astral() serve.Astral                { return exec.Astral }
 func (a *Application[T]) cacheDir() string                    { return CacheDir("portal") }
 func (a *Application[T]) priority(order []int) (out Priority) { return matchers.Sort(order) }

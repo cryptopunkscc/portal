@@ -3,7 +3,6 @@ package serve
 import (
 	"context"
 	"fmt"
-	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	api "github.com/cryptopunkscc/portal/runtime/portal"
@@ -13,16 +12,15 @@ import (
 
 func Runner(d Deps) target.Run[string] {
 	startAstral := d.Astral()
-	port := d.Port()
 	handler := Handler(d)
 	return func(ctx context.Context, _ string, _ ...string) (err error) {
 		if err = startAstral(ctx); err != nil {
 			return plog.Err(err)
 		}
-		if err = checkPortald(port); err != nil {
+		if err = checkPortald(handler.Name); err != nil {
 			return plog.Err(err)
 		}
-		if err = serve(ctx, port, handler); err != nil {
+		if err = serve(ctx, handler); err != nil {
 			return plog.Err(err)
 		}
 		return
@@ -32,14 +30,13 @@ func Runner(d Deps) target.Run[string] {
 type Deps interface {
 	Service
 	Astral() Astral
-	Port() apphost.Port
 }
 
 // Astral starts daemon if not already running.
 type Astral func(ctx context.Context) (err error)
 
-func checkPortald(port apphost.Port) (err error) {
-	if err = api.Client(port.String()).Ping(); err == nil {
+func checkPortald(port string) (err error) {
+	if err = api.Client(port).Ping(); err == nil {
 		err = fmt.Errorf("port already registered or astral is not running: %v", err)
 	}
 	return nil
@@ -47,14 +44,13 @@ func checkPortald(port apphost.Port) (err error) {
 
 func serve(
 	ctx context.Context,
-	port apphost.Port,
 	handler cmd.Handler,
 ) (err error) {
 	log := plog.Get(ctx).Scope("serve")
-	log.Printf("serve start at port:%s", port)
-	defer log.Printf("serve exit:%s", port)
+	log.Println("serve start")
+	defer log.Printf("serve exit")
 
-	router := apphost2.NewRouter(handler, port)
+	router := apphost2.NewRouter(handler)
 	router.Logger = log
 	err = router.Run(ctx)
 

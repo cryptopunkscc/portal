@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/api/apphost"
 	factoryApphost "github.com/cryptopunkscc/portal/factory/apphost"
 	"github.com/cryptopunkscc/portal/runner/cli"
 	rpcApphost "github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
@@ -32,7 +31,6 @@ func main() {
 						cmd.Handler{
 							Func: echo,
 						},
-						apphost.NewPort("test"),
 					).Run(context.Background())
 					return "serve_end", err
 				},

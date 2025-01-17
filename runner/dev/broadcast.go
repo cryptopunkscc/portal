@@ -3,25 +3,19 @@ package dev
 import (
 	"context"
 	"github.com/cryptopunkscc/astrald/sig"
-	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runtime/rpc2"
 )
 
-type Broadcast struct {
-	port    apphost.Port
-	targets *sig.Map[string, rpc.Conn]
-}
-
-func NewBroadcast[T target.Portal_](
-	port apphost.Port,
-	_ *sig.Map[string, T],
-) *Broadcast {
+func NewBroadcast() *Broadcast {
 	return &Broadcast{
-		port:    port,
 		targets: &sig.Map[string, rpc.Conn]{},
 	}
+}
+
+type Broadcast struct {
+	targets *sig.Map[string, rpc.Conn]
 }
 
 func (b *Broadcast) BroadcastMsg(ctx context.Context, conn rpc.Conn) {
