@@ -21,7 +21,7 @@ func Handler(service Service) cmd.Handler {
 				Name: "ping",
 			},
 			{
-				Func: open,
+				Func: open.Start,
 				Name: "open o",
 				Desc: "Open portal app.",
 				Params: cmd.Params{
