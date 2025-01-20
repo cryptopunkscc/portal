@@ -37,9 +37,9 @@ func (a Application[T]) handler() cmd.Handler {
 
 func (a Application[T]) Runner() Run[T] {
 	return multi.Runner[T](
-		reload.Immutable(a.runtime, PortMsg, wails_pro.NewRunner), // FIXME propagate sendMsg
-		reload.Mutable(a.runtime, PortMsg, wails_dist.NewRunner),
-		reload.Immutable(a.runtime, PortMsg, wails.NewRunner),
+		reload.Immutable(a.runtime, wails_pro.NewRunner), // FIXME propagate sendMsg
+		reload.Mutable(a.runtime, wails_dist.NewRunner),
+		reload.Immutable(a.runtime, wails.NewRunner),
 	)
 }
 func (a Application[T]) Resolver() Resolve[T] { return sources.Resolver[T]() }

@@ -5,19 +5,19 @@ import (
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/target"
+	apphost3 "github.com/cryptopunkscc/portal/factory/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runtime/rpc2"
 	apphost2 "github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
 )
 
 type Client struct {
-	port    apphost.Port
 	flow    rpc.Conn
 	handler *Handler
 }
 
-func NewClient(port apphost.Port) (sender *Client) {
-	sender = &Client{port: port}
+func NewClient() (sender *Client) {
+	sender = &Client{}
 	return
 }
 
@@ -30,7 +30,7 @@ func (s *Client) Connect(ctx context.Context, portal target.Portal_) (err error)
 	if s.flow != nil {
 		return
 	}
-	if s.flow, err = apphost2.RpcClient(id.Anyone, s.port.String()); err != nil {
+	if s.flow, err = apphost2.Rpc(apphost3.Full(ctx)).Client(id.Anyone, "dev.portal.broadcast"); err != nil {
 		return
 	}
 	if err = s.flow.Encode(portal.Manifest().Package); err != nil {

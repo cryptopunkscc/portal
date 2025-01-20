@@ -33,8 +33,8 @@ func (a Application[T]) handler() cmd.Handler {
 
 func (a Application[T]) Runner() Run[T] {
 	return multi.Runner[T](
-		reload.Immutable(bind.DefaultRuntime(), PortMsg, reload.Adapter(exec.Bundle(CacheDir("portal-dev")))),
-		reload.Immutable(bind.DefaultRuntime(), PortMsg, reload.Adapter(exec.Dist())),
+		reload.Immutable(bind.DefaultRuntime(), reload.Adapter(exec.Bundle(CacheDir("portal-dev")))),
+		reload.Immutable(bind.DefaultRuntime(), reload.Adapter(exec.Dist())),
 	)
 }
 

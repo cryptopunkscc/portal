@@ -2,7 +2,6 @@ package reload
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runtime/bind"
@@ -10,11 +9,9 @@ import (
 
 func Mutable[T target.Portal_](
 	newRuntime bind.NewRuntime,
-	portMsg apphost.Port,
 	newRunner func(bind.NewRuntime, target.MsgSend) target.Runner[T],
 ) target.Run[target.Portal_] {
 	return runner[T]{
-		portMsg:    portMsg,
 		newRuntime: newRuntime,
 		newRunner:  newRunner,
 	}.Run
@@ -22,11 +19,9 @@ func Mutable[T target.Portal_](
 
 func Immutable[T target.Portal_](
 	newRuntime bind.NewRuntime,
-	portMsg apphost.Port,
 	newRunner func(bind.NewRuntime) target.Runner[T],
 ) target.Run[target.Portal_] {
 	return runner[T]{
-		portMsg:    portMsg,
 		newRuntime: newRuntime,
 		newRunner: func(api bind.NewRuntime, _ target.MsgSend) target.Runner[T] {
 			return newRunner(api)
@@ -35,7 +30,6 @@ func Immutable[T target.Portal_](
 }
 
 type runner[T target.Portal_] struct {
-	portMsg    apphost.Port
 	newRuntime bind.NewRuntime
 	newRunner  func(bind.NewRuntime, target.MsgSend) target.Runner[T]
 }
@@ -47,7 +41,7 @@ func (r runner[T]) Run(ctx context.Context, portal target.Portal_, args ...strin
 	}
 
 	var reloader Reloader
-	client := NewClient(r.portMsg)
+	client := NewClient()
 	sendMsg := client.Send
 	newRuntime := func(ctx context.Context, portal target.Portal_) bind.Runtime {
 		runtime := r.newRuntime(ctx, portal)
