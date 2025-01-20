@@ -10,6 +10,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/observe"
 	"github.com/cryptopunkscc/portal/runner/uninstall"
 	apps2 "github.com/cryptopunkscc/portal/runtime/apps"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 	"text/tabwriter"
 )
@@ -21,7 +22,7 @@ type Application struct{}
 func (a Application) cliHandler() cmd.Handler {
 	return cmd.Handler{
 		Name: "apps",
-		Desc: "Portal applications management.",
+		Desc: "Applications management.",
 		Sub: cmd.Handlers{
 			{
 				Func: a.listApps,
@@ -31,7 +32,7 @@ func (a Application) cliHandler() cmd.Handler {
 			{
 				Func: install.Runner(a.dir()).Run,
 				Name: "install i",
-				Desc: "Install app from a given portal app bundle path.",
+				Desc: "Install app.",
 				Params: cmd.Params{
 					{Type: "string", Desc: "Path to containing directory"},
 				},
@@ -44,19 +45,13 @@ func (a Application) cliHandler() cmd.Handler {
 					{Type: "string", Desc: "Application name or package name"},
 				},
 			},
-			a.apiHandler(),
-		},
-	}
-}
-
-func (a Application) apiHandler() cmd.Handler {
-	return cmd.Handler{
-		Name: "serve s",
-		Desc: "Serve apps management.",
-		Sub: cmd.Handlers{
 			{
-				Name: "observe",
-				Func: observe.NewRun(a.dir()),
+				Name: "serve s",
+				Desc: "Serve apps.",
+				Func: apphost.NewRouter(cmd.Handler{
+					Name: "observe",
+					Func: observe.NewRun(a.dir()),
+				}).Run,
 			},
 		},
 	}
