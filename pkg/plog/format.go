@@ -49,7 +49,7 @@ func (f *Formatter) String(l Log) (line string) {
 		"|"+scopes+"|",
 		l.Message,
 	)
-	if l.Level <= Fatal {
+	if len(l.Stack) > 0 {
 		line += fmt.Sprintf("%s", l.Stack)
 	}
 	for _, err := range l.Errors {

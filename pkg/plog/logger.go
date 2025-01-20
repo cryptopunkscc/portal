@@ -155,7 +155,7 @@ func (l logger) Flush() {
 		return
 	}
 	l.Time = time.Now()
-	if l.Level <= Fatal {
+	if ErrorStackTrace {
 		l.Stack = debug.Stack()
 	}
 	l.out(l.Log)
