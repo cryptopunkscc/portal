@@ -9,6 +9,10 @@ import (
 
 func Test(t *testing.T) {
 	log.Println("\n=================================================================")
-	time.Sleep(100 * time.Millisecond)
-	rpc.NewTestClient("test", "go", "js").Run(t)
+	time.Sleep(300 * time.Millisecond)
+	rpc.NewTestClient(
+		"test",
+		"go",
+		"js",
+	).Run(t)
 }

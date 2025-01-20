@@ -86,14 +86,15 @@ func BundleRun(cacheDir string) target.Run[target.BundleExec] {
 }
 
 func unpackExecutable(cacheDir string, bundle target.BundleExec) (execFile *os.File, err error) {
-	execSource := bundle.Target().Executable()
-	execSrcFile, err := execSource.Files().Open(execSource.Path())
+	execName := fmt.Sprintf("%s_%s", bundle.Manifest().Package, bundle.Manifest().Version)
+	execFile, err = os.CreateTemp(cacheDir, execName)
+	//execFile, err = os.Create(filepath.Join(cacheDir, execName)) // FIXME
 	if err != nil {
 		return nil, plog.Err(err)
 	}
 
-	execName := fmt.Sprintf("%s_%s", bundle.Manifest().Package, bundle.Manifest().Version)
-	execFile, err = os.Create(filepath.Join(cacheDir, execName))
+	execSource := bundle.Target().Executable()
+	execSrcFile, err := execSource.Files().Open(execSource.Path())
 	if err != nil {
 		return nil, plog.Err(err)
 	}
