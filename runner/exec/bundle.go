@@ -7,19 +7,20 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 	"os"
-	"path/filepath"
 )
 
 type bundle struct {
-	cacheDir string
-	ctx      context.Context
-	bundle   target.BundleExec
-	cancel   context.CancelFunc
-	args     []string
+	run    target.Run[target.BundleExec]
+	ctx    context.Context
+	cancel context.CancelFunc
+	bundle target.BundleExec
+	args   []string
 }
 
 func Bundle(cacheDir string) target.Runner[target.BundleExec] {
-	return &bundle{cacheDir: cacheDir}
+	return &bundle{
+		run: BundleRun(cacheDir),
+	}
 }
 
 func (r *bundle) Run(ctx context.Context, bundle target.BundleExec, args ...string) error {
@@ -33,40 +34,8 @@ func (r *bundle) Reload() error {
 	if r.cancel != nil {
 		r.cancel()
 	}
-
-	//execFile, err := os.CreateTemp(r.cacheDir, r.bundle.Manifest().Package)
-	execName := fmt.Sprintf("%s_%s", r.bundle.Manifest().Package, r.bundle.Manifest().Version)
-	execFile, err := os.Create(filepath.Join(r.cacheDir, execName))
-	if err != nil {
-		return plog.Err(err)
-	}
-
-	e := r.bundle.Target().Executable()
-	srcFile, err := e.Files().Open(e.Path())
-	if err != nil {
-		return plog.Err(err)
-	}
-
-	if err = execFile.Chmod(0755); err != nil {
-		return plog.Err(err)
-	}
-	_, err = io.Copy(execFile, srcFile)
-	if err != nil {
-		return plog.Err(err)
-	}
-	if err = execFile.Close(); err != nil {
-		return plog.Err(err)
-	}
-	defer os.Remove(execFile.Name())
-	_ = srcFile.Close()
-
-	var ctx context.Context
-	ctx, r.cancel = context.WithCancel(r.ctx)
-	err = Portal[target.Portal_](execFile.Name()).Run(ctx, r.bundle, r.args...)
-	if err != nil {
-		return err
-	}
-	return nil
+	r.ctx, r.cancel = context.WithCancel(r.ctx)
+	return r.run(r.ctx, r.bundle, r.args...)
 }
 
 func BundleRun(cacheDir string) target.Run[target.BundleExec] {
