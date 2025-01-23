@@ -2,7 +2,6 @@ package exec
 
 import (
 	"context"
-	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	exec2 "github.com/cryptopunkscc/portal/resolve/exec"
@@ -13,21 +12,9 @@ import (
 	"strings"
 )
 
-func RunAny(runner func(string) string) target.Run[target.Portal_] {
-	return func(ctx context.Context, portal target.Portal_, args ...string) (err error) {
-		schema := portal.Manifest().Schema
-		src := runner(schema)
-		if src == "" {
-			return fmt.Errorf("unknown schema %v", schema)
-		}
-		args = slices.Insert(args, 0, portal.Abs())
-		return RunCmd(ctx, src, args...)
-	}
-}
-
-func AnyRun(cacheDir string, schemaPrefix ...string) target.Run[target.Portal_] {
+func AnyRunner(cacheDir string, schemaPrefix ...string) target.Run[target.Portal_] {
 	return func(ctx context.Context, src target.Portal_, args ...string) (err error) {
-		log := plog.Get(ctx).Scope("exec.AnyRun")
+		log := plog.Get(ctx).Scope("exec.AnyRunner")
 		manifest := src.Manifest()
 		schemaArr := schemaPrefix
 		if manifest.Schema != "" {
@@ -48,7 +35,7 @@ func AnyRun(cacheDir string, schemaPrefix ...string) target.Run[target.Portal_] 
 		}
 		runner := runners[0]
 		args = slices.Insert(args, 0, src.Abs())
-		err = BundleRun(cacheDir).Call(ctx, runner, args...)
+		err = BundleRunner(cacheDir).Call(ctx, runner, args...)
 		return
 	}
 }

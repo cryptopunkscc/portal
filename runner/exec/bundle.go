@@ -9,36 +9,7 @@ import (
 	"os"
 )
 
-type bundle struct {
-	run    target.Run[target.BundleExec]
-	ctx    context.Context
-	cancel context.CancelFunc
-	bundle target.BundleExec
-	args   []string
-}
-
-func Bundle(cacheDir string) target.Runner[target.BundleExec] {
-	return &bundle{
-		run: BundleRun(cacheDir),
-	}
-}
-
-func (r *bundle) Run(ctx context.Context, bundle target.BundleExec, args ...string) error {
-	r.ctx = ctx
-	r.bundle = bundle
-	r.args = args
-	return r.Reload()
-}
-
-func (r *bundle) Reload() error {
-	if r.cancel != nil {
-		r.cancel()
-	}
-	r.ctx, r.cancel = context.WithCancel(r.ctx)
-	return r.run(r.ctx, r.bundle, r.args...)
-}
-
-func BundleRun(cacheDir string) target.Run[target.BundleExec] {
+func BundleRunner(cacheDir string) target.Run[target.BundleExec] {
 	return func(ctx context.Context, bundle target.BundleExec, args ...string) (err error) {
 		execFile, err := unpackExecutable(cacheDir, bundle)
 		if err != nil {

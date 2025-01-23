@@ -13,7 +13,7 @@ type Runner struct {
 	app        target.AppJs
 }
 
-func NewRunner(newRuntime bind.NewRuntime) target.Runner[target.AppJs] {
+func NewRunner(newRuntime bind.NewRuntime) target.ReRunner[target.AppJs] {
 	return &Runner{newRuntime: newRuntime}
 }
 
@@ -21,7 +21,7 @@ func NewRun(newRuntime bind.NewRuntime) target.Run[target.AppJs] {
 	return NewRunner(newRuntime).Run
 }
 
-func (r *Runner) Reload() (err error) {
+func (r *Runner) ReRun() (err error) {
 	return r.backend.RunFs(r.app.Files())
 }
 
@@ -31,7 +31,7 @@ func (r *Runner) Run(ctx context.Context, app target.AppJs, args ...string) (err
 	log.Printf("run %T %s", app, app.Abs())
 	r.app = app
 	r.backend = NewBackend(r.newRuntime(ctx, app))
-	if err = r.Reload(); err != nil {
+	if err = r.ReRun(); err != nil {
 		return
 	}
 	<-ctx.Done()

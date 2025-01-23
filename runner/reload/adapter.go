@@ -6,8 +6,8 @@ import (
 	"github.com/cryptopunkscc/portal/runtime/bind"
 )
 
-func Adapter[T target.Portal_](runner target.Runner[T]) func(bind.NewRuntime) target.Runner[T] {
-	return func(newRuntime bind.NewRuntime) target.Runner[T] {
+func Adapter[T target.Portal_](runner target.ReRunner[T]) func(bind.NewRuntime) target.ReRunner[T] {
+	return func(newRuntime bind.NewRuntime) target.ReRunner[T] {
 		return adapter[T]{
 			newRuntime: newRuntime,
 			inner:      runner,
@@ -17,7 +17,7 @@ func Adapter[T target.Portal_](runner target.Runner[T]) func(bind.NewRuntime) ta
 
 type adapter[T target.Portal_] struct {
 	newRuntime bind.NewRuntime
-	inner      target.Runner[T]
+	inner      target.ReRunner[T]
 }
 
 func (a adapter[T]) Run(ctx context.Context, src T, args ...string) (err error) {
@@ -25,6 +25,6 @@ func (a adapter[T]) Run(ctx context.Context, src T, args ...string) (err error) 
 	return a.inner.Run(ctx, src, args...)
 }
 
-func (a adapter[T]) Reload() error {
-	return a.inner.Reload()
+func (a adapter[T]) ReRun() error {
+	return a.inner.ReRun()
 }

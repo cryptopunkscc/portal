@@ -18,17 +18,17 @@ type Runner struct {
 	backend    *goja.Backend
 }
 
-func NewRunner(newRuntime bind.NewRuntime, send target.MsgSend) target.Runner[target.DistJs] {
+func NewRunner(newRuntime bind.NewRuntime, send target.MsgSend) target.ReRunner[target.DistJs] {
 	return &Runner{newRuntime: newRuntime, send: send}
 }
 
-func (r *Runner) Reload() (err error) {
+func (r *Runner) ReRun() (err error) {
 	return r.backend.RunFs(r.dist.Files())
 }
 
 func (r *Runner) Run(ctx context.Context, dist target.DistJs, args ...string) (err error) {
 	if !filepath.IsAbs(dist.Abs()) {
-		return plog.Errorf("Runner needs absolute path: %s", dist.Abs())
+		return plog.Errorf("ReRunner needs absolute path: %s", dist.Abs())
 	}
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Printf("run %T %s", dist, dist.Abs())
@@ -37,15 +37,15 @@ func (r *Runner) Run(ctx context.Context, dist target.DistJs, args ...string) (e
 		panic("newRuntime cannot be nil")
 	}
 	r.backend = goja.NewBackend(r.newRuntime(ctx, dist))
-	if err = r.Reload(); err != nil {
+	if err = r.ReRun(); err != nil {
 		log.E().Println(err.Error())
 	}
 	pkg := dist.Manifest().Package
-	watch := watcher.Runner[target.DistJs](func(...string) error {
+	watch := watcher.ReRunner[target.DistJs](func(...string) error {
 		if err := r.send(target.NewMsg(pkg, target.DevChanged)); err != nil {
 			log.E().Println(err)
 		}
-		if err := r.Reload(); err != nil {
+		if err := r.ReRun(); err != nil {
 			log.E().Println(err.Error())
 		}
 		// TODO find better solution then sleep

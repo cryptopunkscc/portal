@@ -16,16 +16,16 @@ import (
 )
 
 type runner struct {
-	distRunner target.Runner[target.DistJs]
+	distRunner target.ReRunner[target.DistJs]
 }
 
-func NewRunner(newRuntime bind.NewRuntime, send target.MsgSend) target.Runner[target.ProjectJs] {
+func NewRunner(newRuntime bind.NewRuntime, send target.MsgSend) target.ReRunner[target.ProjectJs] {
 	distRunner := goja_dist.NewRunner(newRuntime, send)
 	return &runner{distRunner: distRunner}
 }
 
-func (r *runner) Reload() (err error) {
-	return r.distRunner.Reload()
+func (r *runner) ReRun() (err error) {
+	return r.distRunner.ReRun()
 }
 
 func (r *runner) Run(ctx context.Context, projectJs target.ProjectJs, args ...string) (err error) {

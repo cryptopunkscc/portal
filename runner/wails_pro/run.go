@@ -20,16 +20,16 @@ import (
 	"syscall"
 )
 
-func NewRunner(newRuntime bind.NewRuntime) target.Runner[target.ProjectHtml] {
-	return &Runner{NewRuntime: newRuntime}
+func ReRunner(newRuntime bind.NewRuntime) target.ReRunner[target.ProjectHtml] {
+	return &reRunner{NewRuntime: newRuntime}
 }
 
-type Runner struct {
+type reRunner struct {
 	frontCtx context.Context
 	bind.NewRuntime
 }
 
-func (r *Runner) Run(ctx context.Context, projectHtml target.ProjectHtml, args ...string) (err error) {
+func (r *reRunner) Run(ctx context.Context, projectHtml target.ProjectHtml, args ...string) (err error) {
 	// TODO pass args to js
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Println("start", projectHtml.Manifest().Package, projectHtml.Abs())
@@ -103,7 +103,7 @@ func (r *Runner) Run(ctx context.Context, projectHtml target.ProjectHtml, args .
 	return
 }
 
-func (r *Runner) Reload() (err error) {
+func (r *reRunner) ReRun() (err error) {
 	if r.frontCtx == nil {
 		return errors.New("nil context")
 	}

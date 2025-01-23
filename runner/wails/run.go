@@ -13,20 +13,20 @@ import (
 	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-type Runner struct {
+type reRunner struct {
 	newRuntime bind.NewRuntime
 	frontCtx   context.Context
 }
 
-func NewRunner(newRuntime bind.NewRuntime) target.Runner[target.AppHtml] {
-	return &Runner{newRuntime: newRuntime}
+func ReRunner(newRuntime bind.NewRuntime) target.ReRunner[target.AppHtml] {
+	return &reRunner{newRuntime: newRuntime}
 }
 
-func NewRun(newRuntime bind.NewRuntime) target.Run[target.AppHtml] {
-	return NewRunner(newRuntime).Run
+func Runner(newRuntime bind.NewRuntime) target.Run[target.AppHtml] {
+	return ReRunner(newRuntime).Run
 }
 
-func (r *Runner) Reload() (err error) {
+func (r *reRunner) ReRun() (err error) {
 	if r.frontCtx == nil {
 		return plog.Errorf("nil context")
 	}
@@ -34,7 +34,7 @@ func (r *Runner) Reload() (err error) {
 	return
 }
 
-func (r *Runner) Run(ctx context.Context, app target.AppHtml, args ...string) (err error) {
+func (r *reRunner) Run(ctx context.Context, app target.AppHtml, args ...string) (err error) {
 	// TODO pass args to js
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Println("start", app.Manifest().Package, app.Abs())

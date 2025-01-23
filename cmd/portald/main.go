@@ -88,9 +88,9 @@ func (a *Application[T]) Open() Run[portal.OpenOpt] {
 				&a.wg,
 				&a.processes,
 				multi.Runner[T](
-					app.Run(exec.BundleRun(a.cacheDir())),
-					app.Run(exec.Dist().Run),
-					app.Run(exec.AnyRun(a.cacheDir(), schemaPrefix...)),
+					app.Runner(exec.BundleRunner(a.cacheDir())),
+					app.Runner(exec.DistRunner()),
+					app.Runner(exec.AnyRunner(a.cacheDir(), schemaPrefix...)),
 				),
 			),
 		).Call(ctx, src, args...)

@@ -32,8 +32,8 @@ func (a Application[T]) Handler() cmd.Handler {
 		},
 	}
 }
-func (d Application[T]) Resolver() Resolve[T] { return apps.Resolver[T]() }
-func (a Application[T]) Runner() Run[T]       { return multi.Runner[T](app.Run(wails.NewRun(a.runtime))) }
+func (a Application[T]) Resolver() Resolve[T] { return apps.Resolver[T]() }
+func (a Application[T]) Runner() Run[T]       { return multi.Runner[T](app.Runner(wails.Runner(a.runtime))) }
 func (a Application[T]) runtime(ctx context.Context, portal Portal_) bind.Runtime {
 	return &Adapter{factory.FrontendRuntime()(ctx, portal)}
 }

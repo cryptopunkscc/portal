@@ -25,7 +25,7 @@ type runner struct {
 func Runner(
 	run target.Run[target.DistExec],
 	send target.MsgSend,
-) target.Runner[target.ProjectGo] {
+) target.ReRunner[target.ProjectGo] {
 	return &runner{
 		watcher: golang.NewWatcher(),
 		send:    send,
@@ -36,8 +36,8 @@ func Runner(
 func Adapter(run target.Run[target.DistExec]) func(
 	_ bind.NewRuntime,
 	send target.MsgSend,
-) target.Runner[target.ProjectGo] {
-	return func(newRuntime bind.NewRuntime, send target.MsgSend) target.Runner[target.ProjectGo] {
+) target.ReRunner[target.ProjectGo] {
+	return func(newRuntime bind.NewRuntime, send target.MsgSend) target.ReRunner[target.ProjectGo] {
 		run := func(ctx context.Context, src target.DistExec, args ...string) (err error) {
 			newRuntime(ctx, src) // initiate connection
 			return run(ctx, src, args...)
@@ -46,7 +46,7 @@ func Adapter(run target.Run[target.DistExec]) func(
 	}
 }
 
-func (r *runner) Reload() (err error) {
+func (r *runner) ReRun() (err error) {
 	if r.cancel != nil {
 		r.cancel()
 	}
@@ -74,7 +74,7 @@ func (r *runner) Run(ctx context.Context, project target.ProjectGo, args ...stri
 	}
 	r.dist = project.Dist()
 
-	if err = r.Reload(); err != nil {
+	if err = r.ReRun(); err != nil {
 		return
 	}
 
@@ -89,7 +89,7 @@ func (r *runner) Run(ctx context.Context, project target.ProjectGo, args ...stri
 			log.E().Println(err)
 		}
 		if err = build(ctx, project); err == nil {
-			if err = r.Reload(); err != nil {
+			if err = r.ReRun(); err != nil {
 				log.E().Println(err)
 			}
 		}

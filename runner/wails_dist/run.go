@@ -10,35 +10,35 @@ import (
 	"path/filepath"
 )
 
-type Runner struct {
+type reRunner struct {
 	send  target.MsgSend
-	inner target.Runner[target.AppHtml]
+	inner target.ReRunner[target.AppHtml]
 }
 
-func NewRunner(newRuntime bind.NewRuntime, send target.MsgSend) target.Runner[target.DistHtml] {
-	return &Runner{
+func ReRunner(newRuntime bind.NewRuntime, send target.MsgSend) target.ReRunner[target.DistHtml] {
+	return &reRunner{
 		send:  send,
-		inner: wails.NewRunner(newRuntime),
+		inner: wails.ReRunner(newRuntime),
 	}
 }
 
-func (r *Runner) Reload() (err error) {
-	return r.inner.Reload()
+func (r *reRunner) ReRun() (err error) {
+	return r.inner.ReRun()
 }
 
-func (r *Runner) Run(ctx context.Context, dist target.DistHtml, args ...string) (err error) {
+func (r *reRunner) Run(ctx context.Context, dist target.DistHtml, args ...string) (err error) {
 	if !filepath.IsAbs(dist.Abs()) {
-		return plog.Errorf("Runner needs absolute path: %s", dist.Abs())
+		return plog.Errorf("ReRunner needs absolute path: %s", dist.Abs())
 	}
 	log := plog.Get(ctx).Type(r)
 
 	go func() {
 		pkg := dist.Manifest().Package
-		watch := watcher.Runner[target.DistHtml](func(...string) (err error) {
+		watch := watcher.ReRunner[target.DistHtml](func(...string) (err error) {
 			if err := r.send(target.NewMsg(pkg, target.DevChanged)); err != nil {
 				log.F().Println(err)
 			}
-			err = r.inner.Reload()
+			err = r.inner.ReRun()
 			if err := r.send(target.NewMsg(pkg, target.DevRefreshed)); err != nil {
 				log.F().Println(err)
 			}

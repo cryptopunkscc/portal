@@ -11,22 +11,22 @@ import (
 	apphost2 "github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
 )
 
-type Client struct {
+type client struct {
 	flow    rpc.Conn
-	handler *Handler
+	handler *handler
 }
 
-func NewClient() (sender *Client) {
-	sender = &Client{}
+func newClient() (sender *client) {
+	sender = &client{}
 	return
 }
 
-func (s *Client) Init(reloader Reloader, cache apphost.Cache) *Client {
-	s.handler = NewHandler(reloader, cache)
+func (s *client) Init(reRun ReRun, cache apphost.Cache) *client {
+	s.handler = newHandler(reRun, cache)
 	return s
 }
 
-func (s *Client) Connect(ctx context.Context, portal target.Portal_) (err error) {
+func (s *client) Connect(ctx context.Context, portal target.Portal_) (err error) {
 	if s.flow != nil {
 		return
 	}
@@ -42,7 +42,7 @@ func (s *Client) Connect(ctx context.Context, portal target.Portal_) (err error)
 	return
 }
 
-func (s *Client) handle(ctx context.Context) {
+func (s *client) handle(ctx context.Context) {
 	go func() {
 		<-ctx.Done()
 		_ = s.flow.Close()
@@ -62,7 +62,7 @@ func (s *Client) handle(ctx context.Context) {
 	}
 }
 
-func (s *Client) Send(msg target.Msg) (err error) {
+func (s *client) Send(msg target.Msg) (err error) {
 	if err = s.flow.Encode(msg); err != nil && err.Error() == "EOF" {
 		_ = s.Close()
 		return
@@ -70,7 +70,7 @@ func (s *Client) Send(msg target.Msg) (err error) {
 	return
 }
 
-func (s *Client) Close() (err error) {
+func (s *client) Close() (err error) {
 	err = s.flow.Close()
 	s.flow = nil
 	return

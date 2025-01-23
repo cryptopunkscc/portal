@@ -9,16 +9,16 @@ import (
 	"time"
 )
 
-type runner[T target.Dist_] struct {
+type reRunner[T target.Dist_] struct {
 	reload func(...string) error
 	args   []string
 }
 
-func Runner[T target.Dist_](reload func(...string) error) target.Runner[T] {
-	return &runner[T]{reload: reload}
+func ReRunner[T target.Dist_](reload func(...string) error) target.ReRunner[T] {
+	return &reRunner[T]{reload: reload}
 }
 
-func (r *runner[T]) Run(ctx context.Context, dist T, args ...string) (err error) {
+func (r *reRunner[T]) Run(ctx context.Context, dist T, args ...string) (err error) {
 	changes, err := fs2.NotifyWatch(ctx, dist.Abs(), fsnotify.Write)
 	if err != nil {
 		return
@@ -26,13 +26,13 @@ func (r *runner[T]) Run(ctx context.Context, dist T, args ...string) (err error)
 	changes = flow.From(changes).Debounce(200 * time.Millisecond)
 	r.args = args
 	for range changes {
-		if err = r.Reload(); err != nil {
+		if err = r.ReRun(); err != nil {
 			return
 		}
 	}
 	return
 }
 
-func (r *runner[T]) Reload() error {
+func (r *reRunner[T]) ReRun() error {
 	return r.reload(r.args...)
 }

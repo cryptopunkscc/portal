@@ -9,51 +9,45 @@ import (
 
 func Mutable[T target.Portal_](
 	newRuntime bind.NewRuntime,
-	newRunner func(bind.NewRuntime, target.MsgSend) target.Runner[T],
+	newReRunner func(bind.NewRuntime, target.MsgSend) target.ReRunner[T],
 ) target.Run[target.Portal_] {
-	return runner[T]{
-		newRuntime: newRuntime,
-		newRunner:  newRunner,
-	}.Run
+	return runner(newRuntime, newReRunner)
 }
 
 func Immutable[T target.Portal_](
 	newRuntime bind.NewRuntime,
-	newRunner func(bind.NewRuntime) target.Runner[T],
+	newReRunner func(bind.NewRuntime) target.ReRunner[T],
 ) target.Run[target.Portal_] {
-	return runner[T]{
-		newRuntime: newRuntime,
-		newRunner: func(api bind.NewRuntime, _ target.MsgSend) target.Runner[T] {
-			return newRunner(api)
-		},
-	}.Run
+	return runner(newRuntime, func(api bind.NewRuntime, _ target.MsgSend) target.ReRunner[T] {
+		return newReRunner(api)
+	})
 }
 
-type runner[T target.Portal_] struct {
-	newRuntime bind.NewRuntime
-	newRunner  func(bind.NewRuntime, target.MsgSend) target.Runner[T]
-}
-
-func (r runner[T]) Run(ctx context.Context, portal target.Portal_, args ...string) (err error) {
-	t, ok := portal.(T)
-	if !ok {
-		return target.ErrNotTarget
-	}
-
-	var reloader Reloader
-	client := NewClient()
-	sendMsg := client.Send
-	newRuntime := func(ctx context.Context, portal target.Portal_) bind.Runtime {
-		runtime := r.newRuntime(ctx, portal)
-		if runtime != nil {
-			client.Init(reloader, runtime)
+func runner[T target.Portal_](
+	newRuntime bind.NewRuntime,
+	newReRunner func(bind.NewRuntime, target.MsgSend) target.ReRunner[T],
+) target.Run[target.Portal_] {
+	return func(ctx context.Context, src target.Portal_, args ...string) (err error) {
+		t, ok := src.(T)
+		if !ok {
+			return target.ErrNotTarget
 		}
-		if err = client.Connect(ctx, t); err != nil {
-			plog.Get(ctx).Type(r).P().Println(err)
+
+		var reRun ReRun
+		client := newClient()
+		sendMsg := client.Send
+		newRuntime := func(ctx context.Context, portal target.Portal_) bind.Runtime {
+			runtime := newRuntime(ctx, portal)
+			if runtime != nil {
+				client.Init(reRun, runtime)
+			}
+			if err = client.Connect(ctx, t); err != nil {
+				plog.Get(ctx).Scope("ReRunner").P().Println(err)
+			}
+			return runtime
 		}
-		return runtime
+		_runner := newReRunner(newRuntime, sendMsg)
+		reRun = _runner.ReRun
+		return _runner.Run(ctx, t, args...)
 	}
-	_runner := r.newRunner(newRuntime, sendMsg)
-	reloader = _runner
-	return _runner.Run(ctx, t, args...)
 }

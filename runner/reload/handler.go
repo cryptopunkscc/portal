@@ -10,28 +10,26 @@ import (
 	"time"
 )
 
-type Handler struct {
-	reloader Reloader
-	cache    apphost.Cache
-	changes  mem.Cache[time.Time]
+type handler struct {
+	reRun   ReRun
+	cache   apphost.Cache
+	changes mem.Cache[time.Time]
 }
 
-type Reloader interface {
-	Reload() error
-}
+type ReRun func() error
 
-func NewHandler(
-	reloader Reloader,
+func newHandler(
+	reRun ReRun,
 	cache apphost.Cache,
-) *Handler {
-	return &Handler{
-		reloader: reloader,
-		cache:    cache,
-		changes:  mem.NewCache[time.Time](),
+) *handler {
+	return &handler{
+		reRun:   reRun,
+		cache:   cache,
+		changes: mem.NewCache[time.Time](),
 	}
 }
 
-func (s *Handler) HandleMsg(ctx context.Context, msg target.Msg) {
+func (s *handler) HandleMsg(ctx context.Context, msg target.Msg) {
 	log := plog.Get(ctx).D()
 	log.Println("received broadcast message:", msg)
 	switch msg.Event {
@@ -51,7 +49,7 @@ func (s *Handler) HandleMsg(ctx context.Context, msg target.Msg) {
 			return
 		}
 		log.Println("reloading")
-		if err := s.reloader.Reload(); err != nil {
+		if err := s.reRun(); err != nil {
 			log.F().Println(err)
 		}
 	}
