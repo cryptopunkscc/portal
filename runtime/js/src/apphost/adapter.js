@@ -3,9 +3,9 @@ import {bindings} from "../bindings";
 // ================== Object oriented adapter ==================
 
 export class ApphostClient {
-  async register(service) {
-    await bindings.astral_service_register(service)
-    return new AppHostListener(service)
+  async register() {
+    await bindings.astral_service_register()
+    return new AppHostListener()
   }
 
   async query(query, identity) {
@@ -35,18 +35,17 @@ export class ApphostClient {
 }
 
 export class AppHostListener {
-  constructor(port) {
-    this.port = port
+  constructor() {
   }
 
   async accept() {
-    const json = await bindings.astral_conn_accept(this.port)
+    const json = await bindings.astral_conn_accept()
     const data = JSON.parse(json)
     return new ApphostConn(data)
   }
 
   async close() {
-    await bindings.astral_service_close(this.port)
+    await bindings.astral_service_close()
   }
 }
 

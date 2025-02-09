@@ -32,7 +32,7 @@ func NewTestGoService(p string) *TestGoService {
 		},
 	}
 	return &TestGoService{
-		Router: apphost.NewRouter(root),
+		Router: apphost.Default().Router(root),
 	}
 }
 

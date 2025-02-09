@@ -36,15 +36,15 @@ func runner[T target.Portal_](
 		var reRun ReRun
 		client := newClient()
 		sendMsg := client.Send
-		newRuntime := func(ctx context.Context, portal target.Portal_) bind.Runtime {
-			runtime := newRuntime(ctx, portal)
+		newRuntime := func(ctx context.Context, portal target.Portal_) (bind.Runtime, context.Context) {
+			runtime, ctx := newRuntime(ctx, portal)
 			if runtime != nil {
 				client.Init(reRun, runtime)
 			}
 			if err = client.Connect(ctx, t); err != nil {
-				plog.Get(ctx).Scope("ReRunner").P().Println(err)
+				plog.Get(ctx).Scope("ReRunner").E().Println(err)
 			}
-			return runtime
+			return runtime, ctx
 		}
 		_runner := newReRunner(newRuntime, sendMsg)
 		reRun = _runner.ReRun

@@ -27,11 +27,11 @@ func Timeout(ctx context.Context, apphost apphost.Cache, portal target.Portal_) 
 		t := newTimout(duration, func() {
 			_ = sig2.Interrupt()
 		})
-		log := plog.Get(ctx)
+		log := plog.Get(ctx).D().Type(t).Set(&ctx)
 		t.log = log
 		t.Enable(true)
 		for e := range apphost.Events().Subscribe(ctx) {
-			log.Printf("apphost event %v %s %s", e.Type, e.Port, e.Ref)
+			log.Printf("apphost event %v %s %s", e.Type, e.Query, e.Ref)
 			t.Enable(apphost.Connections().Size() <= ConnectionsThreshold)
 		}
 	}()

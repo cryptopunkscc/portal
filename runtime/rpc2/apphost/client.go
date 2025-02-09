@@ -2,25 +2,17 @@ package apphost
 
 import (
 	"encoding/json"
-	"github.com/cryptopunkscc/astrald/auth/id"
 	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/stream"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/stream/query"
 	"io"
 )
 
-func RpcClient(
-	identity id.Identity,
-	query string,
-) (s rpc.Conn, err error) {
-	return Rpc(Client).Client(identity, query)
-}
-
 func (r RpcBase) Client(
-	identity id.Identity,
+	target string,
 	query string,
 ) (s rpc.Conn, err error) {
-	conn, err := r.client.Query(identity, query)
+	conn, err := r.client.Query(target, query, nil)
 	if err != nil {
 		return
 	}

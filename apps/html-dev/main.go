@@ -13,6 +13,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/wails"
 	"github.com/cryptopunkscc/portal/runner/wails_dist"
 	"github.com/cryptopunkscc/portal/runner/wails_pro"
+	_ "github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/bind"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 )
@@ -30,7 +31,7 @@ func (a Application[T]) handler() cmd.Handler {
 			{Type: "string", Desc: "Absolute path to app bundle or directory."},
 		},
 		Sub: cmd.Handlers{
-			{Name: "v", Desc: "Print version", Func: version.Run},
+			{Name: "v", Desc: "Print version.", Func: version.Run},
 		},
 	}
 }
@@ -44,8 +45,9 @@ func (a Application[T]) Runner() Run[T] {
 }
 func (a Application[T]) Resolver() Resolve[T] { return sources.Resolver[T]() }
 
-func (a Application[T]) runtime(ctx context.Context, portal Portal_) bind.Runtime {
-	return &Adapter{factory.FrontendRuntime()(ctx, portal)}
+func (a Application[T]) runtime(ctx context.Context, portal Portal_) (bind.Runtime, context.Context) {
+	r, ctx := factory.FrontendRuntime()(ctx, portal)
+	return &Adapter{r}, ctx
 }
 
 type Adapter struct{ bind.Runtime }

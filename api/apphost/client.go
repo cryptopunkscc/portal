@@ -1,30 +1,40 @@
 package apphost
 
 import (
-	"github.com/cryptopunkscc/astrald/auth/id"
-	"github.com/cryptopunkscc/astrald/lib/astral"
-	"github.com/cryptopunkscc/astrald/mod/apphost/proto"
+	"context"
+	"github.com/cryptopunkscc/astrald/astral"
 	"io"
 	"net"
 )
 
+var Connect func(ctx context.Context) error
+var DefaultClient Client
+
 type Client interface {
-	Discovery() Discovery
-	Query(remoteID id.Identity, query string) (conn Conn, err error)
-	QueryName(name string, query string) (conn Conn, err error)
-	Resolve(name string) (id.Identity, error)
-	NodeInfo(identity id.Identity) (info proto.NodeInfoData, err error)
-	Exec(identity id.Identity, app string, args []string, env []string) error
-	Register(service string) (l Listener, err error)
+	Query(target string, method string, args any) (Conn, error)
+	Resolve(name string) (*astral.Identity, error)
+	Register() (Listener, error)
+	Protocol() string
+	DisplayName(identity *astral.Identity) string
+	Session() (Session, error)
 }
 
-type Discovery interface {
-	Discover(identity id.Identity) ([]astral.ServiceInfo, error)
+type Session interface {
+	Token(token string) (res TokenResponse, err error)
+	Query(callerID *astral.Identity, targetID *astral.Identity, query string) (conn Conn, err error)
+	Register(identity *astral.Identity, target string) (token string, err error)
+	Close() error
+}
+
+type TokenResponse interface {
+	Code() uint8
+	GuestID() *astral.Identity
+	HostID() *astral.Identity
 }
 
 type Conn interface {
 	io.ReadWriteCloser
-	RemoteIdentity() id.Identity
+	RemoteIdentity() *astral.Identity
 	RemoteAddr() net.Addr
 	Query() string
 	ReadString(delim byte) (string, error)
@@ -34,20 +44,20 @@ type Conn interface {
 }
 
 type Listener interface {
-	Next() (QueryData, error)
-	QueryCh() <-chan QueryData
+	Next() (PendingQuery, error)
 	Accept() (net.Conn, error)
-	AcceptAll() <-chan net.Conn
 	Close() error
 	Addr() net.Addr
-	Target() string
-
-	Port() string
+	String() string
+	Token() string
+	SetToken(token string)
+	Done() <-chan struct{}
 }
 
-type QueryData interface {
+type PendingQuery interface {
 	Query() string
-	RemoteIdentity() id.Identity
-	Reject() error
-	Accept() (Conn, error)
+	RemoteIdentity() *astral.Identity
+	Reject() (err error)
+	Accept() (conn Conn, err error)
+	Close() error
 }

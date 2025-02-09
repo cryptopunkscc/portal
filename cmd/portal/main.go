@@ -4,11 +4,11 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/portal"
-	apphost2 "github.com/cryptopunkscc/portal/factory/apphost"
 	"github.com/cryptopunkscc/portal/runner/cli"
 	"github.com/cryptopunkscc/portal/runner/start"
 	"github.com/cryptopunkscc/portal/runner/version"
-	runtime "github.com/cryptopunkscc/portal/runtime/portal"
+	_ "github.com/cryptopunkscc/portal/runtime/apphost"
+	_ "github.com/cryptopunkscc/portal/runtime/portal"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 )
 
@@ -17,11 +17,15 @@ func main() { cli.Run(Application{}.Handler()) }
 type Application struct{}
 
 func (a Application) Handler() cmd.Handler {
-	run := start.Create(a).Run
+	s := start.Runner{
+		Connect: apphost.Connect,
+		Apphost: apphost.DefaultCached,
+		Portal:  portal.DefaultClient,
+	}
 	return cmd.Handler{
 		Name: "portal",
 		Desc: "Portal command line.",
-		Func: run,
+		Func: s.Run,
 		Params: cmd.Params{
 			{Name: "open o", Type: "bool", Desc: "Open portal tha app as background process without redirecting IO."},
 			{Name: "query q", Type: "string", Desc: "Optional query to execute on invoked service"},
@@ -31,13 +35,13 @@ func (a Application) Handler() cmd.Handler {
 		},
 		Sub: cmd.Handlers{
 			{
-				Func: func(ctx context.Context) error { return run(ctx, start.Opt{Query: "portal.close"}) },
+				Func: func(ctx context.Context) error {
+					return s.Run(ctx, start.Opt{Query: "portal.close"})
+				},
 				Name: "close",
 				Desc: "Stops portald.",
 			},
-			{Name: "v", Desc: "Print version", Func: version.Run},
+			{Name: "v", Desc: "Print version.", Func: version.Run},
 		},
 	}
 }
-func (a Application) Apphost() apphost.Client { return apphost2.Basic }
-func (a Application) Portal() portal.Client   { return runtime.Client("portal") }

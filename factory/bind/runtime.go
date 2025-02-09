@@ -14,10 +14,10 @@ func FrontendRuntime() bind.NewRuntime { return newRuntime(FrontendApphost(Appho
 func BackendRuntime() bind.NewRuntime  { return newRuntime(BackendApphost(ApphostDefault)) }
 
 func newRuntime(newApphost NewApphost) bind.NewRuntime {
-	return func(ctx context.Context, portal target.Portal_) bind.Runtime {
-		return bind.Module{
-			Apphost: newApphost(ctx, portal),
-			Sys:     bind.Sys(ctx),
-		}
+	return func(ctx context.Context, portal target.Portal_) (bind.Runtime, context.Context) {
+		m := bind.Module{}
+		m.Sys, ctx = bind.Sys(ctx)
+		m.Apphost = newApphost(ctx, portal)
+		return m, ctx
 	}
 }

@@ -17,21 +17,20 @@ var portal = (function (exports) {
 
   let wails;
   try {
-    wails = window;
-  } catch (e) {
-    wails = {};
+    wails = window['go']['main']['Adapter'];
+  } catch {
   }
 
   /* eslint-disable */
-  const platform$1 = typeof wails['go'] === "undefined" ? undefined : "wails";
+  const platform$1 = wails ? "wails" : undefined;
 
   /* eslint-disable */
   const adapter = () => ({
     // apphost
-    astral_conn_accept: wails['go']['main']['Adapter']['ConnAccept'],
-    astral_conn_close: wails['go']['main']['Adapter']['ConnClose'],
+    astral_conn_accept: wails['ConnAccept'],
+    astral_conn_close: wails['ConnClose'],
     astral_conn_read: async (id, buffer) => {
-      const base64 = await wails['go']['main']['Adapter']['ConnRead'](id, buffer.byteLength);
+      const base64 = await wails['ConnRead'](id, buffer.byteLength);
       const binary = atob(base64);
       const len = binary.length;
       const view = new Uint8Array(buffer);
@@ -40,19 +39,20 @@ var portal = (function (exports) {
       }
       return len
     },
-    astral_conn_write: wails['go']['main']['Adapter']['ConnWrite'],
-    astral_conn_read_ln: wails['go']['main']['Adapter']['ConnReadLn'],
-    astral_conn_write_ln: wails['go']['main']['Adapter']['ConnWriteLn'],
-    astral_node_info: wails['go']['main']['Adapter']['NodeInfo'],
-    astral_query: wails['go']['main']['Adapter']['Query'],
-    astral_query_name: wails['go']['main']['Adapter']['QueryName'],
-    astral_resolve: wails['go']['main']['Adapter']['Resolve'],
-    astral_service_close: wails['go']['main']['Adapter']['ServiceClose'],
-    astral_service_register: wails['go']['main']['Adapter']['ServiceRegister'],
-    astral_interrupt: wails['go']['main']['Adapter']['Interrupt'],
+    astral_conn_write: wails['ConnWrite'],
+    astral_conn_read_ln: wails['ConnReadLn'],
+    astral_conn_write_ln: wails['ConnWriteLn'],
+    astral_node_info: wails['NodeInfo'],
+    astral_query: wails['Query'],
+    astral_query_name: wails['QueryName'],
+    astral_resolve: wails['Resolve'],
+    astral_service_close: wails['ServiceClose'],
+    astral_service_register: wails['ServiceRegister'],
+    astral_interrupt: wails['Interrupt'],
     // runtime
-    sleep: wails['go']['main']['Adapter']['Sleep'],
-    log: wails['go']['main']['Adapter']['Log'],
+    sleep: wails['Sleep'],
+    log: wails['Log'],
+    exit: wails['Exit'],
   });
 
   inject(platform$1, adapter);
@@ -60,9 +60,9 @@ var portal = (function (exports) {
   // ================== Object oriented adapter ==================
 
   class ApphostClient {
-    async register(service) {
-      await bindings.astral_service_register(service);
-      return new AppHostListener(service)
+    async register() {
+      await bindings.astral_service_register();
+      return new AppHostListener()
     }
 
     async query(query, identity) {
@@ -92,18 +92,17 @@ var portal = (function (exports) {
   }
 
   class AppHostListener {
-    constructor(port) {
-      this.port = port;
+    constructor() {
     }
 
     async accept() {
-      const json = await bindings.astral_conn_accept(this.port);
+      const json = await bindings.astral_conn_accept();
       const data = JSON.parse(json);
       return new ApphostConn(data)
     }
 
     async close() {
-      await bindings.astral_service_close(this.port);
+      await bindings.astral_service_close();
     }
   }
 
@@ -446,66 +445,9 @@ var portal = (function (exports) {
     }
   }
 
-  function prepareRoutes(ctx) {
-    let routes = resolveRoutes(ctx.handlers);
-    routes = formatRoutes(routes);
-    routes = maskRoutes(routes, ctx.routes);
-    return routes
-  }
-
-  function resolveRoutes(handlers, ...name) {
-    if (typeof handlers !== "object") {
-      return name
-    }
-    const props = Object.getOwnPropertyNames(handlers);
-    if (props.length === 0) {
-      return name
-    }
-    const routes = [];
-    for (let prop of props) {
-      const next = handlers[prop];
-      const nested = resolveRoutes(next, ...[...name, prop]);
-      if (typeof nested[0] === "string") {
-        routes.push(nested);
-      } else {
-        routes.push(...nested);
-      }
-    }
-    return routes
-  }
-
-  function formatRoutes(routes) {
-    const formatted = [];
-    for (let route of routes) {
-      formatted.push(route.join("."));
-    }
-    return formatted
-  }
-
-  function maskRoutes(routes, masks) {
-    masks = masks ? masks : [];
-    let arr = [...routes];
-    for (let mask of masks) {
-      if (mask === '*') {
-        return [masks]
-      }
-      const last = mask.length - 1;
-      if (/[*:]/.test(mask.slice(last))) {
-        mask = mask.slice(0, last);
-      }
-      arr = arr.filter(val => !val.startsWith(mask));
-    }
-    masks = masks.filter(mask => !mask.endsWith(":"));
-    arr.push(...masks);
-    return arr
-  }
-
   async function serve(client, ctx) {
-    const routes = prepareRoutes(ctx);
-    for (let route of routes) {
-      const listener = await client.register(route);
-      listen(ctx, listener).catch(bindings.log);
-    }
+    const listener = await client.register();
+    listen(ctx, listener).catch(bindings.log);
   }
 
   async function listen(ctx, listener) {
@@ -626,11 +568,12 @@ var portal = (function (exports) {
   }
 
   const log = async any => await bindings.log(typeof any == 'object' ? JSON.stringify(any) : any);
-  const {sleep, platform} = bindings;
+  const {exit, sleep, platform} = bindings;
   const apphost = new ApphostClient();
   const rpc = new RpcClient();
 
   exports.apphost = apphost;
+  exports.exit = exit;
   exports.log = log;
   exports.platform = platform;
   exports.rpc = rpc;

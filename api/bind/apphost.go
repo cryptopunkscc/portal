@@ -17,18 +17,18 @@ const (
 )
 
 type Apphost interface {
-	ServiceRegister(service string) (err error)
-	ServiceClose(service string) (err error)
-	ConnAccept(service string) (data string, err error)
+	ServiceRegister() (err error)
+	ServiceClose() (err error)
+	ConnAccept() (data string, err error)
 	ConnClose(id string) (err error)
 	ConnWrite(id string, data []byte) (l int, err error)
 	ConnRead(id string, n int) (data []byte, err error)
 	ConnWriteLn(id string, data string) (err error)
 	ConnReadLn(id string) (data string, err error)
-	Query(identity string, query string) (data string, err error)
+	Query(id string, query string) (data string, err error)
 	QueryName(name string, query string) (data string, err error)
 	Resolve(name string) (id string, err error)
-	NodeInfo(identity string) (info *NodeInfo, err error)
+	NodeInfo(id string) (info *NodeInfo, err error)
 	Close() error
 	Interrupt()
 }

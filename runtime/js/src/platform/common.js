@@ -26,9 +26,10 @@ const adapter = () => ({
   astral_service_close: _astral_service_close,
   astral_service_register: _astral_service_register,
   astral_interrupt: _astral_interrupt,
-  // apphost
+  // runtime
   sleep: _sleep,
   log: _log,
+  exit: _exit,
 })
 
 inject(platform, adapter)

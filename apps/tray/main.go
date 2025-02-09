@@ -2,26 +2,15 @@ package main
 
 import (
 	"context"
-	"github.com/cryptopunkscc/astrald/auth/id"
-	"github.com/cryptopunkscc/portal/api/portal"
-	. "github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/pkg/plog"
-	runtime "github.com/cryptopunkscc/portal/runtime/portal"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
+	_ "github.com/cryptopunkscc/portal/runtime/apphost"
+	_ "github.com/cryptopunkscc/portal/runtime/portal"
 )
 
 func main() {
-	mod := module{}
+	t := Tray{}
 	ctx := context.Background()
-	log := plog.New().Type(mod).Set(&ctx)
-	conn := apphost.RpcRequest(id.Anyone, PortPortal.String())
-	conn.Logger(log)
-	mod.Client = runtime.ClientRpc{Conn: conn}
-	r := newRunner(mod)
-	err := r.Run(ctx)
+	err := t.Run(ctx)
 	if err != nil {
-		log.P().Println(err)
+		panic(err)
 	}
 }
-
-type module struct{ portal.Client }

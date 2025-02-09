@@ -16,6 +16,7 @@ func RunCmd(ctx context.Context, path string, args ...string) (err error) {
 	log := plog.Get(ctx).Scope("exec.RunCmd").Set(&ctx)
 	log.Printf("Command run: %s, %v", path, args)
 	cmd := exec.CommandContext(ctx, path, args...)
+	cmd.Env = os.Environ()
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin

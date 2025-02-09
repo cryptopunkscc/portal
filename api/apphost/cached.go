@@ -5,6 +5,8 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/mem"
 )
 
+var DefaultCached Cached
+
 type Cached interface {
 	Client
 	Cache
@@ -13,21 +15,20 @@ type Cached interface {
 
 type Cache interface {
 	Connections() mem.ReadCache[Conn]
-	Listeners() mem.ReadCache[Listener]
 	Events() *sig.Queue[Event]
 }
 
 type Event struct {
-	Type EventType
-	Port string
-	Ref  string
+	Type  EventType
+	Query string
+	Ref   string
 }
 
 type EventType int
 
 const (
-	Connect EventType = iota
-	Disconnect
-	Register
-	Unregister
+	EventConnect EventType = iota
+	EventDisconnect
+	EventRegister
+	EventUnregister
 )

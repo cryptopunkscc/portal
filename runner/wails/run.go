@@ -39,7 +39,7 @@ func (r *reRunner) Run(ctx context.Context, app target.AppHtml, args ...string) 
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Println("start", app.Manifest().Package, app.Abs())
 	defer log.Println("exit", app.Manifest().Package, app.Abs())
-	runtime := r.newRuntime(ctx, app)
+	runtime, ctx := r.newRuntime(ctx, app)
 	opt := AppOptions(runtime)
 	opt.OnStartup = func(ctx context.Context) { r.frontCtx = ctx }
 	SetupOptions(app, opt)

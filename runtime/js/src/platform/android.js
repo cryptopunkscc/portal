@@ -44,6 +44,7 @@ const adapter = () => {
     // runtime
     sleep: (arg1) => _promise(() => _app_host.sleep(arg1)),
     log: (arg1) => _app_host.log(arg1),
+    exit: (arg1) => _app_host.exit(arg1),
   }
 }
 

@@ -48,7 +48,7 @@ func (c Cmd) Parse(cmd ...string) Cmd {
 }
 
 func (c Cmd) Build() (cmd *exec.Cmd) {
-	log.Println(c.Cmd, c.Args)
+	log.Println(c.Dir, c.Cmd, c.Args)
 	if c.Ctx != nil {
 		cmd = exec.CommandContext(c.Ctx, c.Cmd, c.Args...)
 	} else {

@@ -8,6 +8,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/goja"
 	"github.com/cryptopunkscc/portal/runner/open"
 	"github.com/cryptopunkscc/portal/runner/version"
+	_ "github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 )
 
@@ -24,7 +25,7 @@ func (a Application) Handler() cmd.Handler {
 			{Type: "string", Desc: "Absolute path to app bundle or directory."},
 		},
 		Sub: cmd.Handlers{
-			{Name: "v", Desc: "Print version", Func: version.Run},
+			{Name: "v", Desc: "Print version.", Func: version.Run},
 		},
 	}
 }

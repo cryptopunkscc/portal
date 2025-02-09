@@ -3,10 +3,10 @@ package serve
 import (
 	"context"
 	"fmt"
+	"github.com/cryptopunkscc/portal/api/portal"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	api "github.com/cryptopunkscc/portal/runtime/portal"
-	apphost2 "github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
+	"github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 )
 
@@ -17,7 +17,7 @@ func Runner(d Deps) target.Run[string] {
 		if err = startAstral(ctx); err != nil {
 			return plog.Err(err)
 		}
-		if err = checkPortald(handler.Name); err != nil {
+		if err = checkPortald(); err != nil {
 			return plog.Err(err)
 		}
 		if err = serve(ctx, handler); err != nil {
@@ -35,8 +35,8 @@ type Deps interface {
 // Astral starts daemon if not already running.
 type Astral func(ctx context.Context) (err error)
 
-func checkPortald(port string) (err error) {
-	if err = api.Client(port).Ping(); err == nil {
+func checkPortald() (err error) {
+	if err = portal.DefaultClient.Ping(); err == nil {
 		err = fmt.Errorf("port already registered or astral is not running: %v", err)
 	}
 	return nil
@@ -50,7 +50,7 @@ func serve(
 	log.Println("serve start")
 	defer log.Printf("serve exit")
 
-	router := apphost2.NewRouter(handler)
+	router := apphost.Default().Router(handler)
 	router.Logger = log
 	err = router.Run(ctx)
 

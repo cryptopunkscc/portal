@@ -8,6 +8,9 @@ import (
 func Bind(vm *goja.Runtime, astral bind.Runtime) (err error) {
 	var a = adapter{runtime: astral, vm: vm, queue: make(chan func(), 1024)}
 
+	if err = vm.Set(bind.Exit, a.Exit); err != nil {
+		return
+	}
 	if err = vm.Set(bind.Log, a.Log); err != nil {
 		return
 	}
@@ -67,20 +70,23 @@ type adapter struct {
 	queue   chan func()
 }
 
+func (a *adapter) Exit(code int) {
+	a.runtime.Exit(code)
+}
 func (a *adapter) Log(arg string) {
 	a.runtime.Log(arg)
 }
 func (a *adapter) Sleep(millis int64) *goja.Promise {
 	return a.promise0(func() { a.runtime.Sleep(millis) })
 }
-func (a *adapter) ServiceRegister(port string) *goja.Promise {
-	return a.promise1(func() error { return a.runtime.ServiceRegister(port) })
+func (a *adapter) ServiceRegister() *goja.Promise {
+	return a.promise1(func() error { return a.runtime.ServiceRegister() })
 }
-func (a *adapter) ServiceClose(port string) *goja.Promise {
-	return a.promise1(func() error { return a.runtime.ServiceClose(port) })
+func (a *adapter) ServiceClose() *goja.Promise {
+	return a.promise1(func() error { return a.runtime.ServiceClose() })
 }
-func (a *adapter) ConnAccept(port string) *goja.Promise {
-	return a.promise2(func() (any, error) { return a.runtime.ConnAccept(port) })
+func (a *adapter) ConnAccept() *goja.Promise {
+	return a.promise2(func() (any, error) { return a.runtime.ConnAccept() })
 }
 func (a *adapter) ConnClose(id string) *goja.Promise {
 	return a.promise1(func() error { return a.runtime.ConnClose(id) })

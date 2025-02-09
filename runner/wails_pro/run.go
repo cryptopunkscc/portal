@@ -54,7 +54,7 @@ func (r *reRunner) Run(ctx context.Context, projectHtml target.ProjectHtml, args
 		return
 	}
 
-	api := r.NewRuntime(ctx, projectHtml)
+	api, ctx := r.NewRuntime(ctx, projectHtml)
 	opt := wails.AppOptions(api)
 	opt.OnStartup = func(ctx context.Context) { r.frontCtx = ctx }
 	path := projectHtml.Abs()
@@ -95,8 +95,11 @@ func (r *reRunner) Run(ctx context.Context, projectHtml target.ProjectHtml, args
 	// run
 	log.Println("running wails")
 	app := application.NewWithOptions(opt)
+	go func() {
+		<-ctx.Done()
+		app.Quit()
+	}()
 	err = app.Run()
-
 	if err != nil {
 		log.F().Printf("dev.Run: %v", err)
 	}

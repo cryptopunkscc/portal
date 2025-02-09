@@ -6,7 +6,6 @@ import (
 	"github.com/cryptopunkscc/portal"
 	"os"
 	"reflect"
-	"runtime/debug"
 	"slices"
 	"strings"
 	"time"
@@ -63,7 +62,7 @@ func Get(ctx context.Context) Logger {
 			return l.Copy()
 		}
 	}
-	return Default.Scope("detached")
+	return Default
 }
 
 func (l logger) Set(ctx *context.Context) Logger {
@@ -140,7 +139,7 @@ func (l logger) Printf(format string, args ...any) {
 		return
 	}
 	l.Message += fmt.Sprintf(format, args...) + "\n"
-	l.appendErrors().Flush()
+	l.appendErrors(args...).Flush()
 }
 func (l logger) Println(a ...any) {
 	if l.Level > Verbosity {
@@ -155,9 +154,6 @@ func (l logger) Flush() {
 		return
 	}
 	l.Time = time.Now()
-	if ErrorStackTrace {
-		l.Stack = debug.Stack()
-	}
 	l.out(l.Log)
 	if l.Level == Panic {
 		os.Exit(1)

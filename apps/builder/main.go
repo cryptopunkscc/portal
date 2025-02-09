@@ -29,7 +29,7 @@ func (a Application) handler() cmd.Handler {
 					{Type: "string", Desc: "Path to project directory. Default is '.'"},
 				},
 			},
-			{Name: "v", Desc: "Print version", Func: version.Run},
+			{Name: "v", Desc: "Print version.", Func: version.Run},
 		},
 	}
 }

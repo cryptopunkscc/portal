@@ -48,7 +48,7 @@ func (a Application) cliHandler() cmd.Handler {
 			{
 				Name: "serve s",
 				Desc: "Serve apps.",
-				Func: apphost.NewRouter(cmd.Handler{
+				Func: apphost.Default().Router(cmd.Handler{
 					Name: "observe",
 					Func: observe.NewRun(a.dir()),
 				}).Run,

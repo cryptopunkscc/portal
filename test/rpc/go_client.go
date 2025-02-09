@@ -2,7 +2,6 @@ package rpc
 
 import (
 	"errors"
-	"github.com/cryptopunkscc/astrald/auth/id"
 	apphost2 "github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runtime/rpc2"
@@ -38,7 +37,7 @@ func (c TestClient) Run(t *testing.T) {
 			name: "request",
 			getConn: func(srv string, t *testing.T) rpc.Conn {
 				query := apphost2.FormatPort(c.port, srv, "request")
-				return apphost.RpcRequest(id.Anyone, query)
+				return apphost.Default().Request("localnode", query)
 			},
 		},
 		{
@@ -46,7 +45,7 @@ func (c TestClient) Run(t *testing.T) {
 			name: "flow",
 			getConn: func(srv string, t *testing.T) (conn rpc.Conn) {
 				query := apphost2.FormatPort(c.port, srv, "flow")
-				conn, err := apphost.RpcClient(id.Anyone, query)
+				conn, err := apphost.Default().Client("localnode", query)
 				if err != nil {
 					t.Skip(err)
 				}

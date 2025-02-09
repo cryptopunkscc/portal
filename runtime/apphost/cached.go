@@ -1,17 +1,16 @@
 package apphost
 
 import (
-	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/portal/api/apphost"
 )
+
+func Cached(client apphost.Client) apphost.Cached {
+	return &cached{Client: client, cache: newCache()}
+}
 
 type cached struct {
 	apphost.Client
 	*cache
-}
-
-func Cached(client apphost.Client) apphost.Cached {
-	return &cached{Client: client, cache: newCache()}
 }
 
 func (a cached) Interrupt() {
@@ -23,12 +22,13 @@ func (a cached) Interrupt() {
 	}
 }
 
-func (a cached) Query(remoteID id.Identity, query string) (conn apphost.Conn, err error) {
-	return a.setConn(a.Client.Query(remoteID, query))
+func (a cached) Query(target string, method string, args any) (conn apphost.Conn, err error) {
+	return a.setConn(a.Client.Query(target, method, args))
 }
-func (a cached) Register(service string) (l apphost.Listener, err error) {
-	ll, err := a.Client.Register(service)
-	return a.setListener(service, ll, err)
+
+func (a cached) Register() (l apphost.Listener, err error) {
+	ll, err := a.Client.Register()
+	return a.setListener(ll, err)
 }
 
 type cachedListener struct {
@@ -36,36 +36,27 @@ type cachedListener struct {
 	cache *cache
 }
 
-func (l *cachedListener) Next() (q apphost.QueryData, err error) {
+func (l *cachedListener) Next() (q apphost.PendingQuery, err error) {
 	qq := cachedQuery{cache: l.cache}
-	if qq.QueryData, err = l.Listener.Next(); err != nil {
+	if qq.PendingQuery, err = l.Listener.Next(); err != nil {
 		return
 	}
 	return &qq, nil
 }
-func (l *cachedListener) QueryCh() (c <-chan apphost.QueryData) {
-	out := make(chan apphost.QueryData)
-	go func() {
-		defer close(out)
-		for data := range l.Listener.QueryCh() {
-			out <- &cachedQuery{data, l.cache}
-		}
-	}()
-	return out
-}
+
 func (l *cachedListener) Close() (err error) {
 	err = l.Listener.Close()
-	l.cache.deleteListener(l.Port())
+	l.cache.deleteListener(l.String())
 	return
 }
 
 type cachedQuery struct {
-	apphost.QueryData
+	apphost.PendingQuery
 	*cache
 }
 
 func (q *cachedQuery) Accept() (apphost.Conn, error) {
-	return q.setConn(q.QueryData.Accept())
+	return q.setConn(q.PendingQuery.Accept())
 }
 
 type cachedConn struct {

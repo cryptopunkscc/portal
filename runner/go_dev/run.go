@@ -22,17 +22,6 @@ type runner struct {
 	args    []string
 }
 
-func Runner(
-	run target.Run[target.DistExec],
-	send target.MsgSend,
-) target.ReRunner[target.ProjectGo] {
-	return &runner{
-		watcher: golang.NewWatcher(),
-		send:    send,
-		run:     run,
-	}
-}
-
 func Adapter(run target.Run[target.DistExec]) func(
 	_ bind.NewRuntime,
 	send target.MsgSend,
@@ -42,7 +31,18 @@ func Adapter(run target.Run[target.DistExec]) func(
 			newRuntime(ctx, src) // initiate connection
 			return run(ctx, src, args...)
 		}
-		return Runner(run, send)
+		return ReRunner(run, send)
+	}
+}
+
+func ReRunner(
+	run target.Run[target.DistExec],
+	send target.MsgSend,
+) target.ReRunner[target.ProjectGo] {
+	return &runner{
+		watcher: golang.NewWatcher(),
+		send:    send,
+		run:     run,
 	}
 }
 

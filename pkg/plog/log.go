@@ -31,7 +31,6 @@ type Log struct {
 	Scopes  []string
 	Time    time.Time
 	Message string
-	Stack   []byte
 	Errors  []error
 }
 

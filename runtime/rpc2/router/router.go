@@ -39,6 +39,8 @@ func injectHandler(registry *registry.Node[*cmd.Handler], handler cmd.Handler) {
 	}
 }
 
+func (r Base) Err() error { return r.err }
+
 func (r Base) Query(query string) Base {
 	r.Registry, r.args = r.Registry.Fold(query)
 	if r.Registry.IsEmpty() {

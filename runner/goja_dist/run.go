@@ -27,16 +27,17 @@ func (r *Runner) ReRun() (err error) {
 }
 
 func (r *Runner) Run(ctx context.Context, dist target.DistJs, args ...string) (err error) {
+	if any(r.newRuntime) == nil {
+		panic("newRuntime cannot be nil")
+	}
 	if !filepath.IsAbs(dist.Abs()) {
 		return plog.Errorf("ReRunner needs absolute path: %s", dist.Abs())
 	}
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Printf("run %T %s", dist, dist.Abs())
+	runtime, ctx := r.newRuntime(ctx, dist)
+	r.backend = goja.NewBackend(runtime)
 	r.dist = dist
-	if any(r.newRuntime) == nil {
-		panic("newRuntime cannot be nil")
-	}
-	r.backend = goja.NewBackend(r.newRuntime(ctx, dist))
 	if err = r.ReRun(); err != nil {
 		log.E().Println(err.Error())
 	}

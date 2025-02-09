@@ -2,42 +2,41 @@ package apphost
 
 import (
 	"encoding/json"
-	"github.com/cryptopunkscc/astrald/auth/id"
+	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/port"
 	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/stream"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/stream/query"
 	"io"
+	"log"
 )
 
-func RpcRequest(identity id.Identity, query string) rpc.Conn {
-	return newRequest(Client, identity, query)
+func (r RpcBase) Request(target string, query ...string) rpc.Conn {
+	return newRequest(r.client, target, query)
 }
 
-func (r RpcBase) Request(identity id.Identity, query string) rpc.Conn {
-	return newRequest(r.client, identity, query)
-}
-
-func newRequest(client apphost.Client, identity id.Identity, q string) rpc.Conn {
+func newRequest(client apphost.Client, target string, q []string) *rpcRequest {
 	return &rpcRequest{
 		Serializer: &stream.Serializer{
 			MarshalArgs: query.Marshal,
 			Marshal:     json.Marshal,
 			Unmarshal:   json.Unmarshal,
 		},
-		query:    q,
-		remoteID: identity,
-		client:   client,
+		client: client,
+		target: target,
+		query:  q,
 	}
 }
 
 type rpcRequest struct {
 	*stream.Serializer
-	query    string
-	remoteID id.Identity
 	logger   plog.Logger
 	client   apphost.Client
+	target   string
+	targetID *astral.Identity
+	query    []string
 }
 
 func (r *rpcRequest) Logger(logger plog.Logger) {
@@ -45,7 +44,8 @@ func (r *rpcRequest) Logger(logger plog.Logger) {
 }
 
 func (r *rpcRequest) Copy() rpc.Conn {
-	rr := newRequest(r.client, r.remoteID, r.query)
+	rr := newRequest(r.client, r.target, r.query)
+	rr.targetID = r.targetID
 	if r.logger != nil {
 		rr.Logger(r.logger)
 	}
@@ -59,16 +59,15 @@ func (r *rpcRequest) Flush() {
 }
 
 func (r *rpcRequest) Call(method string, value any) (err error) {
-	// build base query
-	q := ""
-	switch {
-	case r.query == "":
-		q = method
-	case method == "":
-		q = r.query
-	default:
-		q = r.query + "." + method
+	if r.client == nil {
+		r.client = apphost.DefaultClient
 	}
+	// build base query
+	p := port.New(r.query...)
+	if method != "" {
+		p = p.Add(method)
+	}
+	q := p.String()
 
 	// marshal args
 	if value != nil {
@@ -90,9 +89,17 @@ func (r *rpcRequest) Call(method string, value any) (err error) {
 		r.logger.Println("~>", q)
 	}
 
+	if r.targetID == nil {
+		r.targetID, err = r.client.Resolve(r.target)
+		if err != nil {
+			log.Println("failed to resolve target", r.target, err)
+			return plog.Err(err)
+		}
+	}
+
 	// query stream
 	var conn io.ReadWriteCloser
-	if conn, err = r.client.Query(r.remoteID, q); err != nil {
+	if conn, err = r.client.Query(r.targetID.String(), q, nil); err != nil {
 		return err
 	}
 

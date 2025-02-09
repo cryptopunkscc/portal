@@ -34,28 +34,19 @@ func (f *Formatter) Bytes(l Log) []byte {
 }
 
 func (f *Formatter) String(l Log) (line string) {
-	scopes := strings.Join(l.Scopes, ">")
-	//scopesSize := len(scopes)
-	//if scopesSize > f.scopeSize {
-	//	f.scopeSize = scopesSize
-	//} else {
-	//	scopes += strings.Repeat(" ", f.scopeSize-scopesSize)
-	//}
+	scopes := strings.Join(l.Scopes, "|")
 
 	line = fmt.Sprintf(f.format,
 		l.Time.Format(f.time),
 		l.Pid,
 		f.level[l.Level],
-		"|"+scopes+"|",
+		scopes,
 		l.Message,
 	)
-	if len(l.Stack) > 0 {
-		line += fmt.Sprintf("%s", l.Stack)
-	}
 	for _, err := range l.Errors {
 		var e ErrStack
 		if errors.As(err, &e) {
-			line += fmt.Sprintf("\n%s", e.stack)
+			line += fmt.Sprintf("\n%s", e.Stack())
 		}
 	}
 	return

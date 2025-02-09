@@ -5,6 +5,8 @@ import (
 	"io"
 )
 
+var DefaultClient Client
+
 type Client interface {
 	Logger(logger plog.Logger)
 	Join()

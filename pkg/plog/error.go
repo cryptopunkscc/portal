@@ -13,9 +13,6 @@ type ErrStack struct {
 }
 
 func Err(err error) error {
-	if !ErrorStackTrace {
-		return err
-	}
 	return ErrStack{
 		error: err,
 		stack: debug.Stack(),

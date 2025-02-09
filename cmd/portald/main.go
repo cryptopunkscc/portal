@@ -19,7 +19,9 @@ import (
 	"github.com/cryptopunkscc/portal/runner/serve"
 	"github.com/cryptopunkscc/portal/runner/supervisor"
 	"github.com/cryptopunkscc/portal/runner/version"
+	_ "github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/apps"
+	_ "github.com/cryptopunkscc/portal/runtime/portal"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 	"sync"
@@ -53,7 +55,7 @@ func (a *Application[T]) handler() cmd.Handler {
 		Desc: "Start portal applications service",
 		Func: serve.Runner(a),
 		Sub: cmd.Handlers{
-			{Name: "v", Desc: "Print version", Func: version.Run},
+			{Name: "v", Desc: "Print version.", Func: version.Run},
 		},
 	}
 }

@@ -38,9 +38,10 @@ var portal = (function (exports) {
     astral_service_close: _astral_service_close,
     astral_service_register: _astral_service_register,
     astral_interrupt: _astral_interrupt,
-    // apphost
+    // runtime
     sleep: _sleep,
     log: _log,
+    exit: _exit,
   });
 
   inject(platform$1, adapter);
@@ -48,9 +49,9 @@ var portal = (function (exports) {
   // ================== Object oriented adapter ==================
 
   class ApphostClient {
-    async register(service) {
-      await bindings.astral_service_register(service);
-      return new AppHostListener(service)
+    async register() {
+      await bindings.astral_service_register();
+      return new AppHostListener()
     }
 
     async query(query, identity) {
@@ -80,18 +81,17 @@ var portal = (function (exports) {
   }
 
   class AppHostListener {
-    constructor(port) {
-      this.port = port;
+    constructor() {
     }
 
     async accept() {
-      const json = await bindings.astral_conn_accept(this.port);
+      const json = await bindings.astral_conn_accept();
       const data = JSON.parse(json);
       return new ApphostConn(data)
     }
 
     async close() {
-      await bindings.astral_service_close(this.port);
+      await bindings.astral_service_close();
     }
   }
 
@@ -434,66 +434,9 @@ var portal = (function (exports) {
     }
   }
 
-  function prepareRoutes(ctx) {
-    let routes = resolveRoutes(ctx.handlers);
-    routes = formatRoutes(routes);
-    routes = maskRoutes(routes, ctx.routes);
-    return routes
-  }
-
-  function resolveRoutes(handlers, ...name) {
-    if (typeof handlers !== "object") {
-      return name
-    }
-    const props = Object.getOwnPropertyNames(handlers);
-    if (props.length === 0) {
-      return name
-    }
-    const routes = [];
-    for (let prop of props) {
-      const next = handlers[prop];
-      const nested = resolveRoutes(next, ...[...name, prop]);
-      if (typeof nested[0] === "string") {
-        routes.push(nested);
-      } else {
-        routes.push(...nested);
-      }
-    }
-    return routes
-  }
-
-  function formatRoutes(routes) {
-    const formatted = [];
-    for (let route of routes) {
-      formatted.push(route.join("."));
-    }
-    return formatted
-  }
-
-  function maskRoutes(routes, masks) {
-    masks = masks ? masks : [];
-    let arr = [...routes];
-    for (let mask of masks) {
-      if (mask === '*') {
-        return [masks]
-      }
-      const last = mask.length - 1;
-      if (/[*:]/.test(mask.slice(last))) {
-        mask = mask.slice(0, last);
-      }
-      arr = arr.filter(val => !val.startsWith(mask));
-    }
-    masks = masks.filter(mask => !mask.endsWith(":"));
-    arr.push(...masks);
-    return arr
-  }
-
   async function serve(client, ctx) {
-    const routes = prepareRoutes(ctx);
-    for (let route of routes) {
-      const listener = await client.register(route);
-      listen(ctx, listener).catch(bindings.log);
-    }
+    const listener = await client.register();
+    listen(ctx, listener).catch(bindings.log);
   }
 
   async function listen(ctx, listener) {
@@ -614,11 +557,12 @@ var portal = (function (exports) {
   }
 
   const log = async any => await bindings.log(typeof any == 'object' ? JSON.stringify(any) : any);
-  const {sleep, platform} = bindings;
+  const {exit, sleep, platform} = bindings;
   const apphost = new ApphostClient();
   const rpc = new RpcClient();
 
   exports.apphost = apphost;
+  exports.exit = exit;
   exports.log = log;
   exports.platform = platform;
   exports.rpc = rpc;

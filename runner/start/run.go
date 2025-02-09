@@ -2,7 +2,6 @@ package start
 
 import (
 	"context"
-	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/portal"
 	"github.com/cryptopunkscc/portal/pkg/flow"
@@ -17,13 +16,10 @@ import (
 	"time"
 )
 
-func New(portal portal.Client, apphost apphost.Client) Start {
-	return Start{portal: portal, apphost: apphost}
-}
-
-type Start struct {
-	portal  portal.Client
-	apphost apphost.Client
+type Runner struct {
+	Connect func(context.Context) error
+	Portal  portal.Client
+	Apphost apphost.Client
 }
 
 type Opt struct {
@@ -32,11 +28,14 @@ type Opt struct {
 	Dev   bool   `cli:"dev d"`
 }
 
-func (s Start) Run(ctx context.Context, opt Opt, cmd ...string) (err error) {
-	log := plog.Get(ctx).Type(s)
-	s.portal.Logger(log)
-	if err = s.portal.Ping(); err != nil {
-		if err = startPortald(ctx, s.portal); err != nil {
+func (s Runner) Run(ctx context.Context, opt Opt, cmd ...string) (err error) {
+	log := plog.Get(ctx).Type(s).Set(&ctx)
+	if err = s.Connect(ctx); err != nil {
+		return
+	}
+	s.Portal.Logger(log)
+	if err = s.Portal.Ping(); err != nil {
+		if err = startPortald(ctx, s.Portal); err != nil {
 			return
 		}
 	}
@@ -69,8 +68,8 @@ func (s Start) Run(ctx context.Context, opt Opt, cmd ...string) (err error) {
 			err = s.runApp(ctx, o, cmd)
 		}
 	}
-	log.Println("exit")
 	wg.Wait()
+	log.Println("exit")
 	return
 }
 
@@ -85,6 +84,7 @@ func startPortald(ctx context.Context, client portal.Client) (err error) {
 }
 
 func startPortaldProcess(ctx context.Context) (err error) {
+	plog.Get(ctx).Println("starting portald")
 	c := exec.Command("portald")
 	err = c.Start()
 	return
@@ -94,7 +94,8 @@ func awaitPortaldService(ctx context.Context, client portal.Client) error {
 	log := plog.Get(ctx)
 	return flow.Retry(ctx, 8*time.Second, func(i int, n int, d time.Duration) (err error) {
 		log.Printf("%d/%d attempt %v: retry after %v", i+1, n, err, d)
-		if err = apphostRuntime.Init(); err != nil {
+		if err = apphostRuntime.Connect(ctx); err != nil {
+			log.Printf("failed to connect to apphost: %v", err)
 			return
 		}
 		return client.Ping()
@@ -119,16 +120,16 @@ func fixPath(str string) string {
 	return str
 }
 
-func (s Start) startApp(ctx context.Context, opt *portal.OpenOpt, cmd []string) (err error) {
+func (s Runner) startApp(ctx context.Context, opt *portal.OpenOpt, cmd []string) (err error) {
 	log := plog.Get(ctx)
 	log.Println("starting app:", cmd)
-	return s.portal.Open(opt, cmd...)
+	return s.Portal.Open(opt, cmd...)
 }
 
-func (s Start) runApp(ctx context.Context, opt *portal.OpenOpt, cmd []string) (err error) {
+func (s Runner) runApp(ctx context.Context, opt *portal.OpenOpt, cmd []string) (err error) {
 	log := plog.Get(ctx)
 	log.Println("running app:", cmd)
-	conn, err := s.portal.Connect(opt, cmd...)
+	conn, err := s.Portal.Connect(opt, cmd...)
 	if err != nil {
 		return
 	}
@@ -147,11 +148,11 @@ func (s Start) runApp(ctx context.Context, opt *portal.OpenOpt, cmd []string) (e
 	return
 }
 
-func (s Start) queryApp(ctx context.Context, query string) (err error) {
+func (s Runner) queryApp(ctx context.Context, query string) (err error) {
 	log := plog.Get(ctx)
 	log.Println("running query:", query)
 
-	conn, err := s.apphost.Query(id.Anyone, query)
+	conn, err := s.Apphost.Query("portal", query, nil)
 	if err != nil {
 		log.E().Printf("query (%s) FAILED: %v", query, err)
 		return err

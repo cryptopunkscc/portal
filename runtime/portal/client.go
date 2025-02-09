@@ -1,14 +1,16 @@
 package portal
 
 import (
-	"github.com/cryptopunkscc/astrald/auth/id"
+	apphostApi "github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/portal"
 	"github.com/cryptopunkscc/portal/runtime/rpc2"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
 	"io"
 )
 
-func Client(pkg string) portal.Client { return ClientRpc{apphost.RpcRequest(id.Anyone, pkg)} }
+func NewClient(apphostClient apphostApi.Client) portal.Client {
+	return ClientRpc{Conn: apphost.Rpc(apphostClient).Request("portal", "portal")}
+}
 
 type ClientRpc struct{ rpc.Conn }
 

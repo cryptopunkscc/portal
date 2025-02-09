@@ -13,7 +13,7 @@ type Application struct{}
 
 func (a Application) cliHandler() cmd.Handler {
 	return cmd.Handler{
-		Func: apphost.NewRouter(a.netHandler()).Run,
+		Func: apphost.Default().Router(a.netHandler()).Run,
 		Name: "dev",
 		Desc: "Portal development service.",
 	}

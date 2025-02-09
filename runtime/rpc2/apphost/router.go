@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"context"
 	"errors"
-	api "github.com/cryptopunkscc/portal/api/apphost"
+	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/caller"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/query"
@@ -12,7 +12,6 @@ import (
 	"github.com/cryptopunkscc/portal/runtime/rpc2/router"
 	"regexp"
 	"strings"
-	"sync"
 )
 
 func Serve() cmd.Handler {
@@ -24,12 +23,8 @@ func Serve() cmd.Handler {
 
 func ServeFunc(ctx context.Context, root *cmd.Root) error {
 	handler := cmd.Handler(*root)
-	r := NewRouter(handler)
+	r := Default().Router(handler)
 	return r.Run(ctx)
-}
-
-func NewRouter(handler cmd.Handler, routes ...string) *Router {
-	return Rpc(Client).Router(handler, routes...)
 }
 
 func (r RpcBase) Router(handler cmd.Handler, routes ...string) *Router {
@@ -39,7 +34,7 @@ func (r RpcBase) Router(handler cmd.Handler, routes ...string) *Router {
 	}
 	return &Router{
 		routes: routes,
-		Port:   api.NewPort(name),
+		Port:   apphost.NewPort(name),
 		Base: router.Base{
 			Registry: router.CreateRegistry(handler),
 			Unmarshalers: []caller.Unmarshaler{
@@ -55,8 +50,8 @@ func (r RpcBase) Router(handler cmd.Handler, routes ...string) *Router {
 type Router struct {
 	router.Base
 	Logger plog.Logger
-	client api.Client
-	Port   api.Port
+	client apphost.Client
+	Port   apphost.Port
 	routes []string
 }
 
@@ -70,6 +65,9 @@ func (r *Router) Start(ctx context.Context) (err error) {
 }
 
 func (r *Router) Run(ctx context.Context) error {
+	if r.client == nil {
+		r.client = apphost.DefaultClient
+	}
 	r.Dependencies = append([]any{ctx}, r.Dependencies)
 	routes := r.routes
 	if len(routes) == 0 {
@@ -77,31 +75,12 @@ func (r *Router) Run(ctx context.Context) error {
 		handler.Name = ""
 		routes = getRoutes(nil, handler)
 	}
-
-	wg := sync.WaitGroup{}
-	errs := make(chan error, len(routes))
-	wg.Add(len(routes))
-	for _, route := range routes {
-		port := r.formatPort(route)
-		go func() {
-			defer wg.Done()
-			if err := r.register(ctx, port); err != nil {
-				errs <- err
-			}
-		}()
-	}
-	wg.Wait()
-	close(errs)
-	var errsArr []error
-	for e := range errs {
-		errsArr = append(errsArr, e)
-	}
-	return errors.Join(errsArr...)
+	return r.register(ctx)
 }
 
 var RouteAll = "RouteAll"
 
-func getRoutes(port api.Port, handler cmd.Handler) (r []string) {
+func getRoutes(port apphost.Port, handler cmd.Handler) (r []string) {
 	if name := handler.Names()[0]; name != "" {
 		port = port.Add(name)
 	}
@@ -134,30 +113,33 @@ func (r *Router) formatPort(route string) (port string) {
 	return
 }
 
-func (r *Router) register(ctx context.Context, port string) (err error) {
-	listener, err := r.client.Register(port)
+func (r *Router) register(ctx context.Context) (err error) {
+	listener, err := r.client.Register()
 	if err != nil {
 		return
 	}
-	queries := listener.QueryCh()
+	go func() {
+		<-ctx.Done()
+		_ = listener.Close()
+	}()
+	var q apphost.PendingQuery
 	for {
-		select {
-		case q := <-queries:
-			rr := *r
-			go rr.routeQuery(q)
-		case <-ctx.Done():
-			if err = listener.Close(); err != nil {
-				return
-			}
+		if q, err = listener.Next(); err != nil {
 			return
 		}
+		rr := *r
+		command, ok := rr.Port.ParseCmd(q.Query())
+		if !ok {
+			_ = q.Close()
+			continue
+		}
+		rr.setup(command)
+		go rr.routeQuery(q)
 	}
 }
 
-func (r *Router) routeQuery(q api.QueryData) {
+func (r *Router) routeQuery(q apphost.PendingQuery) {
 	rr := *r
-	command := rr.Port.ParseCmd(q.Query())
-	rr.setup(command)
 	if !rr.authorize() {
 		_ = q.Reject()
 		return

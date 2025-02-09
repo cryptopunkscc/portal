@@ -6,18 +6,18 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/mem"
 )
 
-type cache struct {
-	connections mem.Cache[apphost.Conn]
-	listeners   mem.Cache[apphost.Listener]
-	events      *sig.Queue[apphost.Event]
-}
-
 func newCache() *cache {
 	return &cache{
 		connections: mem.NewCache[apphost.Conn](),
 		listeners:   mem.NewCache[apphost.Listener](),
 		events:      &sig.Queue[apphost.Event]{},
 	}
+}
+
+type cache struct {
+	connections mem.Cache[apphost.Conn]
+	listeners   mem.Cache[apphost.Listener]
+	events      *sig.Queue[apphost.Event]
 }
 
 func (c *cache) Connections() mem.ReadCache[apphost.Conn]   { return c.connections }
@@ -33,27 +33,28 @@ func (c *cache) setConn(ac apphost.Conn, err error) (apphost.Conn, error) {
 		cache: c,
 	}
 	c.connections.Set(ac.Ref(), ac)
-	c.events.Push(apphost.Event{Type: apphost.Connect, Port: ac.Query(), Ref: ac.Ref()})
+	c.events.Push(apphost.Event{Type: apphost.EventConnect, Query: ac.Query(), Ref: ac.Ref()})
 	return ac, nil
 }
 
 func (c *cache) deleteConn(conn apphost.Conn) {
 	c.connections.Delete(conn.Ref())
-	c.events.Push(apphost.Event{Type: apphost.Disconnect, Port: conn.Query(), Ref: conn.Ref()})
+	c.events.Push(apphost.Event{Type: apphost.EventDisconnect, Query: conn.Query(), Ref: conn.Ref()})
 }
 
-func (c *cache) setListener(port string, al apphost.Listener, err error) (apphost.Listener, error) {
+func (c *cache) setListener(al apphost.Listener, err error) (apphost.Listener, error) {
 	if err != nil {
 		return nil, err
 	}
 	ll := &cachedListener{al, c}
-	c.listeners.Set(ll.Port(), ll)
-	c.events.Push(apphost.Event{Type: apphost.Register, Port: port})
+	ll.String()
+	c.listeners.Set(ll.String(), ll)
+	c.events.Push(apphost.Event{Type: apphost.EventRegister})
 	return ll, nil
 }
 
 func (c *cache) deleteListener(port string) {
 	c.listeners.Delete(port)
-	c.events.Push(apphost.Event{Type: apphost.Unregister, Port: port})
+	c.events.Push(apphost.Event{Type: apphost.EventUnregister})
 	return
 }

@@ -8,24 +8,25 @@ import (
 	"github.com/getlantern/systray"
 )
 
-func newRunner(client portal.Client) *runner {
-	return &runner{portal: client}
-}
-
-type runner struct {
-	portal portal.Client
+type Tray struct {
+	Portal portal.Client
 	log    plog.Logger
 }
 
-func (t *runner) Run(ctx context.Context) (err error) {
-	if err = t.portal.Ping(); err != nil {
+func (t *Tray) Run(ctx context.Context) (err error) {
+	if t.Portal == nil {
+		t.Portal = portal.DefaultClient
+	}
+
+	if err = t.Portal.Ping(); err != nil {
 		return errors.New("portal-tray requires portal-app running")
 	}
 
 	t.log = plog.Get(ctx).Type(t).Set(&ctx)
+	t.Portal.Logger(t.log)
 
 	go func() {
-		t.portal.Join()
+		t.Portal.Join()
 		systray.Quit()
 	}()
 	go func() {
@@ -37,7 +38,7 @@ func (t *runner) Run(ctx context.Context) (err error) {
 	return
 }
 
-func (t *runner) onReady() {
+func (t *Tray) onReady() {
 	t.log.Println("portal tray start")
 	launcher := systray.AddMenuItem("Launcher", "Launcher")
 	quit := systray.AddMenuItem("Quit ", "Quit")
@@ -47,12 +48,12 @@ func (t *runner) onReady() {
 			select {
 			case <-launcher.ClickedCh:
 				go func() {
-					if err := t.portal.Open(nil, "launcher"); err != nil {
+					if err := t.Portal.Open(nil, "launcher"); err != nil {
 						t.log.Println("launcher:", err)
 					}
 				}()
 			case <-quit.ClickedCh:
-				if err := t.portal.Close(); err != nil {
+				if err := t.Portal.Close(); err != nil {
 					t.log.Println("quit:", err)
 					systray.Quit()
 				}
@@ -61,6 +62,6 @@ func (t *runner) onReady() {
 	}()
 }
 
-func (t *runner) onExit() {
+func (t *Tray) onExit() {
 	t.log.Println("portal tray exit")
 }

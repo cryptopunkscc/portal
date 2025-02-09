@@ -1,0 +1,7 @@
+{
+  "name": "test-basic-js",
+  "package": "test.basic.js",
+  "title": "Test basic js",
+  "version": "0.0.0",
+  "schema": "js"
+}

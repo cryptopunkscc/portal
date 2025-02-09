@@ -1,13 +1,14 @@
 package notify
 
 import (
+	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/auth/id"
 	"github.com/cryptopunkscc/portal/pkg/android"
 	"github.com/cryptopunkscc/portal/runtime/rpc"
 )
 
 type Client struct {
-	id.Identity
+	*astral.Identity
 	rpc.Conn
 	port string
 }

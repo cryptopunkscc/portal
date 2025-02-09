@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/cryptopunkscc/astrald/auth/id"
+	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/bind"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -19,68 +19,66 @@ func Adapter(ctx context.Context, cached apphost.Cached, pkg string) Apphost {
 	}
 	a := &adapter{}
 	a.Cached = cached
-	a.port = apphost.NewPort(pkg)
+	a.pkg = pkg
 	a.log = plog.Get(ctx).Type(a)
 	return a
 }
 
 type adapter struct {
 	apphost.Cached
-	log  plog.Logger
-	port apphost.Port
+	log      plog.Logger
+	pkg      string
+	listener apphost.Listener
 }
 
-func (api *adapter) Port(service ...string) string {
-	return apphost.NewPort(service...).String()
-}
-
-func (api *adapter) Close() error {
-	api.Cached.Interrupt()
+func (a *adapter) Close() error {
+	_ = a.ServiceClose()
+	a.Cached.Interrupt()
 	return nil
 }
 
-func (api *adapter) ServiceRegister(service string) (err error) {
-	service = api.localPort(service)
-	api.log.Println("register:", service)
-	_, err = api.Cached.Register(service)
+func (a *adapter) ServiceRegister() (err error) {
+	a.listener, err = a.Cached.Register()
 	return
 }
 
-func (api *adapter) ServiceClose(service string) (err error) {
-	service = api.localPort(service)
-	listener, ok := api.Listeners().Get(service)
-	if !ok {
-		err = errors.New("[ServiceClose] not listening on port: " + service)
+func (a *adapter) ServiceClose() (err error) {
+	listener := a.listener
+	if listener == nil {
 		return
 	}
-	return listener.Close()
+	err = listener.Close()
+	a.listener = nil
+	return
 }
 
-func (api *adapter) ConnAccept(service string) (data string, err error) {
-	service = api.localPort(service)
-	listener, ok := api.Listeners().Get(service)
-	if !ok {
-		err = fmt.Errorf("[ConnAccept] not listening on port: %v, %v", service, api.Listeners().Copy())
-		return
-	}
-	next, err := listener.Next()
-	if err != nil {
+func (a *adapter) ConnAccept() (data string, err error) {
+	listener := a.listener
+	if listener == nil {
+		err = fmt.Errorf("[ConnAccept] not listening: %v", listener)
 		return
 	}
 
+	var next apphost.PendingQuery
+	for {
+		if next, err = listener.Next(); err != nil {
+			return
+		}
+		if strings.HasPrefix(next.Query(), a.pkg) {
+			break
+		}
+		_ = next.Close()
+	}
 	conn, err := next.Accept()
 	if err != nil {
 		return
 	}
 
-	api.log.Println("accepted connection:", conn.Ref())
+	a.log.Println("accepted connection:", conn.Ref())
 
-	base := api.port.String()
-	query := strings.TrimPrefix(conn.Query(), base)
-	query = strings.TrimPrefix(query, ".")
 	bytes, err := json.Marshal(queryData{
 		Id:       conn.Ref(),
-		Query:    query,
+		Query:    conn.Query(),
 		RemoteId: conn.RemoteIdentity().String(),
 	})
 	if err != nil {
@@ -90,25 +88,15 @@ func (api *adapter) ConnAccept(service string) (data string, err error) {
 	return
 }
 
-func (api *adapter) localPort(service string) string {
-	switch service {
-	case "*":
-		return api.port.String() + service
-	case "":
-		return api.port.String()
-	}
-	return api.port.Add(service).String()
-}
-
 type queryData struct {
 	Id       string `json:"id"`
 	Query    string `json:"query"`
 	RemoteId string `json:"remoteId"`
 }
 
-func (api *adapter) ConnClose(id string) (err error) {
-	api.log.Printf("close <%s>", id)
-	conn, ok := api.Connections().Get(id)
+func (a *adapter) ConnClose(id string) (err error) {
+	a.log.Printf("close <%s>", id)
+	conn, ok := a.Connections().Get(id)
 	if !ok {
 		err = errors.New("[ConnClose] not found connection with id: " + id)
 		return
@@ -117,10 +105,10 @@ func (api *adapter) ConnClose(id string) (err error) {
 	return
 }
 
-func (api *adapter) ConnWrite(id string, data []byte) (n int, err error) {
-	api.log.Printf("> [%v]byte <%s>", len(data), id)
+func (a *adapter) ConnWrite(id string, data []byte) (n int, err error) {
+	a.log.Printf("> [%v]byte <%s>", len(data), id)
 	//api.log.Printf("> [%v]byte <%s>", data, id)
-	conn, ok := api.Connections().Get(id)
+	conn, ok := a.Connections().Get(id)
 	if !ok {
 		err = errors.New("[ConnWrite] not found connection with id: " + id)
 		return
@@ -129,8 +117,8 @@ func (api *adapter) ConnWrite(id string, data []byte) (n int, err error) {
 	return
 }
 
-func (api *adapter) ConnRead(id string, n int) (data []byte, err error) {
-	conn, ok := api.Connections().Get(id)
+func (a *adapter) ConnRead(id string, n int) (data []byte, err error) {
+	conn, ok := a.Connections().Get(id)
 	if !ok {
 		err = errors.New("[ConnRead] not found connection with id: " + id)
 		return
@@ -138,14 +126,14 @@ func (api *adapter) ConnRead(id string, n int) (data []byte, err error) {
 	buf := make([]byte, n)
 	n, err = conn.Read(buf)
 	data = buf[:n]
-	api.log.Printf("< [%v]byte <%s>", n, id)
+	a.log.Printf("< [%v]byte <%s>", n, id)
 	//api.log.Printf("< [%v]byte <%s> %v", data, id, err)
 	return
 }
 
-func (api *adapter) ConnWriteLn(id string, data string) (err error) {
-	api.log.Printf("> %s <%s>", strings.TrimRight(data, "\r\n"), id)
-	conn, ok := api.Connections().Get(id)
+func (a *adapter) ConnWriteLn(id string, data string) (err error) {
+	a.log.Printf("> %s <%s>", strings.TrimRight(data, "\r\n"), id)
+	conn, ok := a.Connections().Get(id)
 	if !ok {
 		err = errors.New("[ConnWriteLn] not found connection with id: " + id)
 		return
@@ -157,28 +145,21 @@ func (api *adapter) ConnWriteLn(id string, data string) (err error) {
 	return
 }
 
-func (api *adapter) ConnReadLn(id string) (data string, err error) {
-	conn, ok := api.Connections().Get(id)
+func (a *adapter) ConnReadLn(id string) (data string, err error) {
+	conn, ok := a.Connections().Get(id)
 	if !ok {
 		err = errors.New("[ConnReadLn] not found connection with id: " + id)
 		return
 	}
 	data, err = conn.ReadString('\n')
 	data = strings.TrimSuffix(data, "\n")
-	api.log.Printf("< %s <%s>", data, id)
+	a.log.Printf("< %s <%s>", data, id)
 	return
 }
 
-func (api *adapter) Query(identity string, query string) (data string, err error) {
-	api.log.Println("~>", query)
-	nid := id.Identity{}
-	if len(identity) > 0 {
-		nid, err = id.ParsePublicKeyHex(identity)
-		if err != nil {
-			return
-		}
-	}
-	conn, err := api.Cached.Query(nid, api.Port(query))
+func (a *adapter) Query(target string, query string) (data string, err error) {
+	a.log.Println("~>", query)
+	conn, err := a.Cached.Query(target, query, nil)
 	if err != nil {
 		return
 	}
@@ -194,25 +175,16 @@ func (api *adapter) Query(identity string, query string) (data string, err error
 	return
 }
 
-func (api *adapter) QueryName(name string, query string) (data string, err error) {
-	conn, err := api.Cached.QueryName(name, api.Port(query))
+func (a *adapter) QueryName(name string, query string) (data string, err error) {
+	id, err := a.Resolve(name)
 	if err != nil {
 		return
 	}
-
-	bytes, err := json.Marshal(queryData{
-		Id:    conn.Ref(),
-		Query: conn.Query(),
-	})
-	if err != nil {
-		return
-	}
-	data = string(bytes)
-	return
+	return a.Query(id, query)
 }
 
-func (api *adapter) Resolve(name string) (id string, err error) {
-	identity, err := api.Cached.Resolve(name)
+func (a *adapter) Resolve(name string) (id string, err error) {
+	identity, err := a.Cached.Resolve(name)
 	if err != nil {
 		return
 	}
@@ -220,18 +192,15 @@ func (api *adapter) Resolve(name string) (id string, err error) {
 	return
 }
 
-func (api *adapter) NodeInfo(identity string) (info *bind.NodeInfo, err error) {
-	nid, err := id.ParsePublicKeyHex(identity)
+func (a *adapter) NodeInfo(identity string) (info *bind.NodeInfo, err error) {
+	nid, err := astral.IdentityFromString(identity)
 	if err != nil {
 		return
 	}
-	i, err := api.Cached.NodeInfo(nid)
-	if err != nil {
-		return
-	}
+	name := a.Cached.DisplayName(nid)
 	info = &bind.NodeInfo{
-		Identity: i.Identity.String(),
-		Name:     i.Name,
+		Identity: identity,
+		Name:     name,
 	}
 	return
 }

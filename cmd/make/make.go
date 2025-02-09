@@ -58,23 +58,23 @@ func (d *Install) Run(make Make, goos []string) {
 		// no-op
 	}
 	if make&Libs == Libs {
-		log.Println(" * js libs")
+		log.Println("* js libs")
 		d.buildJsLibs()
 	}
 	if make&Apps == Apps {
-		log.Println(" * embed apps")
+		log.Println("* embed apps")
 		d.buildEmbedApps(goos...)
 	}
 	if make&Dev == Dev {
-		log.Println(" * portal dev")
+		log.Println("* portal dev")
 	}
 	if make&Portal == Portal {
-		log.Println(" * portal")
+		log.Println("* portal")
 		goPortal.Install()
 		goPortald.Install()
 	}
 	if make&Installer == Installer {
-		log.Println(" * installer")
+		log.Println("* installer")
 		d.buildInstaller(goos...)
 	}
 }

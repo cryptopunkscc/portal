@@ -24,15 +24,15 @@ func NewBackend(apphost bind.Runtime) *Backend {
 	}
 }
 
-func (b *Backend) RunFs(files fs.FS) (err error) {
+func (b *Backend) RunFs(files fs.FS, args ...string) (err error) {
 	var src []byte
 	if src, err = fs.ReadFile(files, "main.js"); err != nil {
 		return plog.Err(err)
 	}
-	return b.RunSource(string(src))
+	return b.RunSource(string(src), args...)
 }
 
-func (b *Backend) RunSource(app string) (err error) {
+func (b *Backend) RunSource(app string, args ...string) (err error) {
 	if b.vm != nil {
 		b.vm.ClearInterrupt()
 		b.apphost.Interrupt()
@@ -45,6 +45,11 @@ func (b *Backend) RunSource(app string) (err error) {
 
 	// inject apphost client js lib
 	if _, err = b.vm.RunString(b.apphostJs); err != nil {
+		return plog.Err(err)
+	}
+
+	// set args
+	if err = b.vm.Set("args", args); err != nil {
 		return plog.Err(err)
 	}
 

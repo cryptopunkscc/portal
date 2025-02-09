@@ -34,9 +34,10 @@ func (p Port) String() string {
 	return strings.Join(p, ".")
 }
 
-func (p Port) ParseCmd(query string) (s string) {
+func (p Port) ParseCmd(query string) (s string, ok bool) {
 	s = strings.TrimPrefix(query, p.String())
 	s = strings.TrimPrefix(s, ".")
+	ok = len(s) < len(query)
 	return
 }
 

@@ -1,14 +1,10 @@
 import {bindings} from "../bindings.js";
 import {RpcConn} from "./conn.js";
-import {prepareRoutes} from "./route.js";
 import {parseQueryParams} from "./params";
 
 export async function serve(client, ctx) {
-  const routes = prepareRoutes(ctx)
-  for (let route of routes) {
-    const listener = await client.register(route)
-    listen(ctx, listener).catch(bindings.log)
-  }
+  const listener = await client.register()
+  listen(ctx, listener).catch(bindings.log)
 }
 
 async function listen(ctx, listener) {
