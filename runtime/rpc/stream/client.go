@@ -2,7 +2,7 @@ package stream
 
 import (
 	"bytes"
-	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
+	"github.com/cryptopunkscc/portal/runtime/rpc"
 )
 
 type Client struct{ *Serializer }

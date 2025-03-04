@@ -3,8 +3,8 @@ package portald
 import (
 	"github.com/cryptopunkscc/portal/client/apphost"
 	"github.com/cryptopunkscc/portal/runner/install"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/cli"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
+	"github.com/cryptopunkscc/portal/runtime/rpc/cli"
+	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 )
 
 func (s *Runner[T]) Handlers() cmd.Handlers {

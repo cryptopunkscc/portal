@@ -8,7 +8,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/apps"
 	"github.com/cryptopunkscc/portal/resolve/source"
-	"github.com/cryptopunkscc/portal/runtime/rpc2"
+	"github.com/cryptopunkscc/portal/runtime/rpc"
 	"io"
 )
 

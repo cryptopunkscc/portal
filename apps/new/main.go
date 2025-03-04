@@ -8,7 +8,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/create"
 	"github.com/cryptopunkscc/portal/runner/template"
 	_ "github.com/cryptopunkscc/portal/runtime/apphost"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
+	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 	"log"
 	"strings"
 )

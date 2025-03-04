@@ -3,7 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/stream"
+	"github.com/cryptopunkscc/portal/runtime/rpc/stream"
 )
 
 type Marshaler interface {

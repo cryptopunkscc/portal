@@ -2,7 +2,7 @@ package contacts
 
 import (
 	"github.com/cryptopunkscc/astrald/astral"
-	"github.com/cryptopunkscc/portal/runtime/rpc2"
+	"github.com/cryptopunkscc/portal/runtime/rpc"
 )
 
 type Client struct {

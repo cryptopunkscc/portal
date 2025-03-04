@@ -9,8 +9,8 @@ import (
 	"github.com/cryptopunkscc/portal/resolve/sources"
 	_ "github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/apps"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/cli"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
+	"github.com/cryptopunkscc/portal/runtime/rpc/cli"
+	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 
 	"log"
 	"os"

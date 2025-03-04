@@ -1,9 +1,9 @@
 package portald
 
 import (
-	"github.com/cryptopunkscc/portal/runtime/rpc2"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
+	"github.com/cryptopunkscc/portal/runtime/rpc"
+	"github.com/cryptopunkscc/portal/runtime/rpc/apphost"
+	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 	"io"
 )
 

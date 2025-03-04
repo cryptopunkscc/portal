@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/client/portald"
 	"github.com/cryptopunkscc/portal/runner/exec"
-	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
+	"github.com/cryptopunkscc/portal/runtime/rpc"
 	"log"
 )
 

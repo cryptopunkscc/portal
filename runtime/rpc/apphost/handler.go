@@ -2,7 +2,7 @@ package apphost
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
+	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 )
 
 var ServeHandler = cmd.Handler{

@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/client/portald"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
+	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 	"slices"
 )
 

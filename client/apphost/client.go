@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/astrald/astral"
 	apphost2 "github.com/cryptopunkscc/astrald/mod/apphost"
-	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
+	"github.com/cryptopunkscc/portal/runtime/rpc"
+	"github.com/cryptopunkscc/portal/runtime/rpc/apphost"
 )
 
 func NewClient() Client { return Client{apphost.Request("localnode")} }

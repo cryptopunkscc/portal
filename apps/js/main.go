@@ -9,7 +9,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/open"
 	"github.com/cryptopunkscc/portal/runner/version"
 	_ "github.com/cryptopunkscc/portal/runtime/apphost"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
+	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 )
 
 func main() { cli.Run(Application{}.Handler()) }

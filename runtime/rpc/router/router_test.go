@@ -1,10 +1,10 @@
 package router
 
 import (
-	"github.com/cryptopunkscc/portal/runtime/rpc2/caller"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/registry"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/stream"
+	"github.com/cryptopunkscc/portal/runtime/rpc/caller"
+	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
+	"github.com/cryptopunkscc/portal/runtime/rpc/registry"
+	"github.com/cryptopunkscc/portal/runtime/rpc/stream"
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"

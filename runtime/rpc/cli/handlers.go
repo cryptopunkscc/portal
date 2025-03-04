@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/cryptopunkscc/portal/runner/exec"
-	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/cli"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/query"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/router"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/stream"
+	"github.com/cryptopunkscc/portal/runtime/rpc"
+	"github.com/cryptopunkscc/portal/runtime/rpc/caller/cli"
+	"github.com/cryptopunkscc/portal/runtime/rpc/caller/query"
+	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
+	"github.com/cryptopunkscc/portal/runtime/rpc/router"
+	"github.com/cryptopunkscc/portal/runtime/rpc/stream"
 	"log"
 )
 

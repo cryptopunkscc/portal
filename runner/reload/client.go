@@ -5,8 +5,8 @@ import (
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runtime/rpc2"
-	apphostRpc "github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
+	"github.com/cryptopunkscc/portal/runtime/rpc"
+	apphostRpc "github.com/cryptopunkscc/portal/runtime/rpc/apphost"
 )
 
 type client struct {

@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/runner/cli"
 	_ "github.com/cryptopunkscc/portal/runtime/apphost"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
+	"github.com/cryptopunkscc/portal/runtime/rpc/apphost"
+	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 	"log"
 	"os"
 )

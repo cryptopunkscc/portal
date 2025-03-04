@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runtime/rpc2"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
+	"github.com/cryptopunkscc/portal/runtime/rpc"
+	"github.com/cryptopunkscc/portal/runtime/rpc/apphost"
 )
 
 func Open(ctx context.Context, src string, _ ...string) (err error) {

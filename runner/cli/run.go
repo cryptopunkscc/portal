@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/sig"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/cli"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
+	"github.com/cryptopunkscc/portal/runtime/rpc/cli"
+	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 )
 
 func Run(handler cmd.Handler) {

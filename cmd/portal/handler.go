@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/cryptopunkscc/portal/runner/version"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
+	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 )
 
 func (a Application) Handler() (h cmd.Handler) {

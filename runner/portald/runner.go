@@ -5,8 +5,8 @@ import (
 	"github.com/cryptopunkscc/astrald/sig"
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
+	"github.com/cryptopunkscc/portal/runtime/rpc/apphost"
+	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 	"sync"
 )
 

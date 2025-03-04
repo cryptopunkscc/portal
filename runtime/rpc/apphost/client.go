@@ -2,9 +2,9 @@ package apphost
 
 import (
 	"encoding/json"
-	"github.com/cryptopunkscc/portal/runtime/rpc2"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/stream"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/stream/query"
+	"github.com/cryptopunkscc/portal/runtime/rpc"
+	"github.com/cryptopunkscc/portal/runtime/rpc/stream"
+	"github.com/cryptopunkscc/portal/runtime/rpc/stream/query"
 	"io"
 )
 

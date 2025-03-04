@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/cryptopunkscc/portal/runner/cli"
 	"github.com/cryptopunkscc/portal/runner/dev"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/apphost"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
+	"github.com/cryptopunkscc/portal/runtime/rpc/apphost"
+	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 )
 
 func main() { cli.Run(Application{}.cliHandler()) }

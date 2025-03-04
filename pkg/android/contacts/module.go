@@ -4,7 +4,7 @@ import (
 	"github.com/cryptopunkscc/astrald/log"
 	"github.com/cryptopunkscc/astrald/node/assets"
 	"github.com/cryptopunkscc/astrald/node/modules"
-	rpc "github.com/cryptopunkscc/portal/runtime/rpc/mod"
+	"github.com/cryptopunkscc/portal/runtime/rpc/mod"
 )
 
 const ServiceName = "contacts.*"
