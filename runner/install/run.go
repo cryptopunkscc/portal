@@ -6,14 +6,6 @@ import (
 	"github.com/cryptopunkscc/portal/resolve/source"
 )
 
-func Runner(appsDir string) Install {
-	return Install{appsDir: appsDir}
-}
-
-type Install struct {
-	appsDir string
-}
-
 func (i Install) Run(src string) (c <-chan Result, err error) {
 	file, err := source.File(src)
 	if err != nil {
@@ -26,14 +18,15 @@ func (i Install) Run(src string) (c <-chan Result, err error) {
 }
 
 type Result struct {
+	Id       int
 	Manifest target.Manifest
 	Error    error
 }
 
 func (r Result) MarshalCLI() string {
-	status := "SUCCESS"
+	status := "[DONE]"
 	if r.Error != nil {
-		status = "FAILURE: " + r.Error.Error()
+		status = "[FAILURE]: " + r.Error.Error()
 	}
-	return fmt.Sprintf("install %s: %s", r.Manifest.Name, status)
+	return fmt.Sprintf("%d. %s %s\n", r.Id, r.Manifest.Name, status)
 }

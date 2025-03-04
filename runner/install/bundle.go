@@ -8,6 +8,9 @@ import (
 )
 
 func (i Install) Bundle(bundle target.Bundle_) error {
+	if _, err := i.Token(bundle.Manifest().Package); err != nil {
+		return err
+	}
 	pkg := bundle.Package()
 	name := filepath.Base(bundle.Abs())
 	dstPath := filepath.Join(i.appsDir, name)

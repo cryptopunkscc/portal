@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/cryptopunkscc/portal/runtime/rpc/stream"
@@ -22,11 +23,14 @@ func Marshal(a any) (result []byte, err error) {
 	case []byte:
 		result = t
 	case error:
-		result = fmt.Appendf(nil, "%e\n", t)
+		result = fmt.Appendf(nil, "%e", t)
 	case stream.Failure:
-		result = fmt.Appendf(nil, "API: %s\n", t.Error)
+		result = fmt.Appendf(nil, "API: %s", t.Error)
 	default:
 		result, err = json.Marshal(a)
+	}
+	if !bytes.HasSuffix(result, []byte("\n")) {
+		result = append(result, '\n')
 	}
 	return
 }

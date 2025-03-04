@@ -24,5 +24,4 @@ func init() {
 	if Source, err = source.File(Dir); err != nil {
 		panic(err)
 	}
-
 }

@@ -3,6 +3,8 @@ package portald
 import (
 	"github.com/cryptopunkscc/portal/client/apphost"
 	"github.com/cryptopunkscc/portal/runner/install"
+	"github.com/cryptopunkscc/portal/runner/uninstall"
+	"github.com/cryptopunkscc/portal/runtime/apps"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 )
@@ -45,6 +47,14 @@ func (s *Runner[T]) Handlers() cmd.Handlers {
 func (s *Runner[T]) publicHandlers() cmd.Handlers {
 	return cmd.Handlers{
 		{
+			Func: install.Runner(apps.Dir).Token,
+			Name: "token",
+			Desc: "Create a new token or return existing one.",
+			Params: cmd.Params{
+				{Type: "string", Desc: "Token name."},
+			},
+		},
+		{
 			Func: apphost.NewClient().ListTokens,
 			Name: "tokens",
 			Desc: "List apphost tokens.",
@@ -53,15 +63,7 @@ func (s *Runner[T]) publicHandlers() cmd.Handlers {
 			},
 		},
 		{
-			Func: install.Token,
-			Name: "token",
-			Desc: "Create a new token.",
-			Params: cmd.Params{
-				{Type: "string", Desc: "Token name."},
-			},
-		},
-		{
-			Func: s.Install,
+			Func: install.Runner(apps.Dir).Run,
 			Name: "install i",
 			Desc: "Install app.",
 			Params: cmd.Params{
@@ -69,7 +71,7 @@ func (s *Runner[T]) publicHandlers() cmd.Handlers {
 			},
 		},
 		{
-			Func: s.Uninstall,
+			Func: uninstall.Runner(apps.Source),
 			Name: "uninstall d",
 			Desc: "Uninstall app.",
 			Params: cmd.Params{

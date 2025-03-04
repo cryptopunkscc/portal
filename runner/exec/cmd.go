@@ -2,6 +2,7 @@ package exec
 
 import (
 	"context"
+	"github.com/cryptopunkscc/astrald/lib/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 	"os"
@@ -12,11 +13,11 @@ func WithReadWriter(ctx context.Context, rw io.ReadWriter) context.Context {
 	return context.WithValue(ctx, stdKey, &Std{In: rw, Out: rw, Err: rw})
 }
 
-func RunCmd(ctx context.Context, path string, args ...string) (err error) {
+func RunCmd(ctx context.Context, token string, path string, args ...string) (err error) {
 	log := plog.Get(ctx).Scope("exec.RunCmd").Set(&ctx)
 	log.Printf("Command run: %s, %v", path, args)
 	cmd := exec.CommandContext(ctx, path, args...)
-	cmd.Env = os.Environ()
+	cmd.Env = append(os.Environ(), apphost.AuthTokenEnv+"="+token)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin

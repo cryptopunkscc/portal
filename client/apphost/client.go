@@ -34,7 +34,10 @@ type ListTokensArgs struct {
 	Format string           `query:"format" cli:"format f"`
 }
 
-func (c Client) ListTokens(args ListTokensArgs) (AccessTokens, error) {
+func (c Client) ListTokens(args *ListTokensArgs) (AccessTokens, error) {
+	if args == nil {
+		args = &ListTokensArgs{}
+	}
 	if args.Format == "" {
 		args.Format = "json"
 	}

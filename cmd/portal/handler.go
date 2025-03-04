@@ -18,16 +18,6 @@ func (a Application) Handler() (h cmd.Handler) {
 			{Type: "...string", Desc: "Optional application arguments."},
 		},
 		Sub: cmd.Handlers{
-			{
-				Func: a.portaldCli,
-				Name: "portald d",
-				Desc: "Runs portald command.",
-				Sub: cmd.Handlers{
-					{
-						Name: "help h",
-					},
-				},
-			},
 			{Name: "v", Desc: "Print version.", Func: version.Run},
 		},
 	}
