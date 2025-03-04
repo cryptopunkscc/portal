@@ -11,7 +11,7 @@ func NewClient() Client { return Client{apphost.Request("portal")} }
 
 type Client struct{ rpc.Conn }
 
-func (p Client) Join()        { _ = rpc.Command(p, "") }
+func (p Client) Join()        { _ = rpc.Command(p, "join") }
 func (p Client) Ping() error  { return rpc.Command(p, "ping") }
 func (p Client) Close() error { return rpc.Command(p, "close") }
 func (p Client) Open(opt *OpenOpt, args ...string) error {

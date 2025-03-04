@@ -24,6 +24,10 @@ func (s *Runner[T]) Handlers() cmd.Handlers {
 			Name: "ping",
 		},
 		{
+			Func: Join,
+			Name: "join",
+		},
+		{
 			Func: s.Open().Start,
 			Name: "open o",
 			Desc: "Open portal app.",
