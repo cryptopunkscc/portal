@@ -29,3 +29,7 @@ func (h *Handler) AddSub(handlers ...Handler) {
 func (h *Handler) Names() []string {
 	return strings.Split(h.Name, " ")
 }
+
+func (h Handlers) Plus(handlers ...Handler) Handlers {
+	return append(h, handlers...)
+}

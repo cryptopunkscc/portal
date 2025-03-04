@@ -1,8 +1,7 @@
-package cli
+package cmd
 
 import (
 	"fmt"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
@@ -10,11 +9,11 @@ import (
 
 func Test_injectHelp(t *testing.T) {
 	// given
-	handler := cmd.Handler{
-		Sub: cmd.Handlers{
+	handler := Handler{
+		Sub: Handlers{
 			{
 				Name: "foo",
-				Sub: cmd.Handlers{
+				Sub: Handlers{
 					{
 						Name: "bar",
 					},
@@ -24,7 +23,7 @@ func Test_injectHelp(t *testing.T) {
 	}
 
 	// when
-	injectHelp(&handler)
+	InjectHelp(&handler)
 
 	// then
 	// assert root help
@@ -43,7 +42,7 @@ func Test_injectHelp(t *testing.T) {
 var helpName = "help h"
 var helpType = func() (h Help) { return }
 
-func assertHasHelp(t *testing.T, handler cmd.Handler) {
+func assertHasHelp(t *testing.T, handler Handler) {
 	assert.NotEmpty(t, handler.Sub)
 	help := handler.Sub[len(handler.Sub)-1]
 	assert.Equal(t, helpName, help.Name)
@@ -57,16 +56,16 @@ func assertHelpFunc(t *testing.T, a any) {
 }
 
 func Test_newHelpFunc(t *testing.T) {
-	helpFunc := newHelpFunc(&handler)
+	helpFunc := NewHelpFunc(&handler)
 	actual := helpFunc().Handler
 	assert.Equal(t, handler, actual)
 }
 
-var handler = cmd.Handler{
+var handler = Handler{
 	Func: nil,
 	Name: "foo f",
 	Desc: "Foo description",
-	Params: cmd.Params{
+	Params: Params{
 		{
 			Name: "i",
 			Type: "int",
@@ -82,7 +81,7 @@ var handler = cmd.Handler{
 			Desc: "String",
 		},
 	},
-	Sub: cmd.Handlers{
+	Sub: Handlers{
 		{nil, "bar b", "Bar description", nil, nil},
 		{nil, "baz", "", nil, nil},
 	},

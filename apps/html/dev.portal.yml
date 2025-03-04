@@ -3,6 +3,7 @@ package: portal.html
 title: Portal HTML
 description: Portal HTML runner
 version: 0.0.0
+hidden: true
 build:
   default:
     exec: main

@@ -1,58 +1,33 @@
 package apphost
 
 import (
-	"bufio"
 	"context"
 	"errors"
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/caller"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/caller/query"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/router"
-	"regexp"
+	"log"
+	"math"
 	"strings"
 )
 
-func Serve() cmd.Handler {
-	return cmd.Handler{
-		Name: "-s", Desc: "Serves rpc handler API via apphost interface.",
-		Func: ServeFunc,
-	}
-}
-
-func ServeFunc(ctx context.Context, root *cmd.Root) error {
-	handler := cmd.Handler(*root)
-	r := Default().Router(handler)
-	return r.Run(ctx)
-}
-
-func (r RpcBase) Router(handler cmd.Handler, routes ...string) *Router {
-	name := handler.Name
-	if handler.Name != "" {
-		name = strings.ReplaceAll(handler.Names()[0], "-", ".")
-	}
-	return &Router{
-		routes: routes,
-		Port:   apphost.NewPort(name),
+func (r RpcBase) Router(handler cmd.Handler) *Router {
+	rr := &Router{
 		Base: router.Base{
-			Registry: router.CreateRegistry(handler),
-			Unmarshalers: []caller.Unmarshaler{
-				//cli.Unmarshaler{},
-				//json.Unmarshaler{},
-				query.Unmarshaler{},
-			},
+			Registry:  router.CreateRegistry(handler),
+			Unmarshal: query.Unmarshal,
 		},
 		client: r.client,
 	}
+	return rr
 }
 
 type Router struct {
 	router.Base
 	Logger plog.Logger
 	client apphost.Client
-	Port   apphost.Port
-	routes []string
 }
 
 func (r *Router) Start(ctx context.Context) (err error) {
@@ -64,56 +39,12 @@ func (r *Router) Start(ctx context.Context) (err error) {
 	return nil
 }
 
-func (r *Router) Run(ctx context.Context) error {
+func (r *Router) Run(ctx context.Context) (err error) {
 	if r.client == nil {
 		r.client = apphost.DefaultClient
 	}
-	r.Dependencies = append([]any{ctx}, r.Dependencies)
-	routes := r.routes
-	if len(routes) == 0 {
-		handler := *r.Registry.Get()
-		handler.Name = ""
-		routes = getRoutes(nil, handler)
-	}
-	return r.register(ctx)
-}
+	r.Dependencies = append([]any{ctx}, r.Dependencies...)
 
-var RouteAll = "RouteAll"
-
-func getRoutes(port apphost.Port, handler cmd.Handler) (r []string) {
-	if name := handler.Names()[0]; name != "" {
-		port = port.Add(name)
-	}
-	if handler.Func != nil {
-		p := port.String()
-		if handler.Func == RouteAll {
-			p += "*"
-		}
-		r = append(r, p)
-	}
-	for _, h := range handler.Sub {
-		if b, _ := regexp.MatchString(`^[a-z]+`, h.Name); !b {
-			continue
-		}
-		if strings.HasPrefix(h.Name, "help") {
-			continue
-		}
-		r = append(r, getRoutes(port, h)...)
-	}
-	return
-}
-
-func (r *Router) formatPort(route string) (port string) {
-	switch route {
-	case "*":
-		port = r.Port.String() + "*"
-	default:
-		port = r.Port.Add(route).String()
-	}
-	return
-}
-
-func (r *Router) register(ctx context.Context) (err error) {
 	listener, err := r.client.Register()
 	if err != nil {
 		return
@@ -128,18 +59,18 @@ func (r *Router) register(ctx context.Context) (err error) {
 			return
 		}
 		rr := *r
-		command, ok := rr.Port.ParseCmd(q.Query())
-		if !ok {
-			_ = q.Close()
-			continue
-		}
-		rr.setup(command)
 		go rr.routeQuery(q)
 	}
 }
 
-func (r *Router) routeQuery(q apphost.PendingQuery) {
+func (r *Router) routeQuery(q apphost.PendingQuery) (err error) {
+	log.Println("query", q)
+	r.Responses = math.MaxInt64
+	r.Add(&r.Base, q)
+
 	rr := *r
+	command := q.Query()
+	rr.Setup(command)
 	if !rr.authorize() {
 		_ = q.Reject()
 		return
@@ -149,44 +80,40 @@ func (r *Router) routeQuery(q apphost.PendingQuery) {
 		return
 	}
 	defer conn.Close()
-	flow := NewClient(conn)
+
+	client := NewClient(conn)
 	if r.Logger != nil {
-		flow.Logger(r.Logger.Scope(q.Query()))
+		client.Logger(r.Logger.Scope(q.Query()))
 	}
-	r.Dependencies = append(r.Dependencies, flow)
-	rr.Dependencies = r.Dependencies
-	scanner := bufio.NewScanner(conn)
+
+	r.Add(client)
+	rr.Add(client)
+
 	for {
-		if !rr.skip() {
-			if err = rr.Respond(flow.Serializer); err != nil {
+		if !rr.IsEmpty() {
+			if err = rr.Respond(client.Serializer); err != nil {
 				return
 			}
-		} else {
-			rrr := rr
-			r = &rrr
 		}
-		if !scanner.Scan() {
+		if r.Responses == 0 {
 			return
 		}
-		text := scanner.Text()
+		r.Responses--
+		command, err = client.Serializer.ReadString('\n')
+		if err != nil {
+			return
+		}
+		command = strings.TrimSpace(command)
 		rr = *r
-		rr.setup(text)
+		rr.Setup(command)
 		if !rr.authorize() {
-			_ = flow.Encode(ErrUnauthorized)
+			_ = client.Encode(ErrUnauthorized)
 			return
 		}
 	}
 }
 
 var ErrUnauthorized = errors.New("unauthorized")
-
-func (r *Router) skip() bool {
-	return r.Registry.Get().Func == RouteAll
-}
-
-func (r *Router) setup(query string) {
-	r.Base = r.Query(query)
-}
 
 func (r *Router) authorize() bool {
 	rr := r.Query("!")

@@ -13,6 +13,7 @@ type Manifest struct {
 	Icon        string `json:"icon,omitempty" yaml:"icon,omitempty"`
 	Exec        string `json:"exec,omitempty" yaml:"exec,omitempty"`
 	Schema      string `json:"schema,omitempty" yaml:"schema,omitempty"`
+	Hidden      bool   `json:"hidden,omitempty" yaml:"hidden,omitempty"`
 	Env         Env    `json:"env,omitempty" yaml:"env,omitempty"`
 }
 

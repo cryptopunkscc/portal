@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	_ "github.com/cryptopunkscc/portal/runtime/apphost"
-	_ "github.com/cryptopunkscc/portal/runtime/portal"
 )
 
 func main() {

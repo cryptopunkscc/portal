@@ -7,22 +7,6 @@ import (
 	"strings"
 )
 
-type Unmarshaler struct{}
-
-func (u Unmarshaler) Unmarshal(data []byte, args []any) (err error) {
-	return Unmarshal(data, args)
-}
-
-func (u Unmarshaler) Score(data []byte) (score uint) {
-	for _, r := range string(data) {
-		switch r {
-		case ' ', '-':
-			score++
-		}
-	}
-	return
-}
-
 func Unmarshal(data []byte, args []any) (err error) {
 	p := param.NewValues("cli", args)
 	f := parseFields(data)
@@ -55,12 +39,11 @@ func set(p *param.Values, offset int, fields []string) (err error) {
 	}
 	field := fields[offset]
 	var value reflect.Value
+	isNamed := false
 	if field[0] == '-' {
-		ok := false
-		value, ok = p.Named[field[1:]]
-		if !ok {
-			return fmt.Errorf("unrecognized option %s", field)
-		}
+		value, isNamed = p.Named[field[1:]]
+	}
+	if isNamed {
 		offset++
 		if value.Kind() == reflect.Bool {
 			value.SetBool(true)

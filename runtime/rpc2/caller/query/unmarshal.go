@@ -8,22 +8,6 @@ import (
 	"strconv"
 )
 
-type Unmarshaler struct{}
-
-func (u Unmarshaler) Unmarshal(data []byte, params []any) (err error) {
-	return Unmarshal(data, params)
-}
-
-func (u Unmarshaler) Score(data []byte) (score uint) {
-	for _, r := range string(data) {
-		switch r {
-		case '&', '=':
-			score++
-		}
-	}
-	return
-}
-
 func Unmarshal(data []byte, params []any) (err error) {
 	q, err := url.ParseQuery(string(data))
 	if err != nil {

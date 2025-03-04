@@ -21,4 +21,4 @@ func Invoker(ctx context.Context, client api.Client) api.Client {
 	}
 }
 
-var Invoke = request.Open.Start
+var Invoke = request.Open

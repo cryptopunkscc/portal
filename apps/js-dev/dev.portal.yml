@@ -3,6 +3,7 @@ package: portal.dev.js
 title: Portal JS
 description: Portal JS development runner
 version: 0.0.0
+hidden: true
 build:
   default:
     exec: main

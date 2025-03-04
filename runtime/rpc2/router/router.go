@@ -3,7 +3,7 @@ package router
 import (
 	"errors"
 	"fmt"
-	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
+	"github.com/cryptopunkscc/portal/runtime/rpc2"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/caller"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/registry"
@@ -14,9 +14,9 @@ import (
 
 type Base struct {
 	Registry     *registry.Node[*cmd.Handler]
-	Unmarshalers []caller.Unmarshaler
+	Unmarshal    caller.Unmarshal
+	Responses    int64
 	Dependencies []any
-	query        string
 	args         string
 	err          error
 }
@@ -39,19 +39,36 @@ func injectHandler(registry *registry.Node[*cmd.Handler], handler cmd.Handler) {
 	}
 }
 
-func (r Base) Err() error { return r.err }
+func (r *Base) IsEmpty() bool {
+	return !(!r.Registry.IsEmpty() && r.Registry.Get().Func != nil)
+}
 
-func (r Base) Query(query string) Base {
-	r.Registry, r.args = r.Registry.Fold(query)
-	if r.Registry.IsEmpty() {
-		r.err = fmt.Errorf("invalid query: %s", query)
-		return r
-	}
-	r.args = strings.TrimPrefix(r.args, "?")
+func (r *Base) Add(dependencies ...any) *Base {
+	r.Dependencies = append(r.Dependencies, dependencies...)
 	return r
 }
 
-func (r Base) Respond(conn *stream.Serializer) (err error) {
+func (r *Base) Err() error { return r.err }
+
+func (r *Base) Setup(query string) {
+	base := r.Query(query)
+	if !base.IsEmpty() {
+		*r = base
+	}
+}
+
+func (r *Base) Query(query string) Base {
+	rr := *r
+	rr.Registry, rr.args = rr.Registry.Fold(query)
+	if rr.Registry.IsEmpty() {
+		rr.err = fmt.Errorf("invalid query: %s", query)
+		return rr
+	}
+	rr.args = strings.TrimPrefix(rr.args, "?")
+	return rr
+}
+
+func (r *Base) Respond(conn *stream.Serializer) (err error) {
 	for item := range r.Call() {
 		if item == rpc.Close {
 			_ = conn.Close()
@@ -65,7 +82,7 @@ func (r Base) Respond(conn *stream.Serializer) (err error) {
 	return
 }
 
-func (r Base) Call() (o <-chan any) {
+func (r *Base) Call() (o <-chan any) {
 	c := make(chan any, 1)
 	o = c
 	if r.err != nil {
@@ -75,7 +92,7 @@ func (r Base) Call() (o <-chan any) {
 	}
 	in := []byte(r.args)
 	out, err := r.caller().
-		Unmarshalers(r.Unmarshalers...).
+		Unmarshaler(r.Unmarshal).
 		Defaults(r.Dependencies...).
 		Defaults(r.Registry.Get()).
 		Call(in)
@@ -109,7 +126,7 @@ func respond(c chan any, err error, out ...any) {
 	}
 }
 
-func (r Base) caller() *caller.Func {
+func (r *Base) caller() *caller.Func {
 	h := r.Registry.Get()
 	switch v := h.Func.(type) {
 	case *caller.Func:

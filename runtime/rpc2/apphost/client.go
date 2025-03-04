@@ -2,7 +2,7 @@ package apphost
 
 import (
 	"encoding/json"
-	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
+	"github.com/cryptopunkscc/portal/runtime/rpc2"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/stream"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/stream/query"
 	"io"
@@ -24,5 +24,6 @@ func NewClient(conn io.ReadWriteCloser) *stream.Client {
 	s.MarshalArgs = query.Marshal
 	s.Marshal = json.Marshal
 	s.Unmarshal = json.Unmarshal
+	s.Ending = []byte("\n")
 	return &s
 }

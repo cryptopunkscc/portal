@@ -23,7 +23,7 @@ type Application[T AppHtml] struct{}
 func (a Application[T]) Handler() cmd.Handler {
 	return cmd.Handler{
 		Func: open.Runner[T](&a),
-		Name: "wails",
+		Name: "html",
 		Desc: "Start portal app in wails runner.",
 		Params: cmd.Params{
 			{Type: "string", Desc: "Absolute path to app bundle or directory."},

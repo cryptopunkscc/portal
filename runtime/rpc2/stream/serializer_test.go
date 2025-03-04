@@ -76,6 +76,7 @@ func TestSerializer_Encode(t *testing.T) {
 			serializer := Serializer{
 				Writer:  buffer,
 				Marshal: json.Marshal,
+				Ending:  []byte("\n"),
 			}
 			if err := serializer.Encode(tt.payload); (err != nil) != tt.wantErr {
 				t.Errorf("Encode() error = %v, wantErr %v", err, tt.wantErr)

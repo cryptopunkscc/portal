@@ -1,24 +1,22 @@
 package caller
 
 import (
-	"fmt"
 	"math"
 	"reflect"
 )
 
 type Func struct {
-	Names        []string
-	function     reflect.Value
-	defaults     []any
-	unmarshalers []Unmarshaler
+	Names     []string
+	Unmarshal Unmarshal
+	function  reflect.Value
+	defaults  []any
 }
 
-func New(function any, unmarshalers ...Unmarshaler) (c *Func) {
+func New(function any) (c *Func) {
 	c = new(Func)
 	if c.function = reflect.ValueOf(function); c.function.Kind() != reflect.Func {
 		panic("not a function")
 	}
-	c.unmarshalers = unmarshalers
 	return
 }
 
@@ -27,11 +25,9 @@ func (c *Func) Named(names ...string) *Func {
 	return c
 }
 
-func (c *Func) Unmarshalers(unmarshalers ...Unmarshaler) *Func {
+func (c *Func) Unmarshaler(unmarshal Unmarshal) *Func {
 	cc := *c
-	if len(unmarshalers) > 0 {
-		cc.unmarshalers = unmarshalers
-	}
+	cc.Unmarshal = unmarshal
 	return &cc
 }
 
@@ -114,7 +110,7 @@ func (c *Func) decodeArguments(data []byte) (values []reflect.Value, err error) 
 
 	// decode args
 	if len(decoded) > 0 {
-		if err = c.unmarshal(data, decoded); err != nil {
+		if err = c.Unmarshal(data, decoded); err != nil {
 			return
 		}
 	}
@@ -127,27 +123,6 @@ func (c *Func) decodeArguments(data []byte) (values []reflect.Value, err error) 
 		}
 	}
 	return
-}
-
-func (c *Func) unmarshal(data []byte, args []any) error {
-	if len(c.unmarshalers) == 0 {
-		panic("no unmarshalers specified")
-	}
-	chosen := c.unmarshalers[0]
-	score := chosen.Score(data)
-	for i := 0; i < len(c.unmarshalers); i++ {
-		n := c.unmarshalers[i]
-		s := n.Score(data)
-		if score < s {
-			chosen = n
-			score = s
-		}
-	}
-	err := chosen.Unmarshal(data, args)
-	if err == nil {
-		return nil
-	}
-	return fmt.Errorf("cannot unmarshal data %s %v", data, err)
 }
 
 func getError(returned []reflect.Value) (rest []reflect.Value, err error) {

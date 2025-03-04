@@ -1,36 +1,49 @@
-package cli
+package cmd
 
 import (
 	"bytes"
 	"fmt"
-	"github.com/cryptopunkscc/portal/runtime/rpc2/cmd"
 	"slices"
 	"strconv"
 	"strings"
 	"text/tabwriter"
 )
 
-func injectHelp(handler *cmd.Handler) {
-	for i := range handler.Sub {
-		injectHelp(&handler.Sub[i])
+func HasHelp(handler Handler) bool {
+	if handler.Name == HelpName {
+		return true
 	}
-	help := newHelpHandler(handler)
+	for _, h := range handler.Sub {
+		if HasHelp(h) {
+			return true
+		}
+	}
+	return false
+}
+
+func InjectHelp(handler *Handler) {
+	for i := range handler.Sub {
+		InjectHelp(&handler.Sub[i])
+	}
+	help := NewHelpHandler(handler)
 	handler.AddSub(help)
 	if handler.Func == nil {
 		handler.Func = help.Func
 	}
 }
 
-func newHelpHandler(handler *cmd.Handler) cmd.Handler {
-	return cmd.Handler{
-		Name: "help h", Desc: "Print help.",
-		Func: newHelpFunc(handler),
+func NewHelpHandler(handler *Handler) Handler {
+	return Handler{
+		Name: HelpName, Desc: "Print help.",
+		Func: NewHelpFunc(handler),
 	}
 }
 
-func newHelpFunc(handler *cmd.Handler) func() Help { return func() Help { return Help{*handler} } }
+const HelpName = "help h"
 
-type Help struct{ cmd.Handler }
+func NewHelpFunc(handler *Handler) func() Help { return func() Help { return Help{*handler} } }
+
+type Help struct{ Handler }
 
 //goland:noinspection GoUnhandledErrorResult
 func (h Help) MarshalCLI() (help string) {
@@ -70,9 +83,13 @@ func (h Help) MarshalCLI() (help string) {
 		fmt.Fprintln(w, "Subcommands:")
 		fmt.Fprintln(w)
 		for _, sub := range h.Sub {
-			fmt.Fprintf(w, "\t%s\t- %s\n", formatName(sub.Names()), sub.Desc)
+			if sub.Desc == "" {
+				fmt.Fprintf(w, "\t%s\t\n", formatName(sub.Names()))
+			} else {
+				fmt.Fprintf(w, "\t%s\t- %s\n", formatName(sub.Names()), sub.Desc)
+			}
 		}
-		fmt.Fprintln(w)
+		fmt.Fprint(w)
 	}
 	w.Flush()
 

@@ -33,7 +33,8 @@ func TestRouter_Query(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			router := Base{
 				Registry: registry.New[*cmd.Handler]().Add(tt.route, tt.expected),
-			}.Query(tt.query)
+			}
+			router = router.Query(tt.query)
 
 			actual := router.Registry.Get()
 			if !reflect.DeepEqual(tt.expected, actual) {
@@ -49,7 +50,7 @@ func TestRouter_Call(t *testing.T) {
 		route     string
 		args      string
 		caller    *cmd.Handler
-		unmarshal caller.Unmarshaler
+		unmarshal caller.Unmarshal
 		deps      []any
 		expected  []any
 	}{
@@ -62,10 +63,10 @@ func TestRouter_Call(t *testing.T) {
 			name:   "unmarshaler should be called",
 			args:   "foo",
 			caller: &cmd.Handler{Func: func(_ string) {}},
-			unmarshal: caller.Unmarshal(func(data []byte, args []any) error {
+			unmarshal: func(data []byte, args []any) error {
 				assert.Equal(t, "foo", string(data))
 				return nil
-			}),
+			},
 			expected: []any{stream.End},
 		},
 		{
@@ -86,12 +87,13 @@ func TestRouter_Call(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := Base{
+			b := &Base{
 				Registry:     registry.New[*cmd.Handler]().Add(tt.route, tt.caller),
-				Unmarshalers: []caller.Unmarshaler{tt.unmarshal},
+				Unmarshal:    tt.unmarshal,
 				Dependencies: tt.deps,
 				args:         tt.args,
-			}.Call()
+			}
+			c := b.Call()
 			var actual []any
 			for a := range c {
 				actual = append(actual, a)

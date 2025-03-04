@@ -5,19 +5,7 @@ import (
 	"errors"
 )
 
-type Unmarshaler struct{}
-
-func (u Unmarshaler) Score(data []byte) (score uint) {
-	for _, r := range string(data) {
-		switch r {
-		case '[', ']', '{', '}', '"', ':':
-			score++
-		}
-	}
-	return
-}
-
-func (u Unmarshaler) Unmarshal(data []byte, args []any) error {
+func Unmarshal(data []byte, args []any) error {
 	if len(data) == 0 {
 		return errors.New("empty data")
 	}

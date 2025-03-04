@@ -3,6 +3,7 @@ package: portal.dev.exec
 title: Portal Exec
 description: Portal development runner for executables
 version: 0.0.0
+hidden: true
 schema: go
 build:
   default:

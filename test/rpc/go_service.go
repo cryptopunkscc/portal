@@ -27,7 +27,6 @@ func NewTestGoService(p string) *TestGoService {
 			{
 				Name: "flow",
 				Sub:  handlers,
-				Func: apphost.RouteAll,
 			},
 		},
 	}

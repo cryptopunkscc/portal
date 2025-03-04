@@ -64,10 +64,10 @@ func main() {
 					return fmt.Sprintf("%v %d %s %f %s", o.B, o.I, o.S, o2.F, str)
 				},
 			},
-			apphost.Serve(),
+			apphost.ServeHandler,
 		},
 	}
-	handler.AddSub(cli.InteractiveMode()...)
+	handler.AddSub(cli.InteractiveModeHandlers...)
 
 	if err := cli.New(handler).Run(ctx); err != nil {
 		panic(err)

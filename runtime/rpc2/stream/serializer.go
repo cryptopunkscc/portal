@@ -2,6 +2,7 @@ package stream
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
@@ -15,8 +16,9 @@ type Serializer struct {
 	MarshalArgs Marshal
 	Marshal     Marshal
 	Unmarshal   Unmarshal
+	Ending      []byte
 
-	scanner *bufio.Scanner
+	scanner *bufio.Reader
 	reader  io.Reader
 	logger  plog.Logger
 }
@@ -51,7 +53,7 @@ func (s *Serializer) init() {
 	}
 	if s.reader != s.Reader {
 		s.reader = s.Reader
-		s.scanner = bufio.NewScanner(s.Reader)
+		s.scanner = bufio.NewReader(s.Reader)
 	}
 }
 
@@ -66,7 +68,7 @@ func (s *Serializer) Encode(value any) (err error) {
 	}
 	var data []byte
 	data, err = s.Marshal(r)
-	data = append(data, '\n')
+	data = append(data, s.Ending...)
 	_, err = s.Write(data)
 	return
 }
@@ -74,7 +76,7 @@ func (s *Serializer) Encode(value any) (err error) {
 func (s *Serializer) Decode(value any) (err error) {
 	s.init()
 
-	bytes, err := s.Bytes()
+	bytes, err := s.ReadBytes('\n')
 	if err != nil {
 		return
 	}
@@ -92,17 +94,26 @@ func (s *Serializer) Decode(value any) (err error) {
 	return s.Unmarshal(bytes, value)
 }
 
-func (s *Serializer) Bytes() (bytes []byte, err error) {
+func (s *Serializer) ReadBytes(delim byte) (b []byte, err error) {
 	s.init()
-	if !s.scanner.Scan() {
-		if err = s.scanner.Err(); err == nil {
-			err = io.EOF
-		}
+	if b, err = s.scanner.ReadBytes(delim); err != nil {
 		return
 	}
-	bytes = s.scanner.Bytes()
+	b = bytes.TrimSuffix(b, []byte{delim})
 	if s.logger != nil {
-		s.logger.Printf("< %s [%db]", strings.Trim(string(bytes), "\n"), len(bytes))
+		s.logger.Printf("< %s [%db]", strings.Trim(string(b), "\n"), len(b))
+	}
+	return
+}
+
+func (s *Serializer) ReadString(delim byte) (str string, err error) {
+	s.init()
+	if str, err = s.scanner.ReadString(delim); err != nil {
+		return
+	}
+	str = strings.TrimSuffix(str, string([]byte{delim}))
+	if s.logger != nil {
+		s.logger.Printf("< %s [%db]", strings.Trim(str, "\n"), len(str))
 	}
 	return
 }

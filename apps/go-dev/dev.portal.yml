@@ -3,6 +3,7 @@ package: portal.dev.go
 title: Portal Go
 description: Portal Golang development runner
 version: 0.0.0
+hidden: true
 schema: go
 build:
   default:

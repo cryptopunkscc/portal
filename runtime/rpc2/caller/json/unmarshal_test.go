@@ -35,10 +35,9 @@ func TestUnmarshaler_Unmarshal(t *testing.T) {
 			actual:   []any{&Options{}},
 		},
 	}
-	u := Unmarshaler{}
 	for n, tt := range tests {
 		t.Run(fmt.Sprintf("%d", n), func(t *testing.T) {
-			if err := u.Unmarshal([]byte(tt.data), tt.actual); (err != nil) != tt.wantErr {
+			if err := Unmarshal([]byte(tt.data), tt.actual); (err != nil) != tt.wantErr {
 				t.Errorf("Unmarshal() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			assert.ElementsMatch(t, tt.expected, tt.actual)

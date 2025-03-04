@@ -1,7 +1,9 @@
 name: dev
 package: dev.portal
-title: Portal development service.
+title: Portal Dev
+description: Portal development service.
 version: 0.0.0
+hidden: true
 schema: go
 build:
   default:

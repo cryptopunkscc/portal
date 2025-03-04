@@ -49,6 +49,12 @@ func marshal(from any, to url.Values, tag string) (err error) {
 		for i := 0; i < objType.NumField(); i++ {
 			field := objType.Field(i)
 			fieldValue := objValue.Field(i)
+			if fieldValue.Kind() == reflect.Ptr && fieldValue.IsNil() {
+				continue
+			}
+			if fieldValue.IsZero() {
+				continue
+			}
 
 			// use the `json` tag if available, otherwise fallback to the field name
 			tag = field.Tag.Get("query")

@@ -5,13 +5,16 @@ import (
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/pkg/port"
-	rpc "github.com/cryptopunkscc/portal/runtime/rpc2"
+	"github.com/cryptopunkscc/portal/runtime/rpc2"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/stream"
 	"github.com/cryptopunkscc/portal/runtime/rpc2/stream/query"
 	"io"
 	"log"
 )
+
+func Request(target string, query ...string) rpc.Conn {
+	return Default().Request(target, query...)
+}
 
 func (r RpcBase) Request(target string, query ...string) rpc.Conn {
 	return newRequest(r.client, target, query)
@@ -23,6 +26,7 @@ func newRequest(client apphost.Client, target string, q []string) *rpcRequest {
 			MarshalArgs: query.Marshal,
 			Marshal:     json.Marshal,
 			Unmarshal:   json.Unmarshal,
+			Ending:      []byte("\n"),
 		},
 		client: client,
 		target: target,
@@ -63,7 +67,7 @@ func (r *rpcRequest) Call(method string, value any) (err error) {
 		r.client = apphost.DefaultClient
 	}
 	// build base query
-	p := port.New(r.query...)
+	p := apphost.NewPort(r.query...)
 	if method != "" {
 		p = p.Add(method)
 	}

@@ -1,0 +1,32 @@
+package main
+
+import (
+	"context"
+	"github.com/cryptopunkscc/portal/client/portald"
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"io"
+	"os"
+)
+
+func (a Application) runApp(ctx context.Context, opt *portald.OpenOpt, cmd []string) (err error) {
+	log := plog.Get(ctx)
+	log.Println("running app", cmd)
+
+	conn, err := a.Portal.Connect(opt, cmd...)
+	if err != nil {
+		return
+	}
+	defer conn.Close()
+
+	ctx, cancel := context.WithCancel(ctx)
+	go func() {
+		_, _ = io.Copy(os.Stdout, conn)
+		cancel()
+	}()
+	go func() {
+		_, _ = io.Copy(conn, os.Stdin)
+		cancel()
+	}()
+	<-ctx.Done()
+	return
+}
