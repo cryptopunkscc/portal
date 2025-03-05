@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runtime/apps"
+	"github.com/cryptopunkscc/portal/runtime/tokens"
 	"io"
 	"os"
 )
@@ -18,12 +18,28 @@ func BundleRunner(cacheDir string) target.Run[target.BundleExec] {
 		}
 		defer os.Remove(execFile.Name())
 
-		token, err := apps.Tokens{}.GetToken(bundle.Manifest().Package)
+		token, err := tokens.Repository{}.Get(bundle.Manifest().Package)
 		if err != nil {
 			return err
 		}
 
 		err = RunCmd(ctx, token.Token.String(), execFile.Name(), args...)
+		if err != nil {
+			return
+		}
+		return
+	}
+}
+
+func HostBundleRunner(cacheDir string, token string) target.Run[target.BundleExec] {
+	return func(ctx context.Context, bundle target.BundleExec, args ...string) (err error) {
+		execFile, err := unpackExecutable(cacheDir, bundle)
+		if err != nil {
+			return
+		}
+		defer os.Remove(execFile.Name())
+
+		err = RunCmd(ctx, token, execFile.Name(), args...)
 		if err != nil {
 			return
 		}

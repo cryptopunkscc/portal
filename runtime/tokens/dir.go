@@ -1,9 +1,8 @@
-package apps
+package tokens
 
 import (
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/resolve/source"
-	"log"
 	"os"
 	"path/filepath"
 )
@@ -16,17 +15,13 @@ func init() {
 	if Dir, err = getDir(); err != nil {
 		panic(err)
 	}
-	log.Println("PORTAL_APPS_DIR: " + Dir)
 	if Source, err = source.File(Dir); err != nil {
 		panic(err)
 	}
 }
 
 func getDir() (dir string, err error) {
-	ok := false
-	if dir, ok = os.LookupEnv(target.PortaldHomeEnv); ok {
-		dir = filepath.Join(dir, "apps")
-	} else if dir, err = os.UserCacheDir(); err == nil {
+	if dir, err = os.UserCacheDir(); err == nil {
 		dir = filepath.Join(dir, "portal", "apps")
 	} else {
 		return

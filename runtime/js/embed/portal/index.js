@@ -41,7 +41,6 @@ const adapter$2 = () => ({
   astral_conn_write_ln: wails['ConnWriteLn'],
   astral_node_info: wails['NodeInfo'],
   astral_query: wails['Query'],
-  astral_query_name: wails['QueryName'],
   astral_resolve: wails['Resolve'],
   astral_service_close: wails['ServiceClose'],
   astral_service_register: wails['ServiceRegister'],
@@ -91,7 +90,6 @@ const adapter$1 = () => {
     astral_conn_read_ln: (arg1) => _promise(() => _app_host.connReadLn(arg1)),
     astral_conn_write_ln: (arg1, arg2) => _promise(() => _app_host.connWriteLn(arg1, arg2)),
     astral_query: (arg1, arg2) => _promise(() => _app_host.query(arg1, arg2)),
-    astral_query_name: (arg1, arg2) => _promise(() => _app_host.queryName(arg1, arg2)),
     astral_resolve: (arg1) => _promise(() => _app_host.resolve(arg1)),
     astral_service_close: (arg1) => _promise(() => _app_host.serviceClose(arg1)),
     astral_service_register: (arg1) => _promise(() => _app_host.serviceRegister(arg1)),
@@ -126,7 +124,6 @@ const adapter = () => ({
   astral_conn_write_ln: _astral_conn_write_ln,
   astral_node_info: _astral_node_info,
   astral_query: _astral_query,
-  astral_query_name: _astral_query_name,
   astral_resolve: _astral_resolve,
   astral_service_close: _astral_service_close,
   astral_service_register: _astral_service_register,
@@ -147,15 +144,8 @@ class ApphostClient {
     return new AppHostListener()
   }
 
-  async query(query, identity) {
-    identity = identity ? identity : "";
-    const json = await bindings.astral_query(identity, query);
-    const data = JSON.parse(json);
-    return new ApphostConn(data, query)
-  }
-
-  async queryName(name, query) {
-    const json = await bindings.astral_query_name(name, query);
+  async query(target, query) {
+    const json = await bindings.astral_query(target, query);
     const data = JSON.parse(json);
     return new ApphostConn(data, query)
   }

@@ -60,14 +60,9 @@ func (a *adapter) ConnAccept() (data string, err error) {
 	}
 
 	var next apphost.PendingQuery
-	for {
-		if next, err = listener.Next(); err != nil {
-			return
-		}
-		if strings.HasPrefix(next.Query(), a.pkg) {
-			break
-		}
-		_ = next.Close()
+
+	if next, err = listener.Next(); err != nil {
+		return
 	}
 	conn, err := next.Accept()
 	if err != nil {
@@ -158,7 +153,7 @@ func (a *adapter) ConnReadLn(id string) (data string, err error) {
 }
 
 func (a *adapter) Query(target string, query string) (data string, err error) {
-	a.log.Println("~>", query)
+	a.log.Println("~>", target, query)
 	conn, err := a.Cached.Query(target, query, nil)
 	if err != nil {
 		return
@@ -173,14 +168,6 @@ func (a *adapter) Query(target string, query string) (data string, err error) {
 	}
 	data = string(bytes)
 	return
-}
-
-func (a *adapter) QueryName(name string, query string) (data string, err error) {
-	id, err := a.Resolve(name)
-	if err != nil {
-		return
-	}
-	return a.Query(id, query)
 }
 
 func (a *adapter) Resolve(name string) (id string, err error) {

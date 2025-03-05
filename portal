@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
 CURRENT_DIR=$(pwd)
 SCRIPT_DIR=$(dirname "$0")
 
 cd "$SCRIPT_DIR" || exit
-go run ./cmd/make "$@"
+PLOG=100 go run ./cmd/portal "$@"
 cd "$CURRENT_DIR" || exit

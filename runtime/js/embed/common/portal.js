@@ -33,7 +33,6 @@ var portal = (function (exports) {
     astral_conn_write_ln: _astral_conn_write_ln,
     astral_node_info: _astral_node_info,
     astral_query: _astral_query,
-    astral_query_name: _astral_query_name,
     astral_resolve: _astral_resolve,
     astral_service_close: _astral_service_close,
     astral_service_register: _astral_service_register,
@@ -54,15 +53,8 @@ var portal = (function (exports) {
       return new AppHostListener()
     }
 
-    async query(query, identity) {
-      identity = identity ? identity : "";
-      const json = await bindings.astral_query(identity, query);
-      const data = JSON.parse(json);
-      return new ApphostConn(data, query)
-    }
-
-    async queryName(name, query) {
-      const json = await bindings.astral_query_name(name, query);
+    async query(target, query) {
+      const json = await bindings.astral_query(target, query);
       const data = JSON.parse(json);
       return new ApphostConn(data, query)
     }

@@ -1,8 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
 CURRENT_DIR=$(pwd)
 SCRIPT_DIR=$(dirname "$0")
 
 cd "$SCRIPT_DIR" || exit
-go run ./cmd/make "$@"
+#PORTALD_HOME=$(pwd)
+PLOG=100 go run ./cmd/portald "$@"
 cd "$CURRENT_DIR" || exit

@@ -8,16 +8,9 @@ export class ApphostClient {
     return new AppHostListener()
   }
 
-  async query(query, identity) {
-    identity = identity ? identity : ""
-    const json = await bindings.astral_query(identity, query)
-    const data = JSON.parse(json)
-    return new ApphostConn(data, query)
-  }
-
-  async queryName(name, query) {
-    const json = await bindings.astral_query_name(name, query)
-    const data = JSON.parse(json)
+  async query(target, query) {
+    const json = await bindings.astral_query(target, query);
+    const data = JSON.parse(json);
     return new ApphostConn(data, query)
   }
 

@@ -21,7 +21,6 @@ const adapter = () => ({
   astral_conn_write_ln: _astral_conn_write_ln,
   astral_node_info: _astral_node_info,
   astral_query: _astral_query,
-  astral_query_name: _astral_query_name,
   astral_resolve: _astral_resolve,
   astral_service_close: _astral_service_close,
   astral_service_register: _astral_service_register,

@@ -44,7 +44,6 @@ var portal = (function (exports) {
     astral_conn_write_ln: wails['ConnWriteLn'],
     astral_node_info: wails['NodeInfo'],
     astral_query: wails['Query'],
-    astral_query_name: wails['QueryName'],
     astral_resolve: wails['Resolve'],
     astral_service_close: wails['ServiceClose'],
     astral_service_register: wails['ServiceRegister'],
@@ -65,15 +64,8 @@ var portal = (function (exports) {
       return new AppHostListener()
     }
 
-    async query(query, identity) {
-      identity = identity ? identity : "";
-      const json = await bindings.astral_query(identity, query);
-      const data = JSON.parse(json);
-      return new ApphostConn(data, query)
-    }
-
-    async queryName(name, query) {
-      const json = await bindings.astral_query_name(name, query);
+    async query(target, query) {
+      const json = await bindings.astral_query(target, query);
       const data = JSON.parse(json);
       return new ApphostConn(data, query)
     }

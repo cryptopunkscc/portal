@@ -23,7 +23,7 @@ func (i Invoker) Query(target string, method string, args any) (conn apphost.Con
 	}
 
 	i.Log.Println("invoking app for:", target, method, args)
-	if err = i.Invoke(i.Ctx, method); err != nil {
+	if err = i.Invoke(i.Ctx, target); err != nil {
 		return
 	}
 

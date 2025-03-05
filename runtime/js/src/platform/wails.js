@@ -32,7 +32,6 @@ const adapter = () => ({
   astral_conn_write_ln: wails['ConnWriteLn'],
   astral_node_info: wails['NodeInfo'],
   astral_query: wails['Query'],
-  astral_query_name: wails['QueryName'],
   astral_resolve: wails['Resolve'],
   astral_service_close: wails['ServiceClose'],
   astral_service_register: wails['ServiceRegister'],

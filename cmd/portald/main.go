@@ -24,7 +24,7 @@ func main() {
 	cmd.InjectHelp(&handler)
 	err := cli.New(handler).Run(ctx)
 	if err != nil {
-		//log.Println(err)
+		log.D().Println("finished with error:", err)
 	}
 }
 
@@ -35,7 +35,7 @@ type Application[T Portal_] struct {
 func (a *Application[T]) handler() cmd.Handler {
 	return cmd.Handler{
 		Name: "portald",
-		Desc: "Start portal applications service",
+		Desc: "Portal daemon.",
 		Func: a.run,
 		Sub: cmd.Handlers{
 			{Name: "v", Desc: "Print version.", Func: version.Run},

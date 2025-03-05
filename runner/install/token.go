@@ -5,14 +5,14 @@ import (
 	api "github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/client/apphost"
 	"github.com/cryptopunkscc/portal/client/keys"
-	"github.com/cryptopunkscc/portal/runtime/apps"
+	"github.com/cryptopunkscc/portal/runtime/tokens"
 )
 
 func (i Install) Token(pkg string) (token mod.AccessToken, err error) {
-	tokens := apps.Tokens{Dir: i.appsDir}
+	repo := tokens.Repository{}
 	client := apphost.NewClient()
 
-	if token, err = tokens.GetToken(pkg); err == nil {
+	if token, err = repo.Get(pkg); err == nil {
 		return
 	}
 
@@ -37,6 +37,6 @@ func (i Install) Token(pkg string) (token mod.AccessToken, err error) {
 	}
 
 	token = *t
-	err = tokens.SetToken(pkg, token)
+	err = repo.Set(pkg, token)
 	return
 }

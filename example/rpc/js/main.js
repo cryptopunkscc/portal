@@ -16,5 +16,4 @@ class Service {
 portal.log("start backend")
 portal.rpc.serve({
     handlers: new Service(),
-    routes: ["*"],
 }).catch(portal.log)

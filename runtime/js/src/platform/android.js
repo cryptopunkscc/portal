@@ -36,7 +36,6 @@ const adapter = () => {
     astral_conn_read_ln: (arg1) => _promise(() => _app_host.connReadLn(arg1)),
     astral_conn_write_ln: (arg1, arg2) => _promise(() => _app_host.connWriteLn(arg1, arg2)),
     astral_query: (arg1, arg2) => _promise(() => _app_host.query(arg1, arg2)),
-    astral_query_name: (arg1, arg2) => _promise(() => _app_host.queryName(arg1, arg2)),
     astral_resolve: (arg1) => _promise(() => _app_host.resolve(arg1)),
     astral_service_close: (arg1) => _promise(() => _app_host.serviceClose(arg1)),
     astral_service_register: (arg1) => _promise(() => _app_host.serviceRegister(arg1)),

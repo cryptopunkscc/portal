@@ -10,7 +10,6 @@ const (
 	ConnWriteLn     = "_astral_conn_write_ln"
 	ConnReadLn      = "_astral_conn_read_ln"
 	Query           = "_astral_query"
-	QueryName       = "_astral_query_name"
 	ResolveId       = "_astral_resolve"
 	GetNodeInfo     = "_astral_node_info"
 	Interrupt       = "_astral_interrupt"
@@ -25,8 +24,7 @@ type Apphost interface {
 	ConnRead(id string, n int) (data []byte, err error)
 	ConnWriteLn(id string, data string) (err error)
 	ConnReadLn(id string) (data string, err error)
-	Query(id string, query string) (data string, err error)
-	QueryName(name string, query string) (data string, err error)
+	Query(target string, query string) (data string, err error)
 	Resolve(name string) (id string, err error)
 	NodeInfo(id string) (info *NodeInfo, err error)
 	Close() error

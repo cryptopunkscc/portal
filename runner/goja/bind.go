@@ -44,9 +44,6 @@ func Bind(vm *goja.Runtime, astral bind.Runtime) (err error) {
 	if err = vm.Set(bind.Query, a.Query); err != nil {
 		return
 	}
-	if err = vm.Set(bind.QueryName, a.QueryName); err != nil {
-		return
-	}
 	if err = vm.Set(bind.GetNodeInfo, a.NodeInfo); err != nil {
 		return
 	}
@@ -103,17 +100,14 @@ func (a *adapter) ConnWriteLn(id string, data string) *goja.Promise {
 func (a *adapter) ConnReadLn(id string) *goja.Promise {
 	return a.promise2(func() (any, error) { return a.runtime.ConnReadLn(id) })
 }
-func (a *adapter) Query(identity string, query string) *goja.Promise {
-	return a.promise2(func() (any, error) { return a.runtime.Query(identity, query) })
-}
-func (a *adapter) QueryName(name string, query string) *goja.Promise {
-	return a.promise2(func() (any, error) { return a.runtime.QueryName(name, query) })
+func (a *adapter) Query(target string, query string) *goja.Promise {
+	return a.promise2(func() (any, error) { return a.runtime.Query(target, query) })
 }
 func (a *adapter) Resolve(name string) *goja.Promise {
 	return a.promise2(func() (any, error) { return a.runtime.Resolve(name) })
 }
-func (a *adapter) NodeInfo(identity string) *goja.Promise {
-	return a.promise2(func() (any, error) { return a.runtime.NodeInfo(identity) })
+func (a *adapter) NodeInfo(target string) *goja.Promise {
+	return a.promise2(func() (any, error) { return a.runtime.NodeInfo(target) })
 }
 func (a *adapter) Interrupt() *goja.Promise {
 	return a.promise0(a.runtime.Interrupt)
