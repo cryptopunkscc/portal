@@ -19,6 +19,15 @@ func (a Application) Handler() (h cmd.Handler) {
 		},
 		Sub: cmd.Handlers{
 			{Name: "v", Desc: "Print version.", Func: version.Run},
+			{
+				Func: a.Arg,
+				Name: "-a",
+				Desc: "Execute list of commands with given arg.",
+				Params: cmd.Params{
+					{Type: "string", Desc: "Argument value."},
+					{Type: "...string", Desc: "List of commands to run with given arg."},
+				},
+			},
 		},
 	}
 	cmd.InjectHelp(&h)

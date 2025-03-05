@@ -11,7 +11,7 @@ import (
 
 type Runner struct {
 	router.Base
-	conn        stream.Serializer
+	Conn        stream.Serializer
 	interactive bool
 }
 
@@ -19,7 +19,7 @@ func New(handler cmd.Handler) (runner *Runner) {
 	root := cmd.Root(handler)
 
 	runner = &Runner{
-		conn: cliConnection(),
+		Conn: cliConnection(),
 	}
 
 	r := router.Base{
@@ -36,7 +36,7 @@ func New(handler cmd.Handler) (runner *Runner) {
 func (c *Runner) Run(ctx context.Context) error {
 	for {
 		// read query
-		bytes, err := c.conn.ReadString('\n')
+		bytes, err := c.Conn.ReadString('\n')
 
 		if err != nil {
 			if err == io.EOF {
@@ -49,7 +49,7 @@ func (c *Runner) Run(ctx context.Context) error {
 		rr := *c
 		rr.Setup(bytes)
 		rr.Dependencies = append([]any{ctx}, rr.Dependencies...)
-		if err = rr.Respond(&c.conn); err != nil {
+		if err = rr.Respond(&c.Conn); err != nil {
 			return err
 		}
 
@@ -57,7 +57,7 @@ func (c *Runner) Run(ctx context.Context) error {
 		if !c.interactive {
 			return nil
 		}
-		if _, err = c.conn.Write([]byte("$ ")); err != nil {
+		if _, err = c.Conn.Write([]byte("$ ")); err != nil {
 			return err
 		}
 	}

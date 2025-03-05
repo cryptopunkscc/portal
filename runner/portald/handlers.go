@@ -36,6 +36,11 @@ func (s *Runner[T]) Handlers() cmd.Handlers {
 				{Type: "...string", Desc: "Optional arguments."},
 			},
 		},
+	}.Plus(s.publicHandlers()...)
+}
+
+func (s *Runner[T]) publicHandlers() cmd.Handlers {
+	return cmd.Handlers{
 		{
 			Func: s.Connect,
 			Name: "connect c",
@@ -45,11 +50,6 @@ func (s *Runner[T]) Handlers() cmd.Handlers {
 				{Type: "...string", Desc: "Optional arguments."},
 			},
 		},
-	}.Plus(s.publicHandlers()...)
-}
-
-func (s *Runner[T]) publicHandlers() cmd.Handlers {
-	return cmd.Handlers{
 		{
 			Func: install.Runner(apps.Dir).Token,
 			Name: "token",
