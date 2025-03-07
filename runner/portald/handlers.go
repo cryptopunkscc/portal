@@ -51,7 +51,7 @@ func (s *Runner[T]) publicHandlers() cmd.Handlers {
 			},
 		},
 		{
-			Func: install.Runner(apps.Dir).Token,
+			Func: install.Token,
 			Name: "token",
 			Desc: "Create a new token or return existing one.",
 			Params: cmd.Params{

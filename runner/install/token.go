@@ -8,7 +8,7 @@ import (
 	"github.com/cryptopunkscc/portal/runtime/tokens"
 )
 
-func (i Install) Token(pkg string) (token mod.AccessToken, err error) {
+func Token(pkg string) (token mod.AccessToken, err error) {
 	repo := tokens.Repository{}
 	client := apphost.NewClient()
 
@@ -22,11 +22,11 @@ func (i Install) Token(pkg string) (token mod.AccessToken, err error) {
 			for _, tt := range at {
 				if tt.Identity.IsEqual(t.Identity) {
 					token = tt
+					err = repo.Set(pkg, token)
 					return
 				}
 			}
 		}
-
 	} else if t.Identity, err = keys.NewClient().CreateKey(pkg); err != nil {
 		return
 	}

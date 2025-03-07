@@ -8,6 +8,7 @@ import (
 	"github.com/cryptopunkscc/portal/runtime/tokens"
 	"io"
 	"os"
+	"path/filepath"
 )
 
 func BundleRunner(cacheDir string) target.Run[target.BundleExec] {
@@ -49,7 +50,12 @@ func HostBundleRunner(cacheDir string, token string) target.Run[target.BundleExe
 
 func unpackExecutable(cacheDir string, bundle target.BundleExec) (execFile *os.File, err error) {
 	execName := fmt.Sprintf("%s_%s", bundle.Manifest().Package, bundle.Manifest().Version)
-	execFile, err = os.CreateTemp(cacheDir, execName)
+	binDir := filepath.Join(cacheDir, "bin")
+	if err = os.MkdirAll(binDir, 0755); err != nil {
+		return nil, plog.Err(err)
+	}
+
+	execFile, err = os.CreateTemp(binDir, execName)
 	//execFile, err = os.Create(filepath.Join(cacheDir, execName)) // FIXME
 	if err != nil {
 		return nil, plog.Err(err)

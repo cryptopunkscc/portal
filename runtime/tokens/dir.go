@@ -22,7 +22,7 @@ func init() {
 
 func getDir() (dir string, err error) {
 	if dir, err = os.UserCacheDir(); err == nil {
-		dir = filepath.Join(dir, "portal", "apps")
+		dir = filepath.Join(dir, "portal", "tokens")
 	} else {
 		return
 	}
