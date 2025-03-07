@@ -1,6 +1,6 @@
 {
   "name": "launcher",
-  "package": "cc.cryptopunks.portal.launcher",
+  "package": "portal.launcher",
   "title": "Portal Launcher",
   "description": "Portal applications launcher.",
   "icon": "./src/assets/images/logo.svg",

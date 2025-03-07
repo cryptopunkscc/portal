@@ -9,8 +9,17 @@ import (
 	"text/tabwriter"
 )
 
-func (s *Runner[T]) ListApps() Apps {
-	return apps.ResolveAll.List(apps2.Source)
+type ListAppsOpts struct {
+	Hidden bool `query:"hidden h" cli:"hidden h"`
+}
+
+func (s *Runner[T]) ListApps(opts ListAppsOpts) (a Apps) {
+	for _, app := range apps.ResolveAll.List(apps2.Source) {
+		if opts.Hidden || !app.Manifest().Hidden {
+			a = append(a, app)
+		}
+	}
+	return a
 }
 
 type Apps []target.App_

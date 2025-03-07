@@ -11,13 +11,14 @@ func (s *Runner[T]) Api() cmd.Handlers {
 func (s *Runner[T]) portaldApi() (handlers cmd.Handlers) {
 	for _, handler := range s.publicHandlers() {
 		handler.Func = "portald"
+		handler.Sub = nil
 		handlers = append(handlers, handler)
 	}
 	return handlers
 }
 
 func (s *Runner[T]) appApi() (handlers cmd.Handlers) {
-	for _, app := range s.ListApps() {
+	for _, app := range s.ListApps(ListAppsOpts{Hidden: true}) {
 		m := app.Manifest()
 		if m.Hidden {
 			continue

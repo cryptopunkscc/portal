@@ -612,8 +612,7 @@ class RpcClient extends ApphostClient {
   }
 
   target(id) {
-    this.targetId = id;
-    return this
+    return this.copy({targetId: id})
   }
 
   call(port, ...params) {
@@ -622,7 +621,7 @@ class RpcClient extends ApphostClient {
 
   async conn(port, ...params) {
     const query = formatQuery(port, params);
-    const conn = await super.query(query, this.targetId);
+    const conn = await super.query(this.targetId, query);
     return new RpcConn(conn)
   }
 

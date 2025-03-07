@@ -86,6 +86,17 @@ func (s *Runner[T]) publicHandlers() cmd.Handlers {
 			Func: s.ListApps,
 			Name: "list l",
 			Desc: "List installed apps.",
+			Params: cmd.Params{
+				{Name: "hidden h", Type: "boolean", Desc: "Include hidden apps."},
+			},
+			Sub: cmd.Handlers{{
+				Func: s.ObserveApps,
+				Name: "observe o",
+				Desc: "Observe installed list apps.",
+				Params: cmd.Params{
+					{Name: "hidden h", Type: "boolean", Desc: "Include hidden apps."},
+				},
+			}},
 		},
 		{
 			Func: s.Shutdown,

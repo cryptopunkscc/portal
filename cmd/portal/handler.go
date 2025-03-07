@@ -11,8 +11,8 @@ func (a Application) Handler() (h cmd.Handler) {
 		Desc: "Manage and run portal apps.",
 		Func: a.Run,
 		Params: cmd.Params{
-			{Name: "open o", Type: "bool", Desc: "Open portal tha app as background process without redirecting IO."},
-			{Name: "query q", Type: "string", Desc: "Optional query to execute on invoked service"},
+			{Name: "open o", Type: "bool", Desc: "Open app without redirecting IO."},
+			{Name: "query q", Type: "string", Desc: "Optional query to execute on invoked app."},
 			{Name: "dev d", Type: "bool", Desc: "Development mode."},
 			{Type: "string", Desc: "Application source. The source can be a app name, package name, app bundle path or app dir."},
 			{Type: "...string", Desc: "Optional application arguments."},
