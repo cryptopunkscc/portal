@@ -7,14 +7,13 @@ import (
 	"io/fs"
 )
 
-func Install(dir string, template fs.FS, args template.Args) (err error) {
-	if err = extractTemplate(dir, template, args); err != nil {
-		return fmt.Errorf("extract template: %w", err)
+func installTemplate(dir string, template fs.FS, args template.Args) (err error) {
+	if err = extractTemplate(dir, template, args); err == nil {
+		if err = extractCommons(dir, args); err == nil {
+			return
+		}
 	}
-	if err = extractCommons(dir, args); err != nil {
-		return fmt.Errorf("extract commons: %w", err)
-	}
-	return
+	return fmt.Errorf("cannot install template: %w", err)
 }
 
 func extractTemplate(dir string, files fs.FS, args template.Args) (err error) {
@@ -24,7 +23,7 @@ func extractTemplate(dir string, files fs.FS, args template.Args) (err error) {
 		"gitignore.txt": ".gitignore",
 	})
 	if err = installer.Extract(dir, args); err != nil {
-		return fmt.Errorf("template.Extract: %v", err)
+		return fmt.Errorf("cannot extract template: %v", err)
 	}
 	return
 }
@@ -32,7 +31,7 @@ func extractTemplate(dir string, files fs.FS, args template.Args) (err error) {
 func extractCommons(dir string, args template.Args) (err error) {
 	installer := gosod.New(template.CommonsFs)
 	if err = installer.Extract(dir, args); err != nil {
-		return fmt.Errorf("template.Extract: %v", err)
+		return fmt.Errorf("cannot extract template commons: %v", err)
 	}
 	return
 }

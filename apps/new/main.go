@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"errors"
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/factory/build"
 	"github.com/cryptopunkscc/portal/runner/cli"
-	"github.com/cryptopunkscc/portal/runner/create"
 	"github.com/cryptopunkscc/portal/runner/template"
 	_ "github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
@@ -43,15 +43,15 @@ func createProject(ctx context.Context, targets string, dir string) (err error) 
 	if dir == "" {
 		dir = "."
 	}
+	dir = target.Abs(dir)
 	parsedTargets := parseTargets(targets)
-
-	err = create.Runner(
-		template.Runner,
-		build.Create().Dist,
-	)(ctx, dir, parsedTargets)
-	if err != nil {
-		log.Println("* done")
+	if err = template.NewRunner(dir).GenerateProjects(parsedTargets); err != nil {
+		return
 	}
+	if err = build.Create().Dist(ctx, dir); err != nil {
+		return
+	}
+	log.Println("* done")
 	return
 }
 
@@ -59,12 +59,12 @@ func parseTargets(targets string) (out map[string]string) {
 	out = make(map[string]string)
 	for _, s := range strings.Split(targets, " ") {
 		chunks := strings.Split(s, ":")
-		template := chunks[0]
-		name := template
+		tmpl := chunks[0]
+		name := tmpl
 		if len(chunks) > 1 {
 			name = chunks[1]
 		}
-		out[template] = name
+		out[tmpl] = name
 	}
 	return
 }
