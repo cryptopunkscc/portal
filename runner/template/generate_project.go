@@ -10,11 +10,18 @@ import (
 )
 
 func (r *Runner) GenerateProjects(targets map[string]string) (err error) {
-	for _, t := range List() {
-		if n, ok := targets[t.Name()]; ok {
-			if err = r.GenerateProject(t, n); err != nil {
-				return
-			}
+	availableTemplates := Map()
+	matched := map[string]target.Template{}
+	for projectName, templateName := range targets {
+		t, ok := availableTemplates[templateName]
+		if !ok {
+			return fmt.Errorf("project template %s not found", templateName)
+		}
+		matched[projectName] = t
+	}
+	for n, t := range matched {
+		if err = r.GenerateProject(t, n); err != nil {
+			return
 		}
 	}
 	return

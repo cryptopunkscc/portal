@@ -23,7 +23,7 @@ func (a Application) handler() cmd.Handler {
 		Name: "portal-new",
 		Desc: "Create new portal project from template.",
 		Params: cmd.Params{
-			{Type: "string", Desc: "List of templates with optional module names like: 'svelte backend' or 'svelte:front backend:back'."},
+			{Type: "string", Desc: "List of templates with optional module names like: 'svelte js' or 'svelte:frontend js:backend'."},
 			{Type: "string", Desc: "Project directory."},
 		},
 		Sub: cmd.Handlers{
@@ -45,6 +45,9 @@ func createProject(ctx context.Context, targets string, dir string) (err error) 
 	}
 	dir = target.Abs(dir)
 	parsedTargets := parseTargets(targets)
+	if len(parsedTargets) == 0 {
+		return errors.New("no targets specified")
+	}
 	if err = template.NewRunner(dir).GenerateProjects(parsedTargets); err != nil {
 		return
 	}
@@ -64,7 +67,7 @@ func parseTargets(targets string) (out map[string]string) {
 		if len(chunks) > 1 {
 			name = chunks[1]
 		}
-		out[tmpl] = name
+		out[name] = tmpl
 	}
 	return
 }
