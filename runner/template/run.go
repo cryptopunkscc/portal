@@ -66,7 +66,9 @@ func (r *runner) checkTargetDir(dir, name string) (err error) {
 	_, err = os.Stat(dir)
 	if err == nil {
 		err = fmt.Errorf("cannot create project %s: %s already exists", name, dir)
-	} else if !os.IsNotExist(err) {
+	} else if os.IsNotExist(err) {
+		err = nil
+	} else {
 		err = fmt.Errorf("cannot create project %s: %v", name, err)
 	}
 	return

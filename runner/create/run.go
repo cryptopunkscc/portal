@@ -3,8 +3,8 @@ package create
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/resolve/template"
 )
@@ -17,7 +17,6 @@ type (
 
 func Runner(factory Factory, dist Dist) Run {
 	return func(ctx context.Context, dir string, targets map[string]string) (err error) {
-		log := plog.Get(ctx)
 		create := factory(dir, targets)
 		for _, t := range template.Resolve.List(
 			source.Embed(template.TemplatesFs),
@@ -26,7 +25,7 @@ func Runner(factory Factory, dist Dist) Run {
 				continue
 			}
 			if err = create(ctx, t); err != nil {
-				log.E().Printf("Error creating project from template: %v", err)
+				return fmt.Errorf("cannot create project from template: %w", err)
 			}
 		}
 
