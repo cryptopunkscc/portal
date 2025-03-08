@@ -2,6 +2,8 @@ package exec
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -17,7 +19,6 @@ func BundleRunner(cacheDir string) target.Run[target.BundleExec] {
 		if err != nil {
 			return
 		}
-		defer os.Remove(execFile.Name())
 
 		token, err := tokens.Repository{}.Get(bundle.Manifest().Package)
 		if err != nil {
@@ -49,35 +50,62 @@ func HostBundleRunner(cacheDir string, token string) target.Run[target.BundleExe
 }
 
 func unpackExecutable(cacheDir string, bundle target.BundleExec) (execFile *os.File, err error) {
-	execName := fmt.Sprintf("%s_%s", bundle.Manifest().Package, bundle.Manifest().Version)
 	binDir := filepath.Join(cacheDir, "bin")
 	if err = os.MkdirAll(binDir, 0755); err != nil {
 		return nil, plog.Err(err)
 	}
 
-	execFile, err = os.CreateTemp(binDir, execName)
-	//execFile, err = os.Create(filepath.Join(cacheDir, execName)) // FIXME
+	src := bundle.Target().Executable()
+	srcFile, err := src.File()
+	defer srcFile.Close()
+	if err != nil {
+		return nil, plog.Err(err)
+	}
+	srcId, err := readMD5Hex(srcFile)
+	if err != nil {
+		return nil, plog.Err(err)
+	}
+	_ = srcFile.Close()
+	srcFile, err = src.File()
 	if err != nil {
 		return nil, plog.Err(err)
 	}
 
-	execSource := bundle.Target().Executable()
-	execSrcFile, err := execSource.Files().Open(execSource.Path())
+	execName := fmt.Sprintf("%s_%s_%s",
+		bundle.Manifest().Package,
+		bundle.Manifest().Version,
+		srcId,
+	)
+
+	execFile, err = os.OpenFile(filepath.Join(binDir, execName), os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil {
 		return nil, plog.Err(err)
 	}
-
+	defer execFile.Close()
+	execId, err := readMD5Hex(execFile)
+	if err != nil {
+		return nil, plog.Err(err)
+	}
 	if err = execFile.Chmod(0755); err != nil {
 		return nil, plog.Err(err)
 	}
-	_, err = io.Copy(execFile, execSrcFile)
-	if err != nil {
-		return nil, plog.Err(err)
+
+	if execId == srcId {
+		return execFile, nil
 	}
 
-	if err = execFile.Close(); err != nil {
+	if _, err = io.Copy(execFile, srcFile); err != nil {
 		return nil, plog.Err(err)
 	}
-	_ = execSrcFile.Close()
+	return
+}
+
+func readMD5Hex(src io.Reader) (sum string, err error) {
+	hash := md5.New()
+	if _, err = io.Copy(hash, src); err != nil {
+		return
+	}
+	bytes := hash.Sum(nil)
+	sum = hex.EncodeToString(bytes)
 	return
 }
