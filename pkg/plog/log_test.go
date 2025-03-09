@@ -2,6 +2,7 @@ package plog
 
 import (
 	"context"
+	"errors"
 	"testing"
 )
 
@@ -9,11 +10,11 @@ func TestApi(t *testing.T) {
 	ctx := context.Background()
 	log := New().W().Scope("root").Set(&ctx)
 	log.Println("message 1")
-	nested(ctx)
+	nestedApi(ctx)
 	log.F().Println("message 3")
 }
 
-func nested(ctx context.Context) {
+func nestedApi(ctx context.Context) {
 	Get(ctx).Scope("nested").Set(&ctx)
 	Get(ctx).I().Println("message 2")
 }
@@ -27,4 +28,12 @@ func TestImmutability(t *testing.T) {
 	log3.Printf("message")
 	log2.Printf("message")
 	log1.Printf("message")
+}
+
+func TestError(t *testing.T) {
+	Verbosity = all
+	ctx := context.Background()
+	err := Err(errors.New("error"))
+	log := New().W().Scope("root").Set(&ctx)
+	log.Println(err)
 }

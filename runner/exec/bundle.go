@@ -52,23 +52,25 @@ func HostBundleRunner(cacheDir string, token string) target.Run[target.BundleExe
 func unpackExecutable(cacheDir string, bundle target.BundleExec) (execFile *os.File, err error) {
 	binDir := filepath.Join(cacheDir, "bin")
 	if err = os.MkdirAll(binDir, 0755); err != nil {
-		return nil, plog.Err(err)
+		err = plog.Err(err)
+		return
 	}
 
 	src := bundle.Target().Executable()
 	srcFile, err := src.File()
 	defer srcFile.Close()
 	if err != nil {
-		return nil, plog.Err(err)
+		err = plog.Err(err)
+		return
 	}
 	srcId, err := readMD5Hex(srcFile)
 	if err != nil {
-		return nil, plog.Err(err)
+		return
 	}
 	_ = srcFile.Close()
-	srcFile, err = src.File()
-	if err != nil {
-		return nil, plog.Err(err)
+	if srcFile, err = src.File(); err != nil {
+		err = plog.Err(err)
+		return
 	}
 
 	execName := fmt.Sprintf("%s_%s_%s",
@@ -77,25 +79,27 @@ func unpackExecutable(cacheDir string, bundle target.BundleExec) (execFile *os.F
 		srcId,
 	)
 
-	execFile, err = os.OpenFile(filepath.Join(binDir, execName), os.O_RDWR|os.O_CREATE, 0755)
-	if err != nil {
-		return nil, plog.Err(err)
+	if execFile, err = os.OpenFile(filepath.Join(binDir, execName), os.O_RDWR|os.O_CREATE, 0755); err != nil {
+		err = plog.Err(err)
+		return
 	}
 	defer execFile.Close()
 	execId, err := readMD5Hex(execFile)
 	if err != nil {
-		return nil, plog.Err(err)
+		return
 	}
 	if err = execFile.Chmod(0755); err != nil {
-		return nil, plog.Err(err)
+		err = plog.Err(err)
+		return
 	}
 
 	if execId == srcId {
-		return execFile, nil
+		return
 	}
 
 	if _, err = io.Copy(execFile, srcFile); err != nil {
-		return nil, plog.Err(err)
+		err = plog.Err(err)
+		return
 	}
 	return
 }
@@ -103,6 +107,7 @@ func unpackExecutable(cacheDir string, bundle target.BundleExec) (execFile *os.F
 func readMD5Hex(src io.Reader) (sum string, err error) {
 	hash := md5.New()
 	if _, err = io.Copy(hash, src); err != nil {
+		err = plog.Err(err)
 		return
 	}
 	bytes := hash.Sum(nil)

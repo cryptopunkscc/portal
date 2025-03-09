@@ -8,7 +8,6 @@ import (
 	"github.com/cryptopunkscc/portal/runtime/rpc/caller/query"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 	"github.com/cryptopunkscc/portal/runtime/rpc/router"
-	"log"
 	"math"
 	"strings"
 )
@@ -59,12 +58,15 @@ func (r *Router) Run(ctx context.Context) (err error) {
 			return
 		}
 		rr := *r
-		go rr.routeQuery(q)
+		go func() {
+			if err := rr.routeQuery(q); err != nil && r.Logger != nil {
+				r.Logger.E().Println(q)
+			}
+		}()
 	}
 }
 
 func (r *Router) routeQuery(q apphost.PendingQuery) (err error) {
-	log.Println("query", q)
 	r.Responses = math.MaxInt64
 	r.Add(&r.Base, q)
 

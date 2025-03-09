@@ -24,7 +24,9 @@ func RunCmd(ctx context.Context, token string, path string, args ...string) (err
 	if err = setStd(cmd, ctx); err != nil {
 		return
 	}
-	err = cmd.Run()
+	if err = cmd.Run(); err != nil {
+		err = plog.Err(err)
+	}
 	log.Printf("Command finished: %s, %v, %v", path, args, err)
 	return
 }
@@ -42,6 +44,7 @@ func setStd(cmd *exec.Cmd, ctx context.Context) (err error) {
 	cmd.Stderr = std.Err
 	stdIn, err := cmd.StdinPipe()
 	if err != nil {
+		err = plog.Err(err)
 		return
 	}
 	go func() {

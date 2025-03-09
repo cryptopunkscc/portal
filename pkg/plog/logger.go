@@ -163,7 +163,7 @@ func (l logger) Flush() {
 func (l logger) appendErrors(args ...any) logger {
 	for _, arg := range args {
 		if e, ok := arg.(error); ok {
-			l.Errors = append(l.Errors[:], e)
+			l.Errors = append(l.Errors, e)
 		}
 	}
 	return l
