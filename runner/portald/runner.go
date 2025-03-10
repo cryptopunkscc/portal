@@ -33,7 +33,7 @@ func (s *Runner[T]) Run(ctx context.Context) (err error) {
 	err = router.Run(ctx)
 
 	if err != nil {
-		log.Printf("error: %v", err)
+		log.Println(err)
 		return nil
 	}
 	s.waitGroup.Wait()

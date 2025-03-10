@@ -6,6 +6,8 @@ import (
 	"github.com/cryptopunkscc/portal/resolve/bundle"
 	"github.com/cryptopunkscc/portal/resolve/dist"
 	"github.com/cryptopunkscc/portal/resolve/portal"
+	"github.com/cryptopunkscc/portal/resolve/project"
+	"github.com/cryptopunkscc/portal/resolve/unknown"
 	"io/fs"
 )
 
@@ -39,5 +41,26 @@ func ResolveExec(source target.Source) (t target.Exec, err error) {
 	return New(b)
 }
 
+func ResolveProjectExec(source target.Source) (out target.Exec, err error) {
+	p, err := unknown.ResolveProject(source)
+	if err != nil {
+		return
+	}
+	m := p.Manifest()
+	if m.Exec == "" {
+		e := target.GetBuild(p).Exec
+		if e == "" {
+			err = plog.Errorf("exec not specified for %s", source.Abs())
+			return
+		}
+		m.Exec = e
+	}
+	out = exec{exec: p}
+	return
+}
+
+var _ target.Exec = exec{}
+
 var ResolveDist = dist.Resolver[target.Exec](ResolveExec)
 var ResolveBundle = bundle.Resolver[target.Exec](ResolveDist)
+var ResolveProject = project.Resolver[target.Exec](ResolveProjectExec)

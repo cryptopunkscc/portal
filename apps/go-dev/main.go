@@ -35,7 +35,7 @@ func (a Application[T]) handler() cmd.Handler {
 
 func (a Application[T]) Runner() Run[T] {
 	return multi.Runner[T](
-		reload.Mutable(bind.DefaultRuntime(), go_dev.Adapter(exec.DistRunner())),
+		reload.Mutable(bind.DefaultRuntime(), go_dev.Adapter(exec.DistRun)),
 	)
 }
 

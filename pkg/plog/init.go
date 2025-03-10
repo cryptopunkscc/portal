@@ -11,5 +11,4 @@ func init() {
 			Verbosity = Level(i)
 		}
 	}
-	ErrorStackTrace = Verbosity == Debug
 }

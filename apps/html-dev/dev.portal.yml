@@ -6,9 +6,11 @@ version: 0.0.0
 hidden: true
 build:
   default:
-    exec: main
+    out: main
 #    cmd: go build -tags='desktop,wv2runtime.download,production,webkit2_41' -ldflags='-w -s' -o dist/main
     cmd: go build -tags='dev,webkit2_41' -o dist/main
+    exec: go run -tags='dev,webkit2_41'
   windows:
-    exec: main.exe
+    out: main.exe
     cmd: go build -tags='desktop,wv2runtime.download,production,webkit2_41' -ldflags='-w -s' -o dist/main.exe
+    exec: go run -tags='desktop,wv2runtime.download,production,webkit2_41' -ldflags='-w -s'

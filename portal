@@ -4,5 +4,5 @@ CURRENT_DIR=$(pwd)
 SCRIPT_DIR=$(dirname "$0")
 
 cd "$SCRIPT_DIR" || exit
-PLOG=100 go run ./cmd/portal "$@"
+PLOG=100 go run -tags project ./cmd/portal "$@"
 cd "$CURRENT_DIR" || exit

@@ -16,8 +16,8 @@ func (p Client) Ping() error  { return rpc.Command(p, "ping") }
 func (p Client) Close() error { return rpc.Command(p, "close") }
 func (p Client) Open(opt *OpenOpt, args ...string) error {
 	var argv []any
-	if opt != nil && opt.Schema != "" {
-		argv = []any{*opt}
+	if opt != nil {
+		argv = []any{opt}
 	}
 	for _, arg := range args {
 		argv = append(argv, arg)
@@ -26,7 +26,7 @@ func (p Client) Open(opt *OpenOpt, args ...string) error {
 }
 func (p Client) Connect(opt *OpenOpt, args ...string) (rwc io.ReadWriteCloser, err error) {
 	var argv []any
-	if opt != nil && opt.Schema != "" {
+	if opt != nil {
 		argv = []any{opt}
 	}
 	for _, arg := range args {

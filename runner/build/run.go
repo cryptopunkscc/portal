@@ -62,6 +62,7 @@ func (r Runner) Pack(ctx context.Context, dir ...string) (err error) {
 }
 
 func run[T target.Portal_](ctx context.Context, run target.Run[T], dir []string, matchers ...target.Matcher) (err error) {
+	defer plog.TraceErr(&err)
 	projects, err := findIn[T](ctx, dir, matchers...)
 	if err != nil {
 		return

@@ -3,8 +3,8 @@ package multi
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"reflect"
 )
 
@@ -25,5 +25,5 @@ func (r runner[T]) Run(ctx context.Context, portal T, args ...string) (err error
 			return
 		}
 	}
-	return fmt.Errorf("invalid target %v: %v", reflect.TypeOf(portal), portal.Path())
+	return plog.Errorf("invalid target %v: %v", reflect.TypeOf(portal), portal.Path())
 }

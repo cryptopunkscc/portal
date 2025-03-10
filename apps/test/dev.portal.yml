@@ -3,9 +3,10 @@ package: portal.test
 title: Portal test
 version: 0.0.0
 schema: go
+exec: go run
 build:
   default:
-    exec: main
+    out: main
     cmd: go build -o dist/main
   windows:
-    exec: main.exe
+    out: main.exe

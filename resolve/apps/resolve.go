@@ -9,7 +9,7 @@ import (
 
 var ResolveAll = Resolver[target.App_]()
 
-func Resolver[T target.App_]() target.Resolve[T] {
+func Resolver[T target.Portal_]() target.Resolve[T] {
 	return target.Any[T](
 		target.Skip("node_modules"),
 		target.Try(html.ResolveBundle),

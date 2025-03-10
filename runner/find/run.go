@@ -21,7 +21,7 @@ func Runner[T target.Portal_](find target.Find[T], run target.Run[T]) target.Run
 		for _, t := range portals {
 			go func(t T) {
 				defer group.Done()
-				if err = run(ctx, t, args...); err != nil {
+				if err := run(ctx, t, args...); err != nil {
 					log.E().Println(err)
 				}
 			}(t)

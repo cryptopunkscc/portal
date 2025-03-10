@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/resolve/apps"
 	apps2 "github.com/cryptopunkscc/portal/runtime/apps"
 	"text/tabwriter"
 )
@@ -13,16 +12,18 @@ type ListAppsOpts struct {
 	Hidden bool `query:"hidden h" cli:"hidden h"`
 }
 
-func (s *Runner[T]) ListApps(opts ListAppsOpts) (a Apps) {
-	for _, app := range apps.ResolveAll.List(apps2.Source) {
+func (s *Runner[T]) ListApps(opts ListAppsOpts) Apps {
+	a := target.Portals[target.Portal_]{}
+	for _, app := range resolveApps.List(apps2.Source) {
 		if opts.Hidden || !app.Manifest().Hidden {
 			a = append(a, app)
 		}
 	}
-	return a
+	a = a.Reduced()
+	return Apps(a)
 }
 
-type Apps []target.App_
+type Apps target.Portals[target.Portal_]
 
 func (a Apps) MarshalCLI() string {
 	b := &bytes.Buffer{}

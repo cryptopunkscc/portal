@@ -39,6 +39,7 @@ func (r *Router) Start(ctx context.Context) (err error) {
 }
 
 func (r *Router) Run(ctx context.Context) (err error) {
+	defer plog.TraceErr(&err)
 	if r.client == nil {
 		r.client = apphost.DefaultClient
 	}
@@ -55,6 +56,9 @@ func (r *Router) Run(ctx context.Context) (err error) {
 	var q apphost.PendingQuery
 	for {
 		if q, err = listener.Next(); err != nil {
+			if errors.Is(ctx.Err(), context.Canceled) {
+				err = nil
+			}
 			return
 		}
 		rr := *r

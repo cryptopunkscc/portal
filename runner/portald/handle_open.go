@@ -6,12 +6,11 @@ import (
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/client/portald"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	exec2 "github.com/cryptopunkscc/portal/resolve/exec"
+	"github.com/cryptopunkscc/portal/resolve/exec"
 	"github.com/cryptopunkscc/portal/resolve/path"
+	"github.com/cryptopunkscc/portal/resolve/portal"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/resolve/unknown"
-	"github.com/cryptopunkscc/portal/runner/app"
-	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/find"
 	"github.com/cryptopunkscc/portal/runner/multi"
 	"github.com/cryptopunkscc/portal/runner/supervisor"
@@ -32,6 +31,10 @@ func (s *Runner[T]) Open() Run[portald.OpenOpt] {
 		}
 		plog.Get(ctx).Type(s).Println("open:", opt, cmd, opt.Order)
 
+		if len(opt.Order) == 0 {
+			opt.Order = defaultOrder
+		}
+
 		order := Priority{
 			Match[Bundle_],
 			Match[Dist_],
@@ -42,23 +45,23 @@ func (s *Runner[T]) Open() Run[portald.OpenOpt] {
 			FindByPath(
 				source.File, Any[T](
 					Skip("node_modules"),
-					Try(exec2.ResolveBundle),
-					Try(exec2.ResolveDist),
+					Try(exec.ResolveBundle),
+					Try(exec.ResolveDist),
+					Try(exec.ResolveProject),
 					Try(unknown.ResolveBundle),
 					Try(unknown.ResolveDist),
 					Try(unknown.ResolveProject),
 				),
-			).ById(path.Resolver(apps.Source)).
+			).ById(path.Resolver(Any[T](
+				Try(portal.Resolve_),
+				Try(exec.ResolveBundle),
+			), apps.Source)).
 				Cached(&s.cache).
 				Reduced(order...),
 			supervisor.Runner[T](
 				&s.waitGroup,
 				&s.processes,
-				multi.Runner[T](
-					app.Runner(exec.BundleRunner(s.CacheDir)),
-					app.Runner(exec.DistRunner()),
-					app.Runner(exec.AnyRunner(s.CacheDir, schemaPrefix...)),
-				),
+				multi.Runner[T](s.runners(schemaPrefix)...),
 			),
 		).Call(ctx, src, args...)
 	}

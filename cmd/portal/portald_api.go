@@ -24,7 +24,7 @@ func (a Application) setupFunctions(handlers cmd.Handlers) {
 				return a.portaldCli(ctx, cmd...)
 			}
 		} else {
-			handlers[i].Func = func(ctx context.Context, cmd ...string) (err error) {
+			handlers[i].Func = func(ctx context.Context, opt *portald.OpenOpt, cmd ...string) (err error) {
 				cmd = slices.Insert(cmd, 0, name)
 				return a.runApp(ctx, nil, cmd)
 			}

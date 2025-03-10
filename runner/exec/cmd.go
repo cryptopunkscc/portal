@@ -13,7 +13,11 @@ func WithReadWriter(ctx context.Context, rw io.ReadWriter) context.Context {
 	return context.WithValue(ctx, stdKey, &Std{In: rw, Out: rw, Err: rw})
 }
 
-func RunCmd(ctx context.Context, token string, path string, args ...string) (err error) {
+type Cmd struct {
+	Dir string
+}
+
+func (c Cmd) Run(ctx context.Context, token string, path string, args ...string) (err error) {
 	log := plog.Get(ctx).Scope("exec.RunCmd").Set(&ctx)
 	log.Printf("Command run: %s, %v", path, args)
 	cmd := exec.CommandContext(ctx, path, args...)
@@ -21,13 +25,16 @@ func RunCmd(ctx context.Context, token string, path string, args ...string) (err
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
+	if c.Dir != "" {
+		cmd.Dir = c.Dir
+	}
 	if err = setStd(cmd, ctx); err != nil {
 		return
 	}
 	if err = cmd.Run(); err != nil {
 		err = plog.Err(err)
 	}
-	log.Printf("Command finished: %s, %v, %v", path, args, err)
+	log.Printf("Command finished: %s, %v", path, args)
 	return
 }
 

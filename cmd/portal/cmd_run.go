@@ -4,6 +4,8 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/client/portald"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -12,9 +14,11 @@ type Opt struct {
 	Query string `cli:"query q"`
 	Open  bool   `cli:"open o"`
 	Dev   bool   `cli:"dev d"`
+	Order string `cli:"order"`
 }
 
 func (a Application) Run(ctx context.Context, opt Opt, cmd ...string) (err error) {
+	defer plog.TraceErr(&err)
 	opt.Open = opt.Open || opt.Query != ""
 	log := plog.Get(ctx).Type(a).Set(&ctx)
 	if err = a.Connect(ctx); err != nil {
@@ -49,6 +53,16 @@ func (a Application) Run(ctx context.Context, opt Opt, cmd ...string) (err error
 			if opt.Dev {
 				o.Schema = "dev"
 				o.Order = []int{2, 1, 0}
+			}
+			if opt.Order != "" {
+				o.Order = nil
+				i := 0
+				for _, s := range strings.Split(opt.Order, ",") {
+					if i, err = strconv.Atoi(s); err != nil {
+						return
+					}
+					o.Order = append(o.Order, i)
+				}
 			}
 			if opt.Open {
 				err = a.startApp(ctx, o, cmd)

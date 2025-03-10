@@ -4,10 +4,11 @@ title: Portal JS
 description: Portal JS development runner
 version: 0.0.0
 hidden: true
+exec: go run
 build:
   default:
-    exec: main
+    out: main
     cmd: go build -o dist/main
   windows:
-    exec: main.exe
+    out: main.exe
     cmd: go build -o dist/main.exe

@@ -54,6 +54,7 @@ func (a *adapter) DisplayName(identity *astral.Identity) string {
 }
 
 func (a *adapter) Query(target string, method string, args any) (conn api.Conn, err error) {
+	defer plog.TraceErr(&err)
 	id, err := a.Resolve(target)
 	if err != nil {
 		return
@@ -61,15 +62,17 @@ func (a *adapter) Query(target string, method string, args any) (conn api.Conn, 
 	return outConn(a.client().Query(id.String(), method, args))
 }
 
-func (a *adapter) Session() (api.Session, error) {
-	s, err := a.client().Session()
+func (a *adapter) Session() (s api.Session, err error) {
+	defer plog.TraceErr(&err)
+	ss, err := a.client().Session()
 	if err != nil {
-		return nil, err
+		return
 	}
-	return session{s}, nil
+	return session{ss}, nil
 }
 
 func (a *adapter) Register() (l api.Listener, err error) {
+	defer plog.TraceErr(&err)
 	ll, err := a.client().Listen()
 	if err != nil {
 		return
@@ -81,6 +84,7 @@ func (a *adapter) Register() (l api.Listener, err error) {
 type session struct{ i *lib.Session }
 
 func (s session) Token(token string) (res api.TokenResponse, err error) {
+	defer plog.TraceErr(&err)
 	response, err := s.i.Token(token)
 	if err != nil {
 		return nil, err
@@ -122,8 +126,11 @@ func (l *listener) Next() (q api.PendingQuery, err error) {
 }
 
 func (l *listener) Accept() (net.Conn, error) { return l.i.Accept() }
-func (l *listener) Close() (err error)        { return l.i.Close() }
-func (l *listener) Addr() net.Addr            { return l.i.Addr() }
+func (l *listener) Close() (err error) {
+	plog.TraceErr(&err)
+	return l.i.Close()
+}
+func (l *listener) Addr() net.Addr { return l.i.Addr() }
 
 type query struct{ i *lib.PendingQuery }
 
@@ -145,6 +152,7 @@ var _ api.Conn = &conn{}
 func inConn(c *lib.Conn, err error) (*conn, error)  { return newConn(c, err, true) }
 func outConn(c *lib.Conn, err error) (*conn, error) { return newConn(c, err, false) }
 func newConn(c *lib.Conn, err error, in bool) (*conn, error) {
+	defer plog.TraceErr(&err)
 	if err != nil {
 		return nil, err
 	}

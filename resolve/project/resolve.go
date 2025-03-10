@@ -19,6 +19,9 @@ func Resolver[T any](resolve target.Resolve[T]) target.Resolve[target.Project[T]
 		p.build = target.LoadBuilds(src)
 		p.resolveDist = dist.Resolver(resolve)
 		p.Source = src
+		if p.manifest.Exec == "" {
+			p.manifest.Exec = target.GetBuild(p).Exec
+		}
 		t = p
 		return
 	}

@@ -50,7 +50,7 @@ func (g runner) Run(ctx context.Context, project target.ProjectGo, _ ...string) 
 		if err = cmd.Build().Run(); err != nil {
 			return fmt.Errorf("run golang build %s: %s", project.Abs(), err)
 		}
-		project.Manifest().Exec = build.Exec
+		project.Manifest().Exec = build.Out
 		if err = dist.Dist(ctx, project); err != nil {
 			return
 		}

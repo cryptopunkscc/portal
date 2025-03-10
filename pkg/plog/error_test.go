@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestErr(t *testing.T) {
+func TestErr_stack(t *testing.T) {
 	expect := debug.Stack()
 	actual := Err(errors.New("error")).stack
 
@@ -20,4 +20,16 @@ func TestErr(t *testing.T) {
 	}
 
 	assert.Equal(t, 201, same)
+}
+
+func TestErr_Error_1(t *testing.T) {
+	actual := Err(errors.New("error"), "foo")
+
+	assert.Equal(t, "foo: error", actual.Error())
+}
+
+func TestErr_Error_2(t *testing.T) {
+	actual := Err(nil, "foo")
+
+	assert.Equal(t, "foo", actual.Error())
 }

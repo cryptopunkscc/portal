@@ -77,8 +77,8 @@ var (
 		"windows": target.Build{Cmd: "cmd4", Deps: []string{"dep2", "dep4"}},
 	}
 	EmbedGoBuild = target.Builds{
-		"default": target.Build{Exec: "main", Cmd: "go build -o dist/main"},
-		"linux":   target.Build{Exec: "main", Cmd: "go build -o dist/main", Deps: []string{"gcc", "libgtk-3-dev", "libayatana-appindicator3-dev"}},
-		"windows": target.Build{Exec: "main.exe", Cmd: "go build -ldflags -H=windowsgui -o dist/main.exe", Env: []string{"CGO_ENABLED=1"}},
+		"default": target.Build{Out: "main", Cmd: "go build -o dist/main"},
+		"linux":   target.Build{Out: "main", Cmd: "go build -o dist/main", Deps: []string{"gcc", "libgtk-3-dev", "libayatana-appindicator3-dev"}},
+		"windows": target.Build{Out: "main.exe", Cmd: "go build -ldflags -H=windowsgui -o dist/main.exe", Env: []string{"CGO_ENABLED=1"}},
 	}
 )

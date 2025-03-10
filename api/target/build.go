@@ -2,11 +2,13 @@ package target
 
 import (
 	"github.com/cryptopunkscc/portal/pkg/dec/all"
+	"runtime"
 )
 
 const BuildFilename = "dev.portal"
 
 type Build struct {
+	Out  string   `json:"out,omitempty" yaml:"out,omitempty"`
 	Deps []string `json:"deps,omitempty" yaml:"deps,omitempty"`
 	Env  []string `json:"env,omitempty" yaml:"env,omitempty"`
 	Cmd  string   `json:"cmd,omitempty" yaml:"cmd,omitempty"`
@@ -52,8 +54,16 @@ func (b Build) merge(build Build) Build {
 	if build.Cmd != "" {
 		b.Cmd = build.Cmd
 	}
-	if build.Exec != "" {
-		b.Exec = build.Exec
+	if build.Out != "" {
+		b.Out = build.Out
 	}
 	return b
+}
+
+func GetBuild(project Project_) (out Build) {
+	ok := false
+	if out, ok = project.Build()[runtime.GOOS]; !ok {
+		out = project.Build()["default"]
+	}
+	return
 }

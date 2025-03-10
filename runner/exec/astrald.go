@@ -12,6 +12,7 @@ import (
 
 // Astral starts astral daemon process in a given [context.Context] and waits until available.
 func Astral(ctx context.Context) (err error) {
+	defer plog.TraceErr(&err)
 	log := plog.Get(ctx)
 	// check if astrald already running
 	if err = apphost.Connect(ctx); err == nil {

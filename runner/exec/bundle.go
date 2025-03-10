@@ -25,23 +25,7 @@ func BundleRunner(cacheDir string) target.Run[target.BundleExec] {
 			return err
 		}
 
-		err = RunCmd(ctx, token.Token.String(), execFile.Name(), args...)
-		if err != nil {
-			return
-		}
-		return
-	}
-}
-
-func HostBundleRunner(cacheDir string, token string) target.Run[target.BundleExec] {
-	return func(ctx context.Context, bundle target.BundleExec, args ...string) (err error) {
-		execFile, err := unpackExecutable(cacheDir, bundle)
-		if err != nil {
-			return
-		}
-		defer os.Remove(execFile.Name())
-
-		err = RunCmd(ctx, token, execFile.Name(), args...)
+		err = Cmd{}.Run(ctx, token.Token.String(), execFile.Name(), args...)
 		if err != nil {
 			return
 		}

@@ -24,7 +24,7 @@ func main() {
 	cmd.InjectHelp(&handler)
 	err := cli.New(handler).Run(ctx)
 	if err != nil {
-		log.D().Println("finished with error:", err)
+		log.E().Println("finished with error:", err)
 	}
 }
 
@@ -45,8 +45,8 @@ func (a *Application[T]) handler() cmd.Handler {
 
 func (a *Application[T]) run(ctx context.Context) (err error) {
 	if err = exec.Astral(ctx); err != nil {
-		return plog.Err(err)
+		return
 	}
-	_ = a.Run(ctx)
+	err = a.Run(ctx)
 	return
 }

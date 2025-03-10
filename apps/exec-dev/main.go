@@ -35,7 +35,7 @@ func (a Application[T]) handler() cmd.Handler {
 func (a Application[T]) Runner() Run[T] {
 	return multi.Runner[T](
 		reload.Immutable(bind.DefaultRuntime(), reload.Adapter(exec.BundleRunner(CacheDir("portal-dev")).ReRunner())),
-		reload.Immutable(bind.DefaultRuntime(), reload.Adapter(exec.DistRunner().ReRunner())),
+		reload.Immutable(bind.DefaultRuntime(), reload.Adapter(exec.DistRun.ReRunner())),
 	)
 }
 

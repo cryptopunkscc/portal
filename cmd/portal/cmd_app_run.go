@@ -10,7 +10,7 @@ import (
 
 func (a Application) runApp(ctx context.Context, opt *portald.OpenOpt, cmd []string) (err error) {
 	log := plog.Get(ctx)
-	log.Println("running app", cmd)
+	log.Println("running app", opt, cmd)
 
 	conn, err := a.Portal.Connect(opt, cmd...)
 	if err != nil {

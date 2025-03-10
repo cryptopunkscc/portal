@@ -18,11 +18,8 @@ func (s *Runner[T]) portaldApi() (handlers cmd.Handlers) {
 }
 
 func (s *Runner[T]) appApi() (handlers cmd.Handlers) {
-	for _, app := range s.ListApps(ListAppsOpts{Hidden: true}) {
+	for _, app := range s.ListApps(ListAppsOpts{}) {
 		m := app.Manifest()
-		if m.Hidden {
-			continue
-		}
 		h := cmd.Handler{
 			Func: "app",
 			Name: m.Name,

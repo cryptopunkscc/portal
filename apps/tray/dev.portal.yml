@@ -6,11 +6,13 @@ version: 0.0.0
 schema: go
 build:
   default:
-    exec: main
+    out: main
     cmd: go build -o dist/main
+    exec: go run
   linux:
     deps: [ gcc, libgtk-3-dev, libayatana-appindicator3-dev ]
   windows:
-    exec: main.exe
+    out: main.exe
     cmd: go build -ldflags -H=windowsgui -o dist/main.exe
+    exec: go run -ldflags -H=windowsgui
     env: [ CGO_ENABLED=1 ]
