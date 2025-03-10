@@ -6,17 +6,18 @@
     portal.log(portal.platform)
 
     const rpc = portal.rpc
-    let conn = await rpc.conn("example.rpc.js")
-    conn = conn.bind("get", "sum")
-    console.log(conn)
+    let client = await rpc.target("example.rpc.js")
+      // .conn() // Uncomment to proceed on single connection
+    client = client.bind("get", "sum")
+    console.log(client)
 
-    let result = await conn.get("Hello from front")
+    let result = await client.get("Hello from front")
     alert(JSON.stringify(result))
 
-    result = await conn.sum(1, 2)
+    result = await client.sum(1, 2)
     alert(result)
 
-    await conn.close()
+    await client.close()
   }
 
   rpc().catch(console.log)

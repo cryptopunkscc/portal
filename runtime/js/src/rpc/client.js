@@ -20,10 +20,12 @@ export class RpcClient extends ApphostClient {
   }
 
   call(port, ...params) {
+    port = port ? port : ""
     return call(this, port, ...params);
   }
 
   async conn(port, ...params) {
+    port = port ? port : ""
     const query = formatQuery(port, params)
     const conn = await super.query(this.targetId, query)
     return new RpcConn(conn)
