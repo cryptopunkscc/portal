@@ -25,7 +25,7 @@ func (find Find[T]) Call(ctx context.Context, src string) (portals Portals[T], e
 	return find(ctx, src)
 }
 
-func (find Find[T]) ById(path Path) Find[T] {
+func (find Find[T]) OrById(path Path) Find[T] {
 	return func(ctx context.Context, src string) (portals Portals[T], err error) {
 		if resolved, err := path(src); err == nil {
 			src = resolved

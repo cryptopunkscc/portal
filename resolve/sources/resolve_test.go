@@ -149,7 +149,7 @@ func Test_ByPath_Reduced_ById(t *testing.T) {
 	test.Copy(test.EmbedRoot)
 	ctx := context.Background()
 	expected := packageManifestReduced
-	find := findByPathReduced.ById(path)
+	find := findByPathReduced.OrById(path)
 	for pkg, manifest := range expected {
 		t.Log(manifest)
 		r := test.Assert(find(ctx, pkg))[0]

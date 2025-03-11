@@ -34,7 +34,7 @@ func ProjectHostRunner(schemaPrefix ...string) target.Run[target.Portal_] {
 
 		runners, err := target.
 			FindByPath(source.File, exec2.ResolveProject).
-			ById(path.Resolver(exec2.ResolveProject, apps.Source)).
+			OrById(path.Resolver(exec2.ResolveProject, apps.Source)).
 			Call(ctx, schema)
 
 		if err != nil {

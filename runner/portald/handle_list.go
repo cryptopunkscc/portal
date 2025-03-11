@@ -14,7 +14,7 @@ type ListAppsOpts struct {
 
 func (s *Runner[T]) ListApps(opts ListAppsOpts) Apps {
 	a := target.Portals[target.Portal_]{}
-	for _, app := range resolveApps.List(apps2.Source) {
+	for _, app := range s.Resolve.List(apps2.Source) {
 		if opts.Hidden || !app.Manifest().Hidden {
 			a = append(a, app)
 		}

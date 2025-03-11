@@ -17,10 +17,13 @@ type Runner[T Portal_] struct {
 
 	CacheDir string
 	Shutdown func()
+	Resolve  Resolve[T]
+	Runners  func([]string) []Run[Portal_]
+	Order    []int
 }
 
 func (s *Runner[T]) Run(ctx context.Context) (err error) {
-	log := plog.Get(ctx).Scope("serve")
+	log := plog.Get(ctx).Type(s)
 	log.Println("start")
 	defer log.Println("exit")
 

@@ -46,7 +46,7 @@ func find[T target.Portal_]() target.Find[T] {
 	return target.FindByPath(
 		source.File,
 		sources.Resolver[T]()).
-		ById(path.Resolver(portal.Resolve_, apps.Source))
+		OrById(path.Resolver(portal.Resolve_, apps.Source))
 }
 
 func listPortals(find target.Find[target.Portal_]) func(context.Context, string) error {

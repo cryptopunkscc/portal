@@ -18,7 +18,7 @@ type Cmd struct {
 }
 
 func (c Cmd) Run(ctx context.Context, token string, path string, args ...string) (err error) {
-	log := plog.Get(ctx).Scope("exec.RunCmd").Set(&ctx)
+	log := plog.Get(ctx).Type(c).Set(&ctx)
 	log.Printf("Command run: %s, %v", path, args)
 	cmd := exec.CommandContext(ctx, path, args...)
 	cmd.Env = append(os.Environ(), apphost.AuthTokenEnv+"="+token)

@@ -15,6 +15,7 @@ import (
 
 func BundleHostRunner(cacheDir string, schemaPrefix ...string) target.Run[target.Portal_] {
 	return func(ctx context.Context, src target.Portal_, args ...string) (err error) {
+		defer plog.TraceErr(&err)
 		log := plog.Get(ctx).Scope("exec.BundleHostRunner")
 		manifest := src.Manifest()
 		schemaArr := schemaPrefix
@@ -32,7 +33,7 @@ func BundleHostRunner(cacheDir string, schemaPrefix ...string) target.Run[target
 
 		runner, err := target.
 			FindByPath(source.File, exec.ResolveBundle).
-			ById(path.Resolver(exec.ResolveBundle, apps.Source)).
+			OrById(path.Resolver(exec.ResolveBundle, apps.Source)).
 			Call(ctx, schema)
 
 		if err != nil {

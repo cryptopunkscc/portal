@@ -5,5 +5,5 @@ SCRIPT_DIR=$(dirname "$0")
 
 cd "$SCRIPT_DIR" || exit
 #PLOG=100 go run ./cmd/portald "$@"
-PORTALD_HOME=$(pwd) PLOG=100 go run -tags project ./cmd/portald "$@"
+PORTALD_HOME=$(pwd) PLOG=100 go run -tags debug ./cmd/portald "$@"
 cd "$CURRENT_DIR" || exit
