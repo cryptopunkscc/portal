@@ -3,7 +3,6 @@ package bind
 import (
 	"context"
 	_ "embed"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/astrald/astral"
@@ -52,7 +51,7 @@ func (a *adapter) ServiceClose() (err error) {
 	return
 }
 
-func (a *adapter) ConnAccept() (data string, err error) {
+func (a *adapter) ConnAccept() (data *bind.QueryData, err error) {
 	listener := a.listener
 	if listener == nil {
 		err = fmt.Errorf("[ConnAccept] not listening: %v", listener)
@@ -71,22 +70,12 @@ func (a *adapter) ConnAccept() (data string, err error) {
 
 	a.log.Println("accepted connection:", conn.Ref())
 
-	bytes, err := json.Marshal(queryData{
+	data = &bind.QueryData{
 		Id:       conn.Ref(),
 		Query:    conn.Query(),
 		RemoteId: conn.RemoteIdentity().String(),
-	})
-	if err != nil {
-		return
 	}
-	data = string(bytes)
 	return
-}
-
-type queryData struct {
-	Id       string `json:"id"`
-	Query    string `json:"query"`
-	RemoteId string `json:"remoteId"`
 }
 
 func (a *adapter) ConnClose(id string) (err error) {
@@ -152,21 +141,17 @@ func (a *adapter) ConnReadLn(id string) (data string, err error) {
 	return
 }
 
-func (a *adapter) Query(target string, query string) (data string, err error) {
+func (a *adapter) Query(target string, query string) (data *bind.QueryData, err error) {
 	a.log.Println("~>", target, query)
 	conn, err := a.Cached.Query(target, query, nil)
 	if err != nil {
 		return
 	}
 
-	bytes, err := json.Marshal(queryData{
+	data = &bind.QueryData{
 		Id:    conn.Ref(),
 		Query: conn.Query(),
-	})
-	if err != nil {
-		return
 	}
-	data = string(bytes)
 	return
 }
 

@@ -65,8 +65,7 @@ var portal = (function (exports) {
     }
 
     async query(target, query) {
-      const json = await bindings.astral_query(target, query);
-      const data = JSON.parse(json);
+      const data = await bindings.astral_query(target, query);
       return new ApphostConn(data, query)
     }
 
@@ -88,8 +87,7 @@ var portal = (function (exports) {
     }
 
     async accept() {
-      const json = await bindings.astral_conn_accept();
-      const data = JSON.parse(json);
+      const data = await bindings.astral_conn_accept();
       return new ApphostConn(data)
     }
 
@@ -100,6 +98,7 @@ var portal = (function (exports) {
 
   class ApphostConn {
     constructor(data) {
+      bindings.log("new apphost conn with data: " + JSON.stringify(data));
       this.id = data.id;
       this.query = data.query;
       this.remoteId = data.remoteId;

@@ -6,6 +6,7 @@ import (
 )
 
 func Bind(vm *goja.Runtime, astral bind.Runtime) (err error) {
+	vm.SetFieldNameMapper(goja.TagFieldNameMapper("json", true))
 	var a = adapter{runtime: astral, vm: vm, queue: make(chan func(), 1024)}
 
 	if err = vm.Set(bind.Exit, a.Exit); err != nil {

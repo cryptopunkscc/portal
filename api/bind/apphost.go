@@ -18,17 +18,23 @@ const (
 type Apphost interface {
 	ServiceRegister() (err error)
 	ServiceClose() (err error)
-	ConnAccept() (data string, err error)
+	ConnAccept() (data *QueryData, err error)
 	ConnClose(id string) (err error)
 	ConnWrite(id string, data []byte) (l int, err error)
 	ConnRead(id string, n int) (data []byte, err error)
 	ConnWriteLn(id string, data string) (err error)
 	ConnReadLn(id string) (data string, err error)
-	Query(target string, query string) (data string, err error)
+	Query(target string, query string) (data *QueryData, err error)
 	Resolve(name string) (id string, err error)
 	NodeInfo(id string) (info *NodeInfo, err error)
 	Close() error
 	Interrupt()
+}
+
+type QueryData struct {
+	Id       string `json:"id"`
+	Query    string `json:"query"`
+	RemoteId string `json:"remoteId"`
 }
 
 type NodeInfo struct {

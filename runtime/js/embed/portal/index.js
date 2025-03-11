@@ -145,8 +145,7 @@ class ApphostClient {
   }
 
   async query(target, query) {
-    const json = await bindings.astral_query(target, query);
-    const data = JSON.parse(json);
+    const data = await bindings.astral_query(target, query);
     return new ApphostConn(data, query)
   }
 
@@ -168,8 +167,7 @@ class AppHostListener {
   }
 
   async accept() {
-    const json = await bindings.astral_conn_accept();
-    const data = JSON.parse(json);
+    const data = await bindings.astral_conn_accept();
     return new ApphostConn(data)
   }
 
@@ -180,6 +178,7 @@ class AppHostListener {
 
 class ApphostConn {
   constructor(data) {
+    bindings.log("new apphost conn with data: " + JSON.stringify(data));
     this.id = data.id;
     this.query = data.query;
     this.remoteId = data.remoteId;

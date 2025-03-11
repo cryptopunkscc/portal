@@ -21,7 +21,7 @@ type sys struct {
 	exit   int
 }
 
-func (s *sys) Log(str any)          { s.log.Println(str) }
+func (s *sys) Log(str any)          { s.log.Scope("Log").Println(str) }
 func (s *sys) Sleep(duration int64) { time.Sleep(time.Duration(duration) * time.Millisecond) }
 func (s *sys) Exit(code int) {
 	s.exit = code
