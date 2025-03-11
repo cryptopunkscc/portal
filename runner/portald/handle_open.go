@@ -32,17 +32,15 @@ func (s *Runner[T]) Open() Run[portald.OpenOpt] {
 			opt.Order = s.Order
 		}
 
-		order := Priority{
-			Match[Bundle_],
-			Match[Dist_],
-			Match[Project_],
-		}.Sort(opt.Order)
-
 		return find.Runner[T](
 			FindByPath(source.File, s.Resolve).
 				OrById(path.Resolver(s.Resolve, apps.Source)).
 				Cached(&s.cache).
-				Reduced(order...),
+				Reduced(Priority{
+					Match[Bundle_],
+					Match[Dist_],
+					Match[Project_]}.
+					Sort(opt.Order)...),
 
 			supervisor.Runner[T](
 				&s.waitGroup,
