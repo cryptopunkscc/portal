@@ -11,7 +11,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/find"
 	"github.com/cryptopunkscc/portal/runner/multi"
 	"github.com/cryptopunkscc/portal/runner/supervisor"
-	"github.com/cryptopunkscc/portal/runtime/apps"
+	"github.com/cryptopunkscc/portal/runtime/dir"
 )
 
 func (s *Runner[T]) Open() Run[portald.OpenOpt] {
@@ -34,7 +34,7 @@ func (s *Runner[T]) Open() Run[portald.OpenOpt] {
 
 		return find.Runner[T](
 			FindByPath(source.File, s.Resolve).
-				OrById(path.Resolver(s.Resolve, apps.Source)).
+				OrById(path.Resolver(s.Resolve, dir.AppSource)).
 				Cached(&s.cache).
 				Reduced(Priority{
 					Match[Bundle_],

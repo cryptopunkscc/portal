@@ -4,7 +4,7 @@ import (
 	"github.com/cryptopunkscc/portal/client/apphost"
 	"github.com/cryptopunkscc/portal/runner/install"
 	"github.com/cryptopunkscc/portal/runner/uninstall"
-	"github.com/cryptopunkscc/portal/runtime/apps"
+	"github.com/cryptopunkscc/portal/runtime/dir"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 )
@@ -67,7 +67,7 @@ func (s *Runner[T]) publicHandlers() cmd.Handlers {
 			},
 		},
 		{
-			Func: install.Runner(apps.Dir).Run,
+			Func: install.Runner(dir.App).Run,
 			Name: "install i",
 			Desc: "Install app.",
 			Params: cmd.Params{
@@ -75,7 +75,7 @@ func (s *Runner[T]) publicHandlers() cmd.Handlers {
 			},
 		},
 		{
-			Func: uninstall.Runner(apps.Source),
+			Func: uninstall.Runner(dir.AppSource),
 			Name: "uninstall d",
 			Desc: "Uninstall app.",
 			Params: cmd.Params{

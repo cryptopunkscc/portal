@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
-	apps2 "github.com/cryptopunkscc/portal/runtime/apps"
+	"github.com/cryptopunkscc/portal/runtime/dir"
 	"text/tabwriter"
 )
 
@@ -14,7 +14,7 @@ type ListAppsOpts struct {
 
 func (s *Runner[T]) ListApps(opts ListAppsOpts) Apps {
 	a := target.Portals[target.Portal_]{}
-	for _, app := range s.Resolve.List(apps2.Source) {
+	for _, app := range s.Resolve.List(dir.AppSource) {
 		if opts.Hidden || !app.Manifest().Hidden {
 			a = append(a, app)
 		}

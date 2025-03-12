@@ -7,13 +7,13 @@ import (
 	"github.com/cryptopunkscc/portal/resolve/exec"
 	"github.com/cryptopunkscc/portal/resolve/path"
 	"github.com/cryptopunkscc/portal/resolve/source"
-	"github.com/cryptopunkscc/portal/runtime/apps"
+	"github.com/cryptopunkscc/portal/runtime/dir"
 	"github.com/cryptopunkscc/portal/runtime/tokens"
 	"slices"
 	"strings"
 )
 
-func BundleHostRunner(cacheDir string, schemaPrefix ...string) target.Run[target.Portal_] {
+func BundleHostRunner(schemaPrefix ...string) target.Run[target.Portal_] {
 	return func(ctx context.Context, src target.Portal_, args ...string) (err error) {
 		defer plog.TraceErr(&err)
 		log := plog.Get(ctx).Scope("exec.BundleHostRunner")
@@ -33,7 +33,7 @@ func BundleHostRunner(cacheDir string, schemaPrefix ...string) target.Run[target
 
 		runner, err := target.
 			FindByPath(source.File, exec.ResolveBundle).
-			OrById(path.Resolver(exec.ResolveBundle, apps.Source)).
+			OrById(path.Resolver(exec.ResolveBundle, dir.AppSource)).
 			Call(ctx, schema)
 
 		if err != nil {
@@ -44,7 +44,7 @@ func BundleHostRunner(cacheDir string, schemaPrefix ...string) target.Run[target
 		}
 		runnerBundle := runner[0]
 
-		execFile, err := unpackExecutable(cacheDir, runnerBundle)
+		execFile, err := unpackExecutable(runnerBundle)
 		if err != nil {
 			return
 		}

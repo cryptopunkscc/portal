@@ -7,15 +7,16 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/runtime/dir"
 	"github.com/cryptopunkscc/portal/runtime/tokens"
 	"io"
 	"os"
 	"path/filepath"
 )
 
-func BundleRunner(cacheDir string) target.Run[target.BundleExec] {
+func BundleRunner() target.Run[target.BundleExec] {
 	return func(ctx context.Context, bundle target.BundleExec, args ...string) (err error) {
-		execFile, err := unpackExecutable(cacheDir, bundle)
+		execFile, err := unpackExecutable(bundle)
 		if err != nil {
 			return
 		}
@@ -33,18 +34,16 @@ func BundleRunner(cacheDir string) target.Run[target.BundleExec] {
 	}
 }
 
-func unpackExecutable(cacheDir string, bundle target.BundleExec) (execFile *os.File, err error) {
-	binDir := filepath.Join(cacheDir, "bin")
-	if err = os.MkdirAll(binDir, 0755); err != nil {
-		err = plog.Err(err)
-		return
+func unpackExecutable(bundle target.BundleExec) (execFile *os.File, err error) {
+	defer plog.TraceErr(&err)
+	if dir.Bin == "" {
+		return nil, plog.Errorf("no executable path specified")
 	}
 
 	src := bundle.Target().Executable()
 	srcFile, err := src.File()
 	defer srcFile.Close()
 	if err != nil {
-		err = plog.Err(err)
 		return
 	}
 	srcId, err := readMD5Hex(srcFile)
@@ -53,7 +52,6 @@ func unpackExecutable(cacheDir string, bundle target.BundleExec) (execFile *os.F
 	}
 	_ = srcFile.Close()
 	if srcFile, err = src.File(); err != nil {
-		err = plog.Err(err)
 		return
 	}
 
@@ -63,8 +61,7 @@ func unpackExecutable(cacheDir string, bundle target.BundleExec) (execFile *os.F
 		srcId,
 	)
 
-	if execFile, err = os.OpenFile(filepath.Join(binDir, execName), os.O_RDWR|os.O_CREATE, 0755); err != nil {
-		err = plog.Err(err)
+	if execFile, err = os.OpenFile(filepath.Join(dir.Bin, execName), os.O_RDWR|os.O_CREATE, 0755); err != nil {
 		return
 	}
 	defer execFile.Close()
@@ -73,7 +70,6 @@ func unpackExecutable(cacheDir string, bundle target.BundleExec) (execFile *os.F
 		return
 	}
 	if err = execFile.Chmod(0755); err != nil {
-		err = plog.Err(err)
 		return
 	}
 
@@ -82,7 +78,6 @@ func unpackExecutable(cacheDir string, bundle target.BundleExec) (execFile *os.F
 	}
 
 	if _, err = io.Copy(execFile, srcFile); err != nil {
-		err = plog.Err(err)
 		return
 	}
 	return

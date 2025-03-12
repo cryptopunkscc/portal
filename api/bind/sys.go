@@ -7,7 +7,7 @@ const (
 )
 
 type Sys interface {
-	Log(arg any)
+	Log(arg string)
 	Sleep(duration int64)
 	Exit(code int)
 }

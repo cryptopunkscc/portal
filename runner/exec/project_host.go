@@ -8,7 +8,7 @@ import (
 	exec2 "github.com/cryptopunkscc/portal/resolve/exec"
 	"github.com/cryptopunkscc/portal/resolve/path"
 	"github.com/cryptopunkscc/portal/resolve/source"
-	"github.com/cryptopunkscc/portal/runtime/apps"
+	"github.com/cryptopunkscc/portal/runtime/dir"
 	"github.com/cryptopunkscc/portal/runtime/tokens"
 	"slices"
 	"strings"
@@ -34,7 +34,7 @@ func ProjectHostRunner(schemaPrefix ...string) target.Run[target.Portal_] {
 
 		runners, err := target.
 			FindByPath(source.File, exec2.ResolveProject).
-			OrById(path.Resolver(exec2.ResolveProject, apps.Source)).
+			OrById(path.Resolver(exec2.ResolveProject, dir.AppSource)).
 			Call(ctx, schema)
 
 		if err != nil {

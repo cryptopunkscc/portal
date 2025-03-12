@@ -5,17 +5,12 @@ import (
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	singal "github.com/cryptopunkscc/portal/pkg/sig"
-	"github.com/cryptopunkscc/portal/runner/portald"
 	_ "github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 )
 
-var application = &Application[Portal_]{
-	Runner: portald.Runner[Portal_]{
-		CacheDir: CacheDir("portal"),
-	},
-}
+var application = &Application[Portal_]{}
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())

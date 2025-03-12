@@ -9,14 +9,14 @@ import (
 	"github.com/cryptopunkscc/portal/runner/exec"
 )
 
-func main() {
+func init() {
 	application.Resolve = sources.Resolver[Portal_]()
 
 	application.Runners = func(schemaPrefix []string) []Run[Portal_] {
 		return []Run[Portal_]{
 			app.Runner(exec.DistRun),
-			app.Runner(exec.BundleRunner(application.CacheDir)),
-			app.Runner(exec.BundleHostRunner(application.CacheDir, schemaPrefix...)),
+			app.Runner(exec.BundleRunner()),
+			app.Runner(exec.BundleHostRunner(schemaPrefix...)),
 		}
 	}
 }

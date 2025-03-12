@@ -7,7 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/apps"
 	"github.com/cryptopunkscc/portal/resolve/source"
-	apps2 "github.com/cryptopunkscc/portal/runtime/apps"
+	"github.com/cryptopunkscc/portal/runtime/dir"
 	"github.com/fsnotify/fsnotify"
 )
 
@@ -15,13 +15,12 @@ func (s *Runner[T]) ObserveApps(ctx context.Context, opts ListAppsOpts) (out <-c
 	log := plog.Get(ctx)
 	log.Println("Observing...")
 
-	dir := apps2.Dir
-	watch, err := fs2.NotifyWatch(ctx, dir, 0)
+	watch, err := fs2.NotifyWatch(ctx, dir.App, 0)
 	if err != nil {
 		return
 	}
 
-	file, err := source.File(dir)
+	file, err := source.File(dir.App)
 	if err != nil {
 		return
 	}
