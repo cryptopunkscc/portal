@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/client/portald"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"strconv"
 	"strings"
 	"sync"
@@ -46,7 +46,7 @@ func (a Application) Run(ctx context.Context, opt Opt, cmd ...string) (err error
 		go func() {
 			defer wg.Done()
 			cmd = fixCmd(cmd)
-			o := &portald.OpenOpt{}
+			o := &apphost.PortaldOpenOpt{}
 			if opt.Dev {
 				o.Schema = "dev"
 				o.Order = []int{2, 1, 0}

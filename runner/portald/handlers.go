@@ -1,9 +1,9 @@
 package portald
 
 import (
-	"github.com/cryptopunkscc/portal/client/apphost"
 	"github.com/cryptopunkscc/portal/runner/install"
 	"github.com/cryptopunkscc/portal/runner/uninstall"
+	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/dir"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
@@ -59,7 +59,7 @@ func (s *Runner[T]) publicHandlers() cmd.Handlers {
 			},
 		},
 		{
-			Func: apphost.NewClient().ListTokens,
+			Func: apphost.Default.Token().List,
 			Name: "tokens",
 			Desc: "List apphost tokens.",
 			Params: cmd.Params{

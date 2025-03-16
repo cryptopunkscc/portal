@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/astrald/astral"
 	mod "github.com/cryptopunkscc/astrald/mod/apphost"
-	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc"
 )
 
-func NewClient() Client { return Client{apphost.Default.Rpc().Request("localnode")} }
+func (a *Adapter) Token() Token {
+	return Token{Conn: a.Rpc().Request("localnode")}
+}
 
-type Client struct{ rpc.Conn }
+type Token struct{ rpc.Conn }
 
 type CreateTokenArgs struct {
 	ID       *astral.Identity `query:"id" cli:"id"`
@@ -19,7 +20,7 @@ type CreateTokenArgs struct {
 	Format   astral.String    `query:"format" cli:"format f"`
 }
 
-func (c Client) CreateToken(args CreateTokenArgs) (*mod.AccessToken, error) {
+func (c Token) Create(args CreateTokenArgs) (*mod.AccessToken, error) {
 	if args.ID == nil {
 		return nil, errors.New("id is required")
 	}
@@ -34,7 +35,7 @@ type ListTokensArgs struct {
 	Format string           `query:"format" cli:"format f"`
 }
 
-func (c Client) ListTokens(args *ListTokensArgs) (AccessTokens, error) {
+func (c Token) List(args *ListTokensArgs) (AccessTokens, error) {
 	if args == nil {
 		args = &ListTokensArgs{}
 	}

@@ -2,15 +2,13 @@ package install
 
 import (
 	mod "github.com/cryptopunkscc/astrald/mod/apphost"
-	. "github.com/cryptopunkscc/portal/client/apphost"
-	"github.com/cryptopunkscc/portal/client/keys"
 	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/tokens"
 )
 
 func Token(pkg string) (token mod.AccessToken, err error) {
 	repo := tokens.Repository{}
-	client := NewClient()
+	client := apphost.Default.Token()
 
 	if token, err = repo.Get(pkg); err == nil {
 		return
@@ -18,7 +16,7 @@ func Token(pkg string) (token mod.AccessToken, err error) {
 
 	t := &mod.AccessToken{}
 	if t.Identity, err = apphost.Default.Resolve(pkg); err == nil {
-		if at, err2 := client.ListTokens(nil); err2 == nil {
+		if at, err2 := client.List(nil); err2 == nil {
 			for _, tt := range at {
 				if tt.Identity.IsEqual(t.Identity) {
 					token = tt
@@ -27,12 +25,12 @@ func Token(pkg string) (token mod.AccessToken, err error) {
 				}
 			}
 		}
-	} else if t.Identity, err = keys.NewClient().CreateKey(pkg); err != nil {
+	} else if t.Identity, err = apphost.Default.Key().Create(pkg); err != nil {
 		return
 	}
 
-	args := CreateTokenArgs{ID: t.Identity}
-	if t, err = client.CreateToken(args); err != nil {
+	args := apphost.CreateTokenArgs{ID: t.Identity}
+	if t, err = client.Create(args); err != nil {
 		return
 	}
 

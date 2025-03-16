@@ -3,19 +3,19 @@ package main
 import (
 	"context"
 	"errors"
-	"github.com/cryptopunkscc/portal/client/portald"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/getlantern/systray"
 )
 
 type Tray struct {
-	Portal portald.Client
+	Portal apphost.Portald
 	log    plog.Logger
 }
 
 func (t *Tray) Run(ctx context.Context) (err error) {
 	if t.Portal.Conn == nil {
-		t.Portal = portald.NewClient()
+		t.Portal = apphost.Default.Portald()
 	}
 
 	if err = t.Portal.Ping(); err != nil {

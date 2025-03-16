@@ -1,16 +1,16 @@
 package main
 
 import (
-	"github.com/cryptopunkscc/portal/client/portald"
 	"github.com/cryptopunkscc/portal/runner/cli"
+	"github.com/cryptopunkscc/portal/runtime/apphost"
 )
 
 func main() {
 	cli.Run(Application{
-		Portal: portald.NewClient(),
+		Portal: apphost.Default.Portald(),
 	}.Handler())
 }
 
 type Application struct {
-	Portal portald.Client
+	Portal apphost.Portald
 }

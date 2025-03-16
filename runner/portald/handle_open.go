@@ -4,18 +4,18 @@ import (
 	"context"
 	"errors"
 	. "github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/client/portald"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/path"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/find"
 	"github.com/cryptopunkscc/portal/runner/multi"
 	"github.com/cryptopunkscc/portal/runner/supervisor"
+	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/dir"
 )
 
-func (s *Runner[T]) Open() Run[portald.OpenOpt] {
-	return func(ctx context.Context, opt portald.OpenOpt, cmd ...string) (err error) {
+func (s *Runner[T]) Open() Run[apphost.PortaldOpenOpt] {
+	return func(ctx context.Context, opt apphost.PortaldOpenOpt, cmd ...string) (err error) {
 		if len(cmd) == 0 {
 			return errors.New("no command")
 		}

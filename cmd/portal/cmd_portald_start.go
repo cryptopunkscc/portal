@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/client/portald"
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runtime/apphost"
@@ -10,7 +9,7 @@ import (
 	"time"
 )
 
-func startPortald(ctx context.Context, client portald.Client) (err error) {
+func startPortald(ctx context.Context, client apphost.Portald) (err error) {
 	if err = startPortaldProcess(ctx); err != nil {
 		return
 	}
@@ -27,7 +26,7 @@ func startPortaldProcess(ctx context.Context) (err error) {
 	return
 }
 
-func awaitPortaldService(ctx context.Context, client portald.Client) error {
+func awaitPortaldService(ctx context.Context, client apphost.Portald) error {
 	log := plog.Get(ctx)
 	return flow.Retry(ctx, 8*time.Second, func(i int, n int, d time.Duration) (err error) {
 		log.Printf("%d/%d attempt %v: retry after %v", i+1, n, err, d)

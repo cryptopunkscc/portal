@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/client/portald"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"io"
 	"os"
 )
 
-func (a Application) runApp(ctx context.Context, opt *portald.OpenOpt, cmd []string) (err error) {
+func (a Application) runApp(ctx context.Context, opt *apphost.PortaldOpenOpt, cmd []string) (err error) {
 	log := plog.Get(ctx)
 	log.Println("running app", opt, cmd)
 
