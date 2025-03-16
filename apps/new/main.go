@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/factory/build"
+	"github.com/cryptopunkscc/portal/runner/build_all"
 	"github.com/cryptopunkscc/portal/runner/cli"
 	"github.com/cryptopunkscc/portal/runner/template"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
@@ -50,7 +50,7 @@ func createProject(ctx context.Context, targets string, dir string) (err error) 
 	if err = template.NewRunner(dir).GenerateProjects(parsedTargets); err != nil {
 		return
 	}
-	if err = build.Create().Dist(ctx, dir); err != nil {
+	if err = build_all.NewRunner().Dist(ctx, dir); err != nil {
 		return
 	}
 	log.Println("* done")

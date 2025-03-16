@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/cryptopunkscc/portal/factory/build"
+	"github.com/cryptopunkscc/portal/runner/build_all"
 	"github.com/cryptopunkscc/portal/runner/clean"
 	"github.com/cryptopunkscc/portal/runner/cli"
 	"github.com/cryptopunkscc/portal/runner/version"
@@ -14,7 +14,7 @@ type Application struct{}
 
 func (a Application) handler() cmd.Handler {
 	return cmd.Handler{
-		Func: build.Create().Run,
+		Func: build_all.Run,
 		Name: "portal-build",
 		Desc: "Builds portal project and generates application bundle.",
 		Params: cmd.Params{

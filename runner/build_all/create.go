@@ -1,7 +1,7 @@
-package build
+package build_all
 
 import (
-	. "github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/resolve/npm"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/build"
@@ -13,15 +13,17 @@ import (
 	js "github.com/cryptopunkscc/portal/runtime/js/embed"
 )
 
-func Create() *build.Runner {
+var Run = NewRunner().Run
+
+func NewRunner() *build.Runner {
 	return build.NewRunner(
 		clean.Runner(),
-		multi.Runner[Project_](
+		multi.Runner[target.Project_](
 			go_build.Runner().Portal,
 			npm_build.Runner(
-				Any[NodeModule](
-					Skip("node_modules"),
-					Try(npm.Resolve)).
+				target.Any[target.NodeModule](
+					target.Skip("node_modules"),
+					target.Try(npm.Resolve)).
 					List(source.Embed(js.PortalLibFS))...,
 			).Portal,
 		),
