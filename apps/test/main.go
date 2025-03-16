@@ -3,8 +3,7 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/runner/cli"
-	_ "github.com/cryptopunkscc/portal/runtime/apphost"
-	"github.com/cryptopunkscc/portal/runtime/rpc/apphost"
+	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 	"log"
 	"os"
@@ -27,7 +26,7 @@ func main() {
 				Desc: "serve",
 				Func: func() (s string, err error) {
 					log.Println("test serve")
-					err = apphost.Default().Router(
+					err = apphost.Default.Rpc().Router(
 						cmd.Handler{
 							Func: echo,
 						},

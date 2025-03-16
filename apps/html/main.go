@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	. "github.com/cryptopunkscc/portal/api/target"
-	factory "github.com/cryptopunkscc/portal/factory/bind"
 	"github.com/cryptopunkscc/portal/resolve/apps"
 	"github.com/cryptopunkscc/portal/runner/app"
 	"github.com/cryptopunkscc/portal/runner/cli"
@@ -11,7 +10,6 @@ import (
 	"github.com/cryptopunkscc/portal/runner/open"
 	"github.com/cryptopunkscc/portal/runner/version"
 	"github.com/cryptopunkscc/portal/runner/wails"
-	_ "github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/bind"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 )
@@ -36,7 +34,7 @@ func (a Application[T]) Handler() cmd.Handler {
 func (a Application[T]) Resolver() Resolve[T] { return apps.Resolver[T]() }
 func (a Application[T]) Runner() Run[T]       { return multi.Runner[T](app.Runner(wails.Runner(a.runtime))) }
 func (a Application[T]) runtime(ctx context.Context, portal Portal_) (bind.Runtime, context.Context) {
-	r, ctx := factory.FrontendRuntime()(ctx, portal)
+	r, ctx := bind.FrontendRuntime()(ctx, portal)
 	return &Adapter{r}, ctx
 }
 

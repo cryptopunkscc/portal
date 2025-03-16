@@ -2,15 +2,15 @@ package main
 
 import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc"
-	"github.com/cryptopunkscc/portal/runtime/rpc/apphost"
 	"log"
 	"os"
 	"strings"
 )
 
 func main() {
-	request := apphost.Default().Request("localnode", os.Args[1])
+	request := apphost.Default.Rpc().Request("localnode", os.Args[1])
 	request.Logger(plog.New().Scope("rpc"))
 	var args []any = nil
 	if len(os.Args) > 2 {

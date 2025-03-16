@@ -2,11 +2,11 @@ package reload
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/api/apphost"
+	api "github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc"
-	apphostRpc "github.com/cryptopunkscc/portal/runtime/rpc/apphost"
 )
 
 type client struct {
@@ -19,7 +19,7 @@ func newClient() (sender *client) {
 	return
 }
 
-func (s *client) Init(reRun ReRun, cache apphost.Cache) *client {
+func (s *client) Init(reRun ReRun, cache api.Cache) *client {
 	s.handler = newHandler(reRun, cache)
 	return s
 }
@@ -28,7 +28,7 @@ func (s *client) Connect(ctx context.Context, portal target.Portal_) (err error)
 	if s.conn != nil {
 		return
 	}
-	if s.conn, err = apphostRpc.Default().Client("portal", "dev.portal.broadcast"); err != nil {
+	if s.conn, err = apphost.Default.Rpc().Client("portal", "dev.portal.broadcast"); err != nil {
 		return
 	}
 	if err = s.conn.Encode(portal.Manifest().Package); err != nil {

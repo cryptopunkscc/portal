@@ -5,7 +5,7 @@ import (
 	"github.com/cryptopunkscc/astrald/sig"
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runtime/rpc/apphost"
+	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 	"sync"
 )
@@ -31,7 +31,7 @@ func (s *Runner[T]) Run(ctx context.Context) (err error) {
 		Sub: s.Handlers(),
 	}
 	cmd.InjectHelp(&handler)
-	router := apphost.Default().Router(handler)
+	router := apphost.Default.Rpc().Router(handler)
 	router.Logger = log
 	err = router.Run(ctx)
 

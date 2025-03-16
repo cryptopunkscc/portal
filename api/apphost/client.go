@@ -1,14 +1,10 @@
 package apphost
 
 import (
-	"context"
 	"github.com/cryptopunkscc/astrald/astral"
 	"io"
 	"net"
 )
-
-var Connect func(ctx context.Context) error
-var DefaultClient Client
 
 type Client interface {
 	Query(target string, method string, args any) (Conn, error)

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"io"
 	"os"
 )
@@ -11,7 +12,7 @@ func (a Application) queryApp(ctx context.Context, query string) (err error) {
 	log := plog.Get(ctx)
 	log.Println("running query", query)
 
-	conn, err := a.Apphost.Query("portal", query, nil) //TODO fixme replace portal with app name
+	conn, err := apphost.Default.Query("portal", query, nil) //TODO fixme replace portal with app name
 	if err != nil {
 		return
 	}

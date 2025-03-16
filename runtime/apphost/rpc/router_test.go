@@ -1,4 +1,4 @@
-package apphost
+package rpc
 
 import (
 	"bufio"

@@ -1,4 +1,4 @@
-package apphost
+package rpc
 
 import (
 	"context"
@@ -11,7 +11,8 @@ var ServeHandler = cmd.Handler{
 }
 
 func ServeFunc(ctx context.Context, root *cmd.Root) error {
-	handler := cmd.Handler(*root)
-	r := Default().Router(handler)
-	return r.Run(ctx)
+	//handler := cmd.Handler(*root)
+	//r := Default().Router(handler)
+	//return r.Run(ctx)
+	panic("todo")
 }

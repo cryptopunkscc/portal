@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/cryptopunkscc/portal/runtime/rpc/apphost"
+	apphost "github.com/cryptopunkscc/portal/runtime/apphost/rpc"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 	"log"

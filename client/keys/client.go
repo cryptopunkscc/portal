@@ -3,11 +3,11 @@ package keys
 import (
 	"errors"
 	"github.com/cryptopunkscc/astrald/astral"
+	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc"
-	"github.com/cryptopunkscc/portal/runtime/rpc/apphost"
 )
 
-func NewClient() Client { return Client{apphost.Request("localnode")} }
+func NewClient() Client { return Client{apphost.Default.Rpc().Request("localnode")} }
 
 type Client struct{ rpc.Conn }
 

@@ -5,7 +5,6 @@ import (
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	singal "github.com/cryptopunkscc/portal/pkg/sig"
-	_ "github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 )

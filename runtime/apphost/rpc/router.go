@@ -1,4 +1,4 @@
-package apphost
+package rpc
 
 import (
 	"context"
@@ -12,21 +12,21 @@ import (
 	"strings"
 )
 
-func (r RpcBase) Router(handler cmd.Handler) *Router {
+func (r Rpc) Router(handler cmd.Handler) *Router {
 	rr := &Router{
 		Base: router.Base{
 			Registry:  router.CreateRegistry(handler),
 			Unmarshal: query.Unmarshal,
 		},
-		client: r.client,
+		apphost: r.Apphost,
 	}
 	return rr
 }
 
 type Router struct {
 	router.Base
-	Logger plog.Logger
-	client apphost.Client
+	Logger  plog.Logger
+	apphost apphost.Client
 }
 
 func (r *Router) Start(ctx context.Context) (err error) {
@@ -40,12 +40,9 @@ func (r *Router) Start(ctx context.Context) (err error) {
 
 func (r *Router) Run(ctx context.Context) (err error) {
 	defer plog.TraceErr(&err)
-	if r.client == nil {
-		r.client = apphost.DefaultClient
-	}
 	r.Dependencies = append([]any{ctx}, r.Dependencies...)
 
-	listener, err := r.client.Register()
+	listener, err := r.apphost.Register()
 	if err != nil {
 		return
 	}
@@ -87,7 +84,7 @@ func (r *Router) routeQuery(q apphost.PendingQuery) (err error) {
 	}
 	defer conn.Close()
 
-	client := NewClient(conn)
+	client := rpcClient(conn)
 	if r.Logger != nil {
 		client.Logger(r.Logger.Scope(q.Query()))
 	}

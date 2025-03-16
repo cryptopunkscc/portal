@@ -2,13 +2,12 @@ package main
 
 import (
 	. "github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/factory/bind"
 	"github.com/cryptopunkscc/portal/resolve/apps"
 	"github.com/cryptopunkscc/portal/runner/cli"
 	"github.com/cryptopunkscc/portal/runner/goja"
 	"github.com/cryptopunkscc/portal/runner/open"
 	"github.com/cryptopunkscc/portal/runner/version"
-	_ "github.com/cryptopunkscc/portal/runtime/apphost"
+	"github.com/cryptopunkscc/portal/runtime/bind"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 )
 

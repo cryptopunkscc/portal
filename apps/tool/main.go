@@ -8,7 +8,6 @@ import (
 	"github.com/cryptopunkscc/portal/resolve/portal"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/resolve/sources"
-	_ "github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/dir"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"

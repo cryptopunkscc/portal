@@ -2,12 +2,13 @@ package rpc
 
 import (
 	"errors"
-	"github.com/cryptopunkscc/portal/runtime/rpc/apphost"
+	"github.com/cryptopunkscc/portal/runtime/apphost"
+	"github.com/cryptopunkscc/portal/runtime/apphost/rpc"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 )
 
 type TestGoService struct {
-	*apphost.Router
+	*rpc.Router
 }
 
 func NewTestGoService(p string) *TestGoService {
@@ -31,7 +32,7 @@ func NewTestGoService(p string) *TestGoService {
 		},
 	}
 	return &TestGoService{
-		Router: apphost.Default().Router(root),
+		Router: apphost.Default.Rpc().Router(root),
 	}
 }
 

@@ -1,4 +1,4 @@
-package apphost
+package rpc
 
 import (
 	"encoding/json"
@@ -8,18 +8,18 @@ import (
 	"io"
 )
 
-func (r RpcBase) Client(
+func (r Rpc) Client(
 	target string,
 	query string,
 ) (s rpc.Conn, err error) {
-	conn, err := r.client.Query(target, query, nil)
+	conn, err := r.Apphost.Query(target, query, nil)
 	if err != nil {
 		return
 	}
-	return NewClient(conn), nil
+	return rpcClient(conn), nil
 }
 
-func NewClient(conn io.ReadWriteCloser) *stream.Client {
+func rpcClient(conn io.ReadWriteCloser) *stream.Client {
 	s := stream.Client{Serializer: stream.NewSerializer(conn)}
 	s.MarshalArgs = query.Marshal
 	s.Marshal = json.Marshal

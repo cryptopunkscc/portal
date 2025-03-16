@@ -21,9 +21,6 @@ func (a Application) Run(ctx context.Context, opt Opt, cmd ...string) (err error
 	defer plog.TraceErr(&err)
 	opt.Open = opt.Open || opt.Query != ""
 	log := plog.Get(ctx).Type(a).Set(&ctx)
-	if err = a.Connect(ctx); err != nil {
-		return
-	}
 	a.Portal.Logger(log)
 	if err = a.Portal.Ping(); err != nil {
 		if err = startPortald(ctx, a.Portal); err != nil {

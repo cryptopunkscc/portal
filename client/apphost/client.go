@@ -4,12 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/astrald/astral"
-	apphost2 "github.com/cryptopunkscc/astrald/mod/apphost"
+	mod "github.com/cryptopunkscc/astrald/mod/apphost"
+	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc"
-	"github.com/cryptopunkscc/portal/runtime/rpc/apphost"
 )
 
-func NewClient() Client { return Client{apphost.Request("localnode")} }
+func NewClient() Client { return Client{apphost.Default.Rpc().Request("localnode")} }
 
 type Client struct{ rpc.Conn }
 
@@ -19,14 +19,14 @@ type CreateTokenArgs struct {
 	Format   astral.String    `query:"format" cli:"format f"`
 }
 
-func (c Client) CreateToken(args CreateTokenArgs) (*apphost2.AccessToken, error) {
+func (c Client) CreateToken(args CreateTokenArgs) (*mod.AccessToken, error) {
 	if args.ID == nil {
 		return nil, errors.New("id is required")
 	}
 	if args.Format == "" {
 		args.Format = "json"
 	}
-	return rpc.Query[*apphost2.AccessToken](c, "apphost.create_token", args)
+	return rpc.Query[*mod.AccessToken](c, "apphost.create_token", args)
 }
 
 type ListTokensArgs struct {
@@ -44,7 +44,7 @@ func (c Client) ListTokens(args *ListTokensArgs) (AccessTokens, error) {
 	return rpc.Query[AccessTokens](c, "apphost.list_tokens", args)
 }
 
-type AccessTokens []apphost2.AccessToken
+type AccessTokens []mod.AccessToken
 
 func (t AccessTokens) MarshalCLI() (s string) {
 	for i, token := range t {

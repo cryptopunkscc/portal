@@ -2,22 +2,22 @@ package install
 
 import (
 	mod "github.com/cryptopunkscc/astrald/mod/apphost"
-	api "github.com/cryptopunkscc/portal/api/apphost"
-	"github.com/cryptopunkscc/portal/client/apphost"
+	. "github.com/cryptopunkscc/portal/client/apphost"
 	"github.com/cryptopunkscc/portal/client/keys"
+	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/tokens"
 )
 
 func Token(pkg string) (token mod.AccessToken, err error) {
 	repo := tokens.Repository{}
-	client := apphost.NewClient()
+	client := NewClient()
 
 	if token, err = repo.Get(pkg); err == nil {
 		return
 	}
 
 	t := &mod.AccessToken{}
-	if t.Identity, err = api.DefaultClient.Resolve(pkg); err == nil {
+	if t.Identity, err = apphost.Default.Resolve(pkg); err == nil {
 		if at, err2 := client.ListTokens(nil); err2 == nil {
 			for _, tt := range at {
 				if tt.Identity.IsEqual(t.Identity) {
@@ -31,7 +31,7 @@ func Token(pkg string) (token mod.AccessToken, err error) {
 		return
 	}
 
-	args := apphost.CreateTokenArgs{ID: t.Identity}
+	args := CreateTokenArgs{ID: t.Identity}
 	if t, err = client.CreateToken(args); err != nil {
 		return
 	}

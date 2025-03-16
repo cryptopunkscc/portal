@@ -1,13 +1,13 @@
 package portald
 
 import (
+	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc"
-	"github.com/cryptopunkscc/portal/runtime/rpc/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 	"io"
 )
 
-func NewClient() Client { return Client{apphost.Request("portal")} }
+func NewClient() Client { return Client{apphost.Default.Rpc().Request("portal")} }
 
 type Client struct{ rpc.Conn }
 

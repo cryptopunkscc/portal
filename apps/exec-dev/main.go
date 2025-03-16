@@ -2,7 +2,6 @@ package main
 
 import (
 	. "github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/factory/bind"
 	"github.com/cryptopunkscc/portal/resolve/sources"
 	"github.com/cryptopunkscc/portal/runner/cli"
 	"github.com/cryptopunkscc/portal/runner/exec"
@@ -10,7 +9,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/open"
 	"github.com/cryptopunkscc/portal/runner/reload"
 	"github.com/cryptopunkscc/portal/runner/version"
-	_ "github.com/cryptopunkscc/portal/runtime/apphost"
+	"github.com/cryptopunkscc/portal/runtime/bind"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 )
 

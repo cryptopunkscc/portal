@@ -4,8 +4,8 @@ import (
 	"errors"
 	apphost2 "github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc"
-	"github.com/cryptopunkscc/portal/runtime/rpc/apphost"
 	"github.com/cryptopunkscc/portal/runtime/rpc/stream/query"
 	"github.com/stretchr/testify/assert"
 	"log"
@@ -37,7 +37,7 @@ func (c TestClient) Run(t *testing.T) {
 			name: "request",
 			getConn: func(srv string, t *testing.T) rpc.Conn {
 				query := apphost2.FormatPort(c.port, srv, "request")
-				return apphost.Default().Request("localnode", query)
+				return apphost.Default.Rpc().Request("localnode", query)
 			},
 		},
 		{
@@ -45,7 +45,7 @@ func (c TestClient) Run(t *testing.T) {
 			name: "flow",
 			getConn: func(srv string, t *testing.T) (conn rpc.Conn) {
 				query := apphost2.FormatPort(c.port, srv, "flow")
-				conn, err := apphost.Default().Client("localnode", query)
+				conn, err := apphost.Default.Rpc().Client("localnode", query)
 				if err != nil {
 					t.Skip(err)
 				}

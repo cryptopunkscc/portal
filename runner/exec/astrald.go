@@ -15,7 +15,7 @@ func Astral(ctx context.Context) (err error) {
 	defer plog.TraceErr(&err)
 	log := plog.Get(ctx)
 	// check if astrald already running
-	if err = apphost.Connect(ctx); err == nil {
+	if err = apphost.Default.Connect(); err == nil {
 		return
 	}
 
@@ -31,6 +31,6 @@ func Astral(ctx context.Context) (err error) {
 	// await for apphost
 	return flow.Retry(ctx, 10*time.Second, func(i int, n int, d time.Duration) (err error) {
 		log.Printf("%d/%d attempt %v: retry after %v", i+1, n, err, d)
-		return apphost.Connect(ctx)
+		return apphost.Default.Connect()
 	})
 }

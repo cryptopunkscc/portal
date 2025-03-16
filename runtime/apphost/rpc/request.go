@@ -1,4 +1,4 @@
-package apphost
+package rpc
 
 import (
 	"encoding/json"
@@ -9,15 +9,10 @@ import (
 	"github.com/cryptopunkscc/portal/runtime/rpc/stream"
 	"github.com/cryptopunkscc/portal/runtime/rpc/stream/query"
 	"io"
-	"log"
 )
 
-func Request(target string, query ...string) rpc.Conn {
-	return Default().Request(target, query...)
-}
-
-func (r RpcBase) Request(target string, query ...string) rpc.Conn {
-	return newRequest(r.client, target, query)
+func (r Rpc) Request(target string, query ...string) rpc.Conn {
+	return newRequest(r.Apphost, target, query)
 }
 
 func newRequest(client apphost.Client, target string, q []string) *rpcRequest {
@@ -63,9 +58,7 @@ func (r *rpcRequest) Flush() {
 }
 
 func (r *rpcRequest) Call(method string, value any) (err error) {
-	if r.client == nil {
-		r.client = apphost.DefaultClient
-	}
+	defer plog.TraceErr(&err)
 	// build base query
 	p := apphost.NewPort(r.query...)
 	if method != "" {
@@ -81,9 +74,9 @@ func (r *rpcRequest) Call(method string, value any) (err error) {
 		if r.MarshalArgs == nil {
 			r.MarshalArgs = query.Marshal
 		}
-		args, err := r.MarshalArgs(value)
-		if err != nil {
-			return plog.Err(err)
+		var args []byte
+		if args, err = r.MarshalArgs(value); err != nil {
+			return
 		}
 		q += string(args)
 	}
@@ -94,10 +87,8 @@ func (r *rpcRequest) Call(method string, value any) (err error) {
 	}
 
 	if r.targetID == nil {
-		r.targetID, err = r.client.Resolve(r.target)
-		if err != nil {
-			log.Println("failed to resolve target", r.target, err)
-			return plog.Err(err)
+		if r.targetID, err = r.client.Resolve(r.target); err != nil {
+			return
 		}
 	}
 

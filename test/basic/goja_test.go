@@ -2,10 +2,10 @@ package basic
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/factory/bind"
 	"github.com/cryptopunkscc/portal/resolve/js"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/goja"
+	"github.com/cryptopunkscc/portal/runtime/bind"
 	"testing"
 )
 

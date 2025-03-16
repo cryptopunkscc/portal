@@ -2,7 +2,6 @@ package apphost
 
 import (
 	"bufio"
-	"context"
 	"github.com/cryptopunkscc/astrald/astral"
 	lib "github.com/cryptopunkscc/astrald/lib/apphost"
 	mod "github.com/cryptopunkscc/astrald/mod/apphost"
@@ -13,67 +12,81 @@ import (
 	"sync"
 )
 
-var Default = Adapter(Lib)
+var Default = &Adapter{}
 
-func Adapter(client *lib.Client) api.Client { return &adapter{lib: client} }
-
-type adapter struct {
-	mu  sync.RWMutex
-	lib *lib.Client
+type Adapter struct {
+	Client *Client
+	mu     sync.RWMutex
 }
 
-func (a *adapter) client() *lib.Client {
-	if a.lib == nil {
-		a.lib = Lib
-	}
-	if a.lib == Lib && !IsConnected() {
-		a.mu.Lock()
-		defer a.mu.Unlock()
-		if IsConnected() {
-			return a.lib
-		}
-		ctx := context.Background()
-		log := plog.New().W().Type(a).Set(&ctx)
-		log.Println("apphost not connected")
-		if err := Connect(ctx); err != nil {
-			log.P().Println(err)
-		}
-	}
-	return a.lib
-}
+var defaultClient = &Client{}
 
-func (a *adapter) Protocol() string { return a.client().Protocol() }
-func (a *adapter) Resolve(name string) (*astral.Identity, error) {
-	if name == "" {
-		return a.lib.HostID, nil
-	}
-	return a.client().ResolveIdentity(name)
-}
-func (a *adapter) DisplayName(identity *astral.Identity) string {
-	return a.client().DisplayName(identity)
-}
-
-func (a *adapter) Query(target string, method string, args any) (conn api.Conn, err error) {
+func (a *Adapter) Connect() (err error) {
 	defer plog.TraceErr(&err)
+	if a.Client == nil {
+		a.Client = defaultClient
+	}
+	if !a.Client.IsConnected() {
+		return a.Client.Connect()
+	}
+	return
+}
+
+func (a *Adapter) Protocol() string {
+	if a.Connect() != nil {
+		return ""
+	}
+	return a.Client.Protocol()
+}
+
+func (a *Adapter) Resolve(name string) (i *astral.Identity, err error) {
+	defer plog.TraceErr(&err)
+	if err = a.Connect(); err != nil {
+		return
+	}
+	if name == "" {
+		return a.Client.HostID, nil
+	}
+	return a.Client.ResolveIdentity(name)
+}
+
+func (a *Adapter) DisplayName(identity *astral.Identity) string {
+	if err := a.Connect(); err != nil {
+		return ""
+	}
+	return a.Client.DisplayName(identity)
+}
+
+func (a *Adapter) Query(target string, method string, args any) (conn api.Conn, err error) {
+	defer plog.TraceErr(&err)
+	if err = a.Connect(); err != nil {
+		return
+	}
 	id, err := a.Resolve(target)
 	if err != nil {
 		return
 	}
-	return outConn(a.client().Query(id.String(), method, args))
+	return outConn(a.Client.Query(id.String(), method, args))
 }
 
-func (a *adapter) Session() (s api.Session, err error) {
+func (a *Adapter) Session() (s api.Session, err error) {
 	defer plog.TraceErr(&err)
-	ss, err := a.client().Session()
+	if err = a.Connect(); err != nil {
+		return
+	}
+	ss, err := a.Client.Session()
 	if err != nil {
 		return
 	}
 	return session{ss}, nil
 }
 
-func (a *adapter) Register() (l api.Listener, err error) {
+func (a *Adapter) Register() (l api.Listener, err error) {
 	defer plog.TraceErr(&err)
-	ll, err := a.client().Listen()
+	if err = a.Connect(); err != nil {
+		return
+	}
+	ll, err := a.Client.Listen()
 	if err != nil {
 		return
 	}
