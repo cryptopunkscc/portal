@@ -67,7 +67,7 @@ func (s *Runner[T]) publicHandlers() cmd.Handlers {
 			},
 		},
 		{
-			Func: install.Runner(dir.App).Run,
+			Func: install.NewRunner(dir.App).BundlesByPath,
 			Name: "install i",
 			Desc: "Install app.",
 			Params: cmd.Params{
