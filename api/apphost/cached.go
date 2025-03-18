@@ -5,8 +5,6 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/mem"
 )
 
-var DefaultCached Cached
-
 type Cached interface {
 	Client
 	Cache

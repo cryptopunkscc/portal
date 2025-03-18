@@ -13,7 +13,7 @@ func installApps() {
 	if err != nil {
 		panic(err)
 	}
-	err = install.NewRunner(dir.App).Bundle(bundle)
+	err = install.Runner{OutputDir: dir.App}.Bundle(bundle)
 	if err != nil {
 		panic(err)
 	}
