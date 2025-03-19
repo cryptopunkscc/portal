@@ -33,3 +33,13 @@ func TestErr_Error_2(t *testing.T) {
 
 	assert.Equal(t, "foo", actual.Error())
 }
+
+func TestTraceErr(t *testing.T) {
+	err := errorWithTrace()
+	assert.ErrorAs(t, err, &ErrStack{})
+}
+
+func errorWithTrace() (err error) {
+	defer TraceErr(&err)
+	return errors.New("error")
+}

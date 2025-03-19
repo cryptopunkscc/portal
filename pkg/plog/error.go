@@ -27,6 +27,8 @@ type ErrStack struct {
 	stack []byte
 }
 
+func (e ErrStack) Unwrap() error { return e.error }
+
 func (e ErrStack) Error() string {
 	return e.error.Error()
 }
