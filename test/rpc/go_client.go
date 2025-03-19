@@ -3,10 +3,10 @@ package rpc
 import (
 	"errors"
 	apphost2 "github.com/cryptopunkscc/portal/api/apphost"
+	"github.com/cryptopunkscc/portal/core/apphost"
+	"github.com/cryptopunkscc/portal/core/rpc"
+	"github.com/cryptopunkscc/portal/core/rpc/stream/query"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runtime/apphost"
-	"github.com/cryptopunkscc/portal/runtime/rpc"
-	"github.com/cryptopunkscc/portal/runtime/rpc/stream/query"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"testing"

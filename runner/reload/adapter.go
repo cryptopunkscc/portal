@@ -3,7 +3,7 @@ package reload
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/runtime/bind"
+	"github.com/cryptopunkscc/portal/core/bind"
 )
 
 func Adapter[T target.Portal_](runner target.ReRunner[T]) func(bind.NewRuntime) target.ReRunner[T] {

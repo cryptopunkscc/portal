@@ -2,10 +2,10 @@ package setup
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/core/token"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/astrald"
 	"github.com/cryptopunkscc/portal/runner/exec"
-	"github.com/cryptopunkscc/portal/runtime/token"
 	"github.com/cryptopunkscc/portal/test"
 	"testing"
 )

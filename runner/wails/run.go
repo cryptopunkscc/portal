@@ -3,10 +3,10 @@ package wails
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/core/bind"
+	"github.com/cryptopunkscc/portal/core/js/embed/wails"
 	"github.com/cryptopunkscc/portal/pkg/assets"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runtime/bind"
-	"github.com/cryptopunkscc/portal/runtime/js/embed/wails"
 	"github.com/wailsapp/wails/v2/pkg/application"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"

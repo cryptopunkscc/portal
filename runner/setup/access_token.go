@@ -1,7 +1,7 @@
 package setup
 
 import (
-	"github.com/cryptopunkscc/portal/runtime/apphost"
+	"github.com/cryptopunkscc/portal/core/apphost"
 )
 
 func (r *Runner) resolveAuthToken(pkg string) (err error) {

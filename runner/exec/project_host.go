@@ -3,13 +3,13 @@ package exec
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/core/dir"
+	"github.com/cryptopunkscc/portal/core/token"
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	exec2 "github.com/cryptopunkscc/portal/resolve/exec"
 	"github.com/cryptopunkscc/portal/resolve/path"
 	"github.com/cryptopunkscc/portal/resolve/source"
-	"github.com/cryptopunkscc/portal/runtime/dir"
-	"github.com/cryptopunkscc/portal/runtime/token"
 	"slices"
 	"strings"
 )

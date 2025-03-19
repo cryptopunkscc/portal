@@ -3,9 +3,9 @@ package install
 import (
 	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/core/token"
 	"github.com/cryptopunkscc/portal/resolve/apps"
 	"github.com/cryptopunkscc/portal/resolve/source"
-	"github.com/cryptopunkscc/portal/runtime/token"
 	"io"
 	"os"
 	"path/filepath"

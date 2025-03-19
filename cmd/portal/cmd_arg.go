@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"errors"
-	"github.com/cryptopunkscc/portal/runtime/rpc/cli"
+	"github.com/cryptopunkscc/portal/core/rpc/cli"
 	"log"
 )
 

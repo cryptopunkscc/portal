@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"io"
 	"os"
 	"strings"

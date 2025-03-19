@@ -1,11 +1,11 @@
 package main
 
 import (
+	"github.com/cryptopunkscc/portal/core/rpc/cmd"
 	"github.com/cryptopunkscc/portal/runner/build_all"
 	"github.com/cryptopunkscc/portal/runner/clean"
 	"github.com/cryptopunkscc/portal/runner/cli"
 	"github.com/cryptopunkscc/portal/runner/version"
-	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 )
 
 func main() { cli.Run(Application{}.handler()) }

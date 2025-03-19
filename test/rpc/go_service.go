@@ -2,9 +2,9 @@ package rpc
 
 import (
 	"errors"
-	"github.com/cryptopunkscc/portal/runtime/apphost"
-	"github.com/cryptopunkscc/portal/runtime/apphost/rpc"
-	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
+	"github.com/cryptopunkscc/portal/core/apphost"
+	"github.com/cryptopunkscc/portal/core/apphost/rpc"
+	"github.com/cryptopunkscc/portal/core/rpc/cmd"
 )
 
 type TestGoService struct {

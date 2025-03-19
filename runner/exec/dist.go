@@ -3,7 +3,7 @@ package exec
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/runtime/token"
+	"github.com/cryptopunkscc/portal/core/token"
 )
 
 var DistRun target.Run[target.DistExec] = dist

@@ -3,11 +3,11 @@ package astrald
 import (
 	"context"
 	modApphostSrc "github.com/cryptopunkscc/astrald/mod/apphost/src"
+	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/resources"
-	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"github.com/labstack/gommon/random"
 	"time"
 )

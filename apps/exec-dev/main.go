@@ -2,6 +2,8 @@ package main
 
 import (
 	. "github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/core/bind"
+	"github.com/cryptopunkscc/portal/core/rpc/cmd"
 	"github.com/cryptopunkscc/portal/resolve/sources"
 	"github.com/cryptopunkscc/portal/runner/cli"
 	"github.com/cryptopunkscc/portal/runner/exec"
@@ -9,8 +11,6 @@ import (
 	"github.com/cryptopunkscc/portal/runner/open"
 	"github.com/cryptopunkscc/portal/runner/reload"
 	"github.com/cryptopunkscc/portal/runner/version"
-	"github.com/cryptopunkscc/portal/runtime/bind"
-	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 )
 
 func main() { cli.Run(Application[AppExec]{}.handler()) }

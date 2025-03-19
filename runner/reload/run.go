@@ -3,8 +3,8 @@ package reload
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runtime/bind"
 )
 
 func Mutable[T target.Portal_](

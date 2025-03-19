@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/core/rpc/cmd"
 	"github.com/cryptopunkscc/portal/runner/build_all"
 	"github.com/cryptopunkscc/portal/runner/cli"
 	"github.com/cryptopunkscc/portal/runner/template"
-	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 	"log"
 	"strings"
 )

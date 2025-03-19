@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runtime/apphost"
 	"os/exec"
 	"time"
 )

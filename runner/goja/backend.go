@@ -2,8 +2,8 @@ package goja
 
 import (
 	"github.com/cryptopunkscc/portal/api/bind"
+	"github.com/cryptopunkscc/portal/core/js/embed/common"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runtime/js/embed/common"
 	"github.com/dop251/goja"
 	"io/fs"
 )

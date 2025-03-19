@@ -3,14 +3,14 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/core/dir"
+	"github.com/cryptopunkscc/portal/core/rpc/cli"
+	"github.com/cryptopunkscc/portal/core/rpc/cmd"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/path"
 	"github.com/cryptopunkscc/portal/resolve/portal"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/resolve/sources"
-	"github.com/cryptopunkscc/portal/runtime/dir"
-	"github.com/cryptopunkscc/portal/runtime/rpc/cli"
-	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 
 	"log"
 	"os"

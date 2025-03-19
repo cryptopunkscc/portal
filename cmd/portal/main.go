@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/runner/cli"
-	"github.com/cryptopunkscc/portal/runtime/apphost"
 )
 
 func main() {

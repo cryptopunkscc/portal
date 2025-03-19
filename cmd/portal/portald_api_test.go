@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
+	"github.com/cryptopunkscc/portal/core/rpc/cmd"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

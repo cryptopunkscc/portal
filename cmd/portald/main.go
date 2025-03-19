@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	. "github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/core/rpc/cli"
+	"github.com/cryptopunkscc/portal/core/rpc/cmd"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	singal "github.com/cryptopunkscc/portal/pkg/sig"
-	"github.com/cryptopunkscc/portal/runtime/rpc/cli"
-	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 )
 
 var application = &Application[Portal_]{}

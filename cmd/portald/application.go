@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	. "github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/core/portald"
+	"github.com/cryptopunkscc/portal/core/rpc/cmd"
 	"github.com/cryptopunkscc/portal/runner/astrald"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/version"
-	"github.com/cryptopunkscc/portal/runtime/portald"
-	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 )
 
 type Application[T Portal_] struct {

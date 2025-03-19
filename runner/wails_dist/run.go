@@ -3,10 +3,10 @@ package wails_dist
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/wails"
 	"github.com/cryptopunkscc/portal/runner/watcher"
-	"github.com/cryptopunkscc/portal/runtime/bind"
 	"path/filepath"
 )
 

@@ -3,7 +3,7 @@ package v8
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/bind"
-	"github.com/cryptopunkscc/portal/runtime/js/embed/common"
+	"github.com/cryptopunkscc/portal/core/js/embed/common"
 	"log"
 	"rogchap.com/v8go"
 )

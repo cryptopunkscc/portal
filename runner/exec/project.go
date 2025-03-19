@@ -3,8 +3,8 @@ package exec
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/core/token"
 	"github.com/cryptopunkscc/portal/pkg/exec"
-	"github.com/cryptopunkscc/portal/runtime/token"
 	"strings"
 )
 

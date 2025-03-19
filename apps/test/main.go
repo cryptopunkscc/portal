@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/core/apphost"
+	"github.com/cryptopunkscc/portal/core/rpc/cmd"
 	"github.com/cryptopunkscc/portal/runner/cli"
-	"github.com/cryptopunkscc/portal/runtime/apphost"
-	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 	"log"
 	"os"
 )

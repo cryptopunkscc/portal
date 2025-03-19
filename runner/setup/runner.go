@@ -6,10 +6,10 @@ import (
 	modApphost "github.com/cryptopunkscc/astrald/mod/apphost"
 	modApphostSrc "github.com/cryptopunkscc/astrald/mod/apphost/src"
 	"github.com/cryptopunkscc/astrald/sig"
+	"github.com/cryptopunkscc/portal/core/token"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/resources"
 	"github.com/cryptopunkscc/portal/runner/astrald"
-	"github.com/cryptopunkscc/portal/runtime/token"
 )
 
 type Runner struct {

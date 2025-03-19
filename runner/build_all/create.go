@@ -2,6 +2,7 @@ package build_all
 
 import (
 	"github.com/cryptopunkscc/portal/api/target"
+	js "github.com/cryptopunkscc/portal/core/js/embed"
 	"github.com/cryptopunkscc/portal/resolve/npm"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/build"
@@ -10,7 +11,6 @@ import (
 	"github.com/cryptopunkscc/portal/runner/multi"
 	"github.com/cryptopunkscc/portal/runner/npm_build"
 	"github.com/cryptopunkscc/portal/runner/pack"
-	js "github.com/cryptopunkscc/portal/runtime/js/embed"
 )
 
 var Run = NewRunner().Run

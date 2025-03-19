@@ -16,7 +16,7 @@ import (
 )
 
 func (d *Install) buildEmbedApps(platforms ...string) {
-	file, err := source.File(d.root, "runtime", "js", "embed", "portal")
+	file, err := source.File(d.root, "core", "js", "embed", "portal")
 	if err != nil {
 		log.Fatal(err)
 	}
