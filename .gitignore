@@ -8,3 +8,4 @@ dist
 !runner/build
 !apps/build
 .idea/
+.test

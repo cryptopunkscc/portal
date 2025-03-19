@@ -12,7 +12,7 @@ type Astrald struct {
 	exec.Cmd
 }
 
-func (a *Astrald) Root() string { return a.NodeRoot }
+func (a *Astrald) RootDir() string { return a.NodeRoot }
 
 // Start astral daemon process in a given [context.Context]
 func (a *Astrald) Start(ctx context.Context) (err error) {

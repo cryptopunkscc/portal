@@ -8,7 +8,16 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"testing"
 )
+
+func Dir(t *testing.T) string {
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	return filepath.Join(wd, ".test")
+}
 
 func Assert[T any](value T, err error) T {
 	if err != nil {
