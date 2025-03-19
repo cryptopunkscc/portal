@@ -2,35 +2,35 @@ package exec
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/pkg/flow"
-	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runtime/apphost"
+	"github.com/cryptopunkscc/portal/pkg/exec"
 	"os"
-	"os/exec"
 	"time"
 )
 
-// Astral starts astral daemon process in a given [context.Context] and waits until available.
-func Astral(ctx context.Context) (err error) {
-	defer plog.TraceErr(&err)
-	log := plog.Get(ctx)
-	// check if astrald already running
-	if err = apphost.Default.Connect(); err == nil {
-		return
-	}
+type Astrald struct {
+	NodeRoot string
+	exec.Cmd
+}
 
-	// start astrald process
-	cmd := exec.CommandContext(ctx, "astrald")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Env = os.Environ()
-	if err = cmd.Start(); err != nil {
-		return
-	}
+func (a *Astrald) Root() string { return a.NodeRoot }
 
-	// await for apphost
-	return flow.Retry(ctx, 10*time.Second, func(i int, n int, d time.Duration) (err error) {
-		log.Printf("%d/%d attempt %v: retry after %v", i+1, n, err, d)
-		return apphost.Default.Connect()
-	})
+// Start astral daemon process in a given [context.Context]
+func (a *Astrald) Start(ctx context.Context) (err error) {
+	cmd := []string{"astrald"}
+	if a.NodeRoot != "" {
+		cmd = append(cmd,
+			"-root", a.NodeRoot,
+			"-dbroot", a.NodeRoot,
+		)
+	}
+	a.Cmd.Stdout = os.Stdout
+	a.Cmd.Stderr = os.Stderr
+	a.Cmd.Env = os.Environ()
+	c := a.Cmd.ParseUnsafe(cmd...).Build()
+	go func() {
+		time.Sleep(25 * time.Millisecond)
+		<-ctx.Done()
+		_ = c.Process.Kill()
+	}()
+	return c.Start()
 }

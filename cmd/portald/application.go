@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	. "github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/runner/astrald"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/portald"
 	"github.com/cryptopunkscc/portal/runner/version"
@@ -25,7 +26,8 @@ func (a *Application[T]) handler() cmd.Handler {
 }
 
 func (a *Application[T]) run(ctx context.Context) (err error) {
-	if err = exec.Astral(ctx); err != nil {
+	runner := astrald.Runner{Astrald: &exec.Astrald{}}
+	if err = runner.Start(ctx); err != nil {
 		return
 	}
 	err = a.Run(ctx)
