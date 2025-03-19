@@ -9,23 +9,14 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/google/uuid"
 	"net"
-	"sync"
 )
 
 var Default = &Adapter{}
 
-type Adapter struct {
-	Client *Client
-	mu     sync.RWMutex
-}
-
-var defaultClient = &Client{}
+type Adapter struct{ Client }
 
 func (a *Adapter) Connect() (err error) {
 	defer plog.TraceErr(&err)
-	if a.Client == nil {
-		a.Client = defaultClient
-	}
 	if !a.Client.IsConnected() {
 		return a.Client.Connect()
 	}
