@@ -7,6 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/runtime/dir"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cli"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
+	"github.com/cryptopunkscc/portal/runtime/token"
 )
 
 func (s *Runner[T]) Handlers() cmd.Handlers {
@@ -51,7 +52,7 @@ func (s *Runner[T]) publicHandlers() cmd.Handlers {
 			},
 		},
 		{
-			Func: install.Token,
+			Func: token.Repository{}.Resolve,
 			Name: "token",
 			Desc: "Create a new token or return existing one.",
 			Params: cmd.Params{

@@ -5,6 +5,7 @@ import (
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/resolve/apps"
 	"github.com/cryptopunkscc/portal/resolve/source"
+	"github.com/cryptopunkscc/portal/runtime/token"
 	"io"
 	"os"
 	"path/filepath"
@@ -35,7 +36,7 @@ func (i Runner) installBundles(source target.Source, c chan<- Result) {
 }
 
 func (i Runner) Bundle(bundle target.Bundle_) error {
-	if _, err := Token(bundle.Manifest().Package); err != nil {
+	if _, err := (token.Repository{}).Resolve(bundle.Manifest().Package); err != nil {
 		return err
 	}
 	pkg := bundle.Package()

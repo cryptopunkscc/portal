@@ -8,7 +8,7 @@ import (
 	"github.com/cryptopunkscc/portal/resolve/path"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runtime/dir"
-	"github.com/cryptopunkscc/portal/runtime/tokens"
+	"github.com/cryptopunkscc/portal/runtime/token"
 	"slices"
 	"strings"
 )
@@ -25,7 +25,7 @@ func BundleHostRunner(schemaPrefix ...string) target.Run[target.Portal_] {
 		schema := strings.Join(schemaArr, ".")
 		log.Println("running:", schema, manifest.Package, args)
 
-		token, err := tokens.Repository{}.Get(src.Manifest().Package)
+		t, err := token.Repository{}.Get(src.Manifest().Package)
 		if err != nil {
 			return
 		}
@@ -49,6 +49,6 @@ func BundleHostRunner(schemaPrefix ...string) target.Run[target.Portal_] {
 			return
 		}
 
-		return Cmd{}.Run(ctx, token.Token.String(), execFile.Name(), args...)
+		return Cmd{}.Run(ctx, t.Token.String(), execFile.Name(), args...)
 	}
 }

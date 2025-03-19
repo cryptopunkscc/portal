@@ -8,7 +8,7 @@ import (
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runtime/dir"
-	"github.com/cryptopunkscc/portal/runtime/tokens"
+	"github.com/cryptopunkscc/portal/runtime/token"
 	"io"
 	"os"
 	"path/filepath"
@@ -21,12 +21,12 @@ func BundleRunner() target.Run[target.BundleExec] {
 			return
 		}
 
-		token, err := tokens.Repository{}.Get(bundle.Manifest().Package)
+		t, err := token.Repository{}.Get(bundle.Manifest().Package)
 		if err != nil {
 			return err
 		}
 
-		err = Cmd{}.Run(ctx, token.Token.String(), execFile.Name(), args...)
+		err = Cmd{}.Run(ctx, t.Token.String(), execFile.Name(), args...)
 		if err != nil {
 			return
 		}
