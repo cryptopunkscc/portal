@@ -9,7 +9,7 @@ import (
 )
 
 func installApps() {
-	bundle, err := exec.ResolveBundle(source.Embed(apps.LauncherSvelteFS))
+	bundle, err := exec.ResolveBundle(source.Embed(apps.Builds))
 	if err != nil {
 		panic(err)
 	}
