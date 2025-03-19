@@ -3,7 +3,6 @@ package template
 import (
 	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/resolve/template"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -48,7 +47,7 @@ func (r *Runner) GenerateProject(template target.Template, projectName string) (
 	return
 }
 
-func (r *Runner) setupProjectArgs(projectName string) (args template.Args) {
+func (r *Runner) setupProjectArgs(projectName string) (args Args) {
 	args = r.args
 	args.ProjectName = projectName
 	args.PackageName = "new.portal." + projectName

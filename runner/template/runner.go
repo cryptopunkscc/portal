@@ -3,12 +3,11 @@ package template
 import (
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/git"
-	"github.com/cryptopunkscc/portal/resolve/template"
 )
 
 type Runner struct {
 	dir  string
-	args template.Args
+	args Args
 }
 
 func NewRunner(dir string) *Runner {
@@ -19,8 +18,8 @@ func NewRunner(dir string) *Runner {
 	return r
 }
 
-func defaultTemplateArgs() template.Args {
-	args := template.Args{}
+func defaultTemplateArgs() Args {
+	args := Args{}
 	args.AuthorName = git.UserName(false)
 	if args.AuthorName == "" {
 		args.AuthorName = git.UserName(true)
