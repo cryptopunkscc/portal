@@ -5,8 +5,8 @@ import (
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/runner/astrald"
 	"github.com/cryptopunkscc/portal/runner/exec"
-	"github.com/cryptopunkscc/portal/runner/portald"
 	"github.com/cryptopunkscc/portal/runner/version"
+	"github.com/cryptopunkscc/portal/runtime/portald"
 	"github.com/cryptopunkscc/portal/runtime/rpc/cmd"
 )
 
