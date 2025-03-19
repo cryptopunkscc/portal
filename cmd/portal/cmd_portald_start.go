@@ -26,14 +26,25 @@ func startPortaldProcess(ctx context.Context) (err error) {
 	return
 }
 
-func awaitPortaldService(ctx context.Context, client apphost.Portald) error {
-	log := plog.Get(ctx)
-	return flow.Retry(ctx, 8*time.Second, func(i int, n int, d time.Duration) (err error) {
-		log.Printf("%d/%d attempt %v: retry after %v", i+1, n, err, d)
-		if err = apphost.Default.Connect(); err != nil {
-			log.Printf("failed to connect to apphost: %v", err)
-			return
+func awaitPortaldService(ctx context.Context, client apphost.Portald) (err error) {
+	await := flow.Await{
+		UpTo:  5 * time.Second,
+		Delay: 50 * time.Millisecond,
+		Mod:   6,
+		Ctx:   ctx,
+	}
+	for range await.Chan() {
+		if err = apphost.Default.Connect(); err == nil {
+			break
 		}
-		return client.Ping()
-	})
+	}
+	if err != nil {
+		return
+	}
+	for range await.Chan() {
+		if err = client.Ping(); err == nil {
+			break
+		}
+	}
+	return
 }

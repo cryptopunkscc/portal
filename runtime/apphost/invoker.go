@@ -17,8 +17,7 @@ type Invoker struct {
 }
 
 func (i Invoker) Query(target string, method string, args any) (conn apphost.Conn, err error) {
-	conn, err = i.Client.Query(target, method, args)
-	if err == nil {
+	if conn, err = i.Client.Query(target, method, args); err == nil {
 		return
 	}
 
@@ -27,16 +26,17 @@ func (i Invoker) Query(target string, method string, args any) (conn apphost.Con
 		return
 	}
 
-	conn, err = flow.RetryT[apphost.Conn](
-		i.Ctx, 8188*time.Millisecond,
-		func(ii, n int, d time.Duration) (apphost.Conn, error) {
-			i.Log.Printf("retry query: %s - %d/%d attempt %v: retry after %v", conn, ii+1, n, err, d)
-			return i.Client.Query(target, method, args)
-		},
-	)
-	if err == nil {
-		i.Log.Println("query succeed", conn.Query())
-		return
+	await := flow.Await{
+		UpTo: 8 * time.Millisecond,
+		Mod:  8,
+		Ctx:  i.Ctx,
+	}
+	for in := range await.Chan() {
+		i.Log.Println("retry:", in)
+		if conn, err = i.Client.Query(target, method, args); err == nil {
+			i.Log.Println("query succeed", conn.Query())
+			return
+		}
 	}
 	return
 }
