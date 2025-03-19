@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/astrald/astral"
 	mod "github.com/cryptopunkscc/astrald/mod/apphost"
-	"github.com/cryptopunkscc/portal/core/rpc"
+	"github.com/cryptopunkscc/portal/pkg/rpc"
 )
 
 func (a *Adapter) Token() Token {

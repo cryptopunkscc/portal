@@ -2,7 +2,7 @@ package cli
 
 import (
 	"fmt"
-	"github.com/cryptopunkscc/portal/core/rpc/caller/param"
+	"github.com/cryptopunkscc/portal/pkg/rpc/caller/param"
 	"reflect"
 	"strings"
 )

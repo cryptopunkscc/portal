@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/cryptopunkscc/portal/core/apphost"
-	"github.com/cryptopunkscc/portal/core/rpc"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"log"
 	"os"
 	"strings"

@@ -3,12 +3,12 @@ package cli
 import (
 	"context"
 	"encoding/json"
-	"github.com/cryptopunkscc/portal/core/rpc"
-	"github.com/cryptopunkscc/portal/core/rpc/caller/cli"
-	"github.com/cryptopunkscc/portal/core/rpc/caller/query"
-	"github.com/cryptopunkscc/portal/core/rpc/cmd"
-	"github.com/cryptopunkscc/portal/core/rpc/router"
-	"github.com/cryptopunkscc/portal/core/rpc/stream"
+	"github.com/cryptopunkscc/portal/pkg/rpc"
+	"github.com/cryptopunkscc/portal/pkg/rpc/caller/cli"
+	"github.com/cryptopunkscc/portal/pkg/rpc/caller/query"
+	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
+	"github.com/cryptopunkscc/portal/pkg/rpc/router"
+	"github.com/cryptopunkscc/portal/pkg/rpc/stream"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"log"
 )

@@ -2,7 +2,7 @@ package query
 
 import (
 	"errors"
-	"github.com/cryptopunkscc/portal/core/rpc/caller/param"
+	"github.com/cryptopunkscc/portal/pkg/rpc/caller/param"
 	"net/url"
 	"reflect"
 	"strconv"

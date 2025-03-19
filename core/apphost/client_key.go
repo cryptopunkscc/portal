@@ -3,7 +3,7 @@ package apphost
 import (
 	"errors"
 	"github.com/cryptopunkscc/astrald/astral"
-	"github.com/cryptopunkscc/portal/core/rpc"
+	"github.com/cryptopunkscc/portal/pkg/rpc"
 )
 
 func (a *Adapter) Key() Key { return Key{a.Rpc().Request("localnode")} }

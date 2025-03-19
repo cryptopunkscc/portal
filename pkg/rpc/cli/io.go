@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"github.com/cryptopunkscc/portal/core/rpc/stream"
+	"github.com/cryptopunkscc/portal/pkg/rpc/stream"
 	"io"
 	"os"
 	"strings"

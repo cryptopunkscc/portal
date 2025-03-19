@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/cryptopunkscc/portal/core/rpc/stream"
+	"github.com/cryptopunkscc/portal/pkg/rpc/stream"
 )
 
 type Marshaler interface {

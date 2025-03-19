@@ -1,7 +1,7 @@
 package portald
 
 import (
-	"github.com/cryptopunkscc/portal/core/rpc/cmd"
+	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 )
 
 func (s *Runner[T]) Api() cmd.Handlers {

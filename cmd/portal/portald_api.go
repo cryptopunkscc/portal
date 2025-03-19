@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/core/apphost"
-	"github.com/cryptopunkscc/portal/core/rpc/cmd"
+	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"slices"
 )
 

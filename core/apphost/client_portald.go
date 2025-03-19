@@ -1,8 +1,8 @@
 package apphost
 
 import (
-	"github.com/cryptopunkscc/portal/core/rpc"
-	"github.com/cryptopunkscc/portal/core/rpc/cmd"
+	"github.com/cryptopunkscc/portal/pkg/rpc"
+	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"io"
 )
 

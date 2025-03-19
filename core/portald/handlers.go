@@ -3,9 +3,9 @@ package portald
 import (
 	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/core/dir"
-	"github.com/cryptopunkscc/portal/core/rpc/cli"
-	"github.com/cryptopunkscc/portal/core/rpc/cmd"
 	"github.com/cryptopunkscc/portal/core/token"
+	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
+	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/runner/install"
 	"github.com/cryptopunkscc/portal/runner/uninstall"
 )

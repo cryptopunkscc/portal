@@ -2,10 +2,10 @@ package cli
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/core/rpc/caller/cli"
-	"github.com/cryptopunkscc/portal/core/rpc/cmd"
-	"github.com/cryptopunkscc/portal/core/rpc/router"
-	"github.com/cryptopunkscc/portal/core/rpc/stream"
+	"github.com/cryptopunkscc/portal/pkg/rpc/caller/cli"
+	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
+	"github.com/cryptopunkscc/portal/pkg/rpc/router"
+	"github.com/cryptopunkscc/portal/pkg/rpc/stream"
 	"io"
 )
 

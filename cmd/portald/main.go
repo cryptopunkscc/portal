@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	. "github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/core/rpc/cli"
-	"github.com/cryptopunkscc/portal/core/rpc/cmd"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
+	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	singal "github.com/cryptopunkscc/portal/pkg/sig"
 )
 

@@ -3,7 +3,7 @@ package portald
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/core/apphost"
-	"github.com/cryptopunkscc/portal/core/rpc"
+	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"github.com/cryptopunkscc/portal/runner/exec"
 )
 

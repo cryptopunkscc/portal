@@ -2,9 +2,9 @@ package rpc
 
 import (
 	"encoding/json"
-	"github.com/cryptopunkscc/portal/core/rpc"
-	"github.com/cryptopunkscc/portal/core/rpc/stream"
-	"github.com/cryptopunkscc/portal/core/rpc/stream/query"
+	"github.com/cryptopunkscc/portal/pkg/rpc"
+	"github.com/cryptopunkscc/portal/pkg/rpc/stream"
+	"github.com/cryptopunkscc/portal/pkg/rpc/stream/query"
 	"io"
 )
 
