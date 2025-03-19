@@ -45,7 +45,10 @@ func (g runner) Run(ctx context.Context, project target.ProjectGo, _ ...string) 
 			build, ok = project.Build()["default"]
 		}
 		if ok {
-			cmd = cmd.Parse(build.Cmd).AddEnv(build.Env...).AddEnv("GOOS=" + platform)
+			if cmd, err = cmd.Parse(build.Cmd); err != nil {
+				return
+			}
+			cmd = cmd.AddEnv(build.Env...).AddEnv("GOOS=" + platform)
 		}
 		if err = cmd.Build().Run(); err != nil {
 			return fmt.Errorf("run golang build %s: %s", project.Abs(), err)

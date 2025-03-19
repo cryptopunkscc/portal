@@ -2,9 +2,9 @@ package exec
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/google/shlex"
 	"io"
-	"log"
 	"os"
 	"os/exec"
 )
@@ -33,22 +33,29 @@ func (c Cmd) AddEnv(env ...string) Cmd {
 	return c
 }
 
-func (c Cmd) Parse(cmd ...string) Cmd {
+func (c Cmd) ParseUnsafe(cmd ...string) Cmd {
+	parsed, err := c.Parse(cmd...)
+	if err != nil {
+		plog.New().P().Println(err)
+	}
+	return parsed
+}
+
+func (c Cmd) Parse(cmd ...string) (Cmd, error) {
 	var chunks []string
 	for _, s := range cmd {
 		split, err := shlex.Split(s)
 		if err != nil {
-			panic(err)
+			return c, plog.Err(err)
 		}
 		chunks = append(chunks, split...)
 	}
 	c.Cmd = chunks[0]
 	c.Args = chunks[1:]
-	return c
+	return c, nil
 }
 
 func (c Cmd) Build() (cmd *exec.Cmd) {
-	log.Println(c.Dir, c.Cmd, c.Args)
 	if c.Ctx != nil {
 		cmd = exec.CommandContext(c.Ctx, c.Cmd, c.Args...)
 	} else {

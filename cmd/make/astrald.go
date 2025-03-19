@@ -34,7 +34,7 @@ func buildAstral() {
 	astrald = filepath.Join(home, "go/pkg/mod", astrald)
 	out := filepath.Join(wd, "cmd/portal-installer/bin/")
 
-	err = exec.Cmd{Dir: astrald}.Parse("go", "build -o", out, "./cmd/astrald").Default().Build().Run()
+	err = exec.Cmd{Dir: astrald}.ParseUnsafe("go", "build -o", out, "./cmd/astrald").Default().Build().Run()
 	if err != nil {
 		log.Fatalln("cannot build astrald:", err)
 	}
@@ -54,7 +54,7 @@ func buildAnc() {
 	astrald = filepath.Join(home, "go/pkg/mod", astrald)
 	out := filepath.Join(wd, "cmd/portal-installer/bin/")
 
-	err = exec.Cmd{Dir: astrald}.Parse("go", "build -o", out, "./cmd/anc").Default().Build().Run()
+	err = exec.Cmd{Dir: astrald}.ParseUnsafe("go", "build -o", out, "./cmd/anc").Default().Build().Run()
 	if err != nil {
 		log.Fatalln("cannot build anc:", err)
 	}
