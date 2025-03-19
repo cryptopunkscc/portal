@@ -18,7 +18,7 @@ func (n *nodeModule) PkgJson() *target.PackageJson {
 }
 
 func (n *nodeModule) LoadPkgJson() error {
-	return json.Unmarshaler.Load(&n.packageJson, n.Files(), target.PackageJsonFilename)
+	return json.Unmarshaler.Load(&n.packageJson, n.FS(), target.PackageJsonFilename)
 }
 
 func Resolve(src target.Source) (t target.NodeModule, err error) {
@@ -65,7 +65,7 @@ func Resolver[T any](resolve target.Resolve[T]) target.Resolve[target.ProjectNpm
 			return
 		}
 		p := &project[T]{}
-		if err = all.Unmarshalers.Load(&p.manifest, src.Files(), target.BuildFilename); err != nil {
+		if err = all.Unmarshalers.Load(&p.manifest, src.FS(), target.BuildFilename); err != nil {
 			return
 		}
 		if p.nodeModule, err = Resolve(src); err != nil {

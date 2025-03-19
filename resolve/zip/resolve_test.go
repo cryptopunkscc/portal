@@ -21,7 +21,7 @@ func TestResolve(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, s := range []string{"foo", "bar/baz"} {
-		if _, err = fs.Stat(bundle.Files(), s); err != nil {
+		if _, err = fs.Stat(bundle.FS(), s); err != nil {
 			t.Fatal("s", err)
 		}
 	}

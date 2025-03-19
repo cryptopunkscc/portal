@@ -14,7 +14,7 @@ type js struct{}
 func (h js) MainJs() {}
 
 func ResolveJs(src Source) (t Js, err error) {
-	stat, err := fs.Stat(src.Files(), "main.js")
+	stat, err := fs.Stat(src.FS(), "main.js")
 	if err != nil {
 		return
 	}

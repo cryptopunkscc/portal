@@ -53,7 +53,7 @@ func (resolve Resolve[T]) list(from Source) (out []T) {
 			return append(out, t)
 		}
 	}
-	_ = fs.WalkDir(from.Files(), from.Path(), func(src string, d fs.DirEntry, err error) error {
+	_ = fs.WalkDir(from.FS(), from.Path(), func(src string, d fs.DirEntry, err error) error {
 		if err != nil {
 			log.Println("Resolve list", err)
 			return err

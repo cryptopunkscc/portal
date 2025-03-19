@@ -23,7 +23,7 @@ func NewRun(newRuntime bind.NewRuntime) target.Run[target.AppJs] {
 }
 
 func (r *Runner) ReRun() (err error) {
-	return r.backend.RunFs(r.app.Files(), r.args...)
+	return r.backend.RunFs(r.app.FS(), r.args...)
 }
 
 func (r *Runner) Run(ctx context.Context, app target.AppJs, args ...string) (err error) {

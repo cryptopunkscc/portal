@@ -29,7 +29,7 @@ func TestSource_Sub_dir(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	_, err = src.Files().Open("file")
+	_, err = src.FS().Open("file")
 	if err != nil {
 		t.Error(err)
 	}
@@ -59,7 +59,7 @@ func TestSource_FS_dir(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = src.Files().Open(file)
+	_, err = src.FS().Open(file)
 	if err != nil {
 		t.Fatal(err)
 	}

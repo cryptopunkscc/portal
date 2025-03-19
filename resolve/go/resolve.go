@@ -34,10 +34,10 @@ func ResolveProject(src Source) (t ProjectGo, err error) {
 	if !src.IsDir() {
 		return nil, ErrNotTarget
 	}
-	if _, err = fs.Stat(src.Files(), "main.go"); err != nil {
+	if _, err = fs.Stat(src.FS(), "main.go"); err != nil {
 		return
 	}
-	if err = all.Unmarshalers.Load(&p.manifest, src.Files(), BuildFilename); err != nil {
+	if err = all.Unmarshalers.Load(&p.manifest, src.FS(), BuildFilename); err != nil {
 		return
 	}
 	p.Source = src

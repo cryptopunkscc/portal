@@ -33,7 +33,7 @@ func inject(log plog.Logger, m target.NodeModule, lib target.NodeModule) (err er
 	dep := lib
 	nm := filepath.Join(m.Abs(), "node_modules", filepath.Base(dep.Abs()))
 	log.Printf("copying module %v %v into: %s", dep.Path(), dep.Abs(), nm)
-	return fs.WalkDir(dep.Files(), ".", func(s string, d fs.DirEntry, err error) error {
+	return fs.WalkDir(dep.FS(), ".", func(s string, d fs.DirEntry, err error) error {
 		log.Println("* coping file", d, s)
 		if d.IsDir() {
 			dst := filepath.Join(nm, s)
@@ -42,7 +42,7 @@ func inject(log plog.Logger, m target.NodeModule, lib target.NodeModule) (err er
 			}
 			return nil
 		}
-		src, err := dep.Files().Open(s)
+		src, err := dep.FS().Open(s)
 		if err != nil {
 			return fmt.Errorf("cannot open %s: %s", s, err)
 		}

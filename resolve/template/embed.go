@@ -16,7 +16,7 @@ func init() {
 	if err != nil {
 		return
 	}
-	if CommonsFs = sub.Files(); CommonsFs == nil {
+	if CommonsFs = sub.FS(); CommonsFs == nil {
 		panic("cannot resolve templates commons.")
 	}
 }

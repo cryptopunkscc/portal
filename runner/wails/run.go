@@ -78,12 +78,12 @@ func SetupOptions(src target.Portal_, opt *options.App) {
 	apphostJsFs := wails.JsFs
 
 	// Setup fs assets
-	opt.AssetServer.Assets = assets.ArrayFs{src.Files(), apphostJsFs}
+	opt.AssetServer.Assets = assets.ArrayFs{src.FS(), apphostJsFs}
 
 	// Setup http assets
 	opt.AssetServer.Handler = assets.StoreHandler{
 		Store: &assets.OverlayStore{Stores: []assets.Store{
-			&assets.FsStore{FS: src.Files()},
+			&assets.FsStore{FS: src.FS()},
 			&assets.FsStore{FS: apphostJsFs}},
 		},
 	}

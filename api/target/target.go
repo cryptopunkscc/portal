@@ -8,7 +8,7 @@ type Source interface {
 	Abs() string
 	Path() string
 	File() (fs.File, error)
-	Files() fs.FS
+	FS() fs.FS
 	Sub(dir string) (Source, error)
 	IsDir() bool
 }

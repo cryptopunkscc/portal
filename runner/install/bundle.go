@@ -47,7 +47,7 @@ func (i Runner) Bundle(bundle target.Bundle_) error {
 		return err
 	}
 	defer dst.Close()
-	src, err := pkg.Files().Open(pkg.Path())
+	src, err := pkg.FS().Open(pkg.Path())
 	if err != nil {
 		return err
 	}

@@ -13,7 +13,7 @@ func Resolver[T any](resolve target.Resolve[T]) target.Resolve[target.Project[T]
 			return
 		}
 		p := &project[T]{}
-		if err = all.Unmarshalers.Load(&p.manifest, src.Files(), target.BuildFilename); err != nil {
+		if err = all.Unmarshalers.Load(&p.manifest, src.FS(), target.BuildFilename); err != nil {
 			return
 		}
 		p.build = target.LoadBuilds(src)

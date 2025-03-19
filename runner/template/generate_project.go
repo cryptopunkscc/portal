@@ -38,7 +38,7 @@ func (r *Runner) GenerateProject(template target.Template, projectName string) (
 	}
 
 	args := r.setupProjectArgs(projectName)
-	if err = installTemplate(dir, template.Files(), args); err != nil {
+	if err = installTemplate(dir, template.FS(), args); err != nil {
 		return
 	}
 
@@ -56,7 +56,7 @@ func (r *Runner) setupProjectArgs(projectName string) (args template.Args) {
 }
 
 func fixupManifestIfNeeded(t target.Template, dir string) (err error) {
-	stat, err := fs.Stat(t.Files(), "dev")
+	stat, err := fs.Stat(t.FS(), "dev")
 	shouldFix := err == nil && !stat.IsDir()
 	if !shouldFix {
 		return

@@ -35,7 +35,7 @@ func Resolve(src target.Source) (t target.Bundle, err error) {
 
 func zipFromSource(src target.Source) (r *zip.Reader, err error) {
 	var file []byte
-	if file, err = fs.ReadFile(src.Files(), src.Path()); err != nil {
+	if file, err = fs.ReadFile(src.FS(), src.Path()); err != nil {
 		return
 	}
 	readerAt := bytes.NewReader(file)

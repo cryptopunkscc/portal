@@ -28,7 +28,7 @@ func resolve(src target.Source) (template target.Template, err error) {
 	if !src.IsDir() {
 		return nil, ErrNotTemplate
 	}
-	info, err := readTemplateInfo(src.Files())
+	info, err := readTemplateInfo(src.FS())
 	if err != nil {
 		return
 	}

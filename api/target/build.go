@@ -28,14 +28,14 @@ type builds struct {
 func LoadBuilds(source Source) (out Builds) {
 	out = Builds{}
 	b := build{}
-	if err := all.Unmarshalers.Load(&b, source.Files(), BuildFilename); err == nil {
+	if err := all.Unmarshalers.Load(&b, source.FS(), BuildFilename); err == nil {
 		if b.Build.Cmd != "" || len(b.Build.Deps) > 0 {
 			out["default"] = b.Build
 			return
 		}
 	}
 	bs := builds{}
-	if err := all.Unmarshalers.Load(&bs, source.Files(), BuildFilename); err == nil {
+	if err := all.Unmarshalers.Load(&bs, source.FS(), BuildFilename); err == nil {
 		out = bs.Builds
 	}
 	if def, ok := out["default"]; ok {

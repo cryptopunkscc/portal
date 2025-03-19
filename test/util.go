@@ -40,16 +40,16 @@ func Copy(src target.Source, path ...string) target.Source {
 		split := strings.Split(src.Abs(), string(os.PathSeparator))[2:]
 		out = filepath.Join(append([]string{out}, split...)...)
 		//out = filepath.Join(out, )
-		if err = copyFileAndClose(src.Files(), 0755, src.Path(), out); err != nil {
+		if err = copyFileAndClose(src.FS(), 0755, src.Path(), out); err != nil {
 			panic(err)
 		}
 	} else {
-		if err := fs.WalkDir(src.Files(), ".", func(path string, d fs.DirEntry, err error) error {
+		if err := fs.WalkDir(src.FS(), ".", func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
 				return err
 			}
 			dstPath := filepath.Join(out, path)
-			if err = copyAndClose(src.Files(), d, path, dstPath); err != nil {
+			if err = copyAndClose(src.FS(), d, path, dstPath); err != nil {
 				return err
 			}
 			return nil

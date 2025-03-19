@@ -17,7 +17,7 @@ func (e exec) Executable() target.Source { return e.exec }
 
 func New(portal target.Portal_) (t target.Exec, err error) {
 	file := portal.Manifest().Exec
-	stat, err := fs.Stat(portal.Files(), file)
+	stat, err := fs.Stat(portal.FS(), file)
 	if err != nil {
 		return
 	}

@@ -14,7 +14,7 @@ type html struct{ Source }
 func (h html) IndexHtml() {}
 
 func ResolveHtml(src Source) (t Html, err error) {
-	stat, err := fs.Stat(src.Files(), "index.html")
+	stat, err := fs.Stat(src.FS(), "index.html")
 	if err != nil {
 		return
 	}

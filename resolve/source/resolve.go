@@ -22,7 +22,7 @@ type source struct {
 func (s *source) IsDir() bool       { return !s.isFile }
 func (s *source) Abs() (abs string) { return s.join(s.external, s.internal) }
 func (s *source) Path() string      { return s.internal }
-func (s *source) Files() fs.FS      { return s.files }
+func (s *source) FS() fs.FS         { return s.files }
 func (s *source) Sub(src string) (t target.Source, err error) {
 	if s.isFile {
 		return nil, errors.New("cannot sub file")
@@ -33,13 +33,13 @@ func (s *source) Sub(src string) (t target.Source, err error) {
 	}
 	ts := *s
 	if stat.IsDir() {
-		if ts.files, err = fs.Sub(s.Files(), src); err != nil {
+		if ts.files, err = fs.Sub(s.FS(), src); err != nil {
 			return
 		}
 		ts.external = s.join(s.external, s.internal, src)
 		ts.isFile = false
 	} else {
-		ts.files = s.Files()
+		ts.files = s.FS()
 		ts.internal = s.join(ts.internal, src)
 		ts.isFile = true
 	}
@@ -48,7 +48,7 @@ func (s *source) Sub(src string) (t target.Source, err error) {
 }
 
 func (s *source) File() (fs.File, error) {
-	return s.Files().Open(s.Path())
+	return s.FS().Open(s.Path())
 }
 
 func Embed(files embed.FS) target.Source {

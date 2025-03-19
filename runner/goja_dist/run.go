@@ -23,7 +23,7 @@ func NewRunner(newRuntime bind.NewRuntime, send target.MsgSend) target.ReRunner[
 }
 
 func (r *Runner) ReRun() (err error) {
-	return r.backend.RunFs(r.dist.Files())
+	return r.backend.RunFs(r.dist.FS())
 }
 
 func (r *Runner) Run(ctx context.Context, dist target.DistJs, args ...string) (err error) {

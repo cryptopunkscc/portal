@@ -30,7 +30,7 @@ func (p *unknown) Manifest() *target.Manifest {
 	return &p.manifest
 }
 func (p *unknown) LoadManifest() error {
-	return all.Unmarshalers.Load(&p.manifest, p.Files(), target.ManifestFilename)
+	return all.Unmarshalers.Load(&p.manifest, p.FS(), target.ManifestFilename)
 }
 func (p *unknown) MarshalJSON() ([]byte, error) {
 	return json.Marshal(p.manifest)
