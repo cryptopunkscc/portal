@@ -6,9 +6,9 @@ import (
 	v8 "rogchap.com/v8go"
 )
 
-func Bind(iso *v8.Isolate, runtime bind.Runtime) (template *v8.ObjectTemplate, err error) {
+func Bind(iso *v8.Isolate, core bind.Core) (template *v8.ObjectTemplate, err error) {
 	template = v8.NewObjectTemplate(iso)
-	a := adapter{runtime}
+	a := adapter{core}
 	if err = template.Set(bind.Log, v8.NewFunctionTemplate(iso, a.Log)); err != nil {
 		return
 	}
@@ -36,9 +36,6 @@ func Bind(iso *v8.Isolate, runtime bind.Runtime) (template *v8.ObjectTemplate, e
 	if err = template.Set(bind.Query, v8.NewFunctionTemplate(iso, a.Query)); err != nil {
 		return
 	}
-	if err = template.Set(bind.QueryName, v8.NewFunctionTemplate(iso, a.QueryName)); err != nil {
-		return
-	}
 	if err = template.Set(bind.GetNodeInfo, v8.NewFunctionTemplate(iso, a.NodeInfo)); err != nil {
 		return
 	}
@@ -49,7 +46,7 @@ func Bind(iso *v8.Isolate, runtime bind.Runtime) (template *v8.ObjectTemplate, e
 }
 
 type adapter struct {
-	runtime bind.Runtime
+	core bind.Core
 }
 
 func (a *adapter) Log(info *v8.FunctionCallbackInfo) *v8.Value {
@@ -62,7 +59,7 @@ func (a *adapter) Sleep(info *v8.FunctionCallbackInfo) *v8.Value {
 	t := info.Args()[0].Integer()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		a.runtime.Sleep(t)
+		a.core.Sleep(t)
 		resolver.Resolve(v8.Undefined(iso))
 	}()
 	return resolver.GetPromise().Value
@@ -70,10 +67,9 @@ func (a *adapter) Sleep(info *v8.FunctionCallbackInfo) *v8.Value {
 
 func (a *adapter) ServiceRegister(info *v8.FunctionCallbackInfo) *v8.Value {
 	iso := info.Context().Isolate()
-	port := info.Args()[0].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		err := a.runtime.ServiceRegister(port)
+		err := a.core.ServiceRegister()
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {
@@ -88,10 +84,9 @@ func (a *adapter) ServiceRegister(info *v8.FunctionCallbackInfo) *v8.Value {
 
 func (a *adapter) ServiceClose(info *v8.FunctionCallbackInfo) *v8.Value {
 	iso := info.Context().Isolate()
-	port := info.Args()[0].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		err := a.runtime.ServiceClose(port)
+		err := a.core.ServiceClose()
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {
@@ -106,10 +101,9 @@ func (a *adapter) ServiceClose(info *v8.FunctionCallbackInfo) *v8.Value {
 
 func (a *adapter) ConnAccept(info *v8.FunctionCallbackInfo) *v8.Value {
 	iso := info.Context().Isolate()
-	port := info.Args()[0].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		id, err := a.runtime.ConnAccept(port)
+		id, err := a.core.ConnAccept()
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {
@@ -132,7 +126,7 @@ func (a *adapter) ConnClose(info *v8.FunctionCallbackInfo) *v8.Value {
 	id := info.Args()[0].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		err := a.runtime.ConnClose(id)
+		err := a.core.ConnClose(id)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {
@@ -151,7 +145,7 @@ func (a *adapter) ConnWrite(info *v8.FunctionCallbackInfo) *v8.Value {
 	data := info.Args()[1].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		err := a.runtime.ConnWriteLn(id, data)
+		err := a.core.ConnWriteLn(id, data)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {
@@ -169,7 +163,7 @@ func (a *adapter) ConnRead(info *v8.FunctionCallbackInfo) *v8.Value {
 	id := info.Args()[0].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		data, err := a.runtime.ConnReadLn(id)
+		data, err := a.core.ConnReadLn(id)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {
@@ -193,31 +187,7 @@ func (a *adapter) Query(info *v8.FunctionCallbackInfo) *v8.Value {
 	query := info.Args()[1].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		connId, err := a.runtime.Query(id, query)
-		if err != nil {
-			val, err := v8.NewValue(iso, err.Error())
-			if err != nil {
-				log.Fatal(err)
-			}
-			resolver.Reject(val)
-			return
-		}
-		val, err := v8.NewValue(iso, connId)
-		if err != nil {
-			log.Fatal(err)
-		}
-		resolver.Resolve(val)
-	}()
-	return resolver.GetPromise().Value
-}
-
-func (a *adapter) QueryName(info *v8.FunctionCallbackInfo) *v8.Value {
-	iso := info.Context().Isolate()
-	name := info.Args()[0].String()
-	query := info.Args()[1].String()
-	resolver, _ := v8.NewPromiseResolver(info.Context())
-	go func() {
-		connId, err := a.runtime.QueryName(name, query)
+		connId, err := a.core.Query(id, query)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {
@@ -240,7 +210,7 @@ func (a *adapter) NodeInfo(info *v8.FunctionCallbackInfo) *v8.Value {
 	id := info.Args()[0].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		nodeInfo, err := a.runtime.NodeInfo(id)
+		nodeInfo, err := a.core.NodeInfo(id)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {
@@ -263,7 +233,7 @@ func (a *adapter) Resolve(info *v8.FunctionCallbackInfo) *v8.Value {
 	name := info.Args()[0].String()
 	resolver, _ := v8.NewPromiseResolver(info.Context())
 	go func() {
-		nodeInfo, err := a.runtime.Resolve(name)
+		nodeInfo, err := a.core.Resolve(name)
 		if err != nil {
 			val, err := v8.NewValue(iso, err.Error())
 			if err != nil {

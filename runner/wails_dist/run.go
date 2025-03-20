@@ -15,10 +15,10 @@ type reRunner struct {
 	inner target.ReRunner[target.AppHtml]
 }
 
-func ReRunner(newRuntime bind.NewRuntime, send target.MsgSend) target.ReRunner[target.DistHtml] {
+func ReRunner(newCore bind.NewCore, send target.MsgSend) target.ReRunner[target.DistHtml] {
 	return &reRunner{
 		send:  send,
-		inner: wails.ReRunner(newRuntime),
+		inner: wails.ReRunner(newCore),
 	}
 }
 

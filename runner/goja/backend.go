@@ -9,18 +9,18 @@ import (
 )
 
 type Backend struct {
-	vm        *goja.Runtime
-	apphost   bind.Runtime
-	apphostJs string
+	vm     *goja.Runtime
+	core   bind.Core
+	coreJs string
 }
 
-func NewBackend(apphost bind.Runtime) *Backend {
-	if any(apphost) == nil {
+func NewBackend(core bind.Core) *Backend {
+	if any(core) == nil {
 		panic("apphost nil")
 	}
 	return &Backend{
-		apphost:   apphost,
-		apphostJs: common.JsString,
+		core:   core,
+		coreJs: common.JsString,
 	}
 }
 
@@ -35,16 +35,16 @@ func (b *Backend) RunFs(files fs.FS, args ...string) (err error) {
 func (b *Backend) RunSource(app string, args ...string) (err error) {
 	if b.vm != nil {
 		b.vm.ClearInterrupt()
-		b.apphost.Interrupt()
+		b.core.Interrupt()
 	}
 	b.vm = goja.New()
 
-	if err = Bind(b.vm, b.apphost); err != nil {
+	if err = Bind(b.vm, b.core); err != nil {
 		return plog.Err(err)
 	}
 
 	// inject apphost client js lib
-	if _, err = b.vm.RunString(b.apphostJs); err != nil {
+	if _, err = b.vm.RunString(b.coreJs); err != nil {
 		return plog.Err(err)
 	}
 

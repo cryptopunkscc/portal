@@ -6,7 +6,7 @@ const (
 	Exit  = "_exit"
 )
 
-type Sys interface {
+type Process interface {
 	Log(arg string)
 	Sleep(duration int64)
 	Exit(code int)

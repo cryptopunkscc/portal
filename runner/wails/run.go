@@ -14,16 +14,16 @@ import (
 )
 
 type reRunner struct {
-	newRuntime bind.NewRuntime
-	frontCtx   context.Context
+	newCore  bind.NewCore
+	frontCtx context.Context
 }
 
-func ReRunner(newRuntime bind.NewRuntime) target.ReRunner[target.AppHtml] {
-	return &reRunner{newRuntime: newRuntime}
+func ReRunner(newCore bind.NewCore) target.ReRunner[target.AppHtml] {
+	return &reRunner{newCore: newCore}
 }
 
-func Runner(newRuntime bind.NewRuntime) target.Run[target.AppHtml] {
-	return ReRunner(newRuntime).Run
+func Runner(newCore bind.NewCore) target.Run[target.AppHtml] {
+	return ReRunner(newCore).Run
 }
 
 func (r *reRunner) ReRun() (err error) {
@@ -39,8 +39,8 @@ func (r *reRunner) Run(ctx context.Context, app target.AppHtml, args ...string) 
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Println("start", app.Manifest().Package, app.Abs())
 	defer log.Println("exit", app.Manifest().Package, app.Abs())
-	runtime, ctx := r.newRuntime(ctx, app)
-	opt := AppOptions(runtime)
+	newCore, ctx := r.newCore(ctx, app)
+	opt := AppOptions(newCore)
 	opt.OnStartup = func(ctx context.Context) { r.frontCtx = ctx }
 	SetupOptions(app, opt)
 	if err = application.NewWithOptions(opt).Run(); err != nil {
@@ -49,14 +49,14 @@ func (r *reRunner) Run(ctx context.Context, app target.AppHtml, args ...string) 
 	return
 }
 
-func AppOptions(runtime bind.Runtime) *options.App {
+func AppOptions(core bind.Core) *options.App {
 	return &options.App{
 		Width:            1024,
 		Height:           768,
 		BackgroundColour: options.NewRGB(27, 38, 54),
-		Bind:             []interface{}{runtime},
+		Bind:             []interface{}{core},
 		OnBeforeClose: func(ctx context.Context) (prevent bool) {
-			runtime.Interrupt()
+			core.Interrupt()
 			return false
 		},
 	}

@@ -19,8 +19,8 @@ type runner struct {
 	distRunner target.ReRunner[target.DistJs]
 }
 
-func NewRunner(newRuntime bind.NewRuntime, send target.MsgSend) target.ReRunner[target.ProjectJs] {
-	distRunner := goja_dist.NewRunner(newRuntime, send)
+func NewRunner(newCore bind.NewCore, send target.MsgSend) target.ReRunner[target.ProjectJs] {
+	distRunner := goja_dist.NewRunner(newCore, send)
 	return &runner{distRunner: distRunner}
 }
 

@@ -8,24 +8,24 @@ import (
 )
 
 func Mutable[T target.Portal_](
-	newRuntime bind.NewRuntime,
-	newReRunner func(bind.NewRuntime, target.MsgSend) target.ReRunner[T],
+	newCore bind.NewCore,
+	newReRunner func(bind.NewCore, target.MsgSend) target.ReRunner[T],
 ) target.Run[target.Portal_] {
-	return runner(newRuntime, newReRunner)
+	return runner(newCore, newReRunner)
 }
 
 func Immutable[T target.Portal_](
-	newRuntime bind.NewRuntime,
-	newReRunner func(bind.NewRuntime) target.ReRunner[T],
+	newCore bind.NewCore,
+	newReRunner func(bind.NewCore) target.ReRunner[T],
 ) target.Run[target.Portal_] {
-	return runner(newRuntime, func(api bind.NewRuntime, _ target.MsgSend) target.ReRunner[T] {
+	return runner(newCore, func(api bind.NewCore, _ target.MsgSend) target.ReRunner[T] {
 		return newReRunner(api)
 	})
 }
 
 func runner[T target.Portal_](
-	newRuntime bind.NewRuntime,
-	newReRunner func(bind.NewRuntime, target.MsgSend) target.ReRunner[T],
+	newCore bind.NewCore,
+	newReRunner func(bind.NewCore, target.MsgSend) target.ReRunner[T],
 ) target.Run[target.Portal_] {
 	return func(ctx context.Context, src target.Portal_, args ...string) (err error) {
 		t, ok := src.(T)
@@ -36,17 +36,17 @@ func runner[T target.Portal_](
 		var reRun ReRun
 		client := newClient()
 		sendMsg := client.Send
-		newRuntime := func(ctx context.Context, portal target.Portal_) (bind.Runtime, context.Context) {
-			runtime, ctx := newRuntime(ctx, portal)
-			if runtime != nil {
-				client.Init(reRun, runtime)
+		newCore := func(ctx context.Context, portal target.Portal_) (bind.Core, context.Context) {
+			core, ctx := newCore(ctx, portal)
+			if core != nil {
+				client.Init(reRun, core)
 			}
 			if err = client.Connect(ctx, t); err != nil {
 				plog.Get(ctx).Scope("ReRunner").E().Println(err)
 			}
-			return runtime, ctx
+			return core, ctx
 		}
-		_runner := newReRunner(newRuntime, sendMsg)
+		_runner := newReRunner(newCore, sendMsg)
 		reRun = _runner.ReRun
 		return _runner.Run(ctx, t, args...)
 	}

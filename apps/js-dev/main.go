@@ -35,9 +35,9 @@ func (a Application[T]) handler() cmd.Handler {
 
 func (a Application[T]) Runner() Run[T] {
 	return multi.Runner[T](
-		reload.Mutable(bind.BackendRuntime(), goja_pro.NewRunner),
-		reload.Mutable(bind.BackendRuntime(), goja_dist.NewRunner),
-		reload.Immutable(bind.BackendRuntime(), goja.NewRunner),
+		reload.Mutable(bind.BackendCore(), goja_pro.NewRunner),
+		reload.Mutable(bind.BackendCore(), goja_dist.NewRunner),
+		reload.Immutable(bind.BackendCore(), goja.NewRunner),
 	)
 }
 

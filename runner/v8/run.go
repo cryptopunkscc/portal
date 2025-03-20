@@ -13,9 +13,9 @@ func Run(ctx context.Context, file, src string) (err error) {
 	defer iso.Dispose()
 
 	// bind apphost adapter to js env
-	var runtime bind.Runtime
+	var core bind.Core
 	//ah = apphost.NewFactory(nil).WithTimeout(ctx, "src") // FIXME
-	global, err := Bind(iso, runtime)
+	global, err := Bind(iso, core)
 	if err != nil {
 		log.Fatal(err)
 	}

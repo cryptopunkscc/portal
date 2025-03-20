@@ -6,14 +6,9 @@ import (
 	"github.com/cryptopunkscc/portal/api/target"
 )
 
-type NewRuntime func(ctx context.Context, portal target.Portal_) (Runtime, context.Context)
+type NewCore func(ctx context.Context, portal target.Portal_) (Core, context.Context)
 
-type Runtime interface {
+type Core interface {
 	Apphost
-	bind.Sys
-}
-
-type Module struct {
-	Apphost
-	bind.Sys
+	bind.Process
 }

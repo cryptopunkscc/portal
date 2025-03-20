@@ -23,12 +23,12 @@ type runner struct {
 }
 
 func Adapter(run target.Run[target.DistExec]) func(
-	_ bind.NewRuntime,
+	_ bind.NewCore,
 	send target.MsgSend,
 ) target.ReRunner[target.ProjectGo] {
-	return func(newRuntime bind.NewRuntime, send target.MsgSend) target.ReRunner[target.ProjectGo] {
+	return func(newCore bind.NewCore, send target.MsgSend) target.ReRunner[target.ProjectGo] {
 		run := func(ctx context.Context, src target.DistExec, args ...string) (err error) {
-			newRuntime(ctx, src) // initiate connection
+			newCore(ctx, src) // initiate connection
 			return run(ctx, src, args...)
 		}
 		return ReRunner(run, send)

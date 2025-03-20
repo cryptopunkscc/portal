@@ -32,10 +32,10 @@ func (a Application[T]) Handler() cmd.Handler {
 	}
 }
 func (a Application[T]) Resolver() Resolve[T] { return apps.Resolver[T]() }
-func (a Application[T]) Runner() Run[T]       { return multi.Runner[T](app.Runner(wails.Runner(a.runtime))) }
-func (a Application[T]) runtime(ctx context.Context, portal Portal_) (bind.Runtime, context.Context) {
-	r, ctx := bind.FrontendRuntime()(ctx, portal)
+func (a Application[T]) Runner() Run[T]       { return multi.Runner[T](app.Runner(wails.Runner(a.core))) }
+func (a Application[T]) core(ctx context.Context, portal Portal_) (bind.Core, context.Context) {
+	r, ctx := bind.FrontendCore()(ctx, portal)
 	return &Adapter{r}, ctx
 }
 
-type Adapter struct{ bind.Runtime }
+type Adapter struct{ bind.Core }

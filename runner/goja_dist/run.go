@@ -12,14 +12,14 @@ import (
 )
 
 type Runner struct {
-	newRuntime bind.NewRuntime
-	send       target.MsgSend
-	dist       target.DistJs
-	backend    *goja.Backend
+	newCore bind.NewCore
+	send    target.MsgSend
+	dist    target.DistJs
+	backend *goja.Backend
 }
 
-func NewRunner(newRuntime bind.NewRuntime, send target.MsgSend) target.ReRunner[target.DistJs] {
-	return &Runner{newRuntime: newRuntime, send: send}
+func NewRunner(newCore bind.NewCore, send target.MsgSend) target.ReRunner[target.DistJs] {
+	return &Runner{newCore: newCore, send: send}
 }
 
 func (r *Runner) ReRun() (err error) {
@@ -27,16 +27,16 @@ func (r *Runner) ReRun() (err error) {
 }
 
 func (r *Runner) Run(ctx context.Context, dist target.DistJs, args ...string) (err error) {
-	if any(r.newRuntime) == nil {
-		panic("newRuntime cannot be nil")
+	if any(r.newCore) == nil {
+		panic("newCore cannot be nil")
 	}
 	if !filepath.IsAbs(dist.Abs()) {
 		return plog.Errorf("ReRunner needs absolute path: %s", dist.Abs())
 	}
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Printf("run %T %s", dist, dist.Abs())
-	runtime, ctx := r.newRuntime(ctx, dist)
-	r.backend = goja.NewBackend(runtime)
+	core, ctx := r.newCore(ctx, dist)
+	r.backend = goja.NewBackend(core)
 	r.dist = dist
 	if err = r.ReRun(); err != nil {
 		log.E().Println(err.Error())

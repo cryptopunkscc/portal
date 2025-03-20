@@ -5,9 +5,9 @@ import (
 	"github.com/dop251/goja"
 )
 
-func Bind(vm *goja.Runtime, astral bind.Runtime) (err error) {
+func Bind(vm *goja.Runtime, core bind.Core) (err error) {
 	vm.SetFieldNameMapper(goja.TagFieldNameMapper("json", true))
-	var a = adapter{runtime: astral, vm: vm, queue: make(chan func(), 1024)}
+	var a = adapter{core: core, vm: vm, queue: make(chan func(), 1024)}
 
 	if err = vm.Set(bind.Exit, a.Exit); err != nil {
 		return
@@ -63,55 +63,55 @@ func Bind(vm *goja.Runtime, astral bind.Runtime) (err error) {
 }
 
 type adapter struct {
-	runtime bind.Runtime
-	vm      *goja.Runtime
-	queue   chan func()
+	core  bind.Core
+	vm    *goja.Runtime
+	queue chan func()
 }
 
 func (a *adapter) Exit(code int) {
-	a.runtime.Exit(code)
+	a.core.Exit(code)
 }
 func (a *adapter) Log(arg string) {
-	a.runtime.Log(arg)
+	a.core.Log(arg)
 }
 func (a *adapter) Sleep(millis int64) *goja.Promise {
-	return a.promise0(func() { a.runtime.Sleep(millis) })
+	return a.promise0(func() { a.core.Sleep(millis) })
 }
 func (a *adapter) ServiceRegister() *goja.Promise {
-	return a.promise1(func() error { return a.runtime.ServiceRegister() })
+	return a.promise1(func() error { return a.core.ServiceRegister() })
 }
 func (a *adapter) ServiceClose() *goja.Promise {
-	return a.promise1(func() error { return a.runtime.ServiceClose() })
+	return a.promise1(func() error { return a.core.ServiceClose() })
 }
 func (a *adapter) ConnAccept() *goja.Promise {
-	return a.promise2(func() (any, error) { return a.runtime.ConnAccept() })
+	return a.promise2(func() (any, error) { return a.core.ConnAccept() })
 }
 func (a *adapter) ConnClose(id string) *goja.Promise {
-	return a.promise1(func() error { return a.runtime.ConnClose(id) })
+	return a.promise1(func() error { return a.core.ConnClose(id) })
 }
 func (a *adapter) ConnWrite(id string, data []byte) *goja.Promise {
-	return a.promise2(func() (any, error) { return a.runtime.ConnWrite(id, data) })
+	return a.promise2(func() (any, error) { return a.core.ConnWrite(id, data) })
 }
 func (a *adapter) ConnRead(id string, n int) *goja.Promise {
-	return a.promise2(func() (any, error) { return a.runtime.ConnRead(id, n) })
+	return a.promise2(func() (any, error) { return a.core.ConnRead(id, n) })
 }
 func (a *adapter) ConnWriteLn(id string, data string) *goja.Promise {
-	return a.promise1(func() error { return a.runtime.ConnWriteLn(id, data) })
+	return a.promise1(func() error { return a.core.ConnWriteLn(id, data) })
 }
 func (a *adapter) ConnReadLn(id string) *goja.Promise {
-	return a.promise2(func() (any, error) { return a.runtime.ConnReadLn(id) })
+	return a.promise2(func() (any, error) { return a.core.ConnReadLn(id) })
 }
 func (a *adapter) Query(target string, query string) *goja.Promise {
-	return a.promise2(func() (any, error) { return a.runtime.Query(target, query) })
+	return a.promise2(func() (any, error) { return a.core.Query(target, query) })
 }
 func (a *adapter) Resolve(name string) *goja.Promise {
-	return a.promise2(func() (any, error) { return a.runtime.Resolve(name) })
+	return a.promise2(func() (any, error) { return a.core.Resolve(name) })
 }
 func (a *adapter) NodeInfo(target string) *goja.Promise {
-	return a.promise2(func() (any, error) { return a.runtime.NodeInfo(target) })
+	return a.promise2(func() (any, error) { return a.core.NodeInfo(target) })
 }
 func (a *adapter) Interrupt() *goja.Promise {
-	return a.promise0(a.runtime.Interrupt)
+	return a.promise0(a.core.Interrupt)
 }
 
 func (a *adapter) promise0(f func()) *goja.Promise {

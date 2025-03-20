@@ -20,13 +20,13 @@ import (
 	"syscall"
 )
 
-func ReRunner(newRuntime bind.NewRuntime) target.ReRunner[target.ProjectHtml] {
-	return &reRunner{NewRuntime: newRuntime}
+func ReRunner(newCore bind.NewCore) target.ReRunner[target.ProjectHtml] {
+	return &reRunner{NewCore: newCore}
 }
 
 type reRunner struct {
 	frontCtx context.Context
-	bind.NewRuntime
+	bind.NewCore
 }
 
 func (r *reRunner) Run(ctx context.Context, projectHtml target.ProjectHtml, args ...string) (err error) {
@@ -54,7 +54,7 @@ func (r *reRunner) Run(ctx context.Context, projectHtml target.ProjectHtml, args
 		return
 	}
 
-	api, ctx := r.NewRuntime(ctx, projectHtml)
+	api, ctx := r.NewCore(ctx, projectHtml)
 	opt := wails.AppOptions(api)
 	opt.OnStartup = func(ctx context.Context) { r.frontCtx = ctx }
 	path := projectHtml.Abs()

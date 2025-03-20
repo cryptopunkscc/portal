@@ -6,22 +6,22 @@ import (
 	"github.com/cryptopunkscc/portal/core/bind"
 )
 
-func Adapter[T target.Portal_](runner target.ReRunner[T]) func(bind.NewRuntime) target.ReRunner[T] {
-	return func(newRuntime bind.NewRuntime) target.ReRunner[T] {
+func Adapter[T target.Portal_](runner target.ReRunner[T]) func(bind.NewCore) target.ReRunner[T] {
+	return func(newCore bind.NewCore) target.ReRunner[T] {
 		return adapter[T]{
-			newRuntime: newRuntime,
-			inner:      runner,
+			newCore: newCore,
+			inner:   runner,
 		}
 	}
 }
 
 type adapter[T target.Portal_] struct {
-	newRuntime bind.NewRuntime
-	inner      target.ReRunner[T]
+	newCore bind.NewCore
+	inner   target.ReRunner[T]
 }
 
 func (a adapter[T]) Run(ctx context.Context, src T, args ...string) (err error) {
-	a.newRuntime(ctx, src)
+	a.newCore(ctx, src)
 	return a.inner.Run(ctx, src, args...)
 }
 

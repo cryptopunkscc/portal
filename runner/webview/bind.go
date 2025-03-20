@@ -13,38 +13,35 @@ func New(debug bool) *WebView {
 	return &WebView{WebView: webview.New(debug)}
 }
 
-func (view *WebView) BindApphost(runtime bind.Runtime) {
-	if err := view.Bind(bind.Log, runtime.Log); err != nil {
+func (view *WebView) BindApphost(core bind.Core) {
+	if err := view.Bind(bind.Log, core.Log); err != nil {
 		return
 	}
-	if err := view.Bind(bind.ServiceRegister, runtime.ServiceRegister); err != nil {
+	if err := view.Bind(bind.ServiceRegister, core.ServiceRegister); err != nil {
 		return
 	}
-	if err := view.Bind(bind.ServiceClose, runtime.ServiceClose); err != nil {
+	if err := view.Bind(bind.ServiceClose, core.ServiceClose); err != nil {
 		return
 	}
-	if err := view.Bind(bind.ConnAccept, runtime.ConnAccept); err != nil {
+	if err := view.Bind(bind.ConnAccept, core.ConnAccept); err != nil {
 		return
 	}
-	if err := view.Bind(bind.ConnClose, runtime.ConnClose); err != nil {
+	if err := view.Bind(bind.ConnClose, core.ConnClose); err != nil {
 		return
 	}
-	if err := view.Bind(bind.ConnWrite, runtime.ConnWriteLn); err != nil {
+	if err := view.Bind(bind.ConnWrite, core.ConnWriteLn); err != nil {
 		return
 	}
-	if err := view.Bind(bind.ConnRead, runtime.ConnReadLn); err != nil {
+	if err := view.Bind(bind.ConnRead, core.ConnReadLn); err != nil {
 		return
 	}
-	if err := view.Bind(bind.Query, runtime.Query); err != nil {
+	if err := view.Bind(bind.Query, core.Query); err != nil {
 		return
 	}
-	if err := view.Bind(bind.QueryName, runtime.QueryName); err != nil {
+	if err := view.Bind(bind.GetNodeInfo, core.NodeInfo); err != nil {
 		return
 	}
-	if err := view.Bind(bind.GetNodeInfo, runtime.NodeInfo); err != nil {
-		return
-	}
-	if err := view.Bind(bind.ResolveId, runtime.Resolve); err != nil {
+	if err := view.Bind(bind.ResolveId, core.Resolve); err != nil {
 		return
 	}
 }

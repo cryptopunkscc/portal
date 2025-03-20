@@ -36,16 +36,16 @@ func (a Application[T]) handler() cmd.Handler {
 
 func (a Application[T]) Runner() Run[T] {
 	return multi.Runner[T](
-		reload.Immutable(a.runtime, wails_pro.ReRunner), // FIXME propagate sendMsg
-		reload.Mutable(a.runtime, wails_dist.ReRunner),
-		reload.Immutable(a.runtime, wails.ReRunner),
+		reload.Immutable(a.core, wails_pro.ReRunner), // FIXME propagate sendMsg
+		reload.Mutable(a.core, wails_dist.ReRunner),
+		reload.Immutable(a.core, wails.ReRunner),
 	)
 }
 func (a Application[T]) Resolver() Resolve[T] { return sources.Resolver[T]() }
 
-func (a Application[T]) runtime(ctx context.Context, portal Portal_) (bind.Runtime, context.Context) {
-	r, ctx := bind.FrontendRuntime()(ctx, portal)
+func (a Application[T]) core(ctx context.Context, portal Portal_) (bind.Core, context.Context) {
+	r, ctx := bind.FrontendCore()(ctx, portal)
 	return &Adapter{r}, ctx
 }
 
-type Adapter struct{ bind.Runtime }
+type Adapter struct{ bind.Core }

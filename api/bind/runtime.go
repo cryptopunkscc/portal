@@ -1,6 +1,6 @@
 package bind
 
-type Runtime interface {
-	Sys
+type Core interface {
+	Process
 	Apphost
 }
