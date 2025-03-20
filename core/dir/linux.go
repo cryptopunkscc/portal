@@ -7,10 +7,18 @@ import (
 )
 
 func init() {
-	dir, err := os.UserHomeDir()
+	// portald
+	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		panic(err)
 	}
-	dir = mk(dir, ".local/share/portald")
-	Init(dir)
+	portaldDir := mk(homeDir, ".local/share/portald")
+	Init(portaldDir)
+
+	// astrald
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		panic(err)
+	}
+	Node = mk(configDir, "astrald")
 }
