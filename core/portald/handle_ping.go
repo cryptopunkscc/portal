@@ -1,3 +1,3 @@
 package portald
 
-func (s *Runner[T]) Ping() int { return 0 }
+func (s *Service[T]) Ping() int { return 0 }

@@ -12,7 +12,7 @@ type ListAppsOpts struct {
 	Hidden bool `query:"hidden h" cli:"hidden h"`
 }
 
-func (s *Runner[T]) ListApps(opts ListAppsOpts) Apps {
+func (s *Service[T]) ListApps(opts ListAppsOpts) Apps {
 	a := target.Portals[target.Portal_]{}
 	for _, app := range s.Resolve.List(dir.AppSource) {
 		if opts.Hidden || !app.Manifest().Hidden {

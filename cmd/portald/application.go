@@ -11,7 +11,7 @@ import (
 )
 
 type Application[T Portal_] struct {
-	portald.Runner[Portal_]
+	portald.Service[Portal_]
 }
 
 func (a *Application[T]) handler() cmd.Handler {

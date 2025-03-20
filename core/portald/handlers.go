@@ -10,7 +10,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/uninstall"
 )
 
-func (s *Runner[T]) Handlers() cmd.Handlers {
+func (s *Service[T]) Handlers() cmd.Handlers {
 	return cmd.Handlers{
 		cli.Handler,
 		cli.EncodingHandler,
@@ -39,7 +39,7 @@ func (s *Runner[T]) Handlers() cmd.Handlers {
 	}.Plus(s.publicHandlers()...)
 }
 
-func (s *Runner[T]) publicHandlers() cmd.Handlers {
+func (s *Service[T]) publicHandlers() cmd.Handlers {
 	return cmd.Handlers{
 		{
 			Func: s.Connect,

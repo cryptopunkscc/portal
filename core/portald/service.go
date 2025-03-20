@@ -10,7 +10,7 @@ import (
 	"sync"
 )
 
-type Runner[T Portal_] struct {
+type Service[T Portal_] struct {
 	cache     Cache[T]
 	waitGroup sync.WaitGroup
 	processes sig.Map[string, T]
@@ -22,7 +22,7 @@ type Runner[T Portal_] struct {
 	Order    []int
 }
 
-func (s *Runner[T]) Run(ctx context.Context) (err error) {
+func (s *Service[T]) Run(ctx context.Context) (err error) {
 	log := plog.Get(ctx).Type(s)
 	log.Println("start")
 	defer log.Println("exit")

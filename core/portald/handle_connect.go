@@ -7,7 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/exec"
 )
 
-func (s *Runner[T]) Connect(ctx context.Context, conn rpc.Conn, opt apphost.PortaldOpenOpt, args ...string) (err error) {
+func (s *Service[T]) Connect(ctx context.Context, conn rpc.Conn, opt apphost.PortaldOpenOpt, args ...string) (err error) {
 	ctx = exec.WithReadWriter(ctx, conn)
 	if err = s.Open()(ctx, opt, args...); err != nil {
 		_ = conn.Encode(err)

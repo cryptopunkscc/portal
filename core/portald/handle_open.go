@@ -14,7 +14,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/supervisor"
 )
 
-func (s *Runner[T]) Open() Run[apphost.PortaldOpenOpt] {
+func (s *Service[T]) Open() Run[apphost.PortaldOpenOpt] {
 	return func(ctx context.Context, opt apphost.PortaldOpenOpt, cmd ...string) (err error) {
 		if len(cmd) == 0 {
 			return errors.New("no command")
