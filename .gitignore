@@ -2,10 +2,7 @@ node_modules
 build
 bin
 dist
-!target/dist
 !resolve/dist
-!factory/build
 !runner/build
-!apps/build
 .idea/
 .test
