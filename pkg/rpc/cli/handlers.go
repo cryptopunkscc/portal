@@ -1,15 +1,12 @@
 package cli
 
 import (
-	"context"
 	"encoding/json"
-	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"github.com/cryptopunkscc/portal/pkg/rpc/caller/cli"
 	"github.com/cryptopunkscc/portal/pkg/rpc/caller/query"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/pkg/rpc/router"
 	"github.com/cryptopunkscc/portal/pkg/rpc/stream"
-	"github.com/cryptopunkscc/portal/runner/exec"
 	"log"
 )
 
@@ -34,20 +31,6 @@ var Handler = cmd.Handler{
 
 type optCli struct {
 	Interactive bool `cli:"interactive i" query:"interactive i"`
-}
-
-var StdHandler = cmd.Handler{
-	Name: "redirect.std",
-	Desc: "Redirect standard IO to client.",
-	Func: func(base *router.Base, conn rpc.Conn) {
-		for i, d := range base.Dependencies {
-			if ctx, ok := d.(context.Context); ok {
-				base.Dependencies[i] = exec.WithReadWriter(ctx, conn)
-				return
-			}
-		}
-		return
-	},
 }
 
 type optCoding struct {

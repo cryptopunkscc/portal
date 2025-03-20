@@ -14,7 +14,6 @@ func (s *Runner[T]) Handlers() cmd.Handlers {
 	return cmd.Handlers{
 		cli.Handler,
 		cli.EncodingHandler,
-		cli.StdHandler,
 		{
 			Func: s.Api,
 			Name: "api",
