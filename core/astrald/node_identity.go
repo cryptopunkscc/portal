@@ -6,7 +6,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
-func (r *Runner) readOrGenerateNodeIdentity() (err error) {
+func (r *Initializer) readOrGenerateNodeIdentity() (err error) {
 	if err = r.readNodeIdentity(); err != nil {
 		err = r.generateNodeIdentity()
 		return
@@ -14,7 +14,7 @@ func (r *Runner) readOrGenerateNodeIdentity() (err error) {
 	return
 }
 
-func (r *Runner) readNodeIdentity() (err error) {
+func (r *Initializer) readNodeIdentity() (err error) {
 	defer plog.TraceErr(&err)
 	var pk keys.PrivateKey
 	if err = r.resources.DecodeObject("node_identity", &pk); err != nil {
@@ -27,7 +27,7 @@ func (r *Runner) readNodeIdentity() (err error) {
 	return
 }
 
-func (r *Runner) generateNodeIdentity() (err error) {
+func (r *Initializer) generateNodeIdentity() (err error) {
 	defer plog.TraceErr(&err)
 	if r.nodeIdentity, err = astral.GenerateIdentity(); err != nil {
 		return

@@ -20,7 +20,7 @@ func TestRunner_Start(t *testing.T) {
 		time.Sleep(10 * time.Millisecond) // give a time to kill astrald process
 	})
 
-	r := Runner{}
+	r := Initializer{}
 	r.NodeRoot = testDir
 	r.TokensDir = testDir
 	r.Apphost = &apphost.Adapter{}

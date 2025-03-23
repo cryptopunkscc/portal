@@ -12,7 +12,7 @@ import (
 
 const apphostYaml = "apphost.yaml"
 
-func (r *Runner) initApphostConfig() {
+func (r *Initializer) initApphostConfig() {
 	if r.apphostConfig == nil {
 		if err := r.readApphostConfig(); err != nil {
 			r.apphostConfig = &modApphostSrc.Config{}
@@ -22,14 +22,14 @@ func (r *Runner) initApphostConfig() {
 	}
 }
 
-func (r *Runner) readApphostConfig() (err error) {
+func (r *Initializer) readApphostConfig() (err error) {
 	return r.resources.ReadYaml(apphostYaml, &r.apphostConfig)
 }
-func (r *Runner) writeApphostConfig() (err error) {
+func (r *Initializer) writeApphostConfig() (err error) {
 	return r.resources.WriteYaml(apphostYaml, r.apphostConfig)
 }
 
-func (r *Runner) apphostResolveEndpoint() {
+func (r *Initializer) apphostResolveEndpoint() {
 	for _, endpoint := range r.apphostConfig.Listen {
 		r.Apphost.Endpoint = endpoint
 		return
@@ -37,7 +37,7 @@ func (r *Runner) apphostResolveEndpoint() {
 	r.Apphost.Endpoint = libApphost.DefaultEndpoint
 }
 
-func (r *Runner) apphostSetupAuthToken(pkg string) (err error) {
+func (r *Initializer) apphostSetupAuthToken(pkg string) (err error) {
 	plog.TraceErr(&err)
 	t, ok := r.ResolvedTokens.Get(pkg)
 	if !ok {
@@ -47,11 +47,11 @@ func (r *Runner) apphostSetupAuthToken(pkg string) (err error) {
 	return
 }
 
-func (r *Runner) apphostIsRunning() bool {
+func (r *Initializer) apphostIsRunning() bool {
 	return r.Apphost.Reconnect() == nil
 }
 
-func (r *Runner) apphostAwait(ctx context.Context) (err error) {
+func (r *Initializer) apphostAwait(ctx context.Context) (err error) {
 	log := plog.Get(ctx).D()
 	retry := flow.Await{
 		Delay: 50 * time.Millisecond,

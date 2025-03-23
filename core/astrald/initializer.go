@@ -13,7 +13,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/resources"
 )
 
-type Runner struct {
+type Initializer struct {
 	NodeRoot  mem.String
 	TokensDir mem.String
 	Apphost   *apphost.Adapter
@@ -29,7 +29,7 @@ type Runner struct {
 	ResolvedTokens sig.Map[string, *modApphost.AccessToken]
 }
 
-func (r *Runner) Start(ctx context.Context) (err error) {
+func (r *Initializer) Start(ctx context.Context) (err error) {
 	r.log = plog.Get(ctx).Type(r)
 	if !r.isInitialized() {
 		if err = r.initialize(ctx); err != nil {
@@ -40,11 +40,11 @@ func (r *Runner) Start(ctx context.Context) (err error) {
 	return
 }
 
-func (r *Runner) isInitialized() bool {
+func (r *Initializer) isInitialized() bool {
 	return r.fetchAuthToken("portald") == nil
 }
 
-func (r *Runner) initialize(ctx context.Context) (err error) {
+func (r *Initializer) initialize(ctx context.Context) (err error) {
 	// try to resolve and set apphost endpoint from config.
 	if err = r.initNodeResources(); err != nil {
 		return
@@ -59,7 +59,7 @@ func (r *Runner) initialize(ctx context.Context) (err error) {
 	if err = r.resolveNodeAuthToken(); err != nil {
 		return
 	}
-
+	r.Apphost.AuthToken = r.nodeAuthToken
 	if !r.apphostIsRunning() {
 		if err = r.startAstrald(ctx); err != nil {
 			return
@@ -80,7 +80,7 @@ func (r *Runner) initialize(ctx context.Context) (err error) {
 	return
 }
 
-func (r *Runner) start(ctx context.Context) (err error) {
+func (r *Initializer) start(ctx context.Context) (err error) {
 	// try to get existing portal auth token and set to apphost
 	if err = r.apphostSetupAuthToken("portald"); err != nil {
 		return

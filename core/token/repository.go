@@ -60,10 +60,7 @@ func (r *Repository) Resolve(pkg string) (accessToken *mod.AccessToken, err erro
 		return
 	}
 
-	id, err := r.Adapter.Resolve(pkg)
-	if err != nil {
-		return
-	}
+	id, _ := r.Adapter.Resolve(pkg)
 
 	if id != nil {
 		var tokens apphost.AccessTokens

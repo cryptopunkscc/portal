@@ -2,9 +2,9 @@ package portald
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/core/astrald"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/runner/astrald"
 )
 
 func (s *Service[T]) Run(ctx context.Context) (err error) {
@@ -33,7 +33,7 @@ func (s *Service[T]) Start(ctx context.Context) (err error) {
 }
 
 func (s *Service[T]) startAstrald(ctx context.Context) (err error) {
-	r := astrald.Runner{
+	r := astrald.Initializer{
 		NodeRoot:  s.NodeDir,
 		TokensDir: s.TokensDir,
 		Apphost:   &s.Apphost,

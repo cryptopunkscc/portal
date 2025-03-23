@@ -9,7 +9,7 @@ import (
 
 const temporaryTokenPrefix = "temporary_token_"
 
-func (r *Runner) resolveNodeAuthToken() (err error) {
+func (r *Initializer) resolveNodeAuthToken() (err error) {
 	defer plog.TraceErr(&err)
 	if r.apphostConfig.Tokens == nil {
 		r.apphostConfig.Tokens = map[string]string{}
@@ -39,12 +39,11 @@ func (r *Runner) resolveNodeAuthToken() (err error) {
 	}
 	r.log.Println("added", r.nodeAuthToken, "alias to apphost config")
 
-	r.Apphost.AuthToken = r.nodeAuthToken
 	r.restartAstrald = true
 	return
 }
 
-func (r *Runner) removeTemporaryNodeAuthToken() (err error) {
+func (r *Initializer) removeTemporaryNodeAuthToken() (err error) {
 	if !strings.HasPrefix(r.nodeAuthToken, temporaryTokenPrefix) {
 		return
 	}
