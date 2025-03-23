@@ -70,6 +70,10 @@ func FS(files fs.FS, abs string) target.Source {
 	}
 }
 
+func Dir(abs string) target.Source {
+	return FS(os.DirFS(abs), abs)
+}
+
 func File(path ...string) (t target.Source, err error) {
 	abs := target.Abs(filepath.Join(path...))
 	abs, file := filepath.Split(abs)

@@ -6,8 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/core/dir"
-	"github.com/cryptopunkscc/portal/core/token"
+	"github.com/cryptopunkscc/portal/core/env"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 	"os"
@@ -21,12 +20,7 @@ func BundleRunner() target.Run[target.BundleExec] {
 			return
 		}
 
-		t, err := token.Repository{}.Get(bundle.Manifest().Package)
-		if err != nil {
-			return err
-		}
-
-		err = Cmd{}.Run(ctx, t.Token.String(), execFile.Name(), args...)
+		err = Cmd{}.RunApp(ctx, *bundle.Manifest(), execFile.Name(), args...)
 		if err != nil {
 			return
 		}
@@ -36,7 +30,8 @@ func BundleRunner() target.Run[target.BundleExec] {
 
 func unpackExecutable(bundle target.BundleExec) (execFile *os.File, err error) {
 	defer plog.TraceErr(&err)
-	if dir.Bin == "" {
+	binDir := env.PortaldBin.MkdirAll()
+	if len(binDir) == 0 {
 		return nil, plog.Errorf("no executable path specified")
 	}
 
@@ -61,7 +56,7 @@ func unpackExecutable(bundle target.BundleExec) (execFile *os.File, err error) {
 		srcId,
 	)
 
-	if execFile, err = os.OpenFile(filepath.Join(dir.Bin, execName), os.O_RDWR|os.O_CREATE, 0755); err != nil {
+	if execFile, err = os.OpenFile(filepath.Join(binDir, execName), os.O_RDWR|os.O_CREATE, 0755); err != nil {
 		return
 	}
 	defer execFile.Close()

@@ -11,12 +11,16 @@ import (
 	"testing"
 )
 
-func Dir(t *testing.T) string {
+func Dir(t *testing.T, path ...string) string {
 	wd, err := os.Getwd()
 	if err != nil {
 		t.Fatal(err)
 	}
-	return filepath.Join(wd, ".test")
+	dir := ".test"
+	if len(path) > 0 {
+		dir = filepath.Join(path...)
+	}
+	return filepath.Join(wd, dir)
 }
 
 func Assert[T any](value T, err error) T {

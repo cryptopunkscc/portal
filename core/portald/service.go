@@ -3,10 +3,13 @@ package portald
 import (
 	"context"
 	"github.com/cryptopunkscc/astrald/sig"
+	"github.com/cryptopunkscc/portal/api/astrald"
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/apphost"
-	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
+	"github.com/cryptopunkscc/portal/core/token"
+	"github.com/cryptopunkscc/portal/pkg/mem"
+	"github.com/cryptopunkscc/portal/resolve/source"
+	"github.com/cryptopunkscc/portal/runner/install"
 	"sync"
 )
 
@@ -14,31 +17,42 @@ type Service[T Portal_] struct {
 	cache     Cache[T]
 	waitGroup sync.WaitGroup
 	processes sig.Map[string, T]
+	shutdown  context.CancelFunc
 
-	CacheDir string
-	Shutdown func()
-	Resolve  Resolve[T]
-	Runners  func([]string) []Run[Portal_]
-	Order    []int
+	CreateTokens []string
+	NodeDir      mem.String
+	AppsDir      mem.String
+	TokensDir    mem.String
+
+	Apphost apphost.Adapter
+	Astrald astrald.Runner
+
+	Resolve Resolve[T]
+	Runners func([]string) []Run[Portal_]
+	Order   []int
 }
 
-func (s *Service[T]) Run(ctx context.Context) (err error) {
-	log := plog.Get(ctx).Type(s)
-	log.Println("start")
-	defer log.Println("exit")
+func (s *Service[T]) Stop() {
+	s.shutdown()
+}
 
-	handler := cmd.Handler{
-		Sub: s.Handlers(),
-	}
-	cmd.InjectHelp(&handler)
-	router := apphost.Default.Rpc().Router(handler)
-	router.Logger = log
-	err = router.Run(ctx)
-
-	if err != nil {
-		log.Println(err)
-		return nil
-	}
+func (s *Service[T]) Wait() (err error) {
 	s.waitGroup.Wait()
+	s.shutdown()
 	return
+}
+
+func (s *Service[T]) Install() install.Runner {
+	return install.Runner{
+		AppsDir: s.AppsDir,
+		Tokens:  *s.tokens(),
+	}
+}
+
+func (s *Service[T]) tokens() *token.Repository {
+	return token.NewRepository(s.TokensDir, &s.Apphost)
+}
+
+func (s *Service[T]) apps() Source {
+	return source.Dir(s.AppsDir.Require())
 }

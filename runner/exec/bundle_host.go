@@ -3,8 +3,7 @@ package exec
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/core/dir"
-	"github.com/cryptopunkscc/portal/core/token"
+	"github.com/cryptopunkscc/portal/core/env"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/exec"
 	"github.com/cryptopunkscc/portal/resolve/path"
@@ -25,15 +24,11 @@ func BundleHostRunner(schemaPrefix ...string) target.Run[target.Portal_] {
 		schema := strings.Join(schemaArr, ".")
 		log.Println("running:", schema, manifest.Package, args)
 
-		t, err := token.Repository{}.Get(src.Manifest().Package)
-		if err != nil {
-			return
-		}
 		args = slices.Insert(args, 0, src.Abs())
 
 		runner, err := target.
 			FindByPath(source.File, exec.ResolveBundle).
-			OrById(path.Resolver(exec.ResolveBundle, dir.AppSource)).
+			OrById(path.Resolver(exec.ResolveBundle, env.PortaldApps.Source())).
 			Call(ctx, schema)
 
 		if err != nil {
@@ -49,6 +44,6 @@ func BundleHostRunner(schemaPrefix ...string) target.Run[target.Portal_] {
 			return
 		}
 
-		return Cmd{}.Run(ctx, t.Token.String(), execFile.Name(), args...)
+		return Cmd{}.RunApp(ctx, *src.Manifest(), execFile.Name(), args...)
 	}
 }

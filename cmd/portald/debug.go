@@ -4,14 +4,12 @@ package main
 
 import (
 	. "github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/core/dir"
+	"github.com/cryptopunkscc/portal/core/env"
 	exec2 "github.com/cryptopunkscc/portal/resolve/exec"
 	"github.com/cryptopunkscc/portal/resolve/portal"
-	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/app"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"os"
-	"path/filepath"
 )
 
 func init() {
@@ -19,11 +17,7 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	dir.App = filepath.Join(wd, "apps")
-	dir.AppSource, err = source.File(dir.App)
-	if err != nil {
-		panic(err)
-	}
+	env.PortaldApps.SetDir(wd, "apps")
 
 	application.Order = []int{2, 1, 0}
 

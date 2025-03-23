@@ -8,7 +8,7 @@ import (
 )
 
 func (a Application) injectPortaldApi(handler *cmd.Handler) {
-	if api, err := apphost.Default.Portald().Api(); err == nil {
+	if api, err := a.Portal.Api(); err == nil {
 		a.setupFunctions(api)
 		handler.AddSub(api...)
 		fixHelp(handler)

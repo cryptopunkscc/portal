@@ -6,7 +6,7 @@ import (
 	"io"
 )
 
-func (a *Adapter) Portald() Portald { return Portald{Default.Rpc().Request("portal")} }
+func (a *Adapter) Portald() Portald { return Portald{a.Rpc().Request("portald")} }
 
 type Portald struct{ rpc.Conn }
 

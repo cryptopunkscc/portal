@@ -15,6 +15,7 @@ type FileResources struct {
 }
 
 func NewFileResources(root string, mkdir ...bool) (fr FileResources, err error) {
+	plog.TraceErr(&err)
 	fr.root = root
 	fr.FileResources, err = resources.NewFileResources(root, len(mkdir) > 0 && mkdir[0])
 	return

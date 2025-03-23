@@ -3,6 +3,8 @@ package exec
 import (
 	"context"
 	"github.com/cryptopunkscc/astrald/lib/apphost"
+	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/core/token"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 	"os"
@@ -14,7 +16,16 @@ func WithReadWriter(ctx context.Context, rw io.ReadWriter) context.Context {
 }
 
 type Cmd struct {
-	Dir string
+	Dir    string
+	Tokens token.Repository
+}
+
+func (c Cmd) RunApp(ctx context.Context, manifest target.Manifest, path string, args ...string) (err error) {
+	t, err := c.Tokens.Get(manifest.Package)
+	if err != nil {
+		return err
+	}
+	return c.Run(ctx, t.Token.String(), path, args...)
 }
 
 func (c Cmd) Run(ctx context.Context, token string, path string, args ...string) (err error) {

@@ -5,7 +5,6 @@ import (
 	"errors"
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/apphost"
-	"github.com/cryptopunkscc/portal/core/dir"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/path"
 	"github.com/cryptopunkscc/portal/resolve/source"
@@ -34,7 +33,7 @@ func (s *Service[T]) Open() Run[apphost.PortaldOpenOpt] {
 
 		return find.Runner[T](
 			FindByPath(source.File, s.Resolve).
-				OrById(path.Resolver(s.Resolve, dir.AppSource)).
+				OrById(path.Resolver(s.Resolve, s.apps())).
 				Cached(&s.cache).
 				Reduced(Priority{
 					Match[Bundle_],

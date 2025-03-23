@@ -1,4 +1,4 @@
-package setup
+package astrald
 
 import (
 	"github.com/cryptopunkscc/astrald/astral"

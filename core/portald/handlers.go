@@ -1,16 +1,12 @@
 package portald
 
 import (
-	"github.com/cryptopunkscc/portal/core/apphost"
-	"github.com/cryptopunkscc/portal/core/dir"
-	"github.com/cryptopunkscc/portal/core/token"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/runner/install"
 	"github.com/cryptopunkscc/portal/runner/uninstall"
 )
 
-func (s *Service[T]) Handlers() cmd.Handlers {
+func (s *Service[T]) handlers() cmd.Handlers {
 	return cmd.Handlers{
 		cli.Handler,
 		cli.EncodingHandler,
@@ -51,7 +47,7 @@ func (s *Service[T]) publicHandlers() cmd.Handlers {
 			},
 		},
 		{
-			Func: token.Repository{}.Resolve,
+			Func: s.tokens().Resolve,
 			Name: "token",
 			Desc: "Create a new token or return existing one.",
 			Params: cmd.Params{
@@ -59,7 +55,7 @@ func (s *Service[T]) publicHandlers() cmd.Handlers {
 			},
 		},
 		{
-			Func: apphost.Default.Token().List,
+			Func: s.tokens().List,
 			Name: "tokens",
 			Desc: "List apphost tokens.",
 			Params: cmd.Params{
@@ -67,7 +63,7 @@ func (s *Service[T]) publicHandlers() cmd.Handlers {
 			},
 		},
 		{
-			Func: install.Runner{OutputDir: dir.App}.BundlesByPath,
+			Func: s.Install().BundlesByPath,
 			Name: "install i",
 			Desc: "Install app.",
 			Params: cmd.Params{
@@ -75,7 +71,7 @@ func (s *Service[T]) publicHandlers() cmd.Handlers {
 			},
 		},
 		{
-			Func: uninstall.Runner(dir.AppSource),
+			Func: uninstall.Runner(s.AppsDir),
 			Name: "uninstall d",
 			Desc: "Uninstall app.",
 			Params: cmd.Params{
@@ -99,7 +95,7 @@ func (s *Service[T]) publicHandlers() cmd.Handlers {
 			}},
 		},
 		{
-			Func: s.Shutdown,
+			Func: s.Stop,
 			Name: "close",
 			Desc: "Shutdown portal environment and close all running apps.",
 		},

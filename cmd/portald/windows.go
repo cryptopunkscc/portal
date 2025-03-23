@@ -1,16 +1,15 @@
 //go:build windows
 
-package dir
+package main
 
 import (
 	"os"
 )
 
-func portaldDir() string {
-	panic("FIXME!")
+func init() {
+	panic("TODO")
 	dir, err := os.UserCacheDir()
 	if err != nil {
 		panic(err)
 	}
-	Init(dir)
 }

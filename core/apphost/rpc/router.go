@@ -25,35 +25,52 @@ func (r Rpc) Router(handler cmd.Handler) *Router {
 
 type Router struct {
 	router.Base
-	Logger  plog.Logger
-	apphost apphost.Client
+	Logger   plog.Logger
+	ctx      context.Context
+	apphost  apphost.Client
+	listener apphost.Listener
 }
 
 func (r *Router) Start(ctx context.Context) (err error) {
+	if err = r.Init(ctx); err != nil {
+		return
+	}
 	go func() {
-		if err = r.Run(ctx); err != nil {
+		if err := r.Listen(); err != nil {
 			plog.Get(ctx).Type(r).E().Println(err)
 		}
 	}()
-	return nil
+	return
 }
 
 func (r *Router) Run(ctx context.Context) (err error) {
+	if err = r.Init(ctx); err != nil {
+		return
+	}
+	return r.Listen()
+}
+
+func (r *Router) Init(ctx context.Context) (err error) {
 	defer plog.TraceErr(&err)
+	r.ctx = ctx
 	r.Dependencies = append([]any{ctx}, r.Dependencies...)
 
-	listener, err := r.apphost.Register()
+	r.listener, err = r.apphost.Register()
 	if err != nil {
 		return
 	}
 	go func() {
 		<-ctx.Done()
-		_ = listener.Close()
+		_ = r.listener.Close()
 	}()
+	return
+}
+
+func (r *Router) Listen() (err error) {
 	var q apphost.PendingQuery
 	for {
-		if q, err = listener.Next(); err != nil {
-			if errors.Is(ctx.Err(), context.Canceled) {
+		if q, err = r.listener.Next(); err != nil {
+			if errors.Is(r.ctx.Err(), context.Canceled) {
 				err = nil
 			}
 			return

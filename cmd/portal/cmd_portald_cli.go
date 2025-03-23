@@ -13,7 +13,7 @@ func (a Application) portaldCli(ctx context.Context, cmd ...string) (err error) 
 	log := plog.Get(ctx)
 	log.Println("running portal cli")
 
-	conn, err := apphost.Default.Query("portal", "cli", nil)
+	conn, err := apphost.Default.Query("portald", "cli", nil)
 	if err != nil {
 		return
 	}

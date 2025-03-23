@@ -3,7 +3,6 @@ package install
 import (
 	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/core/token"
 	"github.com/cryptopunkscc/portal/resolve/apps"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"io"
@@ -12,6 +11,7 @@ import (
 )
 
 func (i Runner) BundlesByPath(src string) (c <-chan Result, err error) {
+	i.AppsDir.Require()
 	file, err := source.File(src)
 	if err != nil {
 		return
@@ -36,12 +36,13 @@ func (i Runner) installBundles(source target.Source, c chan<- Result) {
 }
 
 func (i Runner) Bundle(bundle target.Bundle_) error {
-	if _, err := (token.Repository{}).Resolve(bundle.Manifest().Package); err != nil {
+	i.AppsDir.Require()
+	if err := i.generateTokenFor(bundle); err != nil {
 		return err
 	}
 	pkg := bundle.Package()
 	name := filepath.Base(bundle.Abs())
-	dstPath := filepath.Join(i.OutputDir, name)
+	dstPath := filepath.Join(i.AppsDir.Get(), name)
 	dst, err := os.Create(dstPath)
 	if err != nil {
 		return err

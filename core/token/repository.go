@@ -1,12 +1,13 @@
 package token
 
 import (
-	"github.com/cryptopunkscc/astrald/astral"
 	mod "github.com/cryptopunkscc/astrald/mod/apphost"
 	"github.com/cryptopunkscc/portal/core/apphost"
-	"github.com/cryptopunkscc/portal/core/dir"
-	"github.com/cryptopunkscc/portal/pkg/os"
+	"github.com/cryptopunkscc/portal/core/env"
+	"github.com/cryptopunkscc/portal/pkg/mem"
+	pkgOs "github.com/cryptopunkscc/portal/pkg/os"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"os"
 )
 
 type Repository struct {
@@ -14,27 +15,44 @@ type Repository struct {
 	*apphost.Adapter
 }
 
-func (r Repository) Set(pkg string, token *mod.AccessToken) (err error) {
-	if r.Dir == "" {
-		r.Dir = dir.Token
+func NewRepository(
+	dir mem.String,
+	adapter *apphost.Adapter,
+) *Repository {
+	if err := os.MkdirAll(dir.Require(), 0755); err != nil {
+		panic(err)
 	}
-	if err = os.WriteJson[*mod.AccessToken](token, r.Dir, pkg); err != nil {
+	return &Repository{Dir: dir.Get(), Adapter: adapter}
+}
+
+func (r *Repository) Set(pkg string, token *mod.AccessToken) (err error) {
+	if r.Dir == "" {
+		r.Dir = env.PortaldTokens.MkdirAll()
+	}
+	if err = pkgOs.WriteJson[*mod.AccessToken](token, r.Dir, pkg); err != nil {
 		err = plog.Err(err)
 	}
 	return
 }
 
-func (r Repository) Get(pkg string) (token *mod.AccessToken, err error) {
+func (r *Repository) Get(pkg string) (token *mod.AccessToken, err error) {
 	if r.Dir == "" {
-		r.Dir = dir.Token
+		r.Dir = env.PortaldTokens.MkdirAll()
 	}
-	if token, err = os.ReadJson[*mod.AccessToken](r.Dir, pkg); err != nil {
+	if token, err = pkgOs.ReadJson[*mod.AccessToken](r.Dir, pkg); err != nil {
 		err = plog.Err(err)
 	}
 	return
 }
 
-func (r Repository) Fetch(pkg string) (accessToken *mod.AccessToken, err error) {
+func (r *Repository) List(args *apphost.ListTokensArgs) (apphost.AccessTokens, error) {
+	if r.Adapter == nil {
+		r.Adapter = apphost.Default
+	}
+	return r.Adapter.Token().List(args)
+}
+
+func (r *Repository) Resolve(pkg string) (accessToken *mod.AccessToken, err error) {
 	if r.Adapter == nil {
 		r.Adapter = apphost.Default
 	}
@@ -42,40 +60,29 @@ func (r Repository) Fetch(pkg string) (accessToken *mod.AccessToken, err error) 
 		return
 	}
 
-	i, err := r.Adapter.Resolve(pkg)
+	id, err := r.Adapter.Resolve(pkg)
 	if err != nil {
 		return
 	}
 
-	at, err := r.Adapter.Token().List(nil)
-	if err != nil {
-		return
-	}
-
-	for _, t := range at {
-		if t.Identity.IsEqual(i) {
-			accessToken = &t
-			err = r.Set(pkg, accessToken)
+	if id != nil {
+		var tokens apphost.AccessTokens
+		if tokens, err = r.Adapter.Token().List(nil); err != nil {
 			return
 		}
-	}
-	return
-}
 
-func (r Repository) Resolve(pkg string) (accessToken *mod.AccessToken, err error) {
-	if r.Adapter == nil {
-		r.Adapter = apphost.Default
-	}
-	if accessToken, err = r.Fetch(pkg); err == nil {
+		for _, t := range tokens {
+			if t.Identity.IsEqual(id) {
+				accessToken = &t
+				err = r.Set(pkg, accessToken)
+				return
+			}
+		}
+	} else if id, err = r.Adapter.Key().Create(pkg); err != nil {
 		return
 	}
 
-	var i *astral.Identity
-	if i, err = r.Adapter.Key().Create(pkg); err != nil {
-		return
-	}
-
-	args := apphost.CreateTokenArgs{ID: i}
+	args := apphost.CreateTokenArgs{ID: id}
 	if accessToken, err = r.Adapter.Token().Create(args); err != nil {
 		return
 	}

@@ -1,0 +1,52 @@
+package env
+
+import (
+	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/resolve/source"
+	"os"
+	"path/filepath"
+)
+
+type Key string
+
+const (
+	AstraldHome   Key = "ASTRALD_HOME"
+	AstraldDb     Key = "ASTRALD_DB"
+	PortaldTokens Key = "PORTALD_TOKENS"
+	PortaldApps   Key = "PORTALD_APPS"
+	PortaldBin    Key = "PORTALD_BIN"
+)
+
+func (k Key) Get() string {
+	return os.Getenv(string(k))
+}
+
+func (k Key) Set(dir string) {
+	err := os.Setenv(string(k), dir)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (k Key) SetDir(dir string, path ...string) {
+	dir = filepath.Join(dir, filepath.Join(path...))
+	k.Set(dir)
+}
+
+func (k Key) MkdirAll() (dir string) {
+	abs := k.Get()
+	if abs == "" {
+		panic("environment variable " + k + " not set")
+	}
+	err := os.MkdirAll(abs, 0755)
+	if err != nil {
+		panic(err)
+	}
+	return abs
+}
+
+func (k Key) Source() target.Source {
+	return source.Dir(k.MkdirAll())
+}
+
+type Config map[string]string

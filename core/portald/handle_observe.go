@@ -3,7 +3,6 @@ package portald
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/core/dir"
 	"github.com/cryptopunkscc/portal/pkg/fs2"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/apps"
@@ -15,12 +14,7 @@ func (s *Service[T]) ObserveApps(ctx context.Context, opts ListAppsOpts) (out <-
 	log := plog.Get(ctx)
 	log.Println("Observing...")
 
-	watch, err := fs2.NotifyWatch(ctx, dir.App, 0)
-	if err != nil {
-		return
-	}
-
-	file, err := source.File(dir.App)
+	watch, err := fs2.NotifyWatch(ctx, s.AppsDir.Require(), 0)
 	if err != nil {
 		return
 	}
@@ -31,7 +25,7 @@ func (s *Service[T]) ObserveApps(ctx context.Context, opts ListAppsOpts) (out <-
 		defer close(results)
 		resolve := apps.Resolver[target.Bundle_]()
 
-		for _, bundle := range resolve.List(file) {
+		for _, bundle := range resolve.List(s.apps()) {
 			if opts.Hidden || !bundle.Manifest().Hidden {
 				results <- bundle
 			}
@@ -42,7 +36,7 @@ func (s *Service[T]) ObserveApps(ctx context.Context, opts ListAppsOpts) (out <-
 			if event.Op != fsnotify.Write {
 				continue
 			}
-			if file, err = source.File(event.Name); err == nil {
+			if file, err := source.File(event.Name); err == nil {
 				for _, bundle := range resolve.List(file) {
 					if opts.Hidden || !bundle.Manifest().Hidden {
 						results <- bundle
