@@ -5,6 +5,7 @@ import (
 	"github.com/cryptopunkscc/astrald/astral"
 	lib "github.com/cryptopunkscc/astrald/lib/apphost"
 	mod "github.com/cryptopunkscc/astrald/mod/apphost"
+	"github.com/cryptopunkscc/astrald/sig"
 	api "github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/google/uuid"
@@ -13,7 +14,10 @@ import (
 
 var Default = &Adapter{}
 
-type Adapter struct{ Client }
+type Adapter struct {
+	Client
+	identities sig.Map[string, *astral.Identity]
+}
 
 func (a *Adapter) Connect() (err error) {
 	defer plog.TraceErr(&err)
@@ -38,7 +42,15 @@ func (a *Adapter) Resolve(name string) (i *astral.Identity, err error) {
 	if name == "" {
 		return a.Client.HostID, nil
 	}
-	return a.Client.ResolveIdentity(name)
+	i, ok := a.identities.Get(name)
+	if ok {
+		return
+	}
+	if i, err = a.Client.ResolveIdentity(name); err != nil {
+		return
+	}
+	a.identities.Set(name, i)
+	return
 }
 
 func (a *Adapter) DisplayName(identity *astral.Identity) string {
