@@ -1,0 +1,47 @@
+plugins {
+    id 'java-library'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+task environment(type: Exec) {
+    commandLine 'env'
+}
+
+task javaVersion(type: Exec) {
+    group 'test'
+    commandLine "java", '-version'
+}
+
+task updateGoMobile(type: Exec) {
+    group 'build'
+    commandLine "go", 'get', "golang.org/x/mobile/bind"
+}
+
+task buildGoMobile(type: Exec) {
+    group 'build'
+    dependsOn updateGoMobile
+    inputs.files files("go.mod", 'go.sum'), fileTree("../../") { include "**/*.go" }
+    outputs.upToDateWhen {
+        file('./build/portal.aar').exists()
+    }
+    doFirst {
+        mkdir buildDir
+    }
+    environment("GOTOOLCHAIN", "go1.23.7")
+//    environment("GOARCH", "x86_64")
+//    environment("GOOS", "android")
+    commandLine("gomobile", "bind", "-v", "-o", "./build/portal.aar",
+            "-tags", "sqlite_native",
+            "-target=android", "-androidapi=24",
+            "-javapkg=cc.cryptopunks.portal.core",
+            "github.com/cryptopunkscc/portal/api/bind",
+            "github.com/cryptopunkscc/portal/api/mobile",
+            "github.com/cryptopunkscc/portal/core/mobile",
+    )
+}
+
+compileJava.dependsOn buildGoMobile

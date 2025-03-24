@@ -9,15 +9,9 @@ import (
 
 type service struct {
 	portald.Service[target.App_]
-	mobile  Api
-	astrald astrald
-	Ctx     context.Context
-	Find    target.Find[target.App_]
+	find   target.Find[target.App_]
+	ctx    context.Context
+	mobile Api
 }
 
-var _ Portald = &service{}
-
-func (m *service) Stop() {
-	m.Shutdown()
-	m.Ctx = context.Background()
-}
+var _ Core = &service{}

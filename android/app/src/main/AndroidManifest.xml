@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+
+    <application
+        android:name=".app.PortalApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@android:style/Theme.Material.NoActionBar"
+        android:usesCleartextTraffic="true">
+
+        <service
+            android:name=".main.MainService"
+            android:exported="true"
+            android:foregroundServiceType="specialUse">
+            <intent-filter>
+                <action android:name="cc.cryptopunks.portal.main.AstraldService" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+        </service>
+
+        <activity
+            android:name="cc.cryptopunks.portal.main.MainActivity"
+            android:exported="true"
+            android:launchMode="singleInstance"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <data
+                    android:host="main"
+                    android:scheme="astral" />
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".permission.PermissionActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.Material.NoActionBar">
+            <intent-filter>
+                <data
+                    android:host="permissions"
+                    android:scheme="astral" />
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot0"
+            android:taskAffinity=".html.HtmlAppActivity0" />
+        <activity
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot1"
+            android:taskAffinity=".html.HtmlAppActivity1" />
+        <activity
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot2"
+            android:taskAffinity=".html.HtmlAppActivity2" />
+        <activity
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot3"
+            android:taskAffinity=".html.HtmlAppActivity3" />
+        <activity
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot4"
+            android:taskAffinity=".html.HtmlAppActivity4" />
+        <activity
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot5"
+            android:taskAffinity=".html.HtmlAppActivity5" />
+        <activity
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot6"
+            android:taskAffinity=".html.HtmlAppActivity6" />
+        <activity
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot7"
+            android:taskAffinity=".html.HtmlAppActivity7" />
+        <activity
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot8"
+            android:taskAffinity=".html.HtmlAppActivity8" />
+        <activity
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot9"
+            android:taskAffinity=".html.HtmlAppActivity9" />
+        <activity
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot10"
+            android:taskAffinity=".html.HtmlAppActivity10" />
+        <activity
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot11"
+            android:taskAffinity=".html.HtmlAppActivity11" />
+        <activity
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot12"
+            android:taskAffinity=".html.HtmlAppActivity12" />
+        <activity
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot13"
+            android:taskAffinity=".html.HtmlAppActivity13" />
+        <activity
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot14"
+            android:taskAffinity=".html.HtmlAppActivity14" />
+        <activity
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot15"
+            android:taskAffinity=".html.HtmlAppActivity15" />
+        <activity
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot16"
+            android:taskAffinity=".html.HtmlAppActivity16" />
+        <activity
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot17"
+            android:taskAffinity=".html.HtmlAppActivity17" />
+        <activity
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot18"
+            android:taskAffinity=".html.HtmlAppActivity18" />
+        <activity
+            android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot19"
+            android:taskAffinity=".html.HtmlAppActivity19" />
+    </application>
+
+</manifest>
