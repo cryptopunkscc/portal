@@ -1,7 +1,7 @@
 import {log, sleep} from "portal";
 
 export default {
-  launch: async (id) => log("PortalMock.launch: " + id),
+  open: async (id) => log("PortalMock.launch: " + id),
   install: async (id) => log("PortalMock.install: " + id),
   uninstall: async (id) => log("PortalMock.uninstall: " + id),
   observe: async () => {

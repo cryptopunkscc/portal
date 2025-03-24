@@ -45,11 +45,11 @@ func (s *Service[T]) Wait() (err error) {
 func (s *Service[T]) Install() install.Runner {
 	return install.Runner{
 		AppsDir: s.AppsDir,
-		Tokens:  *s.tokens(),
+		Tokens:  *s.Tokens(),
 	}
 }
 
-func (s *Service[T]) tokens() *token.Repository {
+func (s *Service[T]) Tokens() *token.Repository {
 	return token.NewRepository(s.TokensDir, &s.Apphost)
 }
 

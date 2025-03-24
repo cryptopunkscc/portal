@@ -59,7 +59,7 @@ func (s *Service[T]) startPortald(ctx context.Context) error {
 }
 
 func (s *Service[T]) createTokens(log plog.Logger) {
-	tokens := s.tokens()
+	tokens := s.Tokens()
 	for _, pkg := range s.CreateTokens {
 		if _, err := tokens.Resolve(pkg); err != nil {
 			log.Println("cannot resolve token", err)

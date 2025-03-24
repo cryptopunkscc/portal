@@ -47,7 +47,7 @@ func (s *Service[T]) publicHandlers() cmd.Handlers {
 			},
 		},
 		{
-			Func: s.tokens().Resolve,
+			Func: s.Tokens().Resolve,
 			Name: "token",
 			Desc: "Create a new token or return existing one.",
 			Params: cmd.Params{
@@ -55,7 +55,7 @@ func (s *Service[T]) publicHandlers() cmd.Handlers {
 			},
 		},
 		{
-			Func: s.tokens().List,
+			Func: s.Tokens().List,
 			Name: "tokens",
 			Desc: "List apphost tokens.",
 			Params: cmd.Params{

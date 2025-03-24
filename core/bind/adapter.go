@@ -3,6 +3,7 @@ package bind
 import (
 	"context"
 	_ "embed"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/cryptopunkscc/astrald/astral"
@@ -149,9 +150,23 @@ func (a *adapter) Query(target string, query string) (data *bind.QueryData, err 
 	}
 
 	data = &bind.QueryData{
-		Id:    conn.Ref(),
-		Query: conn.Query(),
+		Id:       conn.Ref(),
+		Query:    conn.Query(),
+		RemoteId: conn.RemoteIdentity().String(),
 	}
+	return
+}
+
+func (a *adapter) QueryString(target string, query string) (data string, err error) {
+	queryData, err := a.Query(target, query)
+	if err != nil {
+		return
+	}
+	bytes, err := json.Marshal(queryData)
+	if err != nil {
+		return
+	}
+	data = string(bytes)
 	return
 }
 
@@ -174,5 +189,18 @@ func (a *adapter) NodeInfo(identity string) (info *bind.NodeInfo, err error) {
 		Identity: identity,
 		Name:     name,
 	}
+	return
+}
+
+func (a *adapter) NodeInfoString(identity string) (info string, err error) {
+	nodeInfo, err := a.NodeInfo(identity)
+	if err != nil {
+		return
+	}
+	bytes, err := json.Marshal(nodeInfo)
+	if err != nil {
+		return
+	}
+	info = string(bytes)
 	return
 }

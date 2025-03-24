@@ -44,7 +44,7 @@ func (a Application[T]) Runner() Run[T] {
 func (a Application[T]) Resolver() Resolve[T] { return sources.Resolver[T]() }
 
 func (a Application[T]) core(ctx context.Context, portal Portal_) (bind.Core, context.Context) {
-	r, ctx := bind.FrontendCore()(ctx, portal)
+	r, ctx := bind.NewFrontendCoreFunc()(ctx, portal)
 	return &Adapter{r}, ctx
 }
 

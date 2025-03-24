@@ -25,8 +25,10 @@ type Apphost interface {
 	ConnWriteLn(id string, data string) (err error)
 	ConnReadLn(id string) (data string, err error)
 	Query(target string, query string) (data *QueryData, err error)
+	QueryString(target string, query string) (data string, err error)
 	Resolve(name string) (id string, err error)
 	NodeInfo(id string) (info *NodeInfo, err error)
+	NodeInfoString(id string) (info string, err error)
 	Close() error
 	Interrupt()
 }
@@ -38,6 +40,6 @@ type QueryData struct {
 }
 
 type NodeInfo struct {
-	Identity string
-	Name     string
+	Identity string `json:"identity"`
+	Name     string `json:"name"`
 }

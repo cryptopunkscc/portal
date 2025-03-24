@@ -23,7 +23,7 @@ func (s *Service[T]) ObserveApps(ctx context.Context, opts ListAppsOpts) (out <-
 	out = results
 	go func() {
 		defer close(results)
-		resolve := apps.Resolver[target.Bundle_]()
+		resolve := apps.Resolver[target.App_]()
 
 		for _, bundle := range resolve.List(s.apps()) {
 			if opts.Hidden || !bundle.Manifest().Hidden {
