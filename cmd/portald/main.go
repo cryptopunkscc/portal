@@ -10,6 +10,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	singal "github.com/cryptopunkscc/portal/pkg/sig"
 	"github.com/cryptopunkscc/portal/runner/exec"
+	"path/filepath"
 )
 
 var application = &Application[Portal_]{}
@@ -33,3 +34,15 @@ func main() {
 		log.E().Println("finished with error:", err)
 	}
 }
+
+func init() {
+	env.AstraldHome.Default(defaultAstraldHome)
+	env.AstraldDb.Default(defaultAstraldHome)
+	env.PortaldTokens.Default(defaultTokensDir)
+	env.PortaldApps.Default(defaultAppsDir)
+	env.PortaldBin.Default(defaultBinDir)
+}
+
+func defaultAstraldHome() string { return filepath.Join(userConfigDir(), "astrald") }
+func defaultTokensDir() string   { return filepath.Join(defaultPortalDir(), "tokens") }
+func defaultBinDir() string      { return filepath.Join(defaultPortalDir(), "bin") }

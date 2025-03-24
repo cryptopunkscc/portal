@@ -17,6 +17,17 @@ const (
 	PortaldBin    Key = "PORTALD_BIN"
 )
 
+func (k Key) Default(get func() string) {
+	if !k.Exist() {
+		v := get()
+		k.Set(v)
+	}
+}
+
+func (k Key) Exist() bool {
+	return len(k.Get()) > 0
+}
+
 func (k Key) Get() string {
 	return os.Getenv(string(k))
 }
@@ -48,5 +59,3 @@ func (k Key) MkdirAll() (dir string) {
 func (k Key) Source() target.Source {
 	return source.Dir(k.MkdirAll())
 }
-
-type Config map[string]string

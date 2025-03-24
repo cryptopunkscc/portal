@@ -4,21 +4,14 @@ package main
 
 import (
 	. "github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/core/env"
 	exec2 "github.com/cryptopunkscc/portal/resolve/exec"
 	"github.com/cryptopunkscc/portal/resolve/portal"
 	"github.com/cryptopunkscc/portal/runner/app"
 	"github.com/cryptopunkscc/portal/runner/exec"
-	"os"
+	"path/filepath"
 )
 
 func init() {
-	wd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-	env.PortaldApps.SetDir(wd, "apps")
-
 	application.Order = []int{2, 1, 0}
 
 	application.Resolve = Any[Portal_](
@@ -37,3 +30,5 @@ func init() {
 		}
 	}
 }
+
+func defaultAppsDir() string { return filepath.Join(workingDir(), "apps") }

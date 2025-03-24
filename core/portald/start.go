@@ -16,11 +16,7 @@ func (s *Service[T]) Run(ctx context.Context) (err error) {
 
 func (s *Service[T]) Start(ctx context.Context) (err error) {
 	log := plog.Get(ctx).Type(s)
-	log.Println("start")
-	go func() {
-		s.waitGroup.Wait()
-		log.Println("exit")
-	}()
+	log.Println("starting portald...")
 	ctx, s.shutdown = context.WithCancel(ctx)
 	if err = s.startAstrald(ctx); err != nil {
 		return
@@ -51,7 +47,6 @@ func (s *Service[T]) startPortald(ctx context.Context) error {
 	if err := router.Init(ctx); err != nil {
 		return err
 	}
-
 	s.waitGroup.Add(1)
 	go func() {
 		defer s.waitGroup.Done()
@@ -59,6 +54,7 @@ func (s *Service[T]) startPortald(ctx context.Context) error {
 			log.Println(err)
 		}
 	}()
+	log.Println("portald started")
 	return nil
 }
 
