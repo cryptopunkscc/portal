@@ -2,10 +2,9 @@ package astrald
 
 import (
 	"context"
+	"fmt"
 	"github.com/cryptopunkscc/astrald/astral"
-	modApphost "github.com/cryptopunkscc/astrald/mod/apphost"
 	modApphostSrc "github.com/cryptopunkscc/astrald/mod/apphost/src"
-	"github.com/cryptopunkscc/astrald/sig"
 	"github.com/cryptopunkscc/portal/api/astrald"
 	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/mem"
@@ -14,19 +13,18 @@ import (
 )
 
 type Initializer struct {
-	NodeRoot  mem.String
-	TokensDir mem.String
-	Apphost   *apphost.Adapter
-	Runner    astrald.Runner
+	AgentAlias string
+	NodeRoot   mem.String
+	TokensDir  mem.String
+	Apphost    *apphost.Adapter
+	Runner     astrald.Runner
 
 	log            plog.Logger
 	resources      resources.FileResources
 	nodeIdentity   *astral.Identity
 	apphostConfig  *modApphostSrc.Config
-	nodeAuthToken  string
+	nodeToken      string
 	restartAstrald bool
-
-	ResolvedTokens sig.Map[string, *modApphost.AccessToken]
 }
 
 func (r *Initializer) Start(ctx context.Context) (err error) {
@@ -41,7 +39,7 @@ func (r *Initializer) Start(ctx context.Context) (err error) {
 }
 
 func (r *Initializer) isInitialized() bool {
-	return r.fetchAuthToken("portald") == nil
+	return r.fetchAuthToken(r.AgentAlias) == nil
 }
 
 func (r *Initializer) initialize(ctx context.Context) (err error) {
@@ -59,7 +57,7 @@ func (r *Initializer) initialize(ctx context.Context) (err error) {
 	if err = r.resolveNodeAuthToken(); err != nil {
 		return
 	}
-	r.Apphost.AuthToken = r.nodeAuthToken
+	r.Apphost.AuthToken = r.nodeToken
 	if !r.apphostIsRunning() {
 		if err = r.startAstrald(ctx); err != nil {
 			return
@@ -68,23 +66,20 @@ func (r *Initializer) initialize(ctx context.Context) (err error) {
 			return
 		}
 	} else if r.restartAstrald {
-		return plog.Errorf("cannot configure portald auth token: astrald already running")
+		return plog.Errorf("cannot configure node token: astrald already running")
 	}
 
-	if err = r.resolveAuthToken("portald"); err != nil {
+	if err = r.removeTemporaryNodeAuthToken(); err != nil {
 		return
 	}
-	if err = r.removeTemporaryNodeAuthToken(); err != nil {
+	if err = r.resolveAuthToken(r.AgentAlias); err != nil {
 		return
 	}
 	return
 }
 
 func (r *Initializer) start(ctx context.Context) (err error) {
-	// try to get existing portal auth token and set to apphost
-	if err = r.apphostSetupAuthToken("portald"); err != nil {
-		return
-	}
+	r.verifyAgentToken()
 
 	// try to resolve and set apphost endpoint from config.
 	if err := r.initNodeResources(); err == nil {
@@ -102,4 +97,11 @@ func (r *Initializer) start(ctx context.Context) (err error) {
 		}
 	}
 	return
+}
+
+// verify the agent access token has been set
+func (r *Initializer) verifyAgentToken() {
+	if len(r.Apphost.AuthToken) == 0 || r.Apphost.AuthToken == r.nodeToken {
+		panic(fmt.Errorf("invalid agent token with len %d", len(r.Apphost.AuthToken)))
+	}
 }

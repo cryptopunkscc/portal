@@ -23,30 +23,30 @@ func (r *Initializer) resolveNodeAuthToken() (err error) {
 		}
 		if r.nodeIdentity.IsEqual(identity) {
 			r.log.Println("found existing node token")
-			r.nodeAuthToken = token
+			r.nodeToken = token
 			return
 		}
 	}
 
-	if len(r.nodeAuthToken) == 0 {
-		r.nodeAuthToken = temporaryTokenPrefix + random.String(8)
+	if len(r.nodeToken) == 0 {
+		r.nodeToken = temporaryTokenPrefix + random.String(8)
 	}
 
 	// add access token for node
-	r.apphostConfig.Tokens[r.nodeAuthToken] = r.nodeIdentity.String()
+	r.apphostConfig.Tokens[r.nodeToken] = r.nodeIdentity.String()
 	if err = r.writeApphostConfig(); err != nil {
 		return
 	}
-	r.log.Println("added", r.nodeAuthToken, "alias to apphost config")
+	r.log.Println("added", r.nodeToken, "alias to apphost config")
 
 	r.restartAstrald = true
 	return
 }
 
 func (r *Initializer) removeTemporaryNodeAuthToken() (err error) {
-	if !strings.HasPrefix(r.nodeAuthToken, temporaryTokenPrefix) {
+	if !strings.HasPrefix(r.nodeToken, temporaryTokenPrefix) {
 		return
 	}
-	delete(r.apphostConfig.Tokens, r.nodeAuthToken)
+	delete(r.apphostConfig.Tokens, r.nodeToken)
 	return r.writeApphostConfig()
 }

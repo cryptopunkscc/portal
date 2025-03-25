@@ -21,6 +21,7 @@ func TestRunner_Start(t *testing.T) {
 	})
 
 	r := Initializer{}
+	r.AgentAlias = "portald"
 	r.NodeRoot = testDir
 	r.TokensDir = testDir
 	r.Apphost = &apphost.Adapter{}

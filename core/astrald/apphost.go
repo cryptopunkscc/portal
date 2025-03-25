@@ -2,7 +2,6 @@ package astrald
 
 import (
 	"context"
-	"fmt"
 	libApphost "github.com/cryptopunkscc/astrald/lib/apphost"
 	modApphostSrc "github.com/cryptopunkscc/astrald/mod/apphost/src"
 	"github.com/cryptopunkscc/portal/pkg/flow"
@@ -35,16 +34,6 @@ func (r *Initializer) apphostResolveEndpoint() {
 		return
 	}
 	r.Apphost.Endpoint = libApphost.DefaultEndpoint
-}
-
-func (r *Initializer) apphostSetupAuthToken(pkg string) (err error) {
-	plog.TraceErr(&err)
-	t, ok := r.ResolvedTokens.Get(pkg)
-	if !ok {
-		return fmt.Errorf("no token found for %s", pkg)
-	}
-	r.Apphost.AuthToken = string(t.Token)
-	return
 }
 
 func (r *Initializer) apphostIsRunning() bool {

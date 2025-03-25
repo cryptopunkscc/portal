@@ -30,10 +30,11 @@ func (s *Service[T]) Start(ctx context.Context) (err error) {
 
 func (s *Service[T]) startAstrald(ctx context.Context) (err error) {
 	r := astrald.Initializer{
-		NodeRoot:  s.NodeDir,
-		TokensDir: s.TokensDir,
-		Apphost:   &s.Apphost,
-		Runner:    s.Astrald,
+		AgentAlias: "portald",
+		NodeRoot:   s.NodeDir,
+		TokensDir:  s.TokensDir,
+		Apphost:    &s.Apphost,
+		Runner:     s.Astrald,
 	}
 	return r.Start(ctx)
 }

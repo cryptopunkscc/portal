@@ -11,10 +11,12 @@ type Key string
 
 const (
 	AstraldHome   Key = "ASTRALD_HOME"
-	AstraldDb     Key = "ASTRALD_DB"
-	PortaldTokens Key = "PORTALD_TOKENS"
-	PortaldApps   Key = "PORTALD_APPS"
-	PortaldBin    Key = "PORTALD_BIN"
+	AstraldDb     Key = "ASTRALD_DB_DIR"
+	ApphostAddr   Key = "APPHOST_ADDR"
+	PortaldHome   Key = "PORTALD_HOME"
+	PortaldTokens Key = "PORTALD_TOKENS_DIR"
+	PortaldApps   Key = "PORTALD_APPS_DIR"
+	PortaldBin    Key = "PORTALD_BIN_DIR"
 )
 
 func (k Key) Default(get func() string) {
@@ -32,8 +34,8 @@ func (k Key) Get() string {
 	return os.Getenv(string(k))
 }
 
-func (k Key) Set(dir string) {
-	err := os.Setenv(string(k), dir)
+func (k Key) Set(v string) {
+	err := os.Setenv(string(k), v)
 	if err != nil {
 		panic(err)
 	}
