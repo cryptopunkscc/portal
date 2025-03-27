@@ -18,7 +18,7 @@ func TestConfig_Build(t *testing.T) {
 	c.Dir = test.Dir(t, ".test", "portal")
 	c.Apps = "argapps"
 	c.ApphostAddr = "localhost"
-	err := c.Build()
+	err := c.build()
 	if err != nil {
 		plog.Println(err)
 		return

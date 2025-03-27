@@ -29,6 +29,10 @@ type Service[T Portal_] struct {
 	Order   []int
 }
 
+func (s *Service[T]) Configure() error {
+	return s.Config.build()
+}
+
 func (s *Service[T]) Stop() {
 	s.shutdown()
 }

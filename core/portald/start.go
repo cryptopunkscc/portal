@@ -11,7 +11,7 @@ func (s *Service[T]) Start(ctx context.Context) (err error) {
 	log := plog.Get(ctx).Type(s)
 	log.Println("starting portald...")
 	ctx, s.shutdown = context.WithCancel(ctx)
-	if err = s.Config.Build(); err != nil {
+	if err = s.Configure(); err != nil {
 		return
 	}
 	if err = s.startAstrald(ctx); err != nil {

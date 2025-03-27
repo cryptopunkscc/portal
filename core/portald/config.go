@@ -77,7 +77,7 @@ func (c *Config) dirs() []*string {
 	}
 }
 
-func (c *Config) Build() (err error) {
+func (c *Config) build() (err error) {
 	envConfig := Config{}
 	envConfig.readEnvVars()
 	config.Merge(c, &envConfig, &baseConfig)

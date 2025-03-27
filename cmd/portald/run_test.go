@@ -42,7 +42,7 @@ func TestApplication_loadConfig_platformDefault(t *testing.T) {
 	if err := application.loadConfig(nil); err != nil {
 		plog.P().Println(err)
 	}
-	if err := application.Config.Build(); err != nil {
+	if err := application.Configure(); err != nil {
 		plog.P().Println(err)
 	}
 	bytes, err := yaml.Marshal(application.Config)
