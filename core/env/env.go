@@ -41,6 +41,12 @@ func (k Key) Set(v string) {
 	}
 }
 
+func (k Key) Unset() {
+	if err := os.Unsetenv(string(k)); err != nil {
+		panic(err)
+	}
+}
+
 func (k Key) SetDir(dir string, path ...string) {
 	dir = filepath.Join(dir, filepath.Join(path...))
 	k.Set(dir)

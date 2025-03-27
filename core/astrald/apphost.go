@@ -3,7 +3,6 @@ package astrald
 import (
 	"context"
 	libApphost "github.com/cryptopunkscc/astrald/lib/apphost"
-	modApphostSrc "github.com/cryptopunkscc/astrald/mod/apphost/src"
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"time"
@@ -11,36 +10,32 @@ import (
 
 const apphostYaml = "apphost.yaml"
 
-func (r *Initializer) initApphostConfig() {
-	if r.apphostConfig == nil {
-		if err := r.readApphostConfig(); err != nil {
-			r.apphostConfig = &modApphostSrc.Config{}
-			return
-		}
-		r.log.Println("loaded existing apphost config")
+func (i *Initializer) initApphostConfig() {
+	if err := i.readApphostConfig(); err == nil {
+		i.log.Println("loaded existing apphost config")
 	}
 }
 
-func (r *Initializer) readApphostConfig() (err error) {
-	return r.resources.ReadYaml(apphostYaml, &r.apphostConfig)
+func (i *Initializer) readApphostConfig() (err error) {
+	return i.resources.ReadYaml(apphostYaml, &i.Config.Apphost)
 }
-func (r *Initializer) writeApphostConfig() (err error) {
-	return r.resources.WriteYaml(apphostYaml, r.apphostConfig)
+func (i *Initializer) writeApphostConfig() (err error) {
+	return i.resources.WriteYaml(apphostYaml, i.Config.Apphost)
 }
 
-func (r *Initializer) apphostResolveEndpoint() {
-	for _, endpoint := range r.apphostConfig.Listen {
-		r.Apphost.Endpoint = endpoint
+func (i *Initializer) apphostResolveEndpoint() {
+	for _, endpoint := range i.Config.Apphost.Listen {
+		i.Apphost.Endpoint = endpoint
 		return
 	}
-	r.Apphost.Endpoint = libApphost.DefaultEndpoint
+	i.Apphost.Endpoint = libApphost.DefaultEndpoint
 }
 
-func (r *Initializer) apphostIsRunning() bool {
-	return r.Apphost.Reconnect() == nil
+func (i *Initializer) apphostIsRunning() bool {
+	return i.Apphost.Reconnect() == nil
 }
 
-func (r *Initializer) apphostAwait(ctx context.Context) (err error) {
+func (i *Initializer) apphostAwait(ctx context.Context) (err error) {
 	log := plog.Get(ctx).D()
 	retry := flow.Await{
 		Delay: 50 * time.Millisecond,
@@ -50,7 +45,7 @@ func (r *Initializer) apphostAwait(ctx context.Context) (err error) {
 	}.Chan()
 	for n := range retry {
 		log.Println("awaiting apphost:", n)
-		err = r.Apphost.Connect()
+		err = i.Apphost.Connect()
 		if err == nil || err.Error() == "token authentication failed" {
 			err = nil
 			log.Println("apphost started")

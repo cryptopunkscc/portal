@@ -6,38 +6,38 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
-func (r *Initializer) readOrGenerateNodeIdentity() (err error) {
-	if err = r.readNodeIdentity(); err != nil {
-		err = r.generateNodeIdentity()
+func (i *Initializer) readOrGenerateNodeIdentity() (err error) {
+	if err = i.readNodeIdentity(); err != nil {
+		err = i.generateNodeIdentity()
 		return
 	}
 	return
 }
 
-func (r *Initializer) readNodeIdentity() (err error) {
+func (i *Initializer) readNodeIdentity() (err error) {
 	defer plog.TraceErr(&err)
 	var pk keys.PrivateKey
-	if err = r.resources.DecodeObject("node_identity", &pk); err != nil {
+	if err = i.resources.DecodeObject("node_identity", &pk); err != nil {
 		return
 	}
-	if r.nodeIdentity, err = astral.IdentityFromPrivKeyBytes(pk.Bytes); err != nil {
+	if i.nodeIdentity, err = astral.IdentityFromPrivKeyBytes(pk.Bytes); err != nil {
 		return
 	}
-	r.log.Println("found existing node identity")
+	i.log.Println("found existing node identity")
 	return
 }
 
-func (r *Initializer) generateNodeIdentity() (err error) {
+func (i *Initializer) generateNodeIdentity() (err error) {
 	defer plog.TraceErr(&err)
-	if r.nodeIdentity, err = astral.GenerateIdentity(); err != nil {
+	if i.nodeIdentity, err = astral.GenerateIdentity(); err != nil {
 		return
 	}
-	if err = r.resources.EncodeObject("node_identity", &keys.PrivateKey{
+	if err = i.resources.EncodeObject("node_identity", &keys.PrivateKey{
 		Type:  keys.KeyTypeIdentity,
-		Bytes: r.nodeIdentity.PrivateKey().Serialize(),
+		Bytes: i.nodeIdentity.PrivateKey().Serialize(),
 	}); err != nil {
 		return
 	}
-	r.log.Println("generated node identity")
+	i.log.Println("generated node identity")
 	return
 }

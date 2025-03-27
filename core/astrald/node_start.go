@@ -5,12 +5,12 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
-func (r *Initializer) startAstrald(ctx context.Context) (err error) {
+func (i *Initializer) startAstrald(ctx context.Context) (err error) {
 	defer plog.TraceErr(&err)
-	r.log.Println("starting astrald...")
-	if err = r.Runner.Start(ctx); err != nil {
+	i.log.Println("starting astrald...")
+	if err = i.Runner.Start(ctx); err != nil {
 		return
 	}
-	r.log.Println("astrald started")
+	i.log.Println("astrald started")
 	return
 }

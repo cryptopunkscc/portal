@@ -71,7 +71,7 @@ func (s *Service[T]) publicHandlers() cmd.Handlers {
 			},
 		},
 		{
-			Func: uninstall.Runner(s.AppsDir),
+			Func: uninstall.Runner(s.Config.Apps),
 			Name: "uninstall d",
 			Desc: "Uninstall app.",
 			Params: cmd.Params{

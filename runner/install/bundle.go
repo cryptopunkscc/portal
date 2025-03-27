@@ -11,7 +11,6 @@ import (
 )
 
 func (i Runner) BundlesByPath(src string) (c <-chan Result, err error) {
-	i.AppsDir.Require()
 	file, err := source.File(src)
 	if err != nil {
 		return
@@ -36,13 +35,12 @@ func (i Runner) installBundles(source target.Source, c chan<- Result) {
 }
 
 func (i Runner) Bundle(bundle target.Bundle_) error {
-	i.AppsDir.Require()
 	if err := i.generateTokenFor(bundle); err != nil {
 		return err
 	}
 	pkg := bundle.Package()
 	name := filepath.Base(bundle.Abs())
-	dstPath := filepath.Join(i.AppsDir.Get(), name)
+	dstPath := filepath.Join(i.AppsDir, name)
 	dst, err := os.Create(dstPath)
 	if err != nil {
 		return err

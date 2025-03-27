@@ -4,6 +4,7 @@ package main
 
 import (
 	. "github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/core/env"
 	exec2 "github.com/cryptopunkscc/portal/resolve/exec"
 	"github.com/cryptopunkscc/portal/resolve/portal"
 	"github.com/cryptopunkscc/portal/runner/app"
@@ -12,6 +13,8 @@ import (
 )
 
 func init() {
+	env.PortaldApps.Default(defaultAppsDir)
+
 	application.Order = []int{2, 1, 0}
 
 	application.Resolve = Any[Portal_](

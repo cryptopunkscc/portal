@@ -1,0 +1,89 @@
+package main
+
+import (
+	"context"
+	"github.com/cryptopunkscc/portal/core/env"
+	"github.com/cryptopunkscc/portal/core/portald"
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/test"
+	"github.com/stretchr/testify/assert"
+	"gopkg.in/yaml.v3"
+	"testing"
+	"time"
+)
+
+func init() {
+	plog.Verbosity = 100
+
+}
+
+func TestApplication_loadConfig_custom(t *testing.T) {
+	unsetEnv()
+	dir := test.Dir(t)
+	test.Clean(dir)
+	dir = test.Mkdir(t)
+	c := portald.Config{}
+	c.Dir = dir
+	c.Node.Log.Level = 100
+	c.Apphost.Listen = []string{"tcp:127.0.0.1:8635"}
+	if err := c.Save(dir); err != nil {
+		plog.P().Println(err)
+	}
+
+	args := &RunArgs{ConfigPath: dir}
+	err := application.loadConfig(args)
+	if err != nil {
+		plog.P().Println(err)
+	}
+	assert.Equal(t, c, application.Config)
+}
+
+func TestApplication_loadConfig_platformDefault(t *testing.T) {
+	if err := application.loadConfig(nil); err != nil {
+		plog.P().Println(err)
+	}
+	if err := application.Config.Build(); err != nil {
+		plog.P().Println(err)
+	}
+	bytes, err := yaml.Marshal(application.Config)
+	if err != nil {
+		plog.P().Println(err)
+	}
+	println(string(bytes))
+}
+
+func TestApplication_start(t *testing.T) {
+	dir := test.Mkdir(t)
+	c := portald.Config{}
+	c.Dir = dir
+	c.Node.Log.Level = 100
+	c.Apphost.Listen = []string{"tcp:127.0.0.1:8635"}
+	if err := c.Save(dir); err != nil {
+		plog.P().Println(err)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(func() {
+		cancel()
+		time.Sleep(10 * time.Millisecond) // give a time to kill astrald process
+	})
+	args := &RunArgs{ConfigPath: dir}
+	err := application.start(ctx, args)
+	if err != nil {
+		plog.P().Println(err)
+	}
+}
+
+func unsetEnv() {
+	for _, key := range []env.Key{
+		env.AstraldHome,
+		env.AstraldDb,
+		env.ApphostAddr,
+		env.PortaldHome,
+		env.PortaldTokens,
+		env.PortaldApps,
+		env.PortaldBin,
+	} {
+		key.Unset()
+	}
+}

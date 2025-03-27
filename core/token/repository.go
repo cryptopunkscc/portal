@@ -4,7 +4,6 @@ import (
 	mod "github.com/cryptopunkscc/astrald/mod/apphost"
 	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/core/env"
-	"github.com/cryptopunkscc/portal/pkg/mem"
 	pkgOs "github.com/cryptopunkscc/portal/pkg/os"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"
@@ -16,13 +15,13 @@ type Repository struct {
 }
 
 func NewRepository(
-	dir mem.String,
+	dir string,
 	adapter *apphost.Adapter,
 ) *Repository {
-	if err := os.MkdirAll(dir.Require(), 0755); err != nil {
+	if err := os.MkdirAll(dir, 0755); err != nil {
 		panic(err)
 	}
-	return &Repository{Dir: dir.Get(), Adapter: adapter}
+	return &Repository{Dir: dir, Adapter: adapter}
 }
 
 func (r *Repository) Set(pkg string, token *mod.AccessToken) (err error) {

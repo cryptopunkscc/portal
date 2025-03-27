@@ -4,4 +4,4 @@ import (
 	"path/filepath"
 )
 
-func defaultPortalDir() string { return filepath.Join(localShareDir(), "portald") }
+func defaultPortalHome() string { return filepath.Join(localShareDir(), "portald") }

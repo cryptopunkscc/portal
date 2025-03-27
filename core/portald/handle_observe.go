@@ -14,7 +14,7 @@ func (s *Service[T]) ObserveApps(ctx context.Context, opts ListAppsOpts) (out <-
 	log := plog.Get(ctx)
 	log.Println("Observing...")
 
-	watch, err := fs2.NotifyWatch(ctx, s.AppsDir.Require(), 0)
+	watch, err := fs2.NotifyWatch(ctx, s.Config.Apps, 0)
 	if err != nil {
 		return
 	}

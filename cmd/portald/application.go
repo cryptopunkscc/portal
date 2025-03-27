@@ -7,15 +7,20 @@ import (
 	"github.com/cryptopunkscc/portal/runner/version"
 )
 
-type Application[T Portal_] struct {
-	portald.Service[Portal_]
-}
+type Application[T Portal_] struct{ portald.Service[T] }
 
-func (a *Application[T]) handler() cmd.Handler {
+func (a *Application[T]) commands() (h cmd.Handler) {
 	return cmd.Handler{
-		Func: a.Run,
+		Func: a.run,
 		Name: "portald",
 		Desc: "Portal daemon.",
+		Params: []cmd.Param{
+			{
+				Name: "config c",
+				Type: "string",
+				Desc: "Path to the config file or directory containing .portal.yml",
+			},
+		},
 		Sub: cmd.Handlers{
 			{Name: "v", Desc: "Print version.", Func: version.Run},
 		},

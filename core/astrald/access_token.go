@@ -4,26 +4,26 @@ import (
 	"github.com/cryptopunkscc/portal/core/token"
 )
 
-func (r *Initializer) fetchAuthToken(pkg string) (err error) {
-	t, err := r.tokens().Get(pkg)
+func (i *Initializer) fetchAuthToken(pkg string) (err error) {
+	t, err := i.tokens().Get(pkg)
 	if err != nil {
 		return
 	}
-	r.Apphost.AuthToken = string(t.Token)
-	r.log.Println("fetched", pkg, "auth token")
+	i.Apphost.AuthToken = string(t.Token)
+	i.log.Println("fetched", pkg, "auth token")
 	return
 }
 
-func (r *Initializer) resolveAuthToken(pkg string) (err error) {
-	t, err := r.tokens().Resolve(pkg)
+func (i *Initializer) resolveAuthToken(pkg string) (err error) {
+	t, err := i.tokens().Resolve(pkg)
 	if err != nil {
 		return
 	}
-	r.Apphost.AuthToken = string(t.Token)
-	r.log.Println("resolved", pkg, "auth token")
+	i.Apphost.AuthToken = string(t.Token)
+	i.log.Println("resolved", pkg, "auth token")
 	return
 }
 
-func (r *Initializer) tokens() *token.Repository {
-	return token.NewRepository(r.TokensDir, r.Apphost)
+func (i *Initializer) tokens() *token.Repository {
+	return token.NewRepository(i.TokensDir, i.Apphost)
 }

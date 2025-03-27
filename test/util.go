@@ -23,6 +23,14 @@ func Dir(t *testing.T, path ...string) string {
 	return filepath.Join(wd, dir)
 }
 
+func Mkdir(t *testing.T, path ...string) (d string) {
+	d = Dir(t, path...)
+	if err := os.MkdirAll(d, 0755); err != nil {
+		t.Fatal(err)
+	}
+	return
+}
+
 func Assert[T any](value T, err error) T {
 	if err != nil {
 		panic(err)

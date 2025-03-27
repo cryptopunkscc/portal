@@ -10,7 +10,7 @@ import (
 )
 
 func (i Runner) CopyOf(src target.Portal_) (err error) {
-	return CopyFS(src.FS(), filepath.Join(i.AppsDir.Get(), src.Manifest().Package))
+	return CopyFS(src.FS(), filepath.Join(i.AppsDir, src.Manifest().Package))
 }
 
 func CopyFS(source fs.FS, destPath string) error {

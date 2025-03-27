@@ -7,7 +7,6 @@ import (
 	"github.com/cryptopunkscc/portal/api/mobile"
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/env"
-	"github.com/cryptopunkscc/portal/pkg/mem"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/exec"
 	"github.com/cryptopunkscc/portal/resolve/html"
@@ -16,35 +15,26 @@ import (
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/app"
 	"github.com/cryptopunkscc/portal/runner/goja"
+	"path/filepath"
 )
 
 func Create(api mobile.Api) mobile.Core {
-	env.AstraldHome.SetDir(api.DataDir(), "astrald")
-	env.AstraldDb.SetDir(api.DbDir())
-	env.PortaldApps.SetDir(api.DataDir(), "portald", "apps")
-	env.PortaldTokens.SetDir(api.DataDir(), "portald", "tokens")
-
 	tcp.InterfaceAddrs = interfaceAddrsFunc(api)
 	ether.NetInterfaces = netInterfacesFunc(api)
 	plog.Verbosity = 100
 
 	m := &service{}
-	ctx := context.Background()
-	astraldHomeDir := mem.NewVar(env.AstraldHome.MkdirAll())
-	astraldDbDir := mem.NewVar(env.AstraldDb.MkdirAll())
-	tokensDir := mem.NewVar(env.PortaldTokens.MkdirAll())
-	appsDir := mem.NewVar(env.PortaldApps.MkdirAll())
-
-	m.ctx = ctx
 	m.mobile = api
-	m.TokensDir = tokensDir
-	m.NodeDir = astraldHomeDir
-	m.AppsDir = appsDir
+	m.ctx = context.Background()
+	m.Config.Astrald = filepath.Join(api.DataDir(), "astrald")
+	m.Config.Tokens = filepath.Join(api.DataDir(), "portald", "tokens")
+	m.Config.Apps = filepath.Join(api.DataDir(), "portald", "apps")
+	m.Config.AstralDB = api.DbDir()
 	m.Astrald = &astrald{
-		NodeRoot: astraldHomeDir,
-		DbRoot:   astraldDbDir,
+		NodeRoot: m.Config.Astrald,
+		DbRoot:   api.DbDir(),
 	}
-	m.CreateTokens = []string{
+	m.ExtraTokens = []string{
 		"portal.launcher",
 	}
 	m.Resolve = Any[App_](

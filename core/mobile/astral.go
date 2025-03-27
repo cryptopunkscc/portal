@@ -11,7 +11,6 @@ import (
 	"github.com/cryptopunkscc/astrald/mod/keys"
 	"github.com/cryptopunkscc/astrald/resources"
 	api "github.com/cryptopunkscc/portal/api/astrald"
-	"github.com/cryptopunkscc/portal/pkg/mem"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"gopkg.in/yaml.v3"
 	"os"
@@ -19,8 +18,8 @@ import (
 )
 
 type astrald struct {
-	NodeRoot mem.String
-	DbRoot   mem.String
+	NodeRoot string
+	DbRoot   string
 	Ghost    bool
 }
 
@@ -78,23 +77,23 @@ func setupResources(args *astrald) (r resources.Resources, err error) {
 		return m, nil
 	}
 
-	nodeRes, err := resources.NewFileResources(args.NodeRoot.Require(), true)
+	nodeRes, err := resources.NewFileResources(args.NodeRoot, true)
 	if err != nil {
 		return nil, err
 	}
 
-	if !args.DbRoot.IsZero() {
-		nodeRes.SetDatabaseRoot(args.DbRoot.Require())
+	if len(args.DbRoot) > 0 {
+		nodeRes.SetDatabaseRoot(args.DbRoot)
 	}
 
 	// make sure root directory exists
-	err = os.MkdirAll(args.NodeRoot.Require(), 0700)
+	err = os.MkdirAll(args.NodeRoot, 0700)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error creating node directory: %s\n", err)
 	}
 
 	// set directory for saving crash logs
-	debug.LogDir = args.NodeRoot.Require()
+	debug.LogDir = args.NodeRoot
 	defer debug.SaveLog(func(p any) {
 		debug.SigInt(p)
 		time.Sleep(time.Second) // give components time to exit cleanly

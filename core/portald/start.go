@@ -7,17 +7,13 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 )
 
-func (s *Service[T]) Run(ctx context.Context) (err error) {
-	if err = s.Start(ctx); err != nil {
-		return
-	}
-	return s.Wait()
-}
-
 func (s *Service[T]) Start(ctx context.Context) (err error) {
 	log := plog.Get(ctx).Type(s)
 	log.Println("starting portald...")
 	ctx, s.shutdown = context.WithCancel(ctx)
+	if err = s.Config.Build(); err != nil {
+		return
+	}
 	if err = s.startAstrald(ctx); err != nil {
 		return
 	}
@@ -31,10 +27,11 @@ func (s *Service[T]) Start(ctx context.Context) (err error) {
 func (s *Service[T]) startAstrald(ctx context.Context) (err error) {
 	r := astrald.Initializer{
 		AgentAlias: "portald",
-		NodeRoot:   s.NodeDir,
-		TokensDir:  s.TokensDir,
-		Apphost:    &s.Apphost,
+		NodeRoot:   s.Config.Astrald,
+		TokensDir:  s.Config.Tokens,
+		Config:     s.Config.Config,
 		Runner:     s.Astrald,
+		Apphost:    &s.Apphost,
 	}
 	return r.Start(ctx)
 }
@@ -61,7 +58,7 @@ func (s *Service[T]) startPortald(ctx context.Context) error {
 
 func (s *Service[T]) createTokens(log plog.Logger) {
 	tokens := s.Tokens()
-	for _, pkg := range s.CreateTokens {
+	for _, pkg := range s.ExtraTokens {
 		if _, err := tokens.Resolve(pkg); err != nil {
 			log.Println("cannot resolve token", err)
 		}

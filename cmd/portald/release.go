@@ -7,7 +7,6 @@ import (
 	"github.com/cryptopunkscc/portal/resolve/sources"
 	"github.com/cryptopunkscc/portal/runner/app"
 	"github.com/cryptopunkscc/portal/runner/exec"
-	"path/filepath"
 )
 
 func init() {
@@ -20,5 +19,3 @@ func init() {
 		}
 	}
 }
-
-func defaultAppsDir() string { return filepath.Join(defaultPortalDir(), "apps") }
