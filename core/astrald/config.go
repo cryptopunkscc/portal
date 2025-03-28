@@ -7,11 +7,7 @@ import (
 )
 
 func (i *Initializer) createConfigs() (err error) {
-	for name, config := range map[string]any{
-		"node":    i.Config.Node,
-		"apphost": i.Config.Apphost,
-		"ether":   i.Config.Ether,
-	} {
+	for name, config := range i.Config.Map() {
 		if err = i.writeIfNotExist(config, name+".yaml"); err != nil {
 			return
 		}

@@ -4,6 +4,7 @@ import (
 	"github.com/cryptopunkscc/astrald/core"
 	apphost "github.com/cryptopunkscc/astrald/mod/apphost/src"
 	ether "github.com/cryptopunkscc/astrald/mod/ether/src"
+	tcp "github.com/cryptopunkscc/astrald/mod/tcp/src"
 	"github.com/cryptopunkscc/portal/api/astrald"
 	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/pkg/config"
@@ -61,6 +62,9 @@ var baseConfig = Config{
 		},
 		Ether: ether.Config{
 			UDPPort: 8822,
+		},
+		TCP: tcp.Config{
+			ListenPort: 1791,
 		},
 	},
 }

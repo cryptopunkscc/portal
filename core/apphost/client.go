@@ -2,6 +2,7 @@ package apphost
 
 import (
 	"github.com/cryptopunkscc/astrald/lib/apphost"
+	"github.com/cryptopunkscc/portal/api/env"
 	"os"
 	"sync"
 )
@@ -32,7 +33,10 @@ func (c *Client) Reconnect() (err error) {
 
 func (c *Client) connect() (err error) {
 	if len(c.Endpoint) == 0 {
-		c.Endpoint = apphost.DefaultEndpoint
+		c.Endpoint = env.ApphostAddr.Get()
+		if len(c.Endpoint) == 0 {
+			c.Endpoint = apphost.DefaultEndpoint
+		}
 	}
 	if len(c.AuthToken) == 0 {
 		c.AuthToken = os.Getenv(apphost.AuthTokenEnv)
