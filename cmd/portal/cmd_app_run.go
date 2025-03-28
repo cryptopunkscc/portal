@@ -8,11 +8,11 @@ import (
 	"os"
 )
 
-func (a Application) runApp(ctx context.Context, opt *apphost.PortaldOpenOpt, cmd []string) (err error) {
+func (a *Application) runApp(ctx context.Context, opt *apphost.PortaldOpenOpt, cmd []string) (err error) {
 	log := plog.Get(ctx)
 	log.Println("running app", opt, cmd)
 
-	conn, err := a.Portal.Connect(opt, cmd...)
+	conn, err := a.portald().Connect(opt, cmd...)
 	if err != nil {
 		return
 	}

@@ -2,31 +2,30 @@ package main
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os/exec"
 	"time"
 )
 
-func startPortald(ctx context.Context, client apphost.Portald) (err error) {
-	if err = startPortaldProcess(ctx); err != nil {
+func (a *Application) startPortald(ctx context.Context) (err error) {
+	if err = a.startPortaldProcess(ctx); err != nil {
 		return
 	}
-	if err = awaitPortaldService(ctx, client); err != nil {
+	if err = a.awaitPortaldService(ctx); err != nil {
 		return
 	}
 	return
 }
 
-func startPortaldProcess(ctx context.Context) (err error) {
+func (a *Application) startPortaldProcess(ctx context.Context) (err error) {
 	plog.Get(ctx).Println("starting portald")
 	c := exec.Command("portald")
 	err = c.Start()
 	return
 }
 
-func awaitPortaldService(ctx context.Context, client apphost.Portald) (err error) {
+func (a *Application) awaitPortaldService(ctx context.Context) (err error) {
 	await := flow.Await{
 		UpTo:  5 * time.Second,
 		Delay: 50 * time.Millisecond,
@@ -34,7 +33,7 @@ func awaitPortaldService(ctx context.Context, client apphost.Portald) (err error
 		Ctx:   ctx,
 	}
 	for range await.Chan() {
-		if err = apphost.Default.Connect(); err == nil {
+		if err = a.Apphost.Connect(); err == nil {
 			break
 		}
 	}
@@ -42,7 +41,7 @@ func awaitPortaldService(ctx context.Context, client apphost.Portald) (err error
 		return
 	}
 	for range await.Chan() {
-		if err = client.Ping(); err == nil {
+		if err = a.portald().Ping(); err == nil {
 			break
 		}
 	}

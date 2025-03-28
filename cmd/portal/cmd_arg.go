@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func (a Application) Arg(ctx context.Context, runner *cli.Runner, arg string, cmd ...string) (err error) {
+func (a *Application) Arg(ctx context.Context, runner *cli.Runner, arg string, cmd ...string) (err error) {
 	if arg == "" {
 		return errors.New("empty arg")
 	}

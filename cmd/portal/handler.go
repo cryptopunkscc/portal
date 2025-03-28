@@ -5,7 +5,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/version"
 )
 
-func (a Application) Handler() (h cmd.Handler) {
+func (a *Application) Handler() (h cmd.Handler) {
 	h = cmd.Handler{
 		Name: "Portal CLI",
 		Desc: "Manage and run portal apps.",

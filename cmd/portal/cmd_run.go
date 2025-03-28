@@ -17,13 +17,15 @@ type Opt struct {
 	Order string `cli:"order"`
 }
 
-func (a Application) Run(ctx context.Context, opt Opt, cmd ...string) (err error) {
+func (a *Application) Run(ctx context.Context, opt Opt, cmd ...string) (err error) {
 	defer plog.TraceErr(&err)
+	if err = a.Configure(); err != nil {
+		return
+	}
 	opt.Open = opt.Open || opt.Query != ""
 	log := plog.Get(ctx).Type(a).Set(&ctx)
-	a.Portal.Logger(log)
-	if err = a.Portal.Ping(); err != nil {
-		if err = startPortald(ctx, a.Portal); err != nil {
+	if err = a.portald().Ping(); err != nil {
+		if err = a.startPortald(ctx); err != nil {
 			return
 		}
 	}

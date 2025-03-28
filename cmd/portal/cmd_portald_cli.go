@@ -2,18 +2,17 @@ package main
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 	"os"
 	"strings"
 )
 
-func (a Application) portaldCli(ctx context.Context, cmd ...string) (err error) {
+func (a *Application) portaldCli(ctx context.Context, cmd ...string) (err error) {
 	log := plog.Get(ctx)
 	log.Println("running portal cli")
 
-	conn, err := apphost.Default.Query("portald", "cli", nil)
+	conn, err := a.Apphost.Query("portald", "cli", nil)
 	if err != nil {
 		return
 	}

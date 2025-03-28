@@ -7,15 +7,22 @@ import (
 	"slices"
 )
 
-func (a Application) injectPortaldApi(handler *cmd.Handler) {
-	if api, err := a.Portal.Api(); err == nil {
+func (a *Application) portald() apphost.Portald {
+	return a.Apphost.Portald()
+}
+
+func (a *Application) injectPortaldApi(handler *cmd.Handler) {
+	if err := a.Configure(); err != nil {
+		return
+	}
+	if api, err := a.portald().Api(); err == nil {
 		a.setupFunctions(api)
 		handler.AddSub(api...)
 		fixHelp(handler)
 	}
 }
 
-func (a Application) setupFunctions(handlers cmd.Handlers) {
+func (a *Application) setupFunctions(handlers cmd.Handlers) {
 	for i, handler := range handlers {
 		name := handler.Names()[0]
 		if handler.Func == "portald" {

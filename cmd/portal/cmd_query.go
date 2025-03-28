@@ -2,17 +2,19 @@ package main
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 	"os"
+	"strings"
 )
 
-func (a Application) queryApp(ctx context.Context, query string) (err error) {
+func (a *Application) queryApp(ctx context.Context, query string) (err error) {
 	log := plog.Get(ctx)
 	log.Println("running query", query)
 
-	conn, err := apphost.Default.Query("portal", query, nil) //TODO fixme replace portal with app name
+	target := ""
+	target, query = splitQuery(query)
+	conn, err := a.Apphost.Query(target, query, nil)
 	if err != nil {
 		return
 	}
@@ -28,5 +30,12 @@ func (a Application) queryApp(ctx context.Context, query string) (err error) {
 		cancel()
 	}()
 	<-ctx.Done()
+	return
+}
+
+func splitQuery(targetQuery string) (target string, query string) {
+	chunks := strings.SplitN(targetQuery, ":", 2)
+	target = chunks[0]
+	query = chunks[1]
 	return
 }

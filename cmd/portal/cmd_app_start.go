@@ -6,8 +6,8 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
-func (a Application) startApp(ctx context.Context, opt *apphost.PortaldOpenOpt, cmd []string) (err error) {
+func (a *Application) startApp(ctx context.Context, opt *apphost.PortaldOpenOpt, cmd []string) (err error) {
 	log := plog.Get(ctx)
 	log.Println("starting app", cmd)
-	return a.Portal.Open(opt, cmd...)
+	return a.portald().Open(opt, cmd...)
 }
