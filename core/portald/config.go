@@ -28,11 +28,6 @@ type Dirs struct {
 	Bin      string `yaml:",omitempty"`
 }
 
-type AstraldConfigs struct {
-	Node    core.Config    `yaml:",omitempty"`
-	Apphost apphost.Config `yaml:",omitempty"`
-}
-
 var baseConfig = Config{
 	Dir: "./portal",
 	Dirs: Dirs{
@@ -142,8 +137,9 @@ func (c *Config) mkdirAll() (err error) {
 
 func (c *Config) Load(path ...string) (err error) {
 	l := config.Loader[*Config]{
-		Config:    c,
 		Unmarshal: yaml.Unmarshal,
+		Config:    c,
+		File:      DefaultConfigFile,
 	}
 	if err = l.Load(path...); err != nil {
 		return
@@ -164,4 +160,4 @@ func (c *Config) fixApphostAddress() {
 	}
 }
 
-const DefaultConfigFile = "portal.env.yml"
+const DefaultConfigFile = ".portal.env.yml"

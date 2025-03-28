@@ -6,3 +6,4 @@ dist
 !runner/build
 .idea/
 .test
+.portal
