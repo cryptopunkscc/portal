@@ -3,8 +3,8 @@ package portald
 import (
 	"github.com/cryptopunkscc/astrald/core"
 	apphost "github.com/cryptopunkscc/astrald/mod/apphost/src"
+	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/core/astrald"
-	"github.com/cryptopunkscc/portal/core/env"
 	"github.com/cryptopunkscc/portal/pkg/config"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"gopkg.in/yaml.v3"

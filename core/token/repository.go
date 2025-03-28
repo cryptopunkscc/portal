@@ -2,8 +2,8 @@ package token
 
 import (
 	mod "github.com/cryptopunkscc/astrald/mod/apphost"
+	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/core/apphost"
-	"github.com/cryptopunkscc/portal/core/env"
 	pkgOs "github.com/cryptopunkscc/portal/pkg/os"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"

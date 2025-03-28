@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/core/env"
+	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/core/portald"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/test"

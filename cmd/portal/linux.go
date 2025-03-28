@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/cryptopunkscc/portal/core/env"
+	"github.com/cryptopunkscc/portal/api/env"
 	"os"
 	"path/filepath"
 )

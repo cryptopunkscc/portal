@@ -1,8 +1,8 @@
 package core
 
 import (
+	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/api/mobile"
-	"github.com/cryptopunkscc/portal/core/env"
 	"github.com/cryptopunkscc/portal/test"
 	"log"
 	"testing"

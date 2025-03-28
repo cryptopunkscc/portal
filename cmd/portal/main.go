@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/core/apphost"
-	"github.com/cryptopunkscc/portal/core/env"
 	"github.com/cryptopunkscc/portal/core/token"
 	"github.com/cryptopunkscc/portal/runner/cli"
 )

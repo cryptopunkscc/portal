@@ -2,8 +2,8 @@ package exec
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/core/env"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/exec"
 	"github.com/cryptopunkscc/portal/resolve/path"
