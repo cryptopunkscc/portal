@@ -27,24 +27,12 @@ func (l logger) Copy() Logger {
 
 var Default = New()
 
-func Type(a any) Logger {
-	return Default.Type(a)
-}
-
-func Scope(format string, args ...any) Logger {
-	return Default.Scope(format, args...)
-}
-
-func P() Logger {
-	return Default.P()
-}
-func Println(a ...any) {
-	Default.Println(a...)
-}
-
-func Printf(format string, args ...any) {
-	Default.Printf(format, args...)
-}
+func P() Logger                               { return Default.P() }
+func D() Logger                               { return Default.D() }
+func Type(a any) Logger                       { return Default.Type(a) }
+func Scope(format string, args ...any) Logger { return Default.Scope(format, args...) }
+func Println(a ...any)                        { Default.Println(a...) }
+func Printf(format string, args ...any)       { Default.Printf(format, args...) }
 
 func New() Logger {
 	return logger{
