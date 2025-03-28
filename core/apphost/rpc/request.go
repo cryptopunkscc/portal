@@ -12,20 +12,12 @@ import (
 )
 
 func (r Rpc) Request(target string, query ...string) rpc.Conn {
-	return newRequest(r.Apphost, target, query)
-}
-
-func newRequest(client apphost.Client, target string, q []string) *rpcRequest {
 	return &rpcRequest{
-		Serializer: &stream.Serializer{
-			MarshalArgs: query.Marshal,
-			Marshal:     json.Marshal,
-			Unmarshal:   json.Unmarshal,
-			Ending:      []byte("\n"),
-		},
-		client: client,
-		target: target,
-		query:  q,
+		Serializer: newSerializer(),
+		logger:     r.Log,
+		client:     r.Apphost,
+		target:     target,
+		query:      query,
 	}
 }
 
@@ -38,17 +30,28 @@ type rpcRequest struct {
 	query    []string
 }
 
-func (r *rpcRequest) Logger(logger plog.Logger) {
-	r.logger = logger
+func (r *rpcRequest) Copy() rpc.Conn {
+	return &rpcRequest{
+		Serializer: newSerializer(),
+		client:     r.client,
+		target:     r.target,
+		query:      r.query,
+		targetID:   r.targetID,
+		logger:     r.logger,
+	}
 }
 
-func (r *rpcRequest) Copy() rpc.Conn {
-	rr := newRequest(r.client, r.target, r.query)
-	rr.targetID = r.targetID
-	if r.logger != nil {
-		rr.Logger(r.logger)
+func newSerializer() *stream.Serializer {
+	return &stream.Serializer{
+		MarshalArgs: query.Marshal,
+		Marshal:     json.Marshal,
+		Unmarshal:   json.Unmarshal,
+		Ending:      []byte("\n"),
 	}
-	return rr
+}
+
+func (r *rpcRequest) Logger(logger plog.Logger) {
+	r.logger = logger
 }
 
 func (r *rpcRequest) Flush() {

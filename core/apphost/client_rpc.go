@@ -5,5 +5,8 @@ import (
 )
 
 func (a *Adapter) Rpc() apphost.Rpc {
-	return apphost.Rpc{Apphost: a}
+	return apphost.Rpc{
+		Apphost: a,
+		Log:     a.Log,
+	}
 }

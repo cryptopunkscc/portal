@@ -16,7 +16,9 @@ func (r Rpc) Client(
 	if err != nil {
 		return
 	}
-	return rpcClient(conn), nil
+	s = rpcClient(conn)
+	s.Logger(r.Log)
+	return
 }
 
 func rpcClient(conn io.ReadWriteCloser) *stream.Client {

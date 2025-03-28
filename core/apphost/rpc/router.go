@@ -19,6 +19,7 @@ func (r Rpc) Router(handler cmd.Handler) *Router {
 			Unmarshal: query.Unmarshal,
 		},
 		apphost: r.Apphost,
+		Logger:  r.Log,
 	}
 	return rr
 }

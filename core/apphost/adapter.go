@@ -16,6 +16,7 @@ var Default = &Adapter{}
 
 type Adapter struct {
 	Client
+	Log        plog.Logger
 	identities sig.Map[string, *astral.Identity]
 }
 
