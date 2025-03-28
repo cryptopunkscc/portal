@@ -1,10 +1,6 @@
 package portal
 
 import (
-	"github.com/cryptopunkscc/astrald/core"
-	apphost "github.com/cryptopunkscc/astrald/mod/apphost/src"
-	ether "github.com/cryptopunkscc/astrald/mod/ether/src"
-	tcp "github.com/cryptopunkscc/astrald/mod/tcp/src"
 	"github.com/cryptopunkscc/portal/api/astrald"
 	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/pkg/config"
@@ -39,34 +35,7 @@ var baseConfig = Config{
 		Apps:     "apps",
 		Bin:      "bin",
 	},
-	Config: astrald.Config{
-		Node: core.Config{
-			Log: core.LogConfig{
-				Level:         100,
-				DisableColors: false,
-			},
-		},
-		Apphost: apphost.Config{
-			Workers: 32,
-			Listen: []string{
-				"tcp:127.0.0.1:8625",
-				"unix:~/.apphost.sock",
-				"memu:apphostu",
-				"memb:apphostb",
-			},
-			ObjectServer: apphost.ObjectServerConfig{
-				Bind: []string{
-					"tcp:127.0.0.1:8624",
-				},
-			},
-		},
-		Ether: ether.Config{
-			UDPPort: 8822,
-		},
-		TCP: tcp.Config{
-			ListenPort: 1791,
-		},
-	},
+	Config: astrald.DefaultConfig,
 }
 
 func (c *Config) dirs() []*string {

@@ -16,6 +16,35 @@ type Config struct {
 	TCP     tcp.Config     `yaml:",omitempty"`
 }
 
+var DefaultConfig = Config{
+	Node: core.Config{
+		Log: core.LogConfig{
+			Level:         100,
+			DisableColors: false,
+		},
+	},
+	Apphost: apphost.Config{
+		Workers: 32,
+		Listen: []string{
+			"tcp:127.0.0.1:8625",
+			"unix:~/.apphost.sock",
+			"memu:apphostu",
+			"memb:apphostb",
+		},
+		ObjectServer: apphost.ObjectServerConfig{
+			Bind: []string{
+				"tcp:127.0.0.1:8624",
+			},
+		},
+	},
+	Ether: ether.Config{
+		UDPPort: 8822,
+	},
+	TCP: tcp.Config{
+		ListenPort: 1791,
+	},
+}
+
 func (c Config) Map() (out map[string]any) {
 	out = map[string]any{}
 	v := reflect.ValueOf(c)
