@@ -3,6 +3,7 @@ package portal
 import (
 	"github.com/cryptopunkscc/astrald/core"
 	apphost "github.com/cryptopunkscc/astrald/mod/apphost/src"
+	ether "github.com/cryptopunkscc/astrald/mod/ether/src"
 	"github.com/cryptopunkscc/portal/api/astrald"
 	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/pkg/config"
@@ -57,6 +58,9 @@ var baseConfig = Config{
 					"tcp:127.0.0.1:8624",
 				},
 			},
+		},
+		Ether: ether.Config{
+			UDPPort: 8822,
 		},
 	},
 }
