@@ -7,6 +7,7 @@ import (
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/core/token"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/install"
 	"sync"
@@ -29,8 +30,10 @@ type Service[T Portal_] struct {
 	Order   []int
 }
 
-func (s *Service[T]) Configure() error {
-	return s.Config.build()
+func (s *Service[T]) Configure() (err error) {
+	err = s.Config.build()
+	plog.D().Printf("config:\n%s", s.Config.Yaml())
+	return
 }
 
 func (s *Service[T]) Stop() {

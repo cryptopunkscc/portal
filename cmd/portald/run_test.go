@@ -8,6 +8,8 @@ import (
 	"github.com/cryptopunkscc/portal/test"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v3"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 )
@@ -26,11 +28,11 @@ func TestApplication_loadConfig_custom(t *testing.T) {
 	c.Dir = dir
 	c.Node.Log.Level = 100
 	c.Apphost.Listen = []string{"tcp:127.0.0.1:8635"}
-	if err := c.Save(dir); err != nil {
+	if err := writeConfig(c, dir, portald.DefaultConfigFile); err != nil {
 		plog.P().Println(err)
 	}
 
-	args := &RunArgs{ConfigPath: dir}
+	args := RunArgs{ConfigPath: dir}
 	err := application.loadConfig(args)
 	if err != nil {
 		plog.P().Println(err)
@@ -39,7 +41,7 @@ func TestApplication_loadConfig_custom(t *testing.T) {
 }
 
 func TestApplication_loadConfig_platformDefault(t *testing.T) {
-	if err := application.loadConfig(nil); err != nil {
+	if err := application.loadConfig(RunArgs{}); err != nil {
 		plog.P().Println(err)
 	}
 	if err := application.Configure(); err != nil {
@@ -58,7 +60,7 @@ func TestApplication_start(t *testing.T) {
 	c.Dir = dir
 	c.Node.Log.Level = 100
 	c.Apphost.Listen = []string{"tcp:127.0.0.1:8635"}
-	if err := c.Save(dir); err != nil {
+	if err := writeConfig(c, dir, portald.DefaultConfigFile); err != nil {
 		plog.P().Println(err)
 	}
 
@@ -67,7 +69,7 @@ func TestApplication_start(t *testing.T) {
 		cancel()
 		time.Sleep(10 * time.Millisecond) // give a time to kill astrald process
 	})
-	args := &RunArgs{ConfigPath: dir}
+	args := RunArgs{ConfigPath: dir}
 	err := application.start(ctx, args)
 	if err != nil {
 		plog.P().Println(err)
@@ -86,4 +88,17 @@ func unsetEnv() {
 	} {
 		key.Unset()
 	}
+}
+
+func writeConfig(c portald.Config, path ...string) (err error) {
+	defer plog.TraceErr(&err)
+	p := filepath.Join(path...)
+	bytes, err := yaml.Marshal(c)
+	if err != nil {
+		return
+	}
+	if err = os.WriteFile(p, bytes, 0644); err != nil {
+		return
+	}
+	return
 }

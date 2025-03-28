@@ -77,6 +77,14 @@ func (c *Config) dirs() []*string {
 	}
 }
 
+func (c *Config) Yaml() (s string) {
+	bytes, err := yaml.Marshal(c)
+	if err != nil {
+		panic(err)
+	}
+	return string(bytes)
+}
+
 func (c *Config) build() (err error) {
 	envConfig := Config{}
 	envConfig.readEnvVars()
@@ -133,37 +141,18 @@ func (c *Config) mkdirAll() (err error) {
 }
 
 func (c *Config) Load(path ...string) (err error) {
-	defer plog.TraceErr(&err)
-	p, err := getPortalConfigPath(path...)
-	if err != nil {
+	l := config.Loader[*Config]{
+		Config:    c,
+		Unmarshal: yaml.Unmarshal,
+	}
+	if err = l.Load(path...); err != nil {
 		return
 	}
-	bytes, err := os.ReadFile(p)
-	if err != nil {
-		return
-	}
-	if err = yaml.Unmarshal(bytes, c); err != nil {
-		return
+	if filepath.IsLocal(c.Dir) {
+		c.Dir = filepath.Join(l.Dir, c.Dir)
 	}
 	return
 }
-
-func (c *Config) Save(path ...string) (err error) {
-	defer plog.TraceErr(&err)
-	p, err := getPortalConfigPath(path...)
-	if err != nil {
-		return
-	}
-	bytes, err := yaml.Marshal(c)
-	if err != nil {
-		return
-	}
-	if err = os.WriteFile(p, bytes, 0644); err != nil {
-		return
-	}
-	return
-}
-
 func (c *Config) fixApphostAddress() {
 	if len(c.ApphostAddr) > 0 {
 		c.Apphost.Listen = slices.DeleteFunc(c.Apphost.Listen, func(s string) bool { return s == c.ApphostAddr })
@@ -173,30 +162,6 @@ func (c *Config) fixApphostAddress() {
 	if len(c.Apphost.Listen) > 0 {
 		c.ApphostAddr = c.Apphost.Listen[0]
 	}
-}
-
-func getPortalConfigPath(path ...string) (p string, err error) {
-	p = filepath.Join(path...)
-	if len(p) == 0 {
-		p = DefaultConfigFile
-	} else {
-		ok := false
-		if ok, err = isDir(p); err != nil {
-			return
-		}
-		if ok {
-			p = filepath.Join(p, DefaultConfigFile)
-		}
-	}
-	return
-}
-
-func isDir(path string) (bool, error) {
-	info, err := os.Stat(path)
-	if err != nil {
-		return false, err
-	}
-	return info.IsDir(), nil
 }
 
 const DefaultConfigFile = "portal.env.yml"

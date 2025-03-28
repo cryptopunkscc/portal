@@ -4,7 +4,6 @@ import (
 	"github.com/cryptopunkscc/portal/core/env"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/test"
-	"gopkg.in/yaml.v3"
 	"testing"
 )
 
@@ -23,9 +22,5 @@ func TestConfig_Build(t *testing.T) {
 		plog.Println(err)
 		return
 	}
-	bytes, err := yaml.Marshal(c)
-	if err != nil {
-		t.Error(err)
-	}
-	println(string(bytes))
+	println(c.Yaml())
 }
