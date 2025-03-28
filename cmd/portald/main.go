@@ -31,8 +31,10 @@ func main() {
 }
 
 func init() {
-	env.AstraldHome.Default(defaultAstraldHome)
 	env.PortaldHome.Default(defaultPortalHome)
+	env.AstraldHome.Default(defaultAstraldHome)
+	env.AstraldDb.Default(defaultAstraldHome)
 }
 
+func defaultPortalHome() string  { return filepath.Join(userConfigDir(), "portald") }
 func defaultAstraldHome() string { return filepath.Join(userConfigDir(), "astrald") }
