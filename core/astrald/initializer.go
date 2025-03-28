@@ -14,9 +14,9 @@ type Initializer struct {
 	AgentAlias string
 	NodeRoot   string
 	TokensDir  string
-	Config     Config
-	Apphost    *apphost.Adapter
+	Config     astrald.Config
 	Runner     astrald.Runner
+	Apphost    *apphost.Adapter
 
 	log            plog.Logger
 	resources      resources.FileResources

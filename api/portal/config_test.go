@@ -1,4 +1,4 @@
-package portald
+package portal
 
 import (
 	"github.com/cryptopunkscc/portal/api/env"
@@ -17,7 +17,7 @@ func TestConfig_Build(t *testing.T) {
 	c.Dir = test.Dir(t, ".test", "portal")
 	c.Apps = "argapps"
 	c.ApphostAddr = "localhost"
-	err := c.build()
+	err := c.Build()
 	if err != nil {
 		plog.Println(err)
 		return

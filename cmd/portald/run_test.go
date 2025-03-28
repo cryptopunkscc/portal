@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/env"
-	"github.com/cryptopunkscc/portal/core/portald"
+	"github.com/cryptopunkscc/portal/api/portal"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/test"
 	"github.com/stretchr/testify/assert"
@@ -24,11 +24,11 @@ func TestApplication_loadConfig_custom(t *testing.T) {
 	dir := test.Dir(t)
 	test.Clean(dir)
 	dir = test.Mkdir(t)
-	c := portald.Config{}
+	c := portal.Config{}
 	c.Dir = dir
 	c.Node.Log.Level = 100
 	c.Apphost.Listen = []string{"tcp:127.0.0.1:8635"}
-	if err := writeConfig(c, dir, portald.DefaultConfigFile); err != nil {
+	if err := writeConfig(c, dir, portal.DefaultConfigFile); err != nil {
 		plog.P().Println(err)
 	}
 
@@ -56,11 +56,11 @@ func TestApplication_loadConfig_platformDefault(t *testing.T) {
 
 func TestApplication_start(t *testing.T) {
 	dir := test.Mkdir(t)
-	c := portald.Config{}
+	c := portal.Config{}
 	c.Dir = dir
 	c.Node.Log.Level = 100
 	c.Apphost.Listen = []string{"tcp:127.0.0.1:8635"}
-	if err := writeConfig(c, dir, portald.DefaultConfigFile); err != nil {
+	if err := writeConfig(c, dir, portal.DefaultConfigFile); err != nil {
 		plog.P().Println(err)
 	}
 
@@ -90,7 +90,7 @@ func unsetEnv() {
 	}
 }
 
-func writeConfig(c portald.Config, path ...string) (err error) {
+func writeConfig(c portal.Config, path ...string) (err error) {
 	defer plog.TraceErr(&err)
 	p := filepath.Join(path...)
 	bytes, err := yaml.Marshal(c)

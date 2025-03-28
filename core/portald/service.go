@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/cryptopunkscc/astrald/sig"
 	"github.com/cryptopunkscc/portal/api/astrald"
+	"github.com/cryptopunkscc/portal/api/portal"
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/core/token"
@@ -19,7 +20,7 @@ type Service[T Portal_] struct {
 	processes sig.Map[string, T]
 	shutdown  context.CancelFunc
 
-	Config      Config
+	Config      portal.Config
 	ExtraTokens []string
 
 	Apphost apphost.Adapter
@@ -31,7 +32,7 @@ type Service[T Portal_] struct {
 }
 
 func (s *Service[T]) Configure() (err error) {
-	err = s.Config.build()
+	err = s.Config.Build()
 	plog.D().Printf("config:\n%s", s.Config.Yaml())
 	return
 }

@@ -1,10 +1,10 @@
-package portald
+package portal
 
 import (
 	"github.com/cryptopunkscc/astrald/core"
 	apphost "github.com/cryptopunkscc/astrald/mod/apphost/src"
+	"github.com/cryptopunkscc/portal/api/astrald"
 	"github.com/cryptopunkscc/portal/api/env"
-	"github.com/cryptopunkscc/portal/core/astrald"
 	"github.com/cryptopunkscc/portal/pkg/config"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"gopkg.in/yaml.v3"
@@ -80,7 +80,7 @@ func (c *Config) Yaml() (s string) {
 	return string(bytes)
 }
 
-func (c *Config) build() (err error) {
+func (c *Config) Build() (err error) {
 	envConfig := Config{}
 	envConfig.readEnvVars()
 	config.Merge(c, &envConfig, &baseConfig)

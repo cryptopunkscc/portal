@@ -1,17 +1,10 @@
 package astrald
 
 import (
-	"github.com/cryptopunkscc/astrald/core"
-	apphost "github.com/cryptopunkscc/astrald/mod/apphost/src"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"
 	"path/filepath"
 )
-
-type Config struct {
-	Node    core.Config    `yaml:",omitempty"`
-	Apphost apphost.Config `yaml:",omitempty"`
-}
 
 func (i *Initializer) createConfigs() (err error) {
 	for name, config := range map[string]any{
