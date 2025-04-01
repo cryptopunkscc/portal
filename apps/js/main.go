@@ -17,7 +17,7 @@ type Application struct{}
 
 func (a Application) Handler() cmd.Handler {
 	return cmd.Handler{
-		Func: open.Runner[AppJs](&a),
+		Func: open.NewRun[AppJs](&a),
 		Name: "js",
 		Desc: "Start portal app in goja runner.",
 		Params: cmd.Params{

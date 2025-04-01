@@ -20,7 +20,7 @@ type Application[T ProjectGo] struct{}
 
 func (a Application[T]) handler() cmd.Handler {
 	return cmd.Handler{
-		Func: open.Runner[T](a),
+		Func: open.NewRun[T](a),
 		Name: "dev-go",
 		Desc: "Start portal golang app development.",
 		Params: cmd.Params{

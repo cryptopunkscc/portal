@@ -19,7 +19,7 @@ type Application[T AppExec] struct{}
 
 func (a Application[T]) handler() cmd.Handler {
 	return cmd.Handler{
-		Func: open.Runner[T](&a),
+		Func: open.NewRun[T](&a),
 		Name: "dev-exec",
 		Desc: "Portal development runner for executables.",
 		Params: cmd.Params{

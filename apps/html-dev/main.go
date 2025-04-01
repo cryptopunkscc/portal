@@ -22,7 +22,7 @@ type Application[T PortalHtml] struct{}
 
 func (a Application[T]) handler() cmd.Handler {
 	return cmd.Handler{
-		Func: open.Runner[T](&a),
+		Func: open.NewRun[T](&a),
 		Name: "dev-html",
 		Desc: "Start html app development in wails runner.",
 		Params: cmd.Params{

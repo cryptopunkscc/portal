@@ -22,7 +22,7 @@ func ReRunner(newCore bind.NewCore) target.ReRunner[target.AppHtml] {
 	return &reRunner{newCore: newCore}
 }
 
-func Runner(newCore bind.NewCore) target.Run[target.AppHtml] {
+func NewRun(newCore bind.NewCore) target.Run[target.AppHtml] {
 	return ReRunner(newCore).Run
 }
 

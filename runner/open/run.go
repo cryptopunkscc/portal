@@ -13,7 +13,7 @@ type Deps[T target.Portal_] interface {
 	Runner() target.Run[T]
 }
 
-func Runner[T target.Portal_](deps Deps[T]) target.Run[string] {
+func NewRun[T target.Portal_](deps Deps[T]) target.Run[string] {
 	resolve := deps.Resolver()
 	run := deps.Runner()
 	return func(ctx context.Context, path string, args ...string) (err error) {
