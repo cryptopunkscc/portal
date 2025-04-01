@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/cryptopunkscc/portal"
+	"github.com/cryptopunkscc/portal/api"
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	"log"
 	"os"
@@ -13,7 +13,7 @@ func installAstral() {
 		_ = exec.Run(".", "astrald", "-v")
 		return
 	}
-	astrald := "github.com/cryptopunkscc/astrald/cmd/astrald@" + portal.AstralVersion
+	astrald := "github.com/cryptopunkscc/astrald/cmd/astrald@" + api.AstralVersion
 	log.Println("Installing", astrald)
 	if err := exec.Run(".", "go", "install", astrald); err != nil {
 		log.Fatalln("cannot install astrald:", err)
@@ -30,7 +30,7 @@ func buildAstral() {
 	if err != nil {
 		log.Fatalln("cannot resolve home dir:", err)
 	}
-	astrald := "github.com/cryptopunkscc/astrald@" + portal.AstralVersion
+	astrald := "github.com/cryptopunkscc/astrald@" + api.AstralVersion
 	astrald = filepath.Join(home, "go/pkg/mod", astrald)
 	out := filepath.Join(wd, "cmd/portal-installer/bin/")
 
@@ -50,7 +50,7 @@ func buildAnc() {
 	if err != nil {
 		log.Fatalln("cannot resolve home dir:", err)
 	}
-	astrald := "github.com/cryptopunkscc/astrald@" + portal.AstralVersion
+	astrald := "github.com/cryptopunkscc/astrald@" + api.AstralVersion
 	astrald = filepath.Join(home, "go/pkg/mod", astrald)
 	out := filepath.Join(wd, "cmd/portal-installer/bin/")
 

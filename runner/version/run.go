@@ -2,7 +2,7 @@ package version
 
 import (
 	_ "embed"
-	"github.com/cryptopunkscc/portal"
+	"github.com/cryptopunkscc/portal/api"
 	"github.com/cryptopunkscc/portal/pkg/git"
 	"github.com/cryptopunkscc/portal/pkg/vcs"
 	"strings"
@@ -27,7 +27,7 @@ func Resolve() (version string) {
 }
 
 func goModuleVersion() (version string) {
-	version = portal.Version
+	version = api.Version
 	if hash, err := git.TimestampHash(); err == nil {
 		version += "-" + hash
 	}
