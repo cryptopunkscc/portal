@@ -46,6 +46,6 @@ func (s *Service[T]) Open() Run[apphost.PortaldOpenOpt] {
 				&s.processes,
 				multi.Runner[T](s.Runners(schemaPrefix)...),
 			),
-		).Call(ctx, src, args...)
+		).Run(ctx, src, args...)
 	}
 }

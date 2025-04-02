@@ -7,7 +7,7 @@ import (
 
 type Run[T any] func(ctx context.Context, src T, args ...string) (err error)
 
-func (r Run[T]) Call(ctx context.Context, src T, args ...string) (err error) {
+func (r Run[T]) Run(ctx context.Context, src T, args ...string) (err error) {
 	return r(ctx, src, args...)
 }
 
