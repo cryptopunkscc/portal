@@ -22,8 +22,8 @@ func ReRunner(newCore bind.NewCore, send target.MsgSend) target.ReRunner[target.
 	}
 }
 
-func (r *reRunner) ReRun() (err error) {
-	return r.inner.ReRun()
+func (r *reRunner) Reload() (err error) {
+	return r.inner.Reload()
 }
 
 func (r *reRunner) Run(ctx context.Context, dist target.DistHtml, args ...string) (err error) {
@@ -38,7 +38,7 @@ func (r *reRunner) Run(ctx context.Context, dist target.DistHtml, args ...string
 			if err := r.send(target.NewMsg(pkg, target.DevChanged)); err != nil {
 				log.F().Println(err)
 			}
-			err = r.inner.ReRun()
+			err = r.inner.Reload()
 			if err := r.send(target.NewMsg(pkg, target.DevRefreshed)); err != nil {
 				log.F().Println(err)
 			}

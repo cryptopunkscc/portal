@@ -19,7 +19,7 @@ func newClient() (sender *client) {
 	return
 }
 
-func (s *client) Init(reRun ReRun, cache api.Cache) *client {
+func (s *client) Init(reRun Reload, cache api.Cache) *client {
 	s.handler = newHandler(reRun, cache)
 	return s
 }

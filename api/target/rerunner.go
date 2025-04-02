@@ -4,7 +4,7 @@ import "context"
 
 type ReRunner[T any] interface {
 	Run(ctx context.Context, src T, args ...string) (err error)
-	ReRun() error
+	Reload() error
 }
 
 func (r Run[T]) ReRunner() ReRunner[T] {
@@ -23,14 +23,14 @@ func (r reRunner[T]) Run(ctx context.Context, src T, args ...string) (err error)
 	r.ctx = ctx
 	r.src = src
 	r.args = args
-	return r.ReRun()
+	return r.Reload()
 }
 
-func (r reRunner[T]) ReRun() error {
+func (r reRunner[T]) Reload() error {
 	if r.cancel != nil {
 		r.cancel()
 	}
 	var ctx context.Context
-	ctx, r.cancel = context.WithCancel(context.Background())
+	ctx, r.cancel = context.WithCancel(r.ctx)
 	return r.run(ctx, r.src, r.args...)
 }

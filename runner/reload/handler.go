@@ -11,19 +11,19 @@ import (
 )
 
 type handler struct {
-	reRun   ReRun
+	reload  Reload
 	cache   apphost.Cache
 	changes mem.Cache[time.Time]
 }
 
-type ReRun func() error
+type Reload func() error
 
 func newHandler(
-	reRun ReRun,
+	reload Reload,
 	cache apphost.Cache,
 ) *handler {
 	return &handler{
-		reRun:   reRun,
+		reload:  reload,
 		cache:   cache,
 		changes: mem.NewCache[time.Time](),
 	}
@@ -49,7 +49,7 @@ func (s *handler) HandleMsg(ctx context.Context, msg target.Msg) {
 			return
 		}
 		log.Println("reloading")
-		if err := s.reRun(); err != nil {
+		if err := s.reload(); err != nil {
 			log.F().Println(err)
 		}
 	}

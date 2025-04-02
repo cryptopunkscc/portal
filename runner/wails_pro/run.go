@@ -106,7 +106,7 @@ func (r *reRunner) Run(ctx context.Context, projectHtml target.ProjectHtml, args
 	return
 }
 
-func (r *reRunner) ReRun() (err error) {
+func (r *reRunner) Reload() (err error) {
 	if r.frontCtx == nil {
 		return errors.New("nil context")
 	}

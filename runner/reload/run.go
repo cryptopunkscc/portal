@@ -33,13 +33,13 @@ func runner[T target.Portal_](
 			return target.ErrNotTarget
 		}
 
-		var reRun ReRun
+		var reload Reload
 		client := newClient()
 		sendMsg := client.Send
 		newCore := func(ctx context.Context, portal target.Portal_) (bind.Core, context.Context) {
 			core, ctx := newCore(ctx, portal)
 			if core != nil {
-				client.Init(reRun, core)
+				client.Init(reload, core)
 			}
 			if err = client.Connect(ctx, t); err != nil {
 				plog.Get(ctx).Scope("ReRunner").E().Println(err)
@@ -47,7 +47,7 @@ func runner[T target.Portal_](
 			return core, ctx
 		}
 		_runner := newReRunner(newCore, sendMsg)
-		reRun = _runner.ReRun
+		reload = _runner.Reload
 		return _runner.Run(ctx, t, args...)
 	}
 }

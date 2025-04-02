@@ -25,6 +25,6 @@ func (a adapter[T]) Run(ctx context.Context, src T, args ...string) (err error) 
 	return a.inner.Run(ctx, src, args...)
 }
 
-func (a adapter[T]) ReRun() error {
-	return a.inner.ReRun()
+func (a adapter[T]) Reload() error {
+	return a.inner.Reload()
 }

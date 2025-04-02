@@ -24,8 +24,8 @@ func NewRunner(newCore bind.NewCore, send target.MsgSend) target.ReRunner[target
 	return &runner{distRunner: distRunner}
 }
 
-func (r *runner) ReRun() (err error) {
-	return r.distRunner.ReRun()
+func (r *runner) Reload() (err error) {
+	return r.distRunner.Reload()
 }
 
 func (r *runner) Run(ctx context.Context, projectJs target.ProjectJs, args ...string) (err error) {

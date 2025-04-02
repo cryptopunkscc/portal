@@ -46,7 +46,7 @@ func ReRunner(
 	}
 }
 
-func (r *runner) ReRun() (err error) {
+func (r *runner) Reload() (err error) {
 	if r.cancel != nil {
 		r.cancel()
 	}
@@ -74,7 +74,7 @@ func (r *runner) Run(ctx context.Context, project target.ProjectGo, args ...stri
 	}
 	r.dist = project.Dist()
 
-	if err = r.ReRun(); err != nil {
+	if err = r.Reload(); err != nil {
 		return
 	}
 
@@ -89,7 +89,7 @@ func (r *runner) Run(ctx context.Context, project target.ProjectGo, args ...stri
 			log.E().Println(err)
 		}
 		if err = build(ctx, project); err == nil {
-			if err = r.ReRun(); err != nil {
+			if err = r.Reload(); err != nil {
 				log.E().Println(err)
 			}
 		}

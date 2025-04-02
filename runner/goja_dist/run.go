@@ -22,7 +22,7 @@ func NewRunner(newCore bind.NewCore, send target.MsgSend) target.ReRunner[target
 	return &Runner{newCore: newCore, send: send}
 }
 
-func (r *Runner) ReRun() (err error) {
+func (r *Runner) Reload() (err error) {
 	return r.backend.RunFs(r.dist.FS())
 }
 
@@ -38,7 +38,7 @@ func (r *Runner) Run(ctx context.Context, dist target.DistJs, args ...string) (e
 	core, ctx := r.newCore(ctx, dist)
 	r.backend = goja.NewBackend(core)
 	r.dist = dist
-	if err = r.ReRun(); err != nil {
+	if err = r.Reload(); err != nil {
 		log.E().Println(err.Error())
 	}
 	pkg := dist.Manifest().Package
@@ -46,7 +46,7 @@ func (r *Runner) Run(ctx context.Context, dist target.DistJs, args ...string) (e
 		if err := r.send(target.NewMsg(pkg, target.DevChanged)); err != nil {
 			log.E().Println(err)
 		}
-		if err := r.ReRun(); err != nil {
+		if err := r.Reload(); err != nil {
 			log.E().Println(err.Error())
 		}
 		// TODO find better solution then sleep

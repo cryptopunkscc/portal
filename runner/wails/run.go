@@ -26,7 +26,7 @@ func NewRun(newCore bind.NewCore) target.Run[target.AppHtml] {
 	return ReRunner(newCore).Run
 }
 
-func (r *reRunner) ReRun() (err error) {
+func (r *reRunner) Reload() (err error) {
 	if r.frontCtx == nil {
 		return plog.Errorf("nil context")
 	}
