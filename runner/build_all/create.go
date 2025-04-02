@@ -19,13 +19,13 @@ func NewRunner() *build.Runner {
 	return build.NewRunner(
 		clean.Runner(),
 		multi.Runner[target.Project_](
-			go_build.Runner().Portal,
+			go_build.Runner().Portal(),
 			npm_build.Runner(
 				target.Any[target.NodeModule](
 					target.Skip("node_modules"),
 					target.Try(npm.Resolve)).
 					List(source.Embed(js.PortalLibFS))...,
-			).Portal,
+			).Portal(),
 		),
 		pack.Run,
 	)

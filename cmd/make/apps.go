@@ -28,8 +28,8 @@ func (d *Install) buildEmbedApps(platforms ...string) {
 	feat := build.NewRunner(
 		clean.Runner(),
 		multi.Runner[target.Project_](
-			go_build.Runner(platforms...).Portal,
-			npm_build.Runner(jsLibs...).Portal,
+			go_build.Runner(platforms...).Portal(),
+			npm_build.Runner(jsLibs...).Portal(),
 		),
 		pack.Run,
 	)

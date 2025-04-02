@@ -33,8 +33,8 @@ func Run() error {
 	feat := build.NewRunner(
 		clean.Runner(),
 		multi.Runner[target.Project_](
-			go_build.Runner( /*TODO*/ ).Portal,
-			npm_build.Runner(jsLibs...).Portal,
+			go_build.Runner( /*TODO*/ ).Portal(),
+			npm_build.Runner(jsLibs...).Portal(),
 		),
 		pack.Run,
 	)
