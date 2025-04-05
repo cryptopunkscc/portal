@@ -18,7 +18,7 @@ var Run = NewRunner().Run
 func NewRunner() *build.Runner {
 	return build.NewRunner(
 		clean.Runner(),
-		multi.Runner[target.Project_](
+		multi.NewRun[target.Project_](
 			go_build.Runner().Portal(),
 			npm_build.Runner(
 				target.Any[target.NodeModule](

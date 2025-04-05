@@ -31,7 +31,7 @@ func (s *Service[T]) Open() Run[apphost.PortaldOpenOpt] {
 			opt.Order = s.Order
 		}
 
-		return find.Runner[T](
+		return find.NewRun[T](
 			FindByPath(source.File, s.Resolve).
 				OrById(path.Resolver(s.Resolve, s.apps())).
 				Cached(&s.cache).
@@ -41,10 +41,10 @@ func (s *Service[T]) Open() Run[apphost.PortaldOpenOpt] {
 					Match[Project_]}.
 					Sort(opt.Order)...),
 
-			supervisor.Runner[T](
+			supervisor.NewRun[T](
 				&s.waitGroup,
 				&s.processes,
-				multi.Runner[T](s.Runners(schemaPrefix)...),
+				multi.NewRun[T](s.Runners(schemaPrefix)...),
 			),
 		).Run(ctx, src, args...)
 	}

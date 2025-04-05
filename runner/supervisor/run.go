@@ -8,7 +8,7 @@ import (
 	"sync"
 )
 
-func Runner[T target.Portal_](
+func NewRun[T target.Portal_](
 	wait *sync.WaitGroup,
 	processes *sig.Map[string, T],
 	run target.Run[T],

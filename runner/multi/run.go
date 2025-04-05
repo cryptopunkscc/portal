@@ -12,7 +12,7 @@ type runner[T target.Portal_] struct {
 	runners []target.Run[target.Portal_]
 }
 
-func Runner[T target.Portal_](
+func NewRun[T target.Portal_](
 	runners ...target.Run[target.Portal_],
 ) target.Run[T] {
 	return runner[T]{runners: runners}.Run

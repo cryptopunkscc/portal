@@ -7,7 +7,7 @@ import (
 	"sync"
 )
 
-func Runner[T target.Portal_](find target.Find[T], run target.Run[T]) target.Run[string] {
+func NewRun[T target.Portal_](find target.Find[T], run target.Run[T]) target.Run[string] {
 	return func(ctx context.Context, src string, args ...string) (err error) {
 		log := plog.Get(ctx)
 		log.D().Printf("src: %s, args: %v", src, args)
