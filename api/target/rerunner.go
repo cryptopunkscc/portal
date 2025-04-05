@@ -3,8 +3,8 @@ package target
 import "context"
 
 type ReRunner[T any] interface {
-	Run(ctx context.Context, src T, args ...string) (err error)
-	Reload() error
+	Runner[T]
+	Reloader[T]
 }
 
 func (r Run[T]) ReRunner() ReRunner[T] {

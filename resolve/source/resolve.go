@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 )
 
-type source struct {
+type Source struct {
 	scheme   string
 	external string
 	internal string
@@ -19,11 +19,11 @@ type source struct {
 	isFile   bool
 }
 
-func (s *source) IsDir() bool       { return !s.isFile }
-func (s *source) Abs() (abs string) { return s.join(s.external, s.internal) }
-func (s *source) Path() string      { return s.internal }
-func (s *source) FS() fs.FS         { return s.files }
-func (s *source) Sub(src string) (t target.Source, err error) {
+func (s *Source) IsDir() bool       { return !s.isFile }
+func (s *Source) Abs() (abs string) { return s.join(s.external, s.internal) }
+func (s *Source) Path() string      { return s.internal }
+func (s *Source) FS() fs.FS         { return s.files }
+func (s *Source) Sub(src string) (t target.Source, err error) {
 	if s.isFile {
 		return nil, errors.New("cannot sub file")
 	}
@@ -47,12 +47,12 @@ func (s *source) Sub(src string) (t target.Source, err error) {
 	return
 }
 
-func (s *source) File() (fs.File, error) {
+func (s *Source) File() (fs.File, error) {
 	return s.FS().Open(s.Path())
 }
 
-func Embed(files embed.FS) target.Source {
-	return &source{
+func Embed(files embed.FS) *Source {
+	return &Source{
 		scheme:   "embed",
 		files:    files,
 		internal: ".",
@@ -60,9 +60,9 @@ func Embed(files embed.FS) target.Source {
 	}
 }
 
-func FS(files fs.FS, abs string) target.Source {
-	return &source{
-		scheme:   "files",
+func FS(files fs.FS, abs string) *Source {
+	return &Source{
+		scheme:   "file",
 		external: abs,
 		internal: ".",
 		files:    files,
@@ -70,17 +70,15 @@ func FS(files fs.FS, abs string) target.Source {
 	}
 }
 
-func Dir(abs string) target.Source {
+func Dir(path ...string) *Source {
+	abs := target.Abs(path...)
 	return FS(os.DirFS(abs), abs)
 }
 
 func File(path ...string) (t target.Source, err error) {
-	abs := target.Abs(filepath.Join(path...))
-	abs, file := filepath.Split(abs)
-	tt := FS(os.DirFS(abs), abs)
-	if file != "" {
-		tt, err = tt.Sub(file)
+	abs, file := filepath.Split(target.Abs(path...))
+	if t = Dir(abs); len(file) > 0 {
+		t, err = t.Sub(file)
 	}
-	t = tt
 	return
 }

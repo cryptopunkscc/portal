@@ -5,7 +5,8 @@ import (
 	"path/filepath"
 )
 
-func Abs(src string) string {
+func Abs(path ...string) string {
+	src := filepath.Join(path...)
 	if filepath.IsAbs(src) {
 		return src
 	}
