@@ -27,7 +27,7 @@ func (i Invoker) Query(target string, method string, args any) (conn apphost.Con
 	}
 
 	await := flow.Await{
-		UpTo: 8 * time.Millisecond,
+		UpTo: 8 * time.Second,
 		Mod:  8,
 		Ctx:  i.Ctx,
 	}

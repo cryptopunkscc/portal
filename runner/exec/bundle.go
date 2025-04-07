@@ -8,24 +8,30 @@ import (
 	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/resolve/exec"
 	"io"
 	"os"
 	"path/filepath"
 )
 
-func BundleRunner() target.Run[target.BundleExec] {
-	return func(ctx context.Context, bundle target.BundleExec, args ...string) (err error) {
-		execFile, err := unpackExecutable(bundle)
-		if err != nil {
-			return
-		}
+var BundleRunner = target.SourceRunner[target.BundleExec]{
+	Resolve: target.Any[target.BundleExec](target.Try(exec.ResolveBundle)),
+	Runner:  Bundle,
+}
 
-		err = Cmd{}.RunApp(ctx, *bundle.Manifest(), execFile.Name(), args...)
-		if err != nil {
-			return
-		}
+var Bundle target.Run[target.BundleExec] = runBundle
+
+func runBundle(ctx context.Context, bundle target.BundleExec, args ...string) (err error) {
+	execFile, err := unpackExecutable(bundle)
+	if err != nil {
 		return
 	}
+
+	err = Cmd{}.RunApp(ctx, *bundle.Manifest(), execFile.Name(), args...)
+	if err != nil {
+		return
+	}
+	return
 }
 
 func unpackExecutable(bundle target.BundleExec) (execFile *os.File, err error) {

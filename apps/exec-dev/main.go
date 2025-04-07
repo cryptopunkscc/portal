@@ -33,8 +33,8 @@ func (a Application[T]) handler() cmd.Handler {
 
 func (a Application[T]) Runner() Run[T] {
 	return multi.NewRun[T](
-		reload.Immutable(bind.NewDefaultCoreFunc(), reload.Adapter(exec.BundleRunner().ReRunner())),
-		reload.Immutable(bind.NewDefaultCoreFunc(), reload.Adapter(exec.DistRun.ReRunner())),
+		reload.Immutable(bind.NewDefaultCoreFunc(), reload.Adapter(exec.Bundle.ReRunner())),
+		reload.Immutable(bind.NewDefaultCoreFunc(), reload.Adapter(exec.Dist.ReRunner())),
 	)
 }
 

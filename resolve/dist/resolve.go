@@ -30,3 +30,5 @@ func Resolver[T any](resolve target.Resolve[T]) target.Resolve[target.Dist[T]] {
 		return
 	}
 }
+
+var ResolveAny = Resolver[any](func(target.Source) (result any, err error) { return })

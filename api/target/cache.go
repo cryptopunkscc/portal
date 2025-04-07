@@ -19,7 +19,7 @@ func (c *Cache[T]) portals() portalMap[T] {
 	return c._portals
 }
 
-func (c *Cache[T]) Add(portals []T) {
+func (c *Cache[T]) Add(portals ...T) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	for _, portal := range portals {

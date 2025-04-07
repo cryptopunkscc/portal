@@ -7,21 +7,35 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	golang "github.com/cryptopunkscc/portal/resolve/go"
 	"github.com/cryptopunkscc/portal/runner/dist"
+	"github.com/cryptopunkscc/portal/runner/pack"
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 )
+
+func Runner(platforms ...string) *target.SourceRunner[target.ProjectGo] {
+	return &target.SourceRunner[target.ProjectGo]{
+		Resolve: target.Any[target.ProjectGo](target.Try(golang.ResolveProject)),
+		Runner:  runner{platforms: platforms},
+	}
+}
 
 type runner struct{ platforms []string }
 
-func Runner(platforms ...string) target.Run[target.ProjectGo] {
+func NewRun(platforms ...string) target.Run[target.ProjectGo] {
 	return runner{platforms}.Run
 }
 
-func (g runner) Run(ctx context.Context, project target.ProjectGo, _ ...string) (err error) {
+func (g runner) Run(ctx context.Context, project target.ProjectGo, args ...string) (err error) {
 	log := plog.Get(ctx).Type(g).Set(&ctx)
 	if err = deps.RequireBinary("go"); err != nil {
+		return
+	}
+
+	if !project.Changed() && !slices.Contains(args, "clean") {
 		return
 	}
 
@@ -56,6 +70,12 @@ func (g runner) Run(ctx context.Context, project target.ProjectGo, _ ...string) 
 		project.Manifest().Exec = build.Out
 		if err = dist.Dist(ctx, project); err != nil {
 			return
+		}
+
+		if slices.Contains(args, "pack") {
+			if err = pack.Run(ctx, project.Dist_()); err != nil {
+				return
+			}
 		}
 	}
 	return

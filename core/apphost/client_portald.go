@@ -1,6 +1,7 @@
 package apphost
 
 import (
+	"context"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"io"
@@ -43,4 +44,16 @@ func (p Portald) Api() (cmd.Handlers, error) { return rpc.Query[cmd.Handlers](p,
 type PortaldOpenOpt struct {
 	Schema string `query:"s"`
 	Order  []int  `query:"o"`
+}
+
+var portaldOpenOptKey = &PortaldOpenOpt{}
+
+func (o *PortaldOpenOpt) Load(ctx context.Context) {
+	if value, ok := ctx.Value(portaldOpenOptKey).(*PortaldOpenOpt); ok {
+		*o = *value
+	}
+}
+
+func (o *PortaldOpenOpt) Save(ctx *context.Context) {
+	*ctx = context.WithValue(*ctx, portaldOpenOptKey, o)
 }

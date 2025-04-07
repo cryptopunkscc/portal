@@ -2,6 +2,7 @@ package bundle
 
 import (
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/resolve/dist"
 	"github.com/cryptopunkscc/portal/resolve/zip"
 )
 
@@ -27,3 +28,5 @@ func Resolver[T any](resolve target.Resolve[target.Dist[T]]) target.Resolve[targ
 		return
 	}
 }
+
+var ResolveAny = Resolver[any](dist.ResolveAny)

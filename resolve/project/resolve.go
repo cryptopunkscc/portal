@@ -34,6 +34,7 @@ type project[T any] struct {
 	resolveDist target.Resolve[target.Dist[T]]
 }
 
+func (p *project[T]) Changed(skip ...string) bool  { return target.Changed(p, skip...) }
 func (p *project[T]) MarshalJSON() ([]byte, error) { return json2.Marshal(p.Manifest()) }
 func (p *project[T]) Manifest() *target.Manifest   { return &p.manifest }
 func (p *project[T]) Target() T                    { return p.Dist().Target() }
@@ -50,3 +51,5 @@ func (p *project[T]) Dist() (t target.Dist[T]) {
 	}
 	return
 }
+
+var ResolveAny = Resolver[any](func(target.Source) (result any, err error) { return })

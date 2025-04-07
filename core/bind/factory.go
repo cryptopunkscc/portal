@@ -17,9 +17,9 @@ func NewBackendCoreFunc() NewCore  { return CoreFactory{}.NewBackendFunc() }
 
 type CoreFactory struct{ token.Repository }
 
-func (f CoreFactory) NewDefaultFunc() NewCore  { return f.api(f.frontendApphost(f.cachedInvoker)) }
+func (f CoreFactory) NewDefaultFunc() NewCore  { return f.NewFrontendFunc() }
 func (f CoreFactory) NewFrontendFunc() NewCore { return f.api(f.frontendApphost(f.cachedInvoker)) }
-func (f CoreFactory) NewBackendFunc() NewCore  { return f.api(f.frontendApphost(f.cachedInvoker)) }
+func (f CoreFactory) NewBackendFunc() NewCore  { return f.api(f.backendApphost(f.cachedInvoker)) }
 
 func (f CoreFactory) api(newApphost newApphost) NewCore {
 	return func(ctx context.Context, portal target.Portal_) (Core, context.Context) {

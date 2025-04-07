@@ -41,6 +41,10 @@ type project[T any] struct {
 	resolveDist target.Resolve[target.Dist[T]]
 }
 
+func (p *project[T]) Changed(skip ...string) bool {
+	skip = append(skip, "node_modules")
+	return target.Changed(p, skip...)
+}
 func (p *project[T]) MarshalJSON() ([]byte, error) { return json2.Marshal(p.Manifest()) }
 func (p *project[T]) Manifest() *target.Manifest   { return &p.manifest }
 func (p *project[T]) Target() T                    { return p.Dist().Target() }
@@ -78,3 +82,5 @@ func Resolver[T any](resolve target.Resolve[T]) target.Resolve[target.ProjectNpm
 		return
 	}
 }
+
+var ResolveAny = Resolver[any](func(target.Source) (result any, err error) { return })

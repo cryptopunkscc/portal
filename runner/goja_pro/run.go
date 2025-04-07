@@ -4,11 +4,8 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/bind"
-	jsEmbed "github.com/cryptopunkscc/portal/core/js/embed"
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	npm2 "github.com/cryptopunkscc/portal/resolve/npm"
-	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/goja_dist"
 	"github.com/cryptopunkscc/portal/runner/npm"
 	"github.com/cryptopunkscc/portal/runner/npm_build"
@@ -36,17 +33,7 @@ func (r *runner) Run(ctx context.Context, projectJs target.ProjectJs, args ...st
 		return
 	}
 
-	libs := target.Any[target.NodeModule](
-		target.Skip("node_modules"),
-		target.Try(npm2.Resolve),
-	).List(
-		source.Embed(jsEmbed.PortalLibFS),
-	)
-	if len(libs) == 0 {
-		log.P().Println("libs are empty")
-	}
-
-	build := npm_build.Runner(libs...)
+	build := npm_build.NewRun()
 	if err = build(ctx, projectJs); err != nil {
 		return
 	}

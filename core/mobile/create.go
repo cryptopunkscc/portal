@@ -4,16 +4,10 @@ import (
 	"context"
 	ether "github.com/cryptopunkscc/astrald/mod/ether/src"
 	tcp "github.com/cryptopunkscc/astrald/mod/tcp/src"
-	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/api/mobile"
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/resolve/exec"
-	"github.com/cryptopunkscc/portal/resolve/html"
-	"github.com/cryptopunkscc/portal/resolve/js"
-	"github.com/cryptopunkscc/portal/resolve/path"
-	"github.com/cryptopunkscc/portal/resolve/source"
-	"github.com/cryptopunkscc/portal/runner/app"
+	exec2 "github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/goja"
 	"path/filepath"
 )
@@ -37,19 +31,11 @@ func Create(api mobile.Api) mobile.Core {
 	m.ExtraTokens = []string{
 		"portal.launcher",
 	}
-	m.Resolve = Any[App_](
-		Skip("node_modules"),
-		Try(js.ResolveDist),
-		Try(html.ResolveDist),
-		Try(exec.ResolveDist),
+	m.Resolve = Any[Runnable](
+		goja.Runner(m.cores().NewBackendFunc()).Try,
+		m.htmlRunner().Try,
+		exec2.DistRunner.Try,
+		exec2.BundleRunner.Try,
 	)
-	m.Runners = func(schemaPrefix []string) []Run[Portal_] {
-		return []Run[Portal_]{
-			app.Runner(goja.NewRun(m.cores().NewBackendFunc())),
-			app.Runner(m.htmlRun),
-		}
-	}
-	m.find = FindByPath(source.File, m.Resolve).
-		OrById(path.Resolver(m.Resolve, env.PortaldApps.Source()))
 	return m
 }

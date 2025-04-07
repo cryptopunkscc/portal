@@ -10,7 +10,7 @@ import (
 
 //go:embed data.zip
 var EmbedFS embed.FS
-var EmbedRoot = source.Embed(EmbedFS)
+var EmbedRoot target.Source = source.Embed(EmbedFS)
 var (
 	EmbedSh             target.Source
 	EmbedJs             target.Source

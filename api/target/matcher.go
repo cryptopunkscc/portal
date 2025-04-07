@@ -10,6 +10,9 @@ func Match[T any](arg Portal_) (ok bool) {
 type Priority []Matcher
 
 func (p Priority) Get(app Portal_) int {
+	if r, ok := app.(Runnable); ok {
+		app = r.Source()
+	}
 	for i, match := range p {
 		if match(app) {
 			return i

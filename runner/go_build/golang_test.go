@@ -17,7 +17,7 @@ func TestGoRunner_Run(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Equal(t, test.EmbedGoBuild, project.Build())
-	run := Runner()
+	run := NewRun()
 	if err = run(ctx, project); err != nil {
 		t.Fatal(err)
 	}

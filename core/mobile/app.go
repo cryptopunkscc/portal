@@ -10,21 +10,19 @@ import (
 )
 
 func (m *service) App(path string) mobile.App {
-	apps, err := m.find(m.ctx, path)
-	if err != nil {
-		plog.Get(m.ctx).Type(m).E().Println(err)
-		return nil
-	}
+	apps := m.Provider().Provide(path)
 	if len(apps) == 0 {
 		plog.Get(m.ctx).Type(m).E().Println(target.ErrNotFound)
 		return nil
 	}
-	source := apps[0]
-	return &app_{
-		ctx:     m.ctx,
-		source:  source,
-		newCore: m.cores().NewFrontendFunc(),
+	if source, ok := apps[0].(target.App_); ok {
+		return &app_{
+			ctx:     m.ctx,
+			source:  source,
+			newCore: m.cores().NewFrontendFunc(),
+		}
 	}
+	return nil
 }
 
 func (m *service) cores() CoreFactory {

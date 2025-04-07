@@ -10,10 +10,6 @@ import (
 
 type Resolve[T any] func(src Source) (result T, err error)
 
-type Resolver[T any] interface {
-	Resolve(src Source) (result T, err error)
-}
-
 func (resolve Resolve[T]) Resolve(src Source) (result T, err error) { return resolve(src) }
 
 // List all Source from a given dir.
@@ -54,8 +50,36 @@ func (resolve Resolve[T]) list(from Source) (out []T) {
 	return
 }
 
-func Any[T Source](of ...func(Source) (Source, error)) Resolve[T] {
-	return Combine[Source, T](of...)
+func (resolve Resolve[T]) Try(src Source) (result Source, err error) {
+	r, err := resolve(src)
+	if err != nil {
+		return
+	}
+	result, ok := any(r).(Source)
+	if !ok {
+		err = ErrNotTarget
+	}
+	return
+}
+
+func Any[T Source](of ...Resolve[Source]) Resolve[T] {
+	return func(entry Source) (s T, err error) {
+		for _, f := range of {
+			var v Source
+			if v, err = f(entry); err != nil {
+				if errors.Is(err, fs.SkipDir) {
+					return
+				}
+				err = nil
+				continue
+			}
+			ok := false
+			if s, ok = any(v).(T); ok {
+				return
+			}
+		}
+		return
+	}
 }
 
 func Try[A Source, B Source](f func(A) (B, error)) Resolve[Source] {

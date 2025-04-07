@@ -14,6 +14,7 @@ type project struct {
 	build Builds
 }
 
+func (p *project) Changed(skip ...string) bool  { return Changed(p, skip...) }
 func (p *project) IsGo()                        {}
 func (p *project) Manifest() *Manifest          { return &p.manifest }
 func (p *project) MarshalJSON() ([]byte, error) { return json.Marshal(p.Manifest()) }

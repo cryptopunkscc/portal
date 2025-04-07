@@ -9,7 +9,6 @@ import (
 
 type service struct {
 	portald.Service[target.App_]
-	find   target.Find[target.App_]
 	ctx    context.Context
 	mobile Api
 }

@@ -1,4 +1,4 @@
-package js_build
+package js_lib_build
 
 import (
 	"context"

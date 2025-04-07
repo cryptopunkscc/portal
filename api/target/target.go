@@ -41,12 +41,12 @@ type Project_ interface {
 	Portal_
 	Build() Builds
 	Dist_() Dist_
+	Changed(skip ...string) bool
 }
 
 type Project[T any] interface {
+	Project_
 	Portal[T]
-	Build() Builds
-	Dist_() Dist_
 	Dist() Dist[T]
 }
 

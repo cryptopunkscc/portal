@@ -4,7 +4,7 @@ import "context"
 
 type ReRunner[T any] interface {
 	Runner[T]
-	Reloader[T]
+	Reloader
 }
 
 func (r Run[T]) ReRunner() ReRunner[T] {

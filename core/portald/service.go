@@ -26,9 +26,9 @@ type Service[T Portal_] struct {
 	Apphost apphost.Adapter
 	Astrald astrald.Runner
 
-	Resolve Resolve[T]
-	Runners func([]string) []Run[Portal_]
-	Order   []int
+	Resolve Resolve[Runnable]
+
+	Order []int
 }
 
 func (s *Service[T]) Configure() (err error) {

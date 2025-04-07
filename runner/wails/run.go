@@ -7,11 +7,25 @@ import (
 	"github.com/cryptopunkscc/portal/core/js/embed/wails"
 	"github.com/cryptopunkscc/portal/pkg/assets"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/resolve/html"
 	"github.com/wailsapp/wails/v2/pkg/application"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 )
+
+func SourceRunner(newCore bind.NewCore) *target.SourceRunner[target.AppHtml] {
+	return &target.SourceRunner[target.AppHtml]{
+		Runner: &reRunner{
+			newCore: newCore,
+		},
+		Resolve: target.Any[target.AppHtml](
+			target.Skip("node_modules"),
+			target.Try(html.ResolveDist),
+			target.Try(html.ResolveBundle),
+		),
+	}
+}
 
 type reRunner struct {
 	newCore  bind.NewCore

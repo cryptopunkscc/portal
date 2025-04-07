@@ -4,15 +4,20 @@ package main
 
 import (
 	"github.com/cryptopunkscc/portal/api"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/apps_build"
 	"github.com/cryptopunkscc/portal/runner/astrald_build"
-	"github.com/cryptopunkscc/portal/runner/js_build"
+	"github.com/cryptopunkscc/portal/runner/js_lib_build"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/magefile/mage/target"
 	"runtime"
 	"strings"
 )
+
+func init() {
+	plog.Verbosity = 100
+}
 
 var Aliases = map[string]interface{}{
 	"apps": Install.Apps,
@@ -30,6 +35,10 @@ func Goos(str string) {
 		goos = strings.Split(str, " ")
 	}
 }
+
+var clean = false
+
+func Clean() { clean = true }
 
 type Install mg.Namespace
 
@@ -87,7 +96,12 @@ func (Build) Apps() (err error) {
 	mg.Deps(
 		Build.JsLib,
 	)
-	return apps_build.Run()
+	var args []string
+	args = append(args, "pack")
+	if clean {
+		args = append(args, "clean")
+	}
+	return apps_build.Run(args...)
 }
 
 func (Build) Cli() error {
@@ -114,5 +128,5 @@ func (Build) JsLib() error {
 	} else if !changed {
 		return nil
 	}
-	return js_build.Run()
+	return js_lib_build.Run()
 }

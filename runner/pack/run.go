@@ -5,11 +5,19 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/zip"
+	"github.com/cryptopunkscc/portal/resolve/dist"
 	"os"
 	"path/filepath"
 )
 
-func Run(_ context.Context, app target.Dist_, _ ...string) (err error) {
+var Runner = target.SourceRunner[target.Dist_]{
+	Resolve: target.Any[target.Dist_](target.Try(dist.ResolveAny)),
+	Runner:  Run,
+}
+
+var Run target.Run[target.Dist_] = run
+
+func run(_ context.Context, app target.Dist_, _ ...string) (err error) {
 	// create build dir
 	buildDir := filepath.Join(app.Abs(), "..", "build")
 	if err = os.MkdirAll(buildDir, 0775); err != nil && !os.IsExist(err) {

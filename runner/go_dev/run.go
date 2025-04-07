@@ -68,7 +68,7 @@ func (r *runner) Run(ctx context.Context, project target.ProjectGo, args ...stri
 		return
 	}
 	r.ctx = ctx
-	build := go_build.Runner()
+	build := go_build.NewRun()
 	if err = build(ctx, project); err != nil {
 		return
 	}

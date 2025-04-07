@@ -53,15 +53,17 @@ func (find Find[T]) Cached(cache *Cache[T]) Find[T] {
 		if portals, err = find(ctx, src); err != nil {
 			return
 		}
-		cache.Add(portals)
+		cache.Add(portals...)
 		return
 	}
 }
 
 func (p Portals[T]) SortBy(priority Priority) {
-	slices.SortFunc(p, func(a, b T) int {
-		return priority.Get(a) - priority.Get(b)
-	})
+	if len(priority) > 1 {
+		slices.SortFunc(p, func(a, b T) int {
+			return priority.Get(a) - priority.Get(b)
+		})
+	}
 }
 
 func (p Portals[T]) Reduced() (reduced Portals[T]) {

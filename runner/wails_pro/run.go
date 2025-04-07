@@ -6,11 +6,8 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/bind"
-	js "github.com/cryptopunkscc/portal/core/js/embed"
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/resolve/npm"
-	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/npm_build"
 	"github.com/cryptopunkscc/portal/runner/wails"
 	"github.com/wailsapp/wails/v2/pkg/application"
@@ -39,17 +36,7 @@ func (r *reRunner) Run(ctx context.Context, projectHtml target.ProjectHtml, args
 		return
 	}
 
-	libs := target.Any[target.NodeModule](
-		target.Skip("node_modules"),
-		target.Try(npm.Resolve),
-	).List(
-		source.Embed(js.PortalLibFS),
-	)
-	if len(libs) == 0 {
-		log.P().Println("libs are empty")
-	}
-
-	build := npm_build.Runner(libs...)
+	build := npm_build.NewRun()
 	if err = build(ctx, projectHtml); err != nil {
 		return
 	}
