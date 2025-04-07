@@ -3,16 +3,23 @@
 package main
 
 import (
+	"errors"
 	"github.com/cryptopunkscc/portal/api"
+	"github.com/cryptopunkscc/portal/pkg/gpg"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/apps_build"
 	"github.com/cryptopunkscc/portal/runner/astrald_build"
 	"github.com/cryptopunkscc/portal/runner/js_lib_build"
+	"github.com/cryptopunkscc/portal/runner/version"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/magefile/mage/target"
+	"io/fs"
+	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 )
 
 func init() {
@@ -83,6 +90,10 @@ func (Install) All() {
 type Build mg.Namespace
 
 func (Build) Installer() error {
+	defer clearVersion()
+	defer gpgSignPortalInstallers()
+	cleanInstallerBin()
+	resolveVersion()
 	mg.Deps(
 		Build.Astrald,
 		Build.Portald,
@@ -129,4 +140,48 @@ func (Build) JsLib() error {
 		return nil
 	}
 	return js_lib_build.Run()
+}
+
+func resolveVersion() {
+	file, err := os.Create("./runner/version/name")
+	if err != nil {
+		return
+	}
+	defer file.Close()
+	name := version.Resolve()
+	if _, err = file.WriteString(name); err != nil {
+		panic(err)
+	}
+}
+
+func clearVersion() {
+	file, err := os.Create("./runner/version/name")
+	if err != nil {
+		panic(err)
+	}
+	if err = file.Truncate(0); err != nil {
+		panic(err)
+	}
+}
+
+func cleanInstallerBin() {
+	path := "./cmd/portal-installer/bin"
+	_ = os.RemoveAll(path)
+	err := os.Mkdir(path, 0755)
+	if err != nil && !errors.Is(err, fs.ErrExist) {
+		panic(err)
+	}
+}
+
+func gpgSignPortalInstallers() {
+	_ = filepath.WalkDir("./bin", func(path string, d fs.DirEntry, err error) error {
+		if d.IsDir() ||
+			!strings.HasPrefix(d.Name(), "portal-installer") ||
+			strings.HasSuffix(d.Name(), ".sig") {
+			return nil
+		}
+		time.Sleep(1 * time.Second)
+		gpg.Sign(path)
+		return nil
+	})
 }

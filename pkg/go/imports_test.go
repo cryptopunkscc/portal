@@ -8,7 +8,6 @@ import (
 )
 
 func Test_ListImports(t *testing.T) {
-	plog.ErrorStackTrace = true
 	src, _ := os.Getwd()
 	src, _ = FindProjectRoot(src)
 	src = filepath.Join(src, "pkg/go/imports.go")
