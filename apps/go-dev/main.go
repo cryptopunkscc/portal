@@ -34,7 +34,7 @@ func (a Application[T]) handler() cmd.Handler {
 
 func (a Application[T]) Runner() Run[T] {
 	return multi.NewRun[T](
-		reload.Mutable(bind.NewDefaultCoreFunc(), go_dev.Adapter(exec.Dist)),
+		reload.Mutable(bind.NewDefaultCore, go_dev.Adapter(exec.Dist)),
 	)
 }
 

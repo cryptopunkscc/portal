@@ -11,9 +11,11 @@ import (
 	"github.com/cryptopunkscc/portal/runner/request"
 )
 
-func NewDefaultCoreFunc() NewCore  { return CoreFactory{}.NewDefaultFunc() }
-func NewFrontendCoreFunc() NewCore { return CoreFactory{}.NewFrontendFunc() }
-func NewBackendCoreFunc() NewCore  { return CoreFactory{}.NewBackendFunc() }
+var coreFactory = CoreFactory{}
+
+var NewDefaultCore = coreFactory.NewDefaultFunc()
+var NewFrontendCore = coreFactory.NewFrontendFunc()
+var NewBackendCore = coreFactory.NewBackendFunc()
 
 type CoreFactory struct{ token.Repository }
 

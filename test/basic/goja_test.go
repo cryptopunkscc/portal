@@ -18,7 +18,7 @@ func TestGojaBackend(t *testing.T) {
 	if err != nil {
 		return
 	}
-	core := bind.NewBackendCoreFunc()
+	core := bind.NewBackendCore
 	runner := goja.NewRunner(core)
 	ctx := context.Background()
 	err = runner.Run(ctx, dist, "foo", "bar")

@@ -28,5 +28,5 @@ func (a Application) Handler() cmd.Handler {
 		},
 	}
 }
-func (a Application) Runner() Run[AppJs]       { return goja.NewRun(bind.NewBackendCoreFunc()) }
+func (a Application) Runner() Run[AppJs]       { return goja.NewRun(bind.NewBackendCore) }
 func (a Application) Resolver() Resolve[AppJs] { return apps.Resolver[AppJs]() }
