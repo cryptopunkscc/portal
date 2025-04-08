@@ -20,7 +20,7 @@ func TestService_Start(t *testing.T) {
 			s := Service[target.Portal_]{}
 			s.Config.Dir = dir
 			s.Config.Node.Log.Level = 100
-			s.Config.Apphost.Listen = []string{"tcp:127.0.0.1:8635"}
+			s.Config.Apphost.Listen = []string{"tcp:127.0.0.1:8636"}
 			if err := s.Configure(); err != nil {
 				plog.New().Println(err)
 				t.Error(err)
