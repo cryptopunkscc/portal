@@ -7,9 +7,13 @@ type Provider[T Portal_] struct {
 }
 
 func (r Provider[T]) Provide(src string) (out Portals[T]) {
-	sources := r.Repository.Get(src)
-	out = r.Resolve.List(sources...)
+	out = r.All(src)
 	out.SortBy(r.Priority)
 	out = out.Reduced()
 	return
+}
+
+func (r Provider[T]) All(src string) (out Portals[T]) {
+	sources := r.Repository.Get(src)
+	return r.Resolve.List(sources...)
 }

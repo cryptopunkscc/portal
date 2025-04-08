@@ -2,17 +2,13 @@ package main
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/api/env"
+	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/resolve/path"
 	"github.com/cryptopunkscc/portal/resolve/portal"
 	"github.com/cryptopunkscc/portal/resolve/source"
-	"github.com/cryptopunkscc/portal/resolve/sources"
-
-	"log"
 	"os"
 	"reflect"
 	"strings"
@@ -32,7 +28,7 @@ func main() {
 				Params: cmd.Params{
 					{Type: "string", Desc: "Directory containing targets."},
 				},
-				Func: listPortals(find[target.Portal_]()),
+				Func: list,
 			},
 		},
 	}).Run(ctx)
@@ -41,23 +37,24 @@ func main() {
 	}
 }
 
-func find[T target.Portal_]() target.Find[T] {
-	return target.FindByPath(
-		source.File,
-		sources.Resolver[T]()).
-		OrById(path.Resolver(portal.Resolve_, env.PortaldApps.Source()))
+func list(src string) (p []printable) {
+	wd, _ := os.Getwd()
+	for _, r := range targets.All(src) {
+		p = append(p, printable{wd, r})
+	}
+	return
 }
 
-func listPortals(find target.Find[target.Portal_]) func(context.Context, string) error {
-	return func(ctx context.Context, path string) (err error) {
-		wd, _ := os.Getwd()
-		portals, err := find(ctx, path)
-		if err != nil {
-			return
-		}
-		for _, source := range portals {
-			log.Println(reflect.TypeOf(source), "\t", strings.TrimPrefix(source.Abs(), wd+"/"))
-		}
-		return
-	}
+var targets = target.Provider[target.Portal_]{
+	Repository: source.Repository,
+	Resolve:    target.Any[target.Portal_](portal.Resolve_.Try),
+}
+
+type printable struct {
+	wd string
+	target.Portal_
+}
+
+func (p printable) MarshalCLI() string {
+	return fmt.Sprintln(reflect.TypeOf(p), "\t", strings.TrimPrefix(p.Abs(), p.wd+"/"))
 }

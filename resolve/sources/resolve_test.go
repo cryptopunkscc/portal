@@ -1,7 +1,6 @@
 package sources
 
 import (
-	"context"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/test"
@@ -66,36 +65,22 @@ var packagePathReduced = map[string]string{
 	test.EmbedHtmlManifest.Package:     "test_data/html",
 }
 
-func path(src string) (path string, err error) {
-	path, ok := packagePathReduced[src]
-	if !ok {
-		err = target.ErrNotTarget
-	}
-	return
-
+var provider = target.Provider[target.Portal_]{
+	Priority: target.Priority{
+		target.Match[target.Project_],
+		target.Match[target.Bundle_],
+		target.Match[target.Dist_],
+	},
+	Repository: source.Repository,
+	Resolve:    Resolver[target.Portal_](),
 }
-
-var findByPath = target.FindByPath(
-	source.File,
-	Resolver[target.Portal_](),
-)
-
-var findByPathReduced = findByPath.Reduced(
-	target.Match[target.Project_],
-	target.Match[target.Bundle_],
-	target.Match[target.Dist_],
-)
 
 func TestByPath(t *testing.T) {
 	defer test.Clean()
 	src := test.Copy(test.EmbedRoot)
 	expected := pathManifestAll
-	find := target.FindByPath(
-		source.File,
-		Resolver[target.Portal_](),
-	)
 
-	portals := test.Assert(find(context.Background(), src.Abs()))
+	portals := provider.All(src.Abs())
 
 	for _, portal := range portals {
 		key := strings.TrimPrefix(portal.Abs(), wd)
@@ -109,16 +94,8 @@ func TestByPathReduced(t *testing.T) {
 	defer test.Clean()
 	src := test.Copy(test.EmbedRoot)
 	expected := pathManifestReduced
-	find := target.FindByPath(
-		source.File,
-		Resolver[target.Portal_](),
-	).Reduced(
-		target.Match[target.Project_],
-		target.Match[target.Bundle_],
-		target.Match[target.Dist_],
-	)
 
-	portals := test.Assert(find(context.Background(), src.Abs()))
+	portals := provider.Provide(src.Abs())
 
 	for _, portal := range portals {
 		key := strings.TrimPrefix(portal.Abs(), wd)
@@ -132,9 +109,8 @@ func Test_ByPath_Reduced_Cached(t *testing.T) {
 	defer test.Clean()
 	src := test.Copy(test.EmbedRoot)
 	expected := packageManifestReduced
-	find := findByPathReduced.Cached(&target.Cache[target.Portal_]{})
 
-	test.Assert(find(context.Background(), src.Abs()))
+	assert.NotNil(t, provider.Provide(src.Abs()))
 
 	for pkg, manifest := range expected {
 		t.Log(manifest)
@@ -147,12 +123,12 @@ func Test_ByPath_Reduced_Cached(t *testing.T) {
 func Test_ByPath_Reduced_ById(t *testing.T) {
 	defer test.Clean()
 	test.Copy(test.EmbedRoot)
-	ctx := context.Background()
 	expected := packageManifestReduced
-	find := findByPathReduced.OrById(path)
 	for pkg, manifest := range expected {
 		t.Log(manifest)
-		r := test.Assert(find(ctx, pkg))[0]
+		p := provider.Provide(pkg)
+		assert.NotNil(t, p)
+		r := p[0]
 		assert.Equal(t, manifest, expected[pkg], r.Manifest())
 		delete(expected, pkg)
 	}
