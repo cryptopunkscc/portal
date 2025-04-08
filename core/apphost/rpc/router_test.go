@@ -92,7 +92,7 @@ func TestRouter_routeQuery(t *testing.T) {
 				a.q.conn.Reader = bufio.NewReader(a.q.conn.ReadBuffer)
 			},
 			verify: func(t *testing.T, f fields, a args) {
-				assert.Equal(t, "\n1\n", a.q.conn.WriteBuffer.String())
+				assert.Equal(t, "1\n", a.q.conn.WriteBuffer.String())
 			},
 		},
 		{
@@ -123,7 +123,7 @@ func TestRouter_routeQuery(t *testing.T) {
 				a.q.conn.Reader = bufio.NewReader(a.q.conn.ReadBuffer)
 			},
 			verify: func(t *testing.T, f fields, a args) {
-				assert.Equal(t, "\n1\n", a.q.conn.WriteBuffer.String())
+				assert.Equal(t, "1\n", a.q.conn.WriteBuffer.String())
 			},
 		},
 	}

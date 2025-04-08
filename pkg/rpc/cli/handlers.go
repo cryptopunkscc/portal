@@ -68,6 +68,7 @@ var EncodingHandler = cmd.Handler{
 			c.Ending = []byte("\n")
 		case "cli":
 			c.Marshal = Marshal
+			c.Ending = nil
 		}
 		switch opt.Decoder {
 		case "json":
