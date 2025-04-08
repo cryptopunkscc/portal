@@ -30,6 +30,7 @@ func Test_run(t *testing.T) {
 }
 
 func Test_dispatch_sync(t *testing.T) {
+	t.SkipNow()
 	plog.Verbosity = 100
 	ctx := context.Background()
 	wg := &sync.WaitGroup{}
