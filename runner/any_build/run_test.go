@@ -16,19 +16,6 @@ func Test_provider(t *testing.T) {
 	}
 }
 
-func Test_run(t *testing.T) {
-	plog.Verbosity = 100
-	ctx := context.Background()
-	for i, runnable := range provider.Provide("../../apps") {
-		log.Printf("%d. %T %s", i, runnable.Source(), runnable.Manifest().Package)
-		err := runnable.Run(ctx, "pack", "clean")
-		if err != nil {
-			plog.Println(err)
-			t.Error(err)
-		}
-	}
-}
-
 func Test_dispatch_sync(t *testing.T) {
 	t.SkipNow()
 	plog.Verbosity = 100
@@ -38,7 +25,7 @@ func Test_dispatch_sync(t *testing.T) {
 		Provider: provider,
 		Runner:   target.RunSeq,
 	}
-	err := d.Run(ctx, "../../apps/launcher", "pack", "clean")
+	err := d.Run(ctx, "../../apps", "pack", "clean")
 	wg.Wait()
 	if err != nil {
 		plog.Println(err)
