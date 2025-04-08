@@ -25,14 +25,14 @@ func TestSerializer_Decode(t *testing.T) {
 			name:     "1",
 			actual:   []float64{},
 			expected: []float64{1, 2, 3},
-			reader:   strings.NewReader("[1,2,3]"),
+			reader:   strings.NewReader("[1,2,3]\n"),
 			assert:   assert.ElementsMatch,
 		},
 		{
 			name:     "2",
 			actual:   map[string]any{},
 			expected: map[string]any{"s": "s", "f": 1.1, "b": true},
-			reader:   strings.NewReader(`{"s": "s", "f": 1.1, "b": true}`),
+			reader:   strings.NewReader(`{"s": "s", "f": 1.1, "b": true}` + "\n"),
 			assert:   assert.EqualValues,
 		},
 	}
