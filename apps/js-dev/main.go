@@ -1,27 +1,27 @@
 package main
 
 import (
-	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/resolve/sources"
+	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/cli"
 	"github.com/cryptopunkscc/portal/runner/goja"
 	"github.com/cryptopunkscc/portal/runner/goja_dist"
 	"github.com/cryptopunkscc/portal/runner/goja_pro"
-	"github.com/cryptopunkscc/portal/runner/multi"
-	"github.com/cryptopunkscc/portal/runner/open"
-	"github.com/cryptopunkscc/portal/runner/reload"
 	"github.com/cryptopunkscc/portal/runner/version"
 )
 
-func main() { cli.Run(Application[PortalJs]{}.handler()) }
+func main() { cli.Run(Application{}.handler()) }
 
-type Application[T PortalJs] struct{}
+type Application struct{}
 
-func (a Application[T]) handler() cmd.Handler {
+func (a Application) handler() cmd.Handler {
 	return cmd.Handler{
-		Func: open.NewRun[T](&a),
+		Func: source.File.NewRun(
+			goja_pro.Runner(bind.NewBackendCore).Try,
+			goja_dist.Runner(bind.NewBackendCore).Try,
+			goja.Runner(bind.NewBackendCore).Try,
+		),
 		Name: "dev-js",
 		Desc: "Start portal js app development in goja runner.",
 		Params: cmd.Params{
@@ -32,13 +32,3 @@ func (a Application[T]) handler() cmd.Handler {
 		},
 	}
 }
-
-func (a Application[T]) Runner() Run[T] {
-	return multi.NewRun[T](
-		reload.Mutable(bind.NewBackendCore, goja_pro.NewRunner),
-		reload.Mutable(bind.NewBackendCore, goja_dist.NewRunner),
-		reload.Immutable(bind.NewBackendCore, goja.NewRunner),
-	)
-}
-
-func (a Application[T]) Resolver() Resolve[T] { return sources.Resolver[T]() }

@@ -23,6 +23,7 @@ func (a *Application[T]) start(ctx context.Context, args RunArgs) (err error) {
 	if err = a.Configure(); err != nil {
 		return
 	}
+	a.init()
 	a.Astrald = &exec.Astrald{NodeRoot: a.Config.Astrald}
 	if err = a.Start(ctx); err != nil {
 		return

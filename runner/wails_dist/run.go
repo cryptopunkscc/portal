@@ -5,28 +5,37 @@ import (
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/resolve/html"
+	"github.com/cryptopunkscc/portal/runner/reload"
 	"github.com/cryptopunkscc/portal/runner/wails"
 	"github.com/cryptopunkscc/portal/runner/watcher"
 	"path/filepath"
 )
 
-type reRunner struct {
-	send  target.MsgSend
-	inner target.ReRunner[target.AppHtml]
-}
-
-func ReRunner(newCore bind.NewCore, send target.MsgSend) target.ReRunner[target.DistHtml] {
-	return &reRunner{
-		send:  send,
-		inner: wails.ReRunner(newCore),
+func Runner(newCore bind.NewCore) *target.SourceRunner[target.DistHtml] {
+	return &target.SourceRunner[target.DistHtml]{
+		Runner: &ReRunner{
+			newCore: newCore,
+		},
+		Resolve: target.Any[target.DistHtml](
+			target.Skip("node_modules"),
+			target.Try(html.ResolveDist),
+			target.Try(html.ResolveBundle),
+		),
 	}
 }
 
-func (r *reRunner) Reload() (err error) {
-	return r.inner.Reload()
+type ReRunner struct {
+	*wails.ReRunner
+	send    target.MsgSend
+	newCore bind.NewCore
 }
 
-func (r *reRunner) Run(ctx context.Context, dist target.DistHtml, args ...string) (err error) {
+func (r *ReRunner) Reload() (err error) {
+	return r.ReRunner.Reload()
+}
+
+func (r *ReRunner) Run(ctx context.Context, dist target.DistHtml, args ...string) (err error) {
 	if !filepath.IsAbs(dist.Abs()) {
 		return plog.Errorf("ReRunner needs absolute path: %s", dist.Abs())
 	}
@@ -38,7 +47,7 @@ func (r *reRunner) Run(ctx context.Context, dist target.DistHtml, args ...string
 			if err := r.send(target.NewMsg(pkg, target.DevChanged)); err != nil {
 				log.F().Println(err)
 			}
-			err = r.inner.Reload()
+			err = r.Reload()
 			if err := r.send(target.NewMsg(pkg, target.DevRefreshed)); err != nil {
 				log.F().Println(err)
 			}
@@ -50,7 +59,9 @@ func (r *reRunner) Run(ctx context.Context, dist target.DistHtml, args ...string
 		}
 	}()
 
-	if err = r.inner.Run(ctx, dist, args...); err != nil {
+	r.Core, ctx = r.newCore(ctx, dist)
+	r.send = reload.Start(ctx, dist, r.Reload, r.Core)
+	if err = r.ReRunner.Run(ctx, dist, args...); err != nil {
 		return
 	}
 

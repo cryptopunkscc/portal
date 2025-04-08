@@ -9,9 +9,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/dist"
 	exec2 "github.com/cryptopunkscc/portal/resolve/exec"
-	"github.com/cryptopunkscc/portal/resolve/path"
 	"github.com/cryptopunkscc/portal/resolve/project"
-	"github.com/cryptopunkscc/portal/resolve/source"
 	"slices"
 	"strings"
 )
@@ -26,9 +24,12 @@ var ProjectHostRunner = target.SourceRunner[target.Portal_]{
 
 func ProjectHost(schemaPrefix ...string) target.Run[target.Portal_] {
 	return func(ctx context.Context, src target.Portal_, args ...string) (err error) {
+		repo := target.SourcesRepository[target.ProjectExec]{
+			Sources: []target.Source{env.PortaldApps.Source()},
+			Resolve: target.Any[target.ProjectExec](exec2.ResolveProject.Try),
+		}
 		defer plog.TraceErr(&err)
 		log := plog.Get(ctx).Scope("exec.ProjectHost")
-
 		host := schemaPrefix
 		if host == nil {
 			opt := apphost.PortaldOpenOpt{}
@@ -36,43 +37,25 @@ func ProjectHost(schemaPrefix ...string) target.Run[target.Portal_] {
 				host = append(host, opt.Schema)
 			}
 		}
-
-		manifest := src.Manifest()
-		if manifest.Schema != "" {
-			host = append(host, manifest.Schema)
+		if src.Manifest().Schema != "" {
+			host = append(host, src.Manifest().Schema)
 		}
-
 		hostId := strings.Join(host, ".")
-		log.Println("running:", hostId, manifest.Package, args)
+		log.Println("running:", hostId, src.Manifest(), args)
 
-		runners, err := target.
-			FindByPath(source.File, exec2.ResolveProject).
-			OrById(path.Resolver(exec2.ResolveProject, env.PortaldApps.Source())).
-			Call(ctx, hostId)
-
-		if err != nil {
-			return
-		}
-		if len(runners) == 0 {
-			return target.ErrNotFound
-		}
-		var runner target.ProjectExec
-		for _, r := range runners {
-			if r.Manifest().Exec != "" {
-				runner = r
-				break
-			}
-		}
-		if runner == nil {
+		hostBundle := repo.First(hostId)
+		if hostBundle == nil || hostBundle.Manifest().Exec == "" {
 			return target.ErrNotFound
 		}
 
-		e := runner.Manifest().Exec
+		hostExec := hostBundle.Manifest().Exec
 		args = slices.Insert(args, 0, src.Abs())
-		c, err := exec.Cmd{}.Parse(e, runner.Abs(), strings.Join(args, " "))
+
+		c, err := exec.Cmd{}.Parse(hostExec, hostBundle.Abs(), strings.Join(args, " "))
 		if err != nil {
 			return
 		}
+
 		log.Println("running", c)
 		return Cmd{}.RunApp(ctx, *src.Manifest(), c.Cmd, c.Args...)
 	}

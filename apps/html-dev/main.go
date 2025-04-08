@@ -5,24 +5,25 @@ import (
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/resolve/sources"
+	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/cli"
-	"github.com/cryptopunkscc/portal/runner/multi"
-	"github.com/cryptopunkscc/portal/runner/open"
-	"github.com/cryptopunkscc/portal/runner/reload"
 	"github.com/cryptopunkscc/portal/runner/version"
 	"github.com/cryptopunkscc/portal/runner/wails"
 	"github.com/cryptopunkscc/portal/runner/wails_dist"
 	"github.com/cryptopunkscc/portal/runner/wails_pro"
 )
 
-func main() { cli.Run(Application[PortalHtml]{}.handler()) }
+func main() { cli.Run(Application{}.handler()) }
 
-type Application[T PortalHtml] struct{}
+type Application struct{}
 
-func (a Application[T]) handler() cmd.Handler {
+func (a Application) handler() cmd.Handler {
 	return cmd.Handler{
-		Func: open.NewRun[T](&a),
+		Func: source.File.NewRun(
+			wails.Runner(a.core).Try,
+			wails_dist.Runner(a.core).Try,
+			wails_pro.Runner(a.core).Try,
+		),
 		Name: "dev-html",
 		Desc: "Start html app development in wails runner.",
 		Params: cmd.Params{
@@ -34,16 +35,7 @@ func (a Application[T]) handler() cmd.Handler {
 	}
 }
 
-func (a Application[T]) Runner() Run[T] {
-	return multi.NewRun[T](
-		reload.Immutable(a.core, wails_pro.ReRunner), // FIXME propagate sendMsg
-		reload.Mutable(a.core, wails_dist.ReRunner),
-		reload.Immutable(a.core, wails.ReRunner),
-	)
-}
-func (a Application[T]) Resolver() Resolve[T] { return sources.Resolver[T]() }
-
-func (a Application[T]) core(ctx context.Context, portal Portal_) (bind.Core, context.Context) {
+func (a Application) core(ctx context.Context, portal Portal_) (bind.Core, context.Context) {
 	r, ctx := bind.NewFrontendCore(ctx, portal)
 	return &Adapter{r}, ctx
 }

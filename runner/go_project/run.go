@@ -1,18 +1,28 @@
-package go_dev
+package go_project
 
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	golang "github.com/cryptopunkscc/portal/pkg/go"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	golang2 "github.com/cryptopunkscc/portal/resolve/go"
+	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/go_build"
+	"github.com/cryptopunkscc/portal/runner/reload"
 	"time"
 )
 
-type runner struct {
+var Runner = &target.SourceRunner[target.ProjectGo]{
+	Resolve: target.Any[target.ProjectGo](golang2.ResolveProject.Try),
+	Runner: &ReRunner{
+		watcher: golang.NewWatcher(),
+		run:     exec.Dist,
+	},
+}
+
+type ReRunner struct {
 	watcher *golang.Watcher
 	run     target.Run[target.DistExec]
 	send    target.MsgSend
@@ -22,31 +32,7 @@ type runner struct {
 	args    []string
 }
 
-func Adapter(run target.Run[target.DistExec]) func(
-	_ bind.NewCore,
-	send target.MsgSend,
-) target.ReRunner[target.ProjectGo] {
-	return func(newCore bind.NewCore, send target.MsgSend) target.ReRunner[target.ProjectGo] {
-		run := func(ctx context.Context, src target.DistExec, args ...string) (err error) {
-			newCore(ctx, src) // initiate connection
-			return run(ctx, src, args...)
-		}
-		return ReRunner(run, send)
-	}
-}
-
-func ReRunner(
-	run target.Run[target.DistExec],
-	send target.MsgSend,
-) target.ReRunner[target.ProjectGo] {
-	return &runner{
-		watcher: golang.NewWatcher(),
-		send:    send,
-		run:     run,
-	}
-}
-
-func (r *runner) Reload() (err error) {
+func (r *ReRunner) Reload() (err error) {
 	if r.cancel != nil {
 		r.cancel()
 	}
@@ -60,7 +46,7 @@ func (r *runner) Reload() (err error) {
 	return
 }
 
-func (r *runner) Run(ctx context.Context, project target.ProjectGo, args ...string) (err error) {
+func (r *ReRunner) Run(ctx context.Context, project target.ProjectGo, args ...string) (err error) {
 	r.args = args
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Println("Running project Go")
@@ -84,8 +70,9 @@ func (r *runner) Run(ctx context.Context, project target.ProjectGo, args ...stri
 	}
 
 	pkg := project.Manifest().Package
+	r.send = reload.Start(ctx, project, r.Reload, nil)
 	for range flow.From(events).Debounce(200 * time.Millisecond) {
-		if err := r.send(target.NewMsg(pkg, target.DevChanged)); err != nil {
+		if err := r.sendMsg(pkg, target.DevChanged); err != nil {
 			log.E().Println(err)
 		}
 		if err = build(ctx, project); err == nil {
@@ -94,9 +81,16 @@ func (r *runner) Run(ctx context.Context, project target.ProjectGo, args ...stri
 			}
 		}
 		time.Sleep(2 * time.Second)
-		if err := r.send(target.NewMsg(pkg, target.DevRefreshed)); err != nil {
+		if err := r.sendMsg(pkg, target.DevRefreshed); err != nil {
 			log.E().Println(err)
 		}
+	}
+	return
+}
+
+func (r *ReRunner) sendMsg(pkg string, event target.Event) (err error) {
+	if r.send != nil {
+		return r.send(target.NewMsg(pkg, event))
 	}
 	return
 }

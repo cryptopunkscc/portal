@@ -21,6 +21,10 @@ type SourceRunner[T Portal_] struct {
 }
 
 func (r *SourceRunner[T]) Try(src Source) (Source, error) {
+	return r.Runnable(src)
+}
+
+func (r *SourceRunner[T]) Runnable(src Source) (Runnable, error) {
 	source, err := r.Resolve(src)
 	if err != nil {
 		return nil, err

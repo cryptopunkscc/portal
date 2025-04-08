@@ -30,7 +30,9 @@ func (p *project) Dist() (t Dist[Exec]) {
 	return
 }
 
-func ResolveProject(src Source) (t ProjectGo, err error) {
+var ResolveProject Resolve[ProjectGo] = resolveProject
+
+func resolveProject(src Source) (t ProjectGo, err error) {
 	p := &project{}
 	if !src.IsDir() {
 		return nil, ErrNotTarget

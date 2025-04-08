@@ -30,17 +30,26 @@ func (r *CacheRepository[T]) Get(src string) (out []Source) {
 	return
 }
 
-type SourcesRepository struct {
+type SourcesRepository[T Portal_] struct {
 	Sources []Source
-	Resolve[Portal_]
+	Resolve[T]
 }
 
-var _ Repository = &SourcesRepository{}
+var _ Repository = &SourcesRepository[Portal_]{}
 
-func (r *SourcesRepository) Get(src string) (out []Source) {
+func (r *SourcesRepository[T]) Get(src string) (out []Source) {
 	for _, portal := range r.Resolve.List(r.Sources...) {
 		if portal.Manifest().Match(src) {
 			out = append(out, portal)
+		}
+	}
+	return
+}
+
+func (r *SourcesRepository[T]) First(src string) (out T) {
+	for _, out = range r.Resolve.List(r.Sources...) {
+		if out.Manifest().Match(src) {
+			return
 		}
 	}
 	return

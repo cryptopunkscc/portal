@@ -75,7 +75,9 @@ func Dir(path ...string) *Source {
 	return FS(os.DirFS(abs), abs)
 }
 
-func File(path ...string) (t target.Source, err error) {
+var File target.File = file
+
+func file(path ...string) (t target.Source, err error) {
 	abs, file := filepath.Split(target.Abs(path...))
 	if t = Dir(abs); len(file) > 0 {
 		t, err = t.Sub(file)

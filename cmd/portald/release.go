@@ -7,8 +7,8 @@ import (
 	"github.com/cryptopunkscc/portal/runner/exec"
 )
 
-func init() {
-	application.Resolve = Any[Runnable](
+func (a *Application[T]) init() {
+	a.Resolve = Any[Runnable](
 		exec.DistRunner.Try,
 		exec.BundleRunner.Try,
 		exec.BundleHostRunner.Try,

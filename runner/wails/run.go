@@ -14,9 +14,9 @@ import (
 	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-func SourceRunner(newCore bind.NewCore) *target.SourceRunner[target.AppHtml] {
+func Runner(newCore bind.NewCore) *target.SourceRunner[target.AppHtml] {
 	return &target.SourceRunner[target.AppHtml]{
-		Runner: &reRunner{
+		Runner: &ReRunner{
 			newCore: newCore,
 		},
 		Resolve: target.Any[target.AppHtml](
@@ -27,20 +27,13 @@ func SourceRunner(newCore bind.NewCore) *target.SourceRunner[target.AppHtml] {
 	}
 }
 
-type reRunner struct {
+type ReRunner struct {
+	bind.Core
 	newCore  bind.NewCore
 	frontCtx context.Context
 }
 
-func ReRunner(newCore bind.NewCore) target.ReRunner[target.AppHtml] {
-	return &reRunner{newCore: newCore}
-}
-
-func NewRun(newCore bind.NewCore) target.Run[target.AppHtml] {
-	return ReRunner(newCore).Run
-}
-
-func (r *reRunner) Reload() (err error) {
+func (r *ReRunner) Reload() (err error) {
 	if r.frontCtx == nil {
 		return plog.Errorf("nil context")
 	}
@@ -48,13 +41,15 @@ func (r *reRunner) Reload() (err error) {
 	return
 }
 
-func (r *reRunner) Run(ctx context.Context, app target.AppHtml, args ...string) (err error) {
+func (r *ReRunner) Run(ctx context.Context, app target.AppHtml, args ...string) (err error) {
 	// TODO pass args to js
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Println("start", app.Manifest().Package, app.Abs())
 	defer log.Println("exit", app.Manifest().Package, app.Abs())
-	newCore, ctx := r.newCore(ctx, app)
-	opt := AppOptions(newCore)
+	if r.Core == nil {
+		r.Core, _ = r.newCore(ctx, app)
+	}
+	opt := AppOptions(r.Core)
 	opt.OnStartup = func(ctx context.Context) { r.frontCtx = ctx }
 	SetupOptions(app, opt)
 	if err = application.NewWithOptions(opt).Run(); err != nil {

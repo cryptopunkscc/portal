@@ -9,35 +9,36 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 )
 
+func Start(
+	ctx context.Context,
+	portal target.Portal_,
+	reRun Reload,
+	cache api.Cache,
+) (send target.MsgSend) {
+	c := &client{}
+	c.handler = newHandler(reRun, cache)
+	var err error
+	defer func() {
+		if err != nil {
+			plog.Get(ctx).Println("cannot connect dev.portal.broadcast: %v", err)
+		}
+	}()
+	if c.conn, err = apphost.Default.Rpc().Client("portal", "dev.portal.broadcast"); err != nil {
+		return
+	}
+	if err = c.conn.Encode(portal.Manifest().Package); err != nil {
+		return
+	}
+	if c.handler != nil {
+		go c.handle(ctx)
+	}
+	send = c.Send
+	return
+}
+
 type client struct {
 	conn    rpc.Conn
 	handler *handler
-}
-
-func newClient() (sender *client) {
-	sender = &client{}
-	return
-}
-
-func (s *client) Init(reRun Reload, cache api.Cache) *client {
-	s.handler = newHandler(reRun, cache)
-	return s
-}
-
-func (s *client) Connect(ctx context.Context, portal target.Portal_) (err error) {
-	if s.conn != nil {
-		return
-	}
-	if s.conn, err = apphost.Default.Rpc().Client("portal", "dev.portal.broadcast"); err != nil {
-		return
-	}
-	if err = s.conn.Encode(portal.Manifest().Package); err != nil {
-		return
-	}
-	if s.handler != nil {
-		go s.handle(ctx)
-	}
-	return
 }
 
 func (s *client) handle(ctx context.Context) {

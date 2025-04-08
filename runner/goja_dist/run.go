@@ -5,29 +5,37 @@ import (
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/resolve/js"
 	"github.com/cryptopunkscc/portal/runner/goja"
+	"github.com/cryptopunkscc/portal/runner/reload"
 	"github.com/cryptopunkscc/portal/runner/watcher"
 	"path/filepath"
 	"time"
 )
 
-type Runner struct {
-	newCore bind.NewCore
+func Runner(newCore bind.NewCore) *target.SourceRunner[target.DistJs] {
+	return &target.SourceRunner[target.DistJs]{
+		Resolve: target.Any[target.DistJs](
+			js.ResolveDist.Try,
+			js.ResolveBundle.Try,
+		),
+		Runner: &ReRunner{NewCore: newCore},
+	}
+}
+
+type ReRunner struct {
+	bind.NewCore
 	send    target.MsgSend
 	dist    target.DistJs
 	backend *goja.Backend
 }
 
-func NewRunner(newCore bind.NewCore, send target.MsgSend) target.ReRunner[target.DistJs] {
-	return &Runner{newCore: newCore, send: send}
-}
-
-func (r *Runner) Reload() (err error) {
+func (r *ReRunner) Reload() (err error) {
 	return r.backend.RunFs(r.dist.FS())
 }
 
-func (r *Runner) Run(ctx context.Context, dist target.DistJs, args ...string) (err error) {
-	if any(r.newCore) == nil {
+func (r *ReRunner) Run(ctx context.Context, dist target.DistJs, args ...string) (err error) {
+	if any(r.NewCore) == nil {
 		panic("newCore cannot be nil")
 	}
 	if !filepath.IsAbs(dist.Abs()) {
@@ -35,7 +43,7 @@ func (r *Runner) Run(ctx context.Context, dist target.DistJs, args ...string) (e
 	}
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Printf("run %T %s", dist, dist.Abs())
-	core, ctx := r.newCore(ctx, dist)
+	core, ctx := r.NewCore(ctx, dist)
 	r.backend = goja.NewBackend(core)
 	r.dist = dist
 	if err = r.Reload(); err != nil {
@@ -57,5 +65,6 @@ func (r *Runner) Run(ctx context.Context, dist target.DistJs, args ...string) (e
 		}
 		return nil
 	})
+	r.send = reload.Start(ctx, dist, r.Reload, core)
 	return watch.Run(ctx, dist, args...)
 }

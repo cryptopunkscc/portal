@@ -5,22 +5,19 @@ import (
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/resolve/apps"
-	"github.com/cryptopunkscc/portal/runner/app"
+	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/cli"
-	"github.com/cryptopunkscc/portal/runner/multi"
-	"github.com/cryptopunkscc/portal/runner/open"
 	"github.com/cryptopunkscc/portal/runner/version"
 	"github.com/cryptopunkscc/portal/runner/wails"
 )
 
-func main() { cli.Run(Application[AppHtml]{}.Handler()) }
+func main() { cli.Run(Application{}.Handler()) }
 
-type Application[T AppHtml] struct{}
+type Application struct{}
 
-func (a Application[T]) Handler() cmd.Handler {
+func (a Application) Handler() cmd.Handler {
 	return cmd.Handler{
-		Func: open.NewRun[T](&a),
+		Func: source.File.NewRun(wails.Runner(a.core).Try),
 		Name: "html",
 		Desc: "Start portal app in wails runner.",
 		Params: cmd.Params{
@@ -31,9 +28,8 @@ func (a Application[T]) Handler() cmd.Handler {
 		},
 	}
 }
-func (a Application[T]) Resolver() Resolve[T] { return apps.Resolver[T]() }
-func (a Application[T]) Runner() Run[T]       { return multi.NewRun[T](app.Runner(wails.NewRun(a.core))) }
-func (a Application[T]) core(ctx context.Context, portal Portal_) (bind.Core, context.Context) {
+
+func (a Application) core(ctx context.Context, portal Portal_) (bind.Core, context.Context) {
 	r, ctx := bind.NewFrontendCore(ctx, portal)
 	return &Adapter{r}, ctx
 }

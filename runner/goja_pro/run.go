@@ -6,26 +6,33 @@ import (
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/resolve/js"
 	"github.com/cryptopunkscc/portal/runner/goja_dist"
 	"github.com/cryptopunkscc/portal/runner/npm"
 	"github.com/cryptopunkscc/portal/runner/npm_build"
 	"time"
 )
 
-type runner struct {
+func Runner(newCore bind.NewCore) *target.SourceRunner[target.ProjectJs] {
+	return &target.SourceRunner[target.ProjectJs]{
+		Resolve: target.Any[target.ProjectJs](js.ResolveProject.Try),
+		Runner: &ReRunner{
+			distRunner: &goja_dist.ReRunner{
+				NewCore: newCore,
+			},
+		},
+	}
+}
+
+type ReRunner struct {
 	distRunner target.ReRunner[target.DistJs]
 }
 
-func NewRunner(newCore bind.NewCore, send target.MsgSend) target.ReRunner[target.ProjectJs] {
-	distRunner := goja_dist.NewRunner(newCore, send)
-	return &runner{distRunner: distRunner}
-}
-
-func (r *runner) Reload() (err error) {
+func (r *ReRunner) Reload() (err error) {
 	return r.distRunner.Reload()
 }
 
-func (r *runner) Run(ctx context.Context, projectJs target.ProjectJs, args ...string) (err error) {
+func (r *ReRunner) Run(ctx context.Context, projectJs target.ProjectJs, args ...string) (err error) {
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Println("start", projectJs.Manifest().Package, projectJs.Abs())
 	defer log.Println("exit", projectJs.Manifest().Package, projectJs.Abs())

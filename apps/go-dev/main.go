@@ -1,26 +1,20 @@
 package main
 
 import (
-	. "github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/resolve/sources"
+	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/cli"
-	"github.com/cryptopunkscc/portal/runner/exec"
-	"github.com/cryptopunkscc/portal/runner/go_dev"
-	"github.com/cryptopunkscc/portal/runner/multi"
-	"github.com/cryptopunkscc/portal/runner/open"
-	"github.com/cryptopunkscc/portal/runner/reload"
+	"github.com/cryptopunkscc/portal/runner/go_project"
 	"github.com/cryptopunkscc/portal/runner/version"
 )
 
-func main() { cli.Run(Application[ProjectGo]{}.handler()) }
+func main() { cli.Run(Application{}.handler()) }
 
-type Application[T ProjectGo] struct{}
+type Application struct{}
 
-func (a Application[T]) handler() cmd.Handler {
+func (a Application) handler() cmd.Handler {
 	return cmd.Handler{
-		Func: open.NewRun[T](a),
+		Func: source.File.NewRun(go_project.Runner.Try),
 		Name: "dev-go",
 		Desc: "Start portal golang app development.",
 		Params: cmd.Params{
@@ -31,11 +25,3 @@ func (a Application[T]) handler() cmd.Handler {
 		},
 	}
 }
-
-func (a Application[T]) Runner() Run[T] {
-	return multi.NewRun[T](
-		reload.Mutable(bind.NewDefaultCore, go_dev.Adapter(exec.Dist)),
-	)
-}
-
-func (a Application[T]) Resolver() Resolve[T] { return sources.Resolver[T]() }

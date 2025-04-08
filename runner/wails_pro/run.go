@@ -8,7 +8,9 @@ import (
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/resolve/html"
 	"github.com/cryptopunkscc/portal/runner/npm_build"
+	"github.com/cryptopunkscc/portal/runner/reload"
 	"github.com/cryptopunkscc/portal/runner/wails"
 	"github.com/wailsapp/wails/v2/pkg/application"
 	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
@@ -16,6 +18,13 @@ import (
 	"os/signal"
 	"syscall"
 )
+
+func Runner(newCore bind.NewCore) *target.SourceRunner[target.ProjectHtml] {
+	return &target.SourceRunner[target.ProjectHtml]{
+		Resolve: target.Any[target.ProjectHtml](html.ResolveProject.Try),
+		Runner:  ReRunner(newCore),
+	}
+}
 
 func ReRunner(newCore bind.NewCore) target.ReRunner[target.ProjectHtml] {
 	return &reRunner{NewCore: newCore}
@@ -41,8 +50,8 @@ func (r *reRunner) Run(ctx context.Context, projectHtml target.ProjectHtml, args
 		return
 	}
 
-	api, ctx := r.NewCore(ctx, projectHtml)
-	opt := wails.AppOptions(api)
+	core, ctx := r.NewCore(ctx, projectHtml)
+	opt := wails.AppOptions(core)
 	opt.OnStartup = func(ctx context.Context) { r.frontCtx = ctx }
 	path := projectHtml.Abs()
 
@@ -86,6 +95,9 @@ func (r *reRunner) Run(ctx context.Context, projectHtml target.ProjectHtml, args
 		<-ctx.Done()
 		app.Quit()
 	}()
+
+	_ = reload.Start(ctx, projectHtml, r.Reload, core)
+
 	err = app.Run()
 	if err != nil {
 		log.F().Printf("dev.Run: %v", err)

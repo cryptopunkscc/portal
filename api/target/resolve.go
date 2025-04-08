@@ -39,11 +39,11 @@ func (resolve Resolve[T]) list(from Source) (out []T) {
 			return nil
 		}
 		s, err := resolve(m)
-		if errors.Is(err, fs.SkipDir) || errors.Is(err, fs.SkipAll) {
-			return err
-		}
 		if any(s) != nil && !reflect.ValueOf(s).IsNil() {
 			out = append(out, s)
+		}
+		if errors.Is(err, fs.SkipDir) || errors.Is(err, fs.SkipAll) {
+			return err
 		}
 		return nil
 	})
@@ -73,11 +73,12 @@ func Any[T Source](of ...Resolve[Source]) Resolve[T] {
 				err = nil
 				continue
 			}
-			ok := false
+			var ok bool
 			if s, ok = any(v).(T); ok {
 				return
 			}
 		}
+		err = ErrNotTarget
 		return
 	}
 }

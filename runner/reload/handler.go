@@ -34,6 +34,9 @@ func (s *handler) HandleMsg(ctx context.Context, msg target.Msg) {
 	log.Println("received broadcast message:", msg)
 	switch msg.Event {
 	case target.DevChanged:
+		if s.cache == nil {
+			return
+		}
 		for _, c := range s.cache.Connections().Copy() {
 			if c.In() {
 				continue
