@@ -100,7 +100,7 @@ Parameters:
 Subcommands:
 
     bar b  - Bar description
-    baz    -
+    baz
 `)
 	actual := Help{handler}.MarshalCLI()
 	assert.Equal(t, expected, strings.TrimSpace(actual))
