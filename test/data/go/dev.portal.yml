@@ -1,7 +1,6 @@
 name: go
 package: test.go
 title: test go
-out: main
 build:
   default:
     cmd: go build -o dist/main

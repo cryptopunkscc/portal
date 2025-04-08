@@ -21,7 +21,7 @@ func init() {
 
 var pathManifestAll = map[string]*target.Manifest{
 	"/test_data/bundle/bundle.portal":     test.EmbedBundleManifest,
-	"/test_data/go":                       test.EmbedGoManifest,
+	"/test_data/go":                       test.EmbedGoProjectManifest,
 	"/test_data/go/build/test.go_.portal": test.EmbedGoManifest,
 	"/test_data/go/dist":                  test.EmbedGoManifest,
 	"/test_data/html":                     test.EmbedHtmlManifest,
@@ -36,7 +36,7 @@ var pathManifestAll = map[string]*target.Manifest{
 }
 
 var pathManifestReduced = map[string]*target.Manifest{
-	"/test_data/go":                   test.EmbedGoManifest,
+	"/test_data/go":                   test.EmbedGoProjectManifest,
 	"/test_data/svelte":               test.EmbedSvelteManifest,
 	"/test_data/js-rollup":            test.EmbedJsRollupManifest,
 	"/test_data/bundle/bundle.portal": test.EmbedBundleManifest,

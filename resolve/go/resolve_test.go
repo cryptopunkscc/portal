@@ -14,7 +14,7 @@ func TestResolveProject(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, test.EmbedGoManifest, bundle.Manifest())
+	assert.Equal(t, test.EmbedGoProjectManifest, bundle.Manifest())
 	assert.Equal(t, test.EmbedGoBuild, bundle.Build())
 	assert.Equal(t, test.EmbedGoManifest, bundle.Dist().Manifest())
 }

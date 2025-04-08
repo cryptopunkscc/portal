@@ -60,13 +60,14 @@ func init() {
 }
 
 var (
-	EmbedShManifest       = &target.Manifest{Name: "sh", Package: "new.portal.sh", Exec: "main"}
-	EmbedJsManifest       = &target.Manifest{Name: "js", Package: "new.portal.js"}
-	EmbedBundleManifest   = &target.Manifest{Name: "bundle", Package: "new.portal.bundle"}
-	EmbedHtmlManifest     = &target.Manifest{Name: "html", Package: "new.portal.html"}
-	EmbedSvelteManifest   = &target.Manifest{Name: "svelte", Package: "new.portal.svelte"}
-	EmbedJsRollupManifest = &target.Manifest{Name: "js-rollup", Package: "new.portal.js-rollup"}
-	EmbedGoManifest       = &target.Manifest{Name: "go", Package: "test.go", Title: "test go", Exec: "main"}
+	EmbedShManifest        = &target.Manifest{Name: "sh", Package: "new.portal.sh", Exec: "main"}
+	EmbedJsManifest        = &target.Manifest{Name: "js", Package: "new.portal.js"}
+	EmbedBundleManifest    = &target.Manifest{Name: "bundle", Package: "new.portal.bundle"}
+	EmbedHtmlManifest      = &target.Manifest{Name: "html", Package: "new.portal.html"}
+	EmbedSvelteManifest    = &target.Manifest{Name: "svelte", Package: "new.portal.svelte"}
+	EmbedJsRollupManifest  = &target.Manifest{Name: "js-rollup", Package: "new.portal.js-rollup"}
+	EmbedGoManifest        = &target.Manifest{Name: "go", Package: "test.go", Title: "test go", Exec: "main"}
+	EmbedGoProjectManifest = &target.Manifest{Name: "go", Package: "test.go", Title: "test go"}
 )
 
 var (
