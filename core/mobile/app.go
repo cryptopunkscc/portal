@@ -15,7 +15,7 @@ func (m *service) App(path string) mobile.App {
 		plog.Get(m.ctx).Type(m).E().Println(target.ErrNotFound)
 		return nil
 	}
-	if source, ok := apps[0].(target.App_); ok {
+	if source, ok := apps[0].Source().(target.App_); ok {
 		return &app_{
 			ctx:     m.ctx,
 			source:  source,
