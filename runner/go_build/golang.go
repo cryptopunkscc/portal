@@ -50,8 +50,10 @@ func (g runner) Run(ctx context.Context, project target.ProjectGo, args ...strin
 		Dir:  project.Abs(),
 	}.Default()
 
-	if err = os.RemoveAll(filepath.Join(project.Abs(), "dist")); err != nil {
-		log.W().Println(err)
+	if slices.Contains(args, "clean") {
+		if err = os.RemoveAll(filepath.Join(project.Abs(), "dist")); err != nil {
+			log.W().Println(err)
+		}
 	}
 	for _, platform := range g.platforms {
 		build, ok := project.Build()[platform]

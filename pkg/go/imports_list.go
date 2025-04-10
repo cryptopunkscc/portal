@@ -61,6 +61,10 @@ func (imp *imports) Collect(path string) (err error) {
 	imp.c = make(chan []string)
 	imp.set = make(map[string][]string)
 
+	if filepath.IsAbs(path) {
+		path = strings.TrimPrefix(path, imp.root)
+		path = strings.TrimPrefix(path, "/")
+	}
 	path = filepath.Clean(path)
 	go imp.collect(path)
 
