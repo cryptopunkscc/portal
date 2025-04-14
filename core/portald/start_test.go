@@ -7,6 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/test"
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
@@ -23,7 +24,7 @@ func TestService_Start(t *testing.T) {
 			s.Config.Apphost.Listen = []string{"tcp:127.0.0.1:8636"}
 			s.Config.Ether.UDPPort = 8833
 			if err := s.Configure(); err != nil {
-				plog.New().Println(err)
+				plog.Println(err)
 				t.Error(err)
 			}
 			s.Astrald = &exec.Astrald{NodeRoot: s.Config.Astrald}
@@ -35,8 +36,13 @@ func TestService_Start(t *testing.T) {
 				time.Sleep(10 * time.Millisecond) // give a time to kill astrald process
 			})
 			if err := s.Start(ctx); err != nil {
-				plog.New().Println(err)
-				t.Error(err)
+				plog.P().Println(err)
+			}
+
+			if alias, err := s.Apphost.NodeAlias(); err != nil {
+				plog.P().Println(err)
+			} else {
+				assert.NotZero(t, alias)
 			}
 		})
 	}
