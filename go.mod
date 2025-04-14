@@ -4,7 +4,7 @@ go 1.23.7
 
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
-	github.com/cryptopunkscc/astrald v0.0.0-20250328195113-9f8e531ca592
+	github.com/cryptopunkscc/astrald v0.0.0-20250414163628-2b74db40641e
 	github.com/dop251/goja v0.0.0-20240220182346-e401ed450204
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/getlantern/systray v1.2.2
@@ -22,7 +22,7 @@ require (
 	github.com/webview/webview v0.0.0-20230415172654-8387ff8945fc
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 	golang.org/x/mod v0.24.0
-	golang.org/x/sys v0.31.0
+	golang.org/x/sys v0.32.0
 	gopkg.in/yaml.v3 v3.0.1
 	rogchap.com/v8go v0.9.0
 )
@@ -81,10 +81,13 @@ require (
 	github.com/wailsapp/go-webview2 v1.0.10 // indirect
 	github.com/wailsapp/mimetype v1.4.1 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
-	golang.org/x/crypto v0.36.0 // indirect
-	golang.org/x/net v0.37.0 // indirect
-	golang.org/x/term v0.30.0 // indirect
-	golang.org/x/text v0.23.0 // indirect
+	golang.org/x/crypto v0.37.0 // indirect
+	golang.org/x/mobile v0.0.0-20250408133729-978277e7eaf7 // indirect
+	golang.org/x/net v0.39.0 // indirect
+	golang.org/x/sync v0.13.0 // indirect
+	golang.org/x/term v0.31.0 // indirect
+	golang.org/x/text v0.24.0 // indirect
+	golang.org/x/tools v0.32.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/driver/sqlite v1.5.4 // indirect
 	gorm.io/gorm v1.25.4 // indirect
@@ -94,4 +97,4 @@ require (
 	modernc.org/sqlite v1.25.0 // indirect
 )
 
-replace github.com/cryptopunkscc/astrald => ../astrald
+//replace github.com/cryptopunkscc/astrald => ../astrald

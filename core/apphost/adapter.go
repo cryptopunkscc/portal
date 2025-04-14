@@ -121,7 +121,7 @@ func (s session) Close() error {
 	return s.i.Close()
 }
 
-type tokenResponse struct{ i mod.TokenResponse }
+type tokenResponse struct{ i mod.AuthResponse }
 
 func (t tokenResponse) Code() uint8               { return uint8(t.i.Code) }
 func (t tokenResponse) GuestID() *astral.Identity { return t.i.GuestID }

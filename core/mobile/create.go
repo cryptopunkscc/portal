@@ -9,7 +9,6 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	exec2 "github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/goja"
-	"path/filepath"
 )
 
 func Create(api mobile.Api) mobile.Core {
@@ -20,10 +19,14 @@ func Create(api mobile.Api) mobile.Core {
 	m := &service{}
 	m.mobile = api
 	m.ctx = context.Background()
-	m.Config.Astrald = filepath.Join(api.DataDir(), "astrald")
-	m.Config.Tokens = filepath.Join(api.DataDir(), "portald", "tokens")
-	m.Config.Apps = filepath.Join(api.DataDir(), "portald", "apps")
+	m.Config.Dir = api.DataDir()
+	m.Config.Astrald = "astrald"
+	m.Config.Tokens = "portald/tokens"
+	m.Config.Apps = "portald/apps"
+	m.Config.Bin = "portald/bin"
+	m.Config.Config.Node.Log.DisableColors = true
 	m.Config.AstralDB = api.DbDir()
+	_ = m.Configure()
 	m.Astrald = &astrald{
 		NodeRoot: m.Config.Astrald,
 		DbRoot:   api.DbDir(),
