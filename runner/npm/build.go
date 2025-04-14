@@ -14,7 +14,7 @@ func Build(_ context.Context, m target.NodeModule) (err error) {
 		return
 	}
 	if !m.PkgJson().CanBuild() {
-		return errors.New("missing npm build in package.json")
+		return errors.New("missing scripts.build in package.json")
 	}
 	if err = exec.Run(m.Abs(), "npm", "run", "build"); err != nil {
 		return fmt.Errorf("npm.Build %v: %w", m.Abs(), err)

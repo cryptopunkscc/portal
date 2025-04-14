@@ -6,7 +6,17 @@ import (
 
 type Unmarshal func(in []byte, out interface{}) (err error)
 
+type Unmarshaler interface {
+	Load(dst any, src fs.FS, name string) (err error)
+}
+
+type Load func(dst any, src fs.FS, name string) (err error)
+
+func (l Load) Load(dst any, src fs.FS, name string) (err error) { return l(dst, src, name) }
+
 type Unmarshalers map[string]Unmarshal
+
+var _ Unmarshaler = Unmarshalers{}
 
 func From(unmarshalers ...Unmarshalers) (out Unmarshalers) {
 	out = make(Unmarshalers)

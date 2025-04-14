@@ -13,3 +13,5 @@ build:
   windows:
     out: main.exe
     cmd: go build -o dist/main.exe
+  linux_x86:
+  linux_x64:

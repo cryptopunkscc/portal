@@ -6,4 +6,4 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/dec/yaml"
 )
 
-var Unmarshalers = dec.From(json.Unmarshaler, yaml.Unmarshalers)
+var Unmarshalers dec.Unmarshaler = dec.From(json.Unmarshaler, yaml.Unmarshalers)
