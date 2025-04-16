@@ -21,6 +21,7 @@ type Service[T Portal_] struct {
 	shutdown  context.CancelFunc
 
 	Config      portal.Config
+	configured  bool
 	ExtraTokens []string
 
 	Apphost apphost.Adapter
@@ -32,7 +33,10 @@ type Service[T Portal_] struct {
 }
 
 func (s *Service[T]) Configure() (err error) {
-	err = s.Config.Build()
+	if err = s.Config.Build(); err != nil {
+		return
+	}
+	s.configured = true
 	plog.D().Printf("config:\n%s", s.Config.Yaml())
 	return
 }
