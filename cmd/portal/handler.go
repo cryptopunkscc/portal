@@ -28,6 +28,14 @@ func (a *Application) Handler() (h cmd.Handler) {
 					{Type: "...string", Desc: "List of commands to run with given arg."},
 				},
 			},
+			{
+				Func: a.queryApp,
+				Name: "query q",
+				Desc: "Astral query. Accepted formats are CLI or URI query.",
+				Params: cmd.Params{
+					{Type: "...string", Desc: "Optional application arguments."},
+				},
+			},
 		},
 	}
 	cmd.InjectHelp(&h)
