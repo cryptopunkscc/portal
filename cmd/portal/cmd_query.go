@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
+	"net/url"
 	"os"
 	"strings"
 )
@@ -14,6 +15,7 @@ func (a *Application) queryApp(ctx context.Context, query string) (err error) {
 
 	target := ""
 	target, query = splitQuery(query)
+	query = parseQuery(query)
 	conn, err := a.Apphost.Query(target, query, nil)
 	if err != nil {
 		return
@@ -38,4 +40,22 @@ func splitQuery(targetQuery string) (target string, query string) {
 	target = chunks[0]
 	query = chunks[1]
 	return
+}
+
+func parseQuery(query string) string {
+	if !strings.Contains(query, " -") {
+		return query
+	}
+	vals := url.Values{}
+	chunks := strings.Split(query, " ")
+	for len(chunks) > 1 {
+		if !strings.HasPrefix(chunks[0], "-") {
+			break
+		}
+		vals.Add(chunks[0], chunks[1])
+	}
+	if len(chunks) > 0 {
+		vals["_"] = chunks
+	}
+	return vals.Encode()
 }
