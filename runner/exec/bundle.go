@@ -14,15 +14,22 @@ import (
 	"path/filepath"
 )
 
-var BundleRunner = target.SourceRunner[target.BundleExec]{
-	Resolve: target.Any[target.BundleExec](target.Try(exec.ResolveBundle)),
-	Runner:  Bundle,
+func NewBundleRunner(binDir string) target.SourceRunner[target.BundleExec] {
+	return target.SourceRunner[target.BundleExec]{
+		Resolve: target.Any[target.BundleExec](target.Try(exec.ResolveBundle)),
+		Runner:  &bundleRunner{binDir: binDir},
+	}
 }
 
-var Bundle target.Run[target.BundleExec] = runBundle
+var BundleRunner = target.SourceRunner[target.BundleExec]{
+	Resolve: target.Any[target.BundleExec](target.Try(exec.ResolveBundle)),
+	Runner:  &bundleRunner{},
+}
 
-func runBundle(ctx context.Context, bundle target.BundleExec, args ...string) (err error) {
-	execFile, err := unpackExecutable(bundle)
+type bundleRunner struct{ binDir string }
+
+func (r *bundleRunner) Run(ctx context.Context, bundle target.BundleExec, args ...string) (err error) {
+	execFile, err := r.unpackExecutable(bundle)
 	if err != nil {
 		return
 	}
@@ -34,10 +41,13 @@ func runBundle(ctx context.Context, bundle target.BundleExec, args ...string) (e
 	return
 }
 
-func unpackExecutable(bundle target.BundleExec) (execFile *os.File, err error) {
+func (r *bundleRunner) unpackExecutable(bundle target.BundleExec) (execFile *os.File, err error) {
 	defer plog.TraceErr(&err)
-	binDir := env.PortaldBin.MkdirAll()
-	if len(binDir) == 0 {
+
+	if len(r.binDir) == 0 {
+		r.binDir = env.PortaldBin.MkdirAll()
+	}
+	if len(r.binDir) == 0 {
 		return nil, plog.Errorf("no executable path specified")
 	}
 
@@ -62,7 +72,7 @@ func unpackExecutable(bundle target.BundleExec) (execFile *os.File, err error) {
 		srcId,
 	)
 
-	if execFile, err = os.OpenFile(filepath.Join(binDir, execName), os.O_RDWR|os.O_CREATE, 0755); err != nil {
+	if execFile, err = os.OpenFile(filepath.Join(r.binDir, execName), os.O_RDWR|os.O_CREATE, 0755); err != nil {
 		return
 	}
 	defer execFile.Close()

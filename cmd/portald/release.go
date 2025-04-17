@@ -10,7 +10,7 @@ import (
 func (a *Application[T]) init() {
 	a.Resolve = Any[Runnable](
 		exec.DistRunner.Try,
-		exec.BundleRunner.Try,
-		exec.BundleHostRunner.Try,
+		exec.NewBundleRunner(a.Config.Bin).Try,
+		exec.NewBundleHostRunner(a.Config.Bin).Try,
 	)
 }

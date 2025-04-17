@@ -38,7 +38,7 @@ func Create(api mobile.Api) mobile.Core {
 		goja.Runner(m.cores().NewBackendFunc()).Try,
 		m.htmlRunner().Try,
 		exec2.DistRunner.Try,
-		exec2.BundleRunner.Try,
+		exec2.NewBundleRunner(m.Config.Bin).Try,
 	)
 	return m
 }
