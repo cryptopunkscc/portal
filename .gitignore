@@ -5,5 +5,5 @@ dist
 !resolve/dist
 !runner/build
 .idea/
-.test
+.test*
 .portal

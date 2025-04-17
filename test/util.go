@@ -11,6 +11,11 @@ import (
 	"testing"
 )
 
+func CleanDir(t *testing.T, path ...string) string {
+	Clean(path...)
+	return Dir(t, path...)
+}
+
 func Dir(t *testing.T, path ...string) string {
 	wd, err := os.Getwd()
 	if err != nil {

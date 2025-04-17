@@ -66,7 +66,7 @@ func (c *Config) Build() (err error) {
 		return
 	}
 	c.fixApphostAddress()
-	c.writeEnvVars()
+	//c.writeEnvVars()
 	return
 }
 
