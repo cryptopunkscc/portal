@@ -28,7 +28,6 @@ func init() {
 
 var Aliases = map[string]interface{}{
 	"apps": Install.Apps,
-	"a":    Install.Astrald,
 	"p":    Install.Portald,
 	"c":    Install.Cli,
 	"all":  Install.All,
