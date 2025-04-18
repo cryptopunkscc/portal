@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/portal"
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/core/portald/debug"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/test"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -30,7 +30,8 @@ func (s *testService) configure() {
 	if err := s.Configure(); err != nil {
 		plog.P().Println(err)
 	}
-	s.Astrald = &exec.Astrald{NodeRoot: s.Config.Astrald}
+	//s.Astrald = &exec.Astrald{NodeRoot: s.Config.Astrald} // Faster testing
+	s.Astrald = &debug.Astrald{NodeRoot: s.Config.Astrald} // Debugging astrald
 }
 
 func (s *testService) testNodeStart(t *testing.T, ctx context.Context) {
