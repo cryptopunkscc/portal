@@ -1,6 +1,9 @@
 package query
 
-import "testing"
+import (
+	"github.com/cryptopunkscc/portal/pkg/rpc"
+	"testing"
+)
 
 func TestMarshal(t *testing.T) {
 	tests := []struct {
@@ -16,6 +19,16 @@ func TestMarshal(t *testing.T) {
 				S string
 				B bool
 			}{1, "s", true},
+			want:    "b=true&i=1&s=s",
+			wantErr: false,
+		},
+		{
+			name: "map",
+			arg: rpc.Opt{
+				"b": true,
+				"i": 1,
+				"s": "s",
+			},
 			want:    "b=true&i=1&s=s",
 			wantErr: false,
 		},

@@ -29,7 +29,8 @@ func marshal(from any, to url.Values, tag string) (err error) {
 		objValue = objValue.Elem()
 	}
 
-	if objType.Kind() == reflect.Array || objType.Kind() == reflect.Slice {
+	switch objType.Kind() {
+	case reflect.Array, reflect.Slice:
 		if objValue.Len() == 0 {
 			return ErrorEmptyValue
 		}
@@ -40,27 +41,49 @@ func marshal(from any, to url.Values, tag string) (err error) {
 			if err != nil {
 				return
 			}
-
 		}
-	} else if objType.Kind() == reflect.Struct {
+
+	case reflect.Map:
+		if objValue.Len() == 0 {
+			return ErrorEmptyValue
+		}
+		for _, key := range objValue.MapKeys() {
+			mapValue := objValue.MapIndex(key)
+			// skip nil pointers in map values
+			if mapValue.Kind() == reflect.Ptr && mapValue.IsNil() {
+				continue
+			}
+			// skip zero values
+			if mapValue.IsZero() {
+				continue
+			}
+
+			if err = marshal(mapValue.Interface(), to, key.String()); err != nil {
+				return
+			}
+		}
+
+	case reflect.Struct:
 		if objValue.NumField() == 0 {
 			return ErrorEmptyValue
 		}
 		for i := 0; i < objType.NumField(); i++ {
 			field := objType.Field(i)
 			fieldValue := objValue.Field(i)
+
+			// skip nil pointers
 			if fieldValue.Kind() == reflect.Ptr && fieldValue.IsNil() {
 				continue
 			}
+			// skip zero values
 			if fieldValue.IsZero() {
 				continue
 			}
 
-			// use the `json` tag if available, otherwise fallback to the field name
-			tag = field.Tag.Get("query")
-			if tag == "" || tag == "-" {
-				tag = field.Name
-				tag = strings.ToLower(tag)
+			// use the "query" tag if available, otherwise fallback to field name
+			fieldTag := field.Tag.Get("query")
+			if fieldTag == "" || fieldTag == "-" {
+				fieldTag = strings.ToLower(field.Name)
 			}
 
 			// Skip unexported fields
@@ -70,7 +93,7 @@ func marshal(from any, to url.Values, tag string) (err error) {
 
 			// handle collections
 			if fieldValue.Kind() == reflect.Array || fieldValue.Kind() == reflect.Slice {
-				if err = marshal(fieldValue.Interface(), to, tag); err != nil {
+				if err = marshal(fieldValue.Interface(), to, fieldTag); err != nil {
 					return
 				}
 				continue
@@ -79,10 +102,12 @@ func marshal(from any, to url.Values, tag string) (err error) {
 			// format single value
 			value := fmt.Sprintf("%v", fieldValue.Interface())
 			if value != "" {
-				to.Add(tag, value)
+				to.Add(fieldTag, value)
 			}
 		}
-	} else {
+
+	default:
+		// for basic types, add value with fallback key
 		to.Add(tag, fmt.Sprintf("%v", from))
 	}
 

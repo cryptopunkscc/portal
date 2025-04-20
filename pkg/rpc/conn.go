@@ -19,6 +19,8 @@ type Conn interface {
 	Flush()
 }
 
+type Opt map[string]any
+
 func Call[T any](conn Conn, name string, args ...T) (err error) {
 	var payload any
 	if len(args) > 0 {
