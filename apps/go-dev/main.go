@@ -14,7 +14,7 @@ type Application struct{}
 
 func (a Application) handler() cmd.Handler {
 	return cmd.Handler{
-		Func: source.File.NewRun(go_project.Runner.Try),
+		Func: source.File.NewRun(go_project.Runner().Try),
 		Name: "dev-go",
 		Desc: "Start portal golang app development.",
 		Params: cmd.Params{

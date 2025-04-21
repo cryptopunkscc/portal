@@ -10,9 +10,9 @@ import (
 func (a *Application[T]) init() {
 	a.Order = []int{2, 1, 0}
 	a.Resolve = Any[Runnable](
-		exec.DistRunner.Try,
-		exec.NewBundleRunner(a.Config.Bin).Try,
-		exec.ProjectRunner.Try,
-		exec.ProjectHostRunner.Try,
+		exec.Runner{Config: a.Config}.Dist().Try,
+		exec.Runner{Config: a.Config}.Bundle().Try,
+		exec.Runner{Config: a.Config}.Project().Try,
+		exec.Runner{Config: a.Config}.ProjectHost().Try,
 	)
 }

@@ -14,12 +14,14 @@ import (
 	"time"
 )
 
-var Runner = &target.SourceRunner[target.ProjectGo]{
-	Resolve: target.Any[target.ProjectGo](golang2.ResolveProject.Try),
-	Runner: &ReRunner{
-		watcher: golang.NewWatcher(),
-		run:     exec.Dist,
-	},
+func Runner() *target.SourceRunner[target.ProjectGo] {
+	return &target.SourceRunner[target.ProjectGo]{
+		Resolve: target.Any[target.ProjectGo](golang2.ResolveProject.Try),
+		Runner: &ReRunner{
+			watcher: golang.NewWatcher(),
+			run:     exec.DefaultRunner().Dist().Runner.Run,
+		},
+	}
 }
 
 type ReRunner struct {

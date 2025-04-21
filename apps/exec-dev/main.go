@@ -13,10 +13,11 @@ func main() { cli.Run(Application{}.handler()) }
 type Application struct{}
 
 func (a Application) handler() cmd.Handler {
+	r := exec.DefaultRunner()
 	return cmd.Handler{
 		Func: source.File.NewRun(
-			exec.BundleRunner.Try,
-			exec.DistRunner.Try,
+			r.Bundle().Try,
+			r.Dist().Try,
 		),
 		Name: "dev-exec",
 		Desc: "Portal development runner for executables.",

@@ -6,14 +6,16 @@ import (
 	"github.com/cryptopunkscc/portal/resolve/exec"
 )
 
-var DistRunner = target.SourceRunner[target.DistExec]{
-	Resolve: target.Any[target.DistExec](target.Try(exec.ResolveDist)),
-	Runner:  Dist,
+func (r Runner) Dist() *target.SourceRunner[target.DistExec] {
+	return &target.SourceRunner[target.DistExec]{
+		Resolve: target.Any[target.DistExec](target.Try(exec.ResolveDist)),
+		Runner:  &DistRunner{r},
+	}
 }
 
-var Dist target.Run[target.DistExec] = runDist
+type DistRunner struct{ Runner }
 
-func runDist(ctx context.Context, src target.DistExec, args ...string) (err error) {
+func (r *DistRunner) Run(ctx context.Context, src target.DistExec, args ...string) (err error) {
 	abs := src.Target().Executable().Abs()
-	return Cmd{}.RunApp(ctx, *src.Manifest(), abs, args...)
+	return r.RunApp(ctx, *src.Manifest(), abs, args...)
 }

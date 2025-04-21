@@ -3,33 +3,33 @@ package exec
 import (
 	"context"
 	"errors"
-	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/bundle"
 	"github.com/cryptopunkscc/portal/resolve/exec"
+	"github.com/cryptopunkscc/portal/resolve/source"
 	"slices"
 )
 
-func NewBundleHostRunner(binDir string) *target.SourceRunner[target.Portal_] {
+func (r Runner) BundleHost() *target.SourceRunner[target.Portal_] {
 	return &target.SourceRunner[target.Portal_]{
 		Resolve: target.Any[target.Portal_](target.Try(bundle.ResolveAny)),
-		Runner:  &bundleHostRunner{bundleRunner{binDir}},
+		Runner:  &BundleHostRunner{BundleRunner{r}},
 	}
 }
 
-type bundleHostRunner struct{ bundleRunner }
+type BundleHostRunner struct{ BundleRunner }
 
-func (r *bundleHostRunner) Run(ctx context.Context, src target.Portal_, args ...string) (err error) {
+func (r *BundleHostRunner) Run(ctx context.Context, src target.Portal_, args ...string) (err error) {
 	defer plog.TraceErr(&err)
 	if src.Manifest().Schema == "" {
-		return errors.New("bundleHostRunner requires a schema declared in manifest")
+		return errors.New("BundleHostRunner requires a schema declared in manifest")
 	}
 
 	log := plog.Get(ctx).Type(r)
 	repo := target.SourcesRepository[target.BundleExec]{
-		Sources: []target.Source{env.PortaldApps.Source()},
+		Sources: []target.Source{source.Dir(r.Apps)},
 		Resolve: target.Any[target.BundleExec](exec.ResolveBundle.Try),
 	}
 	hostId := src.Manifest().Schema
@@ -51,5 +51,5 @@ func (r *bundleHostRunner) Run(ctx context.Context, src target.Portal_, args ...
 	}
 
 	args = slices.Insert(args, 0, src.Abs())
-	return Cmd{}.RunApp(ctx, *src.Manifest(), hostExec.Name(), args...)
+	return r.RunApp(ctx, *src.Manifest(), hostExec.Name(), args...)
 }

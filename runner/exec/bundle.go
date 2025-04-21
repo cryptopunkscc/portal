@@ -5,7 +5,6 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/exec"
@@ -14,42 +13,30 @@ import (
 	"path/filepath"
 )
 
-func NewBundleRunner(binDir string) *target.SourceRunner[target.BundleExec] {
+func (r Runner) Bundle() *target.SourceRunner[target.BundleExec] {
 	return &target.SourceRunner[target.BundleExec]{
 		Resolve: target.Any[target.BundleExec](target.Try(exec.ResolveBundle)),
-		Runner:  &bundleRunner{binDir: binDir},
+		Runner:  &BundleRunner{r},
 	}
 }
 
-var BundleRunner = target.SourceRunner[target.BundleExec]{
-	Resolve: target.Any[target.BundleExec](target.Try(exec.ResolveBundle)),
-	Runner:  &bundleRunner{},
-}
+type BundleRunner struct{ Runner }
 
-type bundleRunner struct{ binDir string }
-
-func (r *bundleRunner) Run(ctx context.Context, bundle target.BundleExec, args ...string) (err error) {
+func (r *BundleRunner) Run(ctx context.Context, bundle target.BundleExec, args ...string) (err error) {
 	execFile, err := r.unpackExecutable(bundle)
 	if err != nil {
 		return
 	}
 
-	err = Cmd{}.RunApp(ctx, *bundle.Manifest(), execFile.Name(), args...)
+	err = r.RunApp(ctx, *bundle.Manifest(), execFile.Name(), args...)
 	if err != nil {
 		return
 	}
 	return
 }
 
-func (r *bundleRunner) unpackExecutable(bundle target.BundleExec) (execFile *os.File, err error) {
+func (r *BundleRunner) unpackExecutable(bundle target.BundleExec) (execFile *os.File, err error) {
 	defer plog.TraceErr(&err)
-
-	if len(r.binDir) == 0 {
-		r.binDir = env.PortaldBin.MkdirAll()
-	}
-	if len(r.binDir) == 0 {
-		return nil, plog.Errorf("no executable path specified")
-	}
 
 	src := bundle.Target().Executable()
 	srcFile, err := src.File()
@@ -72,7 +59,7 @@ func (r *bundleRunner) unpackExecutable(bundle target.BundleExec) (execFile *os.
 		srcId,
 	)
 
-	if execFile, err = os.OpenFile(filepath.Join(r.binDir, execName), os.O_RDWR|os.O_CREATE, 0755); err != nil {
+	if execFile, err = os.OpenFile(filepath.Join(r.Bin, execName), os.O_RDWR|os.O_CREATE, 0755); err != nil {
 		return
 	}
 	defer execFile.Close()

@@ -3,7 +3,6 @@ package exec
 import (
 	"context"
 	"errors"
-	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/exec"
@@ -11,30 +10,33 @@ import (
 	"github.com/cryptopunkscc/portal/resolve/dist"
 	exec2 "github.com/cryptopunkscc/portal/resolve/exec"
 	"github.com/cryptopunkscc/portal/resolve/project"
+	"github.com/cryptopunkscc/portal/resolve/source"
 	"slices"
 	"strings"
 )
 
-var ProjectHostRunner = target.SourceRunner[target.Portal_]{
-	Resolve: target.Any[target.Portal_](
-		target.Try(dist.ResolveAny),
-		target.Try(project.ResolveAny),
-	),
-	Runner: &projectHostRunner{},
+func (r Runner) ProjectHost() *target.SourceRunner[target.Portal_] {
+	return &target.SourceRunner[target.Portal_]{
+		Resolve: target.Any[target.Portal_](
+			target.Try(dist.ResolveAny),
+			target.Try(project.ResolveAny),
+		),
+		Runner: &ProjectHostRunner{r},
+	}
 }
 
-type projectHostRunner struct{}
+type ProjectHostRunner struct{ Runner }
 
-func (r *projectHostRunner) Run(ctx context.Context, src target.Portal_, args ...string) (err error) {
+func (r *ProjectHostRunner) Run(ctx context.Context, src target.Portal_, args ...string) (err error) {
 	defer plog.TraceErr(&err)
 	if src.Manifest().Schema == "" {
-		return errors.New("projectHostRunner requires a schema declared in manifest")
+		return errors.New("ProjectHostRunner requires a schema declared in manifest")
 	}
 
 	log := plog.Get(ctx).Type(r)
-	repo := target.SourcesRepository[target.ProjectExec]{
-		Sources: []target.Source{env.PortaldApps.Source()},
-		Resolve: target.Any[target.ProjectExec](exec2.ResolveProject.Try),
+	repo := target.SourcesRepository[target.Portal_]{
+		Sources: []target.Source{source.Dir(r.Apps)},
+		Resolve: target.Any[target.Portal_](exec2.ResolveProject.Try),
 	}
 	hostId := src.Manifest().Schema
 	opt := apphost.PortaldOpenOpt{}
@@ -57,5 +59,5 @@ func (r *projectHostRunner) Run(ctx context.Context, src target.Portal_, args ..
 		return
 	}
 
-	return Cmd{}.RunApp(ctx, *src.Manifest(), c.Cmd, c.Args...)
+	return r.RunApp(ctx, *src.Manifest(), c.Cmd, c.Args...)
 }

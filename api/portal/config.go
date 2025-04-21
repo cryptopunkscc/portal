@@ -1,6 +1,7 @@
 package portal
 
 import (
+	"fmt"
 	"github.com/cryptopunkscc/portal/api/astrald"
 	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/pkg/config"
@@ -95,6 +96,13 @@ func (c *Config) env() map[env.Key]*string {
 		env.PortaldApps:   &c.Apps,
 		env.PortaldBin:    &c.Bin,
 	}
+}
+
+func (c *Config) Env() (e []string) {
+	for key, s := range c.env() {
+		e = append(e, fmt.Sprintf("%s=%s", key, *s))
+	}
+	return
 }
 
 func (c *Config) fixPath() {
