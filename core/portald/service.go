@@ -9,6 +9,7 @@ import (
 	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/core/token"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/resources"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/install"
 	"sync"
@@ -24,18 +25,25 @@ type Service[T Portal_] struct {
 	configured  bool
 	ExtraTokens []string
 
-	Apphost apphost.Adapter
-	Astrald astrald.Runner
+	Apphost   apphost.Adapter
+	Astrald   astrald.Runner
+	Resources resources.FileResources
 
 	Resolve Resolve[Runnable]
 
 	Order []int
+
+	UserInfo *apphost.UserInfo
 }
 
 func (s *Service[T]) Configure() (err error) {
 	if err = s.Config.Build(); err != nil {
 		return
 	}
+	if s.Resources, err = resources.NewFileResources(s.Config.Portald, true); err != nil {
+		return
+	}
+	_ = s.ReadUserInfo()
 	s.configured = true
 	plog.D().Printf("config:\n%s", s.Config.Yaml())
 	return

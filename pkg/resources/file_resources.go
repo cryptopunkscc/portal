@@ -1,6 +1,7 @@
 package resources
 
 import (
+	"fmt"
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/resources"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -47,7 +48,17 @@ func (fr FileResources) DecodeObject(name string, o astral.Object) (err error) {
 		return
 	}
 	defer file.Close()
-	return astral.DecodeObject(file, o)
+
+	objType, payload, err := astral.OpenCanonical(file)
+	switch {
+	case err != nil:
+		return
+	case objType != o.ObjectType():
+		return fmt.Errorf("invalid object type: %s", objType)
+	}
+
+	_, err = o.ReadFrom(payload)
+	return
 }
 
 func (fr FileResources) EncodeObject(name string, o astral.Object) (err error) {
@@ -58,5 +69,6 @@ func (fr FileResources) EncodeObject(name string, o astral.Object) (err error) {
 		return
 	}
 	defer file.Close()
-	return astral.EncodeObject(file, o)
+	_, err = astral.WriteCanonical(file, o)
+	return
 }

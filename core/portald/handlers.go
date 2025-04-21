@@ -38,6 +38,28 @@ func (s *Service[T]) handlers() cmd.Handlers {
 func (s *Service[T]) publicHandlers() cmd.Handlers {
 	return cmd.Handlers{
 		{
+			Name: "user u",
+			Desc: "Manage user.",
+			Sub: cmd.Handlers{
+				{
+					Func: s.CreateUser,
+					Name: "create",
+					Desc: "Create user.",
+					Params: cmd.Params{
+						{Type: "string", Desc: "alias"},
+					},
+				},
+				{
+					Func: s.Claim,
+					Name: "claim",
+					Desc: "Claim a user.",
+					Params: cmd.Params{
+						{Type: "string", Desc: "alias"},
+					},
+				},
+			},
+		},
+		{
 			Func: s.Connect,
 			Name: "connect c",
 			Desc: "Open portal app and redirect standard IO to client.",

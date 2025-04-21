@@ -13,11 +13,11 @@ type User struct {
 }
 
 type UserInfo struct {
-	AccessToken string `json:"access_token"`
-	ContractId  string `json:"contract_id"`
-	KeyId       string `json:"key_id"`
-	UserAlias   string `json:"user_alias"`
-	UserId      string `json:"user_id"`
+	AccessToken string `json:"access_token" yaml:"access_token"`
+	ContractId  string `json:"contract_id" yaml:"contract_id"`
+	KeyId       string `json:"key_id" yaml:"key_id"`
+	UserAlias   string `json:"user_alias" yaml:"user_alias"`
+	UserId      string `json:"user_id" yaml:"user_id"`
 }
 
 func (u User) Create(alias string) (ui *UserInfo, err error) {

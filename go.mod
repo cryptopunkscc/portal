@@ -4,7 +4,7 @@ go 1.23.7
 
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
-	github.com/cryptopunkscc/astrald v0.0.0-20250414163628-2b74db40641e
+	github.com/cryptopunkscc/astrald v0.0.0-20250421140305-22e5ac5e5176
 	github.com/dop251/goja v0.0.0-20240220182346-e401ed450204
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/getlantern/systray v1.2.2
@@ -94,4 +94,4 @@ require (
 	modernc.org/sqlite v1.25.0 // indirect
 )
 
-//replace github.com/cryptopunkscc/astrald => ../astrald
+replace github.com/cryptopunkscc/astrald => ../astrald

@@ -19,6 +19,7 @@ type Config struct {
 }
 
 type Dirs struct {
+	Portald  string `yaml:",omitempty"`
 	Astrald  string `yaml:",omitempty"`
 	AstralDB string `yaml:",omitempty"`
 	Tokens   string `yaml:",omitempty"`
@@ -29,6 +30,7 @@ type Dirs struct {
 var baseConfig = Config{
 	Dir: "./portal",
 	Dirs: Dirs{
+		Portald:  "",
 		Astrald:  "astrald",
 		AstralDB: "astrald",
 		Tokens:   "tokens",
@@ -40,6 +42,7 @@ var baseConfig = Config{
 
 func (c *Config) dirs() []*string {
 	return []*string{
+		&c.Portald,
 		&c.Astrald,
 		&c.AstralDB,
 		&c.Dir,
@@ -96,7 +99,7 @@ func (c *Config) env() map[env.Key]*string {
 
 func (c *Config) fixPath() {
 	for _, path := range c.dirs() {
-		if filepath.IsLocal(*path) {
+		if filepath.IsLocal(*path) || *path == "" {
 			*path = filepath.Join(c.Dir, *path)
 		}
 	}

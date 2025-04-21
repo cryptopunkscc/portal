@@ -20,6 +20,13 @@ type Adapter struct {
 	identities sig.Map[string, *astral.Identity]
 }
 
+func (a *Adapter) Clone() (c *Adapter) {
+	c = &Adapter{}
+	c.Log = a.Log
+	c.Client.Client = a.Client.Client
+	return
+}
+
 func (a *Adapter) Connect() (err error) {
 	defer plog.TraceErr(&err)
 	if !a.Client.IsConnected() {

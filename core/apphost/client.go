@@ -3,6 +3,7 @@ package apphost
 import (
 	"github.com/cryptopunkscc/astrald/lib/apphost"
 	"github.com/cryptopunkscc/portal/api/env"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"
 	"sync"
 )
@@ -32,6 +33,7 @@ func (c *Client) Reconnect() (err error) {
 }
 
 func (c *Client) connect() (err error) {
+	defer plog.TraceErr(&err)
 	if len(c.Endpoint) == 0 {
 		c.Endpoint = env.ApphostAddr.Get()
 		if len(c.Endpoint) == 0 {
