@@ -6,10 +6,11 @@
   "main": "index.js",
   "module": "index.js",
   "scripts": {
-    "build": "npm run module && npm run backend && npm run wails",
+    "build": "npm run module && npm run backend && npm run wails && npm run android",
     "module": "rollup -c",
     "backend": "rollup common.js -o embed/common/portal.js --f iife -n portal",
-    "wails": "rollup wails.js -o embed/wails/portal.js --f iife -n portal"
+    "wails": "rollup wails.js -o embed/wails/portal.js --f iife -n portal",
+    "android": "rollup android.js -o embed/android/portal.js --f iife -n portal"
   },
   "author": "yang@cryptopunks.cc",
   "license": "MIT",

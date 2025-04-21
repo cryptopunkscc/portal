@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>profile</title>
+</head>
+<body>
+<h2 id="text" style="white-space: pre;">hello</h2>
+<script src="portal.js"></script>
+<script>
+  const text = document.getElementById('text')
+  portal.rpc.target("localnode").call(".profile").request().then(r => {
+    text.textContent = JSON.stringify(r, null, 2)
+  }).catch(portal.log)
+</script>
+</body>
+</html>

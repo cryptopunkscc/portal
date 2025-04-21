@@ -123,8 +123,7 @@ func setupNodeConfig(res resources.Resources) (err error) {
 }
 
 // setupNodeIdentity reads node's identity from resources or generates one if needed
-func setupNodeIdentity(resources resources.Resources) (i *astral.Identity, err error) {
-	defer plog.TraceErr(&err)
+func setupNodeIdentity(resources resources.Resources) (*astral.Identity, error) {
 	keyBytes, err := resources.Read(resNodeIdentity)
 	if err == nil {
 		if len(keyBytes) == 32 {
@@ -133,7 +132,15 @@ func setupNodeIdentity(resources resources.Resources) (i *astral.Identity, err e
 
 		var pk keys.PrivateKey
 
-		err = astral.DecodeObject(bytes.NewReader(keyBytes), &pk)
+		objType, payload, err := astral.OpenCanonical(bytes.NewReader(keyBytes))
+		switch {
+		case err != nil:
+			return nil, err
+		case objType != pk.ObjectType():
+			return nil, fmt.Errorf("invalid object type: %s", objType)
+		}
+
+		_, err = pk.ReadFrom(payload)
 		if err != nil {
 			return nil, err
 		}
@@ -153,7 +160,7 @@ func setupNodeIdentity(resources resources.Resources) (i *astral.Identity, err e
 		Bytes: nodeID.PrivateKey().Serialize(),
 	}
 
-	err = astral.EncodeObject(buf, pk)
+	_, err = astral.WriteCanonical(buf, pk)
 	if err != nil {
 		return nil, err
 	}

@@ -1,0 +1,10 @@
+{
+  "name": "profile",
+  "package": "astrald.profile",
+  "version": "0.0.0",
+  "title": "Astrald Profile",
+  "description": "Display astrald profile.",
+  "author": "yang",
+  "email": "cryptopunkyang@pm.me",
+  "schema": "html"
+}

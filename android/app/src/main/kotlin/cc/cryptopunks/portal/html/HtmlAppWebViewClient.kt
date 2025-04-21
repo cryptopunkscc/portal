@@ -8,7 +8,6 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import cc.cryptopunks.portal.core.mobile.Assets
 import cc.cryptopunks.portal.ext.mobile.inputStream
-import kotlin.math.min
 
 internal class PortalWebViewClient(
     private val assets: Assets
@@ -20,7 +19,7 @@ internal class PortalWebViewClient(
         request: WebResourceRequest
     ): WebResourceResponse? {
         return when (request.url.scheme) {
-            "file" -> {
+            "file" -> try {
                 Log.d(tag, "requesting url: ${request.url}")
 
                 val host = request.url.host ?: return null
@@ -32,11 +31,14 @@ internal class PortalWebViewClient(
                 val encoding = asset.encoding()
                 Log.d(tag, "requesting: $mime, $encoding, $path")
 
-                return WebResourceResponse(
+                WebResourceResponse(
                     mime,
                     encoding,
                     asset.data().inputStream(),
                 )
+            } catch (e: Throwable) {
+                e.printStackTrace()
+                super.shouldInterceptRequest(view, request)
             }
 
             else -> super.shouldInterceptRequest(view, request)

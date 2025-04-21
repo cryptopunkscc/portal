@@ -2,6 +2,8 @@ package core
 
 import (
 	"github.com/cryptopunkscc/portal/api/mobile"
+	"github.com/cryptopunkscc/portal/core/js/embed/android"
+	"io"
 	"io/fs"
 	"mime"
 	"net/http"
@@ -13,6 +15,16 @@ type assets struct{ files fs.FS }
 
 func (a assets) Get(uri string) (out mobile.Asset, err error) {
 	uri = filepath.Clean(uri)
+
+	if strings.HasSuffix(uri, "portal.js") {
+		out = asset{
+			encoding: "UTF-8",
+			mimetype: "application/javascript",
+			Reader:   reader{strings.NewReader(android.JsString)},
+			Closer:   io.NopCloser(nil),
+		}
+		return
+	}
 
 	mimetype := mime.TypeByExtension(filepath.Ext(uri))
 	if len(mimetype) == 0 {
@@ -35,7 +47,6 @@ func (a assets) Get(uri string) (out mobile.Asset, err error) {
 		return
 	}
 	out = asset{
-		//mimetype: strings.Split(mime.String(), ";")[0],
 		encoding: encoding,
 		mimetype: mimetype,
 		Reader:   reader{file},

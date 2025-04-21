@@ -24,19 +24,30 @@ func Test_runtime_Install(t *testing.T) {
 		t.Error(err)
 	}
 
-	app := core.App("portal.launcher")
-	ass := app.Assets()
-	indexAsset, err := ass.Get("index.html")
-	if err != nil {
-		plog.New().Println(err)
-		t.Error(err)
-		return
+	tests := []struct {
+		name string
+	}{
+		{name: "portal.launcher"},
+		{name: "astrald.profile"},
 	}
-	indexBytes, err := io.ReadAll(indexAsset.Data())
-	if err != nil {
-		plog.New().Println(err)
-		t.Error(err)
-		return
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			app := core.App(tt.name)
+			ass := app.Assets()
+			indexAsset, err := ass.Get("index.html")
+			if err != nil {
+				plog.New().Println(err)
+				t.FailNow()
+				return
+			}
+			indexBytes, err := io.ReadAll(indexAsset.Data())
+			if err != nil {
+				plog.New().Println(err)
+				t.Error(err)
+				return
+			}
+			log.Println(string(indexBytes))
+		})
 	}
-	log.Println(string(indexBytes))
 }

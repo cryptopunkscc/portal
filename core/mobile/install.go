@@ -8,6 +8,7 @@ import (
 func (m *service) Install() (err error) {
 	for _, dist := range m.Resolve.List(
 		source.Embed(apps.LauncherSvelteFS),
+		source.Embed(apps.ProfileFS),
 	) {
 		if err = m.Service.Install().CopyOf(dist); err != nil {
 			return
