@@ -14,8 +14,8 @@ import (
 	"path/filepath"
 )
 
-func NewBundleRunner(binDir string) target.SourceRunner[target.BundleExec] {
-	return target.SourceRunner[target.BundleExec]{
+func NewBundleRunner(binDir string) *target.SourceRunner[target.BundleExec] {
+	return &target.SourceRunner[target.BundleExec]{
 		Resolve: target.Any[target.BundleExec](target.Try(exec.ResolveBundle)),
 		Runner:  &bundleRunner{binDir: binDir},
 	}

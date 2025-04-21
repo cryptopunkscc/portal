@@ -12,8 +12,8 @@ import (
 	"slices"
 )
 
-func NewBundleHostRunner(binDir string) target.SourceRunner[target.Portal_] {
-	return target.SourceRunner[target.Portal_]{
+func NewBundleHostRunner(binDir string) *target.SourceRunner[target.Portal_] {
+	return &target.SourceRunner[target.Portal_]{
 		Resolve: target.Any[target.Portal_](target.Try(bundle.ResolveAny)),
 		Runner:  &bundleHostRunner{bundleRunner{binDir}},
 	}
