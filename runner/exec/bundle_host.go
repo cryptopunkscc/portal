@@ -14,7 +14,7 @@ import (
 
 func (r Runner) BundleHost() *target.SourceRunner[target.Portal_] {
 	return &target.SourceRunner[target.Portal_]{
-		Resolve: target.Any[target.Portal_](target.Try(bundle.ResolveAny)),
+		Resolve: target.Any[target.Portal_](target.Try(bundle.Resolve_)),
 		Runner:  &BundleHostRunner{BundleRunner{r}},
 	}
 }

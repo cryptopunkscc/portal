@@ -11,7 +11,7 @@ import (
 )
 
 var Runner = target.SourceRunner[target.Dist_]{
-	Resolve: target.Any[target.Dist_](target.Try(dist.ResolveAny)),
+	Resolve: target.Any[target.Dist_](target.Try(dist.Resolve_)),
 	Runner:  Run,
 }
 

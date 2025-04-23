@@ -1,7 +1,6 @@
 package portal
 
 import (
-	"encoding/json"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/dec/all"
 )
@@ -21,19 +20,19 @@ func Resolve[T any](src target.Source) (t target.Portal[T], err error) {
 	return
 }
 
-type unknown struct {
+type of_ struct {
 	target.Source
 	manifest target.Manifest
 }
 
-func (p *unknown) Manifest() *target.Manifest {
+func (p *of_) Manifest() *target.Manifest {
 	return &p.manifest
 }
-func (p *unknown) LoadManifest() error {
+func (p *of_) LoadManifest() error {
 	return all.Unmarshalers.Load(&p.manifest, p.FS(), target.ManifestFilename)
 }
-func (p *unknown) MarshalJSON() ([]byte, error) {
-	return json.Marshal(p.manifest)
+func (p *of_) MarshalJSON() ([]byte, error) {
+	return p.manifest.MarshalJSON()
 }
 
 func resolve(src target.Source) (t target.Portal_, err error) {
@@ -41,7 +40,7 @@ func resolve(src target.Source) (t target.Portal_, err error) {
 	if ok {
 		return
 	}
-	p := unknown{Source: src}
+	p := of_{Source: src}
 	if err = p.LoadManifest(); err != nil {
 		return
 	}

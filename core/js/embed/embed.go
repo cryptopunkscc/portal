@@ -15,7 +15,7 @@ var PortalLibFS embed.FS
 
 var resolve = target.Any[target.NodeModule](
 	target.Skip("node_modules"),
-	target.Try(npm.Resolve),
+	target.Try(npm.ResolveNodeModule),
 )
 
 var LibsDefault = LibsEmbed()

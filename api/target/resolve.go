@@ -10,6 +10,8 @@ import (
 
 type Resolve[T any] func(src Source) (result T, err error)
 
+var Resolve_ Resolve[any] = func(Source) (result any, err error) { return }
+
 func (resolve Resolve[T]) Resolve(src Source) (result T, err error) { return resolve(src) }
 
 // List all Source from a given dir.

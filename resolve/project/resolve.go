@@ -52,4 +52,4 @@ func (p *project[T]) Dist() (t target.Dist[T]) {
 	return
 }
 
-var ResolveAny = Resolver[any](func(target.Source) (result any, err error) { return })
+var Resolve_ = Resolver(target.Resolve_)

@@ -7,7 +7,6 @@ import (
 	"github.com/cryptopunkscc/portal/resolve/dist"
 	"github.com/cryptopunkscc/portal/resolve/portal"
 	"github.com/cryptopunkscc/portal/resolve/project"
-	"github.com/cryptopunkscc/portal/resolve/unknown"
 	"io/fs"
 )
 
@@ -42,7 +41,7 @@ func ResolveExec(source target.Source) (t target.Exec, err error) {
 }
 
 func ResolveProjectExec(source target.Source) (out target.Exec, err error) {
-	p, err := unknown.ResolveProject(source)
+	p, err := project.Resolve_(source)
 	if err != nil {
 		return
 	}

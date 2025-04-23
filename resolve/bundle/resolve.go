@@ -29,4 +29,4 @@ func Resolver[T any](resolve target.Resolve[target.Dist[T]]) target.Resolve[targ
 	}
 }
 
-var ResolveAny = Resolver[any](dist.ResolveAny)
+var Resolve_ = Resolver(dist.Resolve_)

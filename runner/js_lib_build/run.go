@@ -25,7 +25,7 @@ func Run() (err error) {
 	ctx := context.Background()
 	for _, p := range target.Any[target.NodeModule](
 		target.Skip("node_modules"),
-		target.Try(npm2.Resolve),
+		target.Try(npm2.ResolveNodeModule),
 	).List(libs) {
 		if !p.PkgJson().CanBuild() {
 			continue

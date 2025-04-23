@@ -18,8 +18,8 @@ import (
 func (r Runner) ProjectHost() *target.SourceRunner[target.Portal_] {
 	return &target.SourceRunner[target.Portal_]{
 		Resolve: target.Any[target.Portal_](
-			target.Try(dist.ResolveAny),
-			target.Try(project.ResolveAny),
+			target.Try(dist.Resolve_),
+			target.Try(project.Resolve_),
 		),
 		Runner: &ProjectHostRunner{r},
 	}

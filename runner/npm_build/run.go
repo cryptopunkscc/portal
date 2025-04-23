@@ -14,7 +14,7 @@ import (
 
 func Runner(dependencies ...target.NodeModule) *target.SourceRunner[target.ProjectNpm_] {
 	return &target.SourceRunner[target.ProjectNpm_]{
-		Resolve: target.Any[target.ProjectNpm_](target.Try(npm2.ResolveAny)),
+		Resolve: target.Any[target.ProjectNpm_](target.Try(npm2.Resolve_)),
 		Runner:  &runner{dependencies: dependencies},
 	}
 }
