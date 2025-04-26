@@ -1,4 +1,4 @@
-package apphost
+package keys
 
 import (
 	"errors"
@@ -6,16 +6,16 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 )
 
-func (a *Adapter) Key() Key { return Key{a.Rpc().Request("localnode")} }
+func Client(rpc rpc.Rpc) Conn { return Conn{rpc.Request("localnode", "keys")} }
 
-type Key struct{ rpc.Conn }
+type Conn struct{ rpc.Conn }
 
 type createKeyArgs struct {
 	Alias  string `query:"alias" cli:"alias a"`
 	Format string `query:"format" cli:"format f"`
 }
 
-func (c Key) Create(alias string) (*astral.Identity, error) {
+func (c Conn) Create(alias string) (*astral.Identity, error) {
 	if alias == "" {
 		return nil, errors.New("alias is required")
 	}
@@ -23,5 +23,5 @@ func (c Key) Create(alias string) (*astral.Identity, error) {
 		Alias:  alias,
 		Format: "json",
 	}
-	return rpc.Query[*astral.Identity](c, "keys.create_key", args)
+	return rpc.Query[*astral.Identity](c, "create_key", args)
 }

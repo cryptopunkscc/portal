@@ -3,8 +3,8 @@ package exec
 import (
 	"context"
 	"errors"
+	"github.com/cryptopunkscc/portal/api/portald"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/dist"
@@ -39,7 +39,7 @@ func (r *ProjectHostRunner) Run(ctx context.Context, src target.Portal_, args ..
 		Resolve: target.Any[target.Portal_](exec2.ResolveProject.Try),
 	}
 	hostId := src.Manifest().Schema
-	opt := apphost.PortaldOpenOpt{}
+	opt := portald.OpenOpt{}
 	if opt.Load(ctx); len(opt.Schema) > 0 {
 		hostId = hostId + "." + opt.Schema
 	}

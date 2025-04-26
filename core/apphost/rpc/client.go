@@ -8,7 +8,7 @@ import (
 	"io"
 )
 
-func (r Rpc) Client(
+func (r Rpc) Conn(
 	target string,
 	query string,
 ) (s rpc.Conn, err error) {

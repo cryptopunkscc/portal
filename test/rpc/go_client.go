@@ -45,7 +45,7 @@ func (c TestClient) Run(t *testing.T) {
 			name: "flow",
 			getConn: func(srv string, t *testing.T) (conn rpc.Conn) {
 				query := apphost2.FormatPort(c.port, srv, "flow")
-				conn, err := apphost.Default.Rpc().Client("localnode", query)
+				conn, err := apphost.Default.Rpc().Conn("localnode", query)
 				if err != nil {
 					t.Skip(err)
 				}

@@ -1,18 +1,15 @@
-package apphost
+package user
 
 import (
 	"encoding/json"
+	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 )
 
-func (a *Adapter) User() User { return User{a} }
+type Client struct{ apphost.Client }
 
-type User struct {
-	*Adapter
-}
-
-type UserInfo struct {
+type Info struct {
 	AccessToken string `json:"access_token" yaml:"access_token"`
 	ContractId  string `json:"contract_id" yaml:"contract_id"`
 	KeyId       string `json:"key_id" yaml:"key_id"`
@@ -20,7 +17,7 @@ type UserInfo struct {
 	UserId      string `json:"user_id" yaml:"user_id"`
 }
 
-func (u User) Create(alias string) (ui *UserInfo, err error) {
+func (u Client) Create(alias string) (ui *Info, err error) {
 	c, err := u.Query("localnode", "user.create", "alias="+alias)
 	if err != nil {
 		return
@@ -31,7 +28,7 @@ func (u User) Create(alias string) (ui *UserInfo, err error) {
 	return
 }
 
-func (u User) Claim(alias string) (err error) {
+func (u Client) Claim(alias string) (err error) {
 	c, err := u.Query("localnode", "user.claim", "target="+alias)
 	if err != nil {
 		return

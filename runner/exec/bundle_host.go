@@ -3,8 +3,8 @@ package exec
 import (
 	"context"
 	"errors"
+	"github.com/cryptopunkscc/portal/api/portald"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/bundle"
 	"github.com/cryptopunkscc/portal/resolve/exec"
@@ -33,7 +33,7 @@ func (r *BundleHostRunner) Run(ctx context.Context, src target.Portal_, args ...
 		Resolve: target.Any[target.BundleExec](exec.ResolveBundle.Try),
 	}
 	hostId := src.Manifest().Schema
-	opt := apphost.PortaldOpenOpt{}
+	opt := portald.OpenOpt{}
 	if opt.Load(ctx); len(opt.Schema) > 0 {
 		hostId = hostId + "." + opt.Schema
 	}

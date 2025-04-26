@@ -3,6 +3,7 @@ package portald
 import (
 	"context"
 	"fmt"
+	"github.com/cryptopunkscc/portal/api/nodes"
 	"github.com/cryptopunkscc/portal/api/portal"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/portald/debug"
@@ -83,7 +84,8 @@ func (s *testService) testAddEndpoint(t *testing.T, s2 *testService) {
 		id := s2.Apphost.HostID.String()
 		port := s2.Config.TCP.ListenPort
 		endpoint := fmt.Sprintf("tcp:127.0.0.1:%d", port)
-		if err := s.Apphost.Nodes().AddEndpoint(id, endpoint); err != nil {
+		if err := nodes.Client(&s.Apphost).AddEndpoint(id, endpoint); err != nil {
+			//if err := s.Apphost.Client().Nodes().AddEndpoint(id, endpoint); err != nil {
 			plog.Println(err)
 			t.FailNow()
 		}

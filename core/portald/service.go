@@ -6,6 +6,7 @@ import (
 	"github.com/cryptopunkscc/portal/api/astrald"
 	"github.com/cryptopunkscc/portal/api/portal"
 	. "github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/api/user"
 	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/core/token"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -33,7 +34,7 @@ type Service[T Portal_] struct {
 
 	Order []int
 
-	UserInfo *apphost.UserInfo
+	UserInfo *user.Info
 }
 
 func (s *Service[T]) Configure() (err error) {

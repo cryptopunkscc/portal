@@ -3,30 +3,31 @@ package main
 import (
 	"context"
 	"errors"
+	"github.com/cryptopunkscc/portal/api/portald"
 	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/getlantern/systray"
 )
 
 type Tray struct {
-	Portal apphost.Portald
-	log    plog.Logger
+	Portald portald.Conn
+	log     plog.Logger
 }
 
 func (t *Tray) Run(ctx context.Context) (err error) {
-	if t.Portal.Conn == nil {
-		t.Portal = apphost.Default.Portald()
+	if t.Portald.Conn == nil {
+		t.Portald = portald.Client(apphost.Default)
 	}
 
-	if err = t.Portal.Ping(); err != nil {
+	if err = t.Portald.Ping(); err != nil {
 		return errors.New("portal-tray requires portal-app running")
 	}
 
 	t.log = plog.Get(ctx).Type(t).Set(&ctx)
-	t.Portal.Logger(t.log)
+	t.Portald.Logger(t.log)
 
 	go func() {
-		t.Portal.Join()
+		t.Portald.Join()
 		systray.Quit()
 	}()
 	go func() {
@@ -48,12 +49,12 @@ func (t *Tray) onReady() {
 			select {
 			case <-launcher.ClickedCh:
 				go func() {
-					if err := t.Portal.Open(nil, "launcher"); err != nil {
+					if err := t.Portald.Open(nil, "launcher"); err != nil {
 						t.log.Println("launcher:", err)
 					}
 				}()
 			case <-quit.ClickedCh:
-				if err := t.Portal.Close(); err != nil {
+				if err := t.Portald.Close(); err != nil {
 					t.log.Println("quit:", err)
 					systray.Quit()
 				}

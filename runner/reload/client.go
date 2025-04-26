@@ -23,7 +23,7 @@ func Start(
 			plog.Get(ctx).Println("cannot connect dev.portal.broadcast: %v", err)
 		}
 	}()
-	if c.conn, err = apphost.Default.Rpc().Client("portal", "dev.portal.broadcast"); err != nil {
+	if c.conn, err = apphost.Default.Rpc().Conn("portal", "dev.portal.broadcast"); err != nil {
 		return
 	}
 	if err = c.conn.Encode(portal.Manifest().Package); err != nil {

@@ -1,7 +1,11 @@
 package portald
 
+import "C"
+import "github.com/cryptopunkscc/portal/api/user"
+
 func (s *Service[T]) CreateUser(alias string) (err error) {
-	if s.UserInfo, err = s.Apphost.User().Create(alias); err != nil {
+	c := user.Client{Client: &s.Apphost}
+	if s.UserInfo, err = c.Create(alias); err != nil {
 		return
 	}
 	return s.WriteUserInfo()

@@ -8,11 +8,11 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 )
 
-func (a *Adapter) Token() Token {
-	return Token{Conn: a.Rpc().Request("localnode")}
+func TokenClient(rpc rpc.Rpc) TokenConn {
+	return TokenConn{rpc.Request("localnode")}
 }
 
-type Token struct{ rpc.Conn }
+type TokenConn struct{ rpc.Conn }
 
 type CreateTokenArgs struct {
 	ID       *astral.Identity `query:"id" cli:"id"`
@@ -20,7 +20,7 @@ type CreateTokenArgs struct {
 	Format   astral.String    `query:"format" cli:"format f"`
 }
 
-func (c Token) Create(args CreateTokenArgs) (*mod.AccessToken, error) {
+func (c TokenConn) Create(args CreateTokenArgs) (*mod.AccessToken, error) {
 	if args.ID == nil {
 		return nil, errors.New("id is required")
 	}
@@ -35,7 +35,7 @@ type ListTokensArgs struct {
 	Format string           `query:"format" cli:"format f"`
 }
 
-func (c Token) List(args *ListTokensArgs) (AccessTokens, error) {
+func (c TokenConn) List(args *ListTokensArgs) (AccessTokens, error) {
 	if args == nil {
 		args = &ListTokensArgs{}
 	}

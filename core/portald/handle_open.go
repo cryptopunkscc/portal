@@ -3,16 +3,16 @@ package portald
 import (
 	"context"
 	"errors"
+	"github.com/cryptopunkscc/portal/api/portald"
 	. "github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/portal"
 	"github.com/cryptopunkscc/portal/resolve/source"
 )
 
-func (s *Service[T]) Open() Run[apphost.PortaldOpenOpt] {
+func (s *Service[T]) Open() Run[portald.OpenOpt] {
 	dispatcher := s.dispatcher()
-	return func(ctx context.Context, opt apphost.PortaldOpenOpt, cmd ...string) (err error) {
+	return func(ctx context.Context, opt portald.OpenOpt, cmd ...string) (err error) {
 		plog.Get(ctx).Type(s).Println("open:", opt, cmd)
 		if len(cmd) == 0 {
 			return errors.New("no command")

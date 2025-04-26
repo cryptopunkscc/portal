@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/core/apphost"
+	"github.com/cryptopunkscc/portal/api/portald"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"strconv"
 	"strings"
@@ -48,7 +48,7 @@ func (a *Application) Run(ctx context.Context, opt Opt, cmd ...string) (err erro
 		go func() {
 			defer wg.Done()
 			cmd = fixCmd(cmd)
-			o := &apphost.PortaldOpenOpt{}
+			o := &portald.OpenOpt{}
 			if opt.Dev {
 				o.Schema = "dev"
 				o.Order = []int{2, 1, 0}

@@ -1,10 +1,13 @@
 package portald
 
+import "github.com/cryptopunkscc/portal/api/user"
+
 func (s *Service[T]) Claim(alias string) (err error) {
 	a := s.Apphost.Clone()
 	a.AuthToken = s.UserInfo.AccessToken
 	if err = a.Reconnect(); err != nil {
 		return
 	}
-	return a.User().Claim(alias)
+
+	return user.Client{a}.Claim(alias)
 }
