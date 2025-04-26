@@ -2,6 +2,6 @@ package api
 
 const (
 	Version       = "v0.2.0"
-	AstralVersion = "v0.0.0-20250421140305-22e5ac5e5176"
+	AstralVersion = "v0.0.0-20250425231037-7d91fdc06d04"
 	Module        = "github.com/cryptopunkscc/portal/"
 )

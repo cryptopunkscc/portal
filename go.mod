@@ -4,7 +4,7 @@ go 1.23.7
 
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
-	github.com/cryptopunkscc/astrald v0.0.0-20250421140305-22e5ac5e5176
+	github.com/cryptopunkscc/astrald v0.0.0-20250425231037-7d91fdc06d04
 	github.com/dop251/goja v0.0.0-20240220182346-e401ed450204
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/getlantern/systray v1.2.2
@@ -17,7 +17,7 @@ require (
 	github.com/matryer/is v1.4.1
 	github.com/pterm/pterm v0.12.79
 	github.com/samber/lo v1.39.0
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/wailsapp/wails/v2 v2.9.0
 	github.com/webview/webview v0.0.0-20230415172654-8387ff8945fc
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
@@ -82,12 +82,9 @@ require (
 	github.com/wailsapp/mimetype v1.4.1 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	golang.org/x/crypto v0.37.0 // indirect
-	golang.org/x/mobile v0.0.0-20250408133729-978277e7eaf7 // indirect
 	golang.org/x/net v0.39.0 // indirect
-	golang.org/x/sync v0.13.0 // indirect
 	golang.org/x/term v0.31.0 // indirect
 	golang.org/x/text v0.24.0 // indirect
-	golang.org/x/tools v0.32.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/driver/sqlite v1.5.4 // indirect
 	gorm.io/gorm v1.25.4 // indirect
