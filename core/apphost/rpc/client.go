@@ -1,31 +1,29 @@
 package rpc
 
 import (
-	"encoding/json"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"github.com/cryptopunkscc/portal/pkg/rpc/stream"
-	"github.com/cryptopunkscc/portal/pkg/rpc/stream/query"
 	"io"
 )
 
-func (r Rpc) Conn(
-	target string,
-	query string,
-) (s rpc.Conn, err error) {
+func (r Rpc) Conn(target, query string) (c rpc.Conn, err error) {
 	conn, err := r.Apphost.Query(target, query, nil)
 	if err != nil {
 		return
 	}
-	s = rpcClient(conn)
-	s.Logger(r.Log)
+	c = r.client(conn)
 	return
 }
 
-func rpcClient(conn io.ReadWriteCloser) *stream.Client {
-	s := stream.Client{Serializer: stream.NewSerializer(conn)}
-	s.MarshalArgs = query.Marshal
-	s.Marshal = json.Marshal
-	s.Unmarshal = json.Unmarshal
-	s.Ending = []byte("\n")
+func (r Rpc) client(conn io.ReadWriteCloser) *stream.Client {
+	s := stream.Client{}
+	s.Serializer = stream.NewSerializer(conn)
 	return &s
+}
+
+func (r Rpc) serializer(conn io.ReadWriteCloser) *stream.Serializer {
+	s := stream.NewSerializer(conn)
+	s.Codec = r.codec()
+	s.Logger(r.Log)
+	return s
 }

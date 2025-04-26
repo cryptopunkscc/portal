@@ -29,6 +29,11 @@ func Call[T any](conn Conn, name string, args ...T) (err error) {
 	return conn.Call(name, payload)
 }
 
+func NewCall[T any](conn Conn, name string, args ...T) (Conn, error) {
+	conn = conn.Copy()
+	return conn, Call(conn, name, args...)
+}
+
 func Decode[R any](conn Conn) (r R, err error) {
 	err = conn.Decode(&r)
 	return

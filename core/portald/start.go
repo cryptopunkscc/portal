@@ -43,7 +43,7 @@ func (s *Service[T]) startPortald(ctx context.Context) error {
 	handler := cmd.Handler{Sub: s.handlers()}
 	cmd.InjectHelp(&handler)
 	router := s.Apphost.Rpc().Router(handler)
-	router.Logger = log
+	router.Log = log
 	if err := router.Init(ctx); err != nil {
 		return err
 	}

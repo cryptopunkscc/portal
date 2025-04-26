@@ -133,10 +133,9 @@ func TestRouter_routeQuery(t *testing.T) {
 				tt.setup(t, &tt.fields, &tt.args)
 			}
 
-			r := &Router{
-				Base:   tt.fields.Base,
-				Logger: tt.fields.Logger,
-			}
+			r := &Router{}
+			r.Base = tt.fields.Base
+			r.Log = tt.fields.Logger
 
 			if err := r.routeQuery(tt.args.q); !errors.Is(err, tt.wantErr) {
 				t.Errorf("routeQuery() error = %v, wantErr %v", err, tt.wantErr)

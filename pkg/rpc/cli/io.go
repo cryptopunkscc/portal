@@ -19,6 +19,8 @@ func cliConnection() stream.Serializer {
 			os.Exit(0)
 			return nil
 		}),
-		Marshal: Marshal,
+		Codec: stream.Codec{
+			Marshal: Marshal,
+		},
 	}
 }

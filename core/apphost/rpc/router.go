@@ -13,22 +13,17 @@ import (
 )
 
 func (r Rpc) Router(handler cmd.Handler) *Router {
-	rr := &Router{
-		Base: router.Base{
-			Registry:  router.CreateRegistry(handler),
-			Unmarshal: query.Unmarshal,
-		},
-		apphost: r.Apphost,
-		Logger:  r.Log,
-	}
+	rr := &Router{}
+	rr.Rpc = r
+	rr.Registry = router.CreateRegistry(handler)
+	rr.Unmarshal = query.Unmarshal
 	return rr
 }
 
 type Router struct {
+	Rpc
 	router.Base
-	Logger   plog.Logger
 	ctx      context.Context
-	apphost  apphost.Client
 	listener apphost.Listener
 }
 
@@ -56,7 +51,7 @@ func (r *Router) Init(ctx context.Context) (err error) {
 	r.ctx = ctx
 	r.Dependencies = append([]any{ctx}, r.Dependencies...)
 
-	r.listener, err = r.apphost.Register()
+	r.listener, err = r.Apphost.Register()
 	if err != nil {
 		return
 	}
@@ -78,8 +73,8 @@ func (r *Router) Listen() (err error) {
 		}
 		rr := *r
 		go func() {
-			if err := rr.routeQuery(q); err != nil && r.Logger != nil {
-				r.Logger.E().Println(q)
+			if err := rr.routeQuery(q); err != nil && r.Log != nil {
+				r.Log.E().Println(q)
 			}
 		}()
 	}
@@ -102,17 +97,17 @@ func (r *Router) routeQuery(q apphost.PendingQuery) (err error) {
 	}
 	defer conn.Close()
 
-	client := rpcClient(conn)
-	if r.Logger != nil {
-		client.Logger(r.Logger.Scope(q.Query()))
+	s := r.client(conn)
+	if r.Log != nil {
+		s.Logger(r.Log.Scope(q.Query()))
 	}
 
-	r.Add(client)
-	rr.Add(client)
+	r.Add(s)
+	rr.Add(s)
 
 	for {
 		if !rr.IsEmpty() {
-			if err = rr.Respond(client.Serializer); err != nil {
+			if err = rr.Respond(s.Serializer); err != nil {
 				return
 			}
 		}
@@ -120,7 +115,7 @@ func (r *Router) routeQuery(q apphost.PendingQuery) (err error) {
 			return
 		}
 		r.Responses--
-		command, err = client.Serializer.ReadString('\n')
+		command, err = s.ReadString('\n')
 		if err != nil {
 			return
 		}
@@ -128,7 +123,7 @@ func (r *Router) routeQuery(q apphost.PendingQuery) (err error) {
 		rr = *r
 		rr.Setup(command)
 		if !rr.authorize() {
-			_ = client.Encode(ErrUnauthorized)
+			_ = s.Encode(ErrUnauthorized)
 			return
 		}
 	}

@@ -10,17 +10,22 @@ import (
 )
 
 type Serializer struct {
+	Codec
+
 	io.Reader
 	io.Writer
 	io.Closer
-	MarshalArgs Marshal
-	Marshal     Marshal
-	Unmarshal   Unmarshal
-	Ending      []byte
 
 	scanner *bufio.Reader
 	reader  io.Reader
 	logger  plog.Logger
+}
+
+type Codec struct {
+	MarshalArgs Marshal
+	Marshal     Marshal
+	Unmarshal   Unmarshal
+	Ending      []byte
 }
 
 type Marshal func(v any) ([]byte, error)
@@ -76,22 +81,22 @@ func (s *Serializer) Encode(value any) (err error) {
 func (s *Serializer) Decode(value any) (err error) {
 	s.init()
 
-	bytes, err := s.ReadBytes('\n')
+	b, err := s.ReadBytes('\n')
 	if err != nil {
 		return
 	}
-	if len(bytes) == 0 {
+	if len(b) == 0 {
 		return End
 	}
 
 	// try decode as failure
 	f := Failure{}
-	if err = s.Unmarshal(bytes, &f); err == nil && f.Error != "" {
+	if err = s.Unmarshal(b, &f); err == nil && f.Error != "" {
 		return fmt.Errorf("RPC: %s", f.Error)
 	}
 
 	// decode value
-	return s.Unmarshal(bytes, value)
+	return s.Unmarshal(b, value)
 }
 
 func (s *Serializer) ReadBytes(delim byte) (b []byte, err error) {
