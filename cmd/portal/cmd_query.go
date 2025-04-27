@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 	"net/url"
@@ -46,16 +47,31 @@ func parseQuery(query string) string {
 	if !strings.Contains(query, " -") {
 		return query
 	}
+	cmd := strings.SplitN(query, " -", 2)[0]
+	query = strings.TrimPrefix(query, cmd)
+	cmd = strings.TrimSpace(cmd)
+	query = strings.TrimSpace(query)
+	if strings.HasPrefix(query, "- ") {
+		query = query[2:]
+	}
 	vals := url.Values{}
 	chunks := strings.Split(query, " ")
 	for len(chunks) > 1 {
 		if !strings.HasPrefix(chunks[0], "-") {
+			if strings.HasPrefix(chunks[0], "- ") {
+				chunks = chunks[1:]
+			}
 			break
 		}
-		vals.Add(chunks[0], chunks[1])
+		vals.Add(chunks[0][1:], chunks[1])
+		chunks = chunks[2:]
 	}
 	if len(chunks) > 0 {
 		vals["_"] = chunks
 	}
-	return vals.Encode()
+	cmd = strings.ReplaceAll(cmd, " ", ".")
+	if len(vals) > 0 {
+		cmd = fmt.Sprintf("%s?%s", cmd, vals.Encode())
+	}
+	return cmd
 }
