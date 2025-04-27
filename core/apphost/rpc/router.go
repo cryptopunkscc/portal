@@ -12,9 +12,9 @@ import (
 	"strings"
 )
 
-func (r Rpc) Router(handler cmd.Handler) *Router {
+func (r *Rpc) Router(handler cmd.Handler) *Router {
 	rr := &Router{}
-	rr.Rpc = r
+	rr.Rpc = *r
 	rr.Registry = router.CreateRegistry(handler)
 	rr.Unmarshal = query.Unmarshal
 	return rr

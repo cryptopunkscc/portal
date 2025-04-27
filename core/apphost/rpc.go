@@ -5,14 +5,18 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 )
 
-func (a *Adapter) Rpc() apphost.Rpc {
-	return apphost.Rpc{
+func (a *Adapter) Rpc() *apphost.Rpc {
+	return &apphost.Rpc{
 		Apphost: a,
 		Log:     a.Log,
 	}
 }
 
 var _ rpc.Rpc = &Adapter{}
+
+func (a *Adapter) Format(name string) rpc.Rpc {
+	return a.Rpc().Format(name)
+}
 
 func (a *Adapter) Conn(target, query string) (rpc.Conn, error) {
 	return a.Rpc().Conn(target, query)

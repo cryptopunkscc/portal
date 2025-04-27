@@ -9,9 +9,9 @@ import (
 	"io"
 )
 
-func (r Rpc) Request(target string, query ...string) rpc.Conn {
+func (r *Rpc) Request(target string, query ...string) rpc.Conn {
 	rr := &rpcRequest{
-		Rpc:    r,
+		Rpc:    *r,
 		target: target,
 		query:  query,
 	}
@@ -59,7 +59,7 @@ func (r *rpcRequest) Call(method string, value any) (err error) {
 			q += "?"
 		}
 		var args []byte
-		if args, err = r.MarshalArgs(value); err != nil {
+		if args, err = r.Serializer.MarshalArgs(value); err != nil {
 			return
 		}
 		q += string(args)

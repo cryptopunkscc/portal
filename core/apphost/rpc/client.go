@@ -6,7 +6,7 @@ import (
 	"io"
 )
 
-func (r Rpc) Conn(target, query string) (c rpc.Conn, err error) {
+func (r *Rpc) Conn(target, query string) (c rpc.Conn, err error) {
 	conn, err := r.Apphost.Query(target, query, nil)
 	if err != nil {
 		return
@@ -15,13 +15,13 @@ func (r Rpc) Conn(target, query string) (c rpc.Conn, err error) {
 	return
 }
 
-func (r Rpc) client(conn io.ReadWriteCloser) *stream.Client {
+func (r *Rpc) client(conn io.ReadWriteCloser) *stream.Client {
 	s := stream.Client{}
-	s.Serializer = stream.NewSerializer(conn)
+	s.Serializer = r.serializer(conn)
 	return &s
 }
 
-func (r Rpc) serializer(conn io.ReadWriteCloser) *stream.Serializer {
+func (r *Rpc) serializer(conn io.ReadWriteCloser) *stream.Serializer {
 	s := stream.NewSerializer(conn)
 	s.Codec = r.codec()
 	s.Logger(r.Log)
