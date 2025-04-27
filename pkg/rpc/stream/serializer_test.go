@@ -38,10 +38,9 @@ func TestSerializer_Decode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			serializer := Serializer{
-				Reader:    tt.reader,
-				Unmarshal: json.Unmarshal,
-			}
+			serializer := Serializer{}
+			serializer.Reader = tt.reader
+			serializer.Unmarshal = json.Unmarshal
 			if err := serializer.Decode(&tt.actual); (err != nil) != tt.wantErr {
 				t.Errorf("Decode() error = %v, wantErr %v", err, tt.wantErr)
 			} else {
@@ -74,9 +73,11 @@ func TestSerializer_Encode(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			buffer := bytes.NewBuffer(nil)
 			serializer := Serializer{
-				Writer:  buffer,
-				Marshal: json.Marshal,
-				Ending:  []byte("\n"),
+				Writer: buffer,
+				Codec: Codec{
+					Marshal: json.Marshal,
+					Ending:  []byte("\n"),
+				},
 			}
 			if err := serializer.Encode(tt.payload); (err != nil) != tt.wantErr {
 				t.Errorf("Encode() error = %v, wantErr %v", err, tt.wantErr)

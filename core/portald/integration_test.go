@@ -2,14 +2,16 @@ package portald
 
 import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/test"
 	"testing"
+	"time"
 )
 
 func TestService_Integration(t *testing.T) {
 	plog.Verbosity = plog.Debug
 	it := newIntegrationTest()
-	it.s1.setupDir(t)
-	it.s2.setupDir(t)
+	it.s1.cleanDir(t)
+	it.s2.cleanDir(t)
 	for _, tt := range []struct {
 		name string
 		test func(t *testing.T)
@@ -18,27 +20,41 @@ func TestService_Integration(t *testing.T) {
 			name: "just start",
 			test: func(t *testing.T) {
 				ctx := testServiceContext(t)
+
 				it.s1.configure(t)
 				it.s1.testNodeStart(t, ctx)
 				it.s1.testNodeAlias(t)
 			},
 		},
 		{
-			name: "create user and claim",
+			name: "start",
 			test: func(t *testing.T) {
 				ctx := testServiceContext(t)
-
-				it.s2.configure(t)
-				it.s2.testNodeStart(t, ctx)
-				it.s2.testNodeAlias(t)
 
 				it.s1.configure(t)
 				it.s1.testNodeStart(t, ctx)
 				it.s1.testNodeAlias(t)
 				it.s1.testCreateUser(t)
 
-				it.s1.testAddEndpoint(t, &it.s2)
-				it.s1.testUserClaim(t, &it.s2)
+				t.Run("app write", func(t *testing.T) {
+					obj := test.EmbedGoProjectManifest
+					id := it.s1.testWriteObject(t, obj) // write object to data directory
+					it.s1.testReconnectAsUser(t)        // setup object clients with user auth token
+					time.Sleep(2000 * time.Millisecond) // time for mod content to identify written object
+					it.s1.testAwaitDescribe(t, id)      // await fetching describe
+					it.s1.testShowObject(t, id)         // test show object
+					it.s1.testReadObject(t, id)         // test read object
+					//it.s1.testSearchObjects(t, id.String()) // test search objects
+					it.s1.testSearchObjects(t, "app.manifest") // test search objects
+				})
+
+				t.Run("claim", func(t *testing.T) {
+					it.s2.configure(t)
+					it.s2.testNodeStart(t, ctx)
+
+					it.s1.testAddEndpoint(t, &it.s2)
+					it.s1.testUserClaim(t, &it.s2)
+				})
 			},
 		},
 	} {
