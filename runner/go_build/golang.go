@@ -7,9 +7,9 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runner/dist"
-	dist2 "github.com/cryptopunkscc/portal/target/dist"
+	"github.com/cryptopunkscc/portal/target/dist"
 	golang "github.com/cryptopunkscc/portal/target/go"
+	"github.com/cryptopunkscc/portal/target/project"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -29,13 +29,13 @@ func NewRun(platforms ...string) target.Run[target.ProjectGo] {
 	return runner{platforms}.Run
 }
 
-func (g runner) Run(ctx context.Context, project target.ProjectGo, args ...string) (err error) {
+func (g runner) Run(ctx context.Context, projectGo target.ProjectGo, args ...string) (err error) {
 	log := plog.Get(ctx).Type(g).Set(&ctx)
 	if err = deps.RequireBinary("go"); err != nil {
 		return
 	}
 
-	if !project.Changed() && !slices.Contains(args, "clean") {
+	if !projectGo.Changed() && !slices.Contains(args, "clean") {
 		return
 	}
 
@@ -43,22 +43,22 @@ func (g runner) Run(ctx context.Context, project target.ProjectGo, args ...strin
 		g.platforms = []string{runtime.GOOS}
 	}
 
-	log.Printf("go build %T %s %v", project, project.Abs(), g.platforms)
+	log.Printf("go build %T %s %v", projectGo, projectGo.Abs(), g.platforms)
 	cmd := exec.Cmd{
 		Cmd:  "go",
 		Args: []string{"build", "-o", "dist/main"},
-		Dir:  project.Abs(),
+		Dir:  projectGo.Abs(),
 	}.Default()
 
 	if slices.Contains(args, "clean") {
-		if err = os.RemoveAll(filepath.Join(project.Abs(), "dist")); err != nil {
+		if err = os.RemoveAll(filepath.Join(projectGo.Abs(), "dist")); err != nil {
 			log.W().Println(err)
 		}
 	}
 	for _, platform := range g.platforms {
-		build, ok := project.Build()[platform]
+		build, ok := projectGo.Build()[platform]
 		if !ok {
-			build, ok = project.Build()["default"]
+			build, ok = projectGo.Build()["default"]
 		}
 		if ok {
 			if cmd, err = cmd.Parse(build.Cmd); err != nil {
@@ -67,15 +67,15 @@ func (g runner) Run(ctx context.Context, project target.ProjectGo, args ...strin
 			cmd = cmd.AddEnv(build.Env...).AddEnv("GOOS=" + platform)
 		}
 		if err = cmd.Build().Run(); err != nil {
-			return fmt.Errorf("run golang build %s: %s", project.Abs(), err)
+			return fmt.Errorf("run golang build %s: %s", projectGo.Abs(), err)
 		}
-		project.Manifest().Exec = build.Out
-		if err = dist.Dist(ctx, project); err != nil {
+		projectGo.Manifest().Exec = build.Out
+		if err = project.Dist(ctx, projectGo); err != nil {
 			return
 		}
 
 		if slices.Contains(args, "pack") {
-			if err = dist2.Pack(project.Dist_()); err != nil {
+			if err = dist.Pack(projectGo.Dist_()); err != nil {
 				return
 			}
 		}

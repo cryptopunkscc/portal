@@ -8,8 +8,8 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runner/dist"
-	dist2 "github.com/cryptopunkscc/portal/target/dist"
+	"github.com/cryptopunkscc/portal/target/dist"
+	"github.com/cryptopunkscc/portal/target/project"
 	"slices"
 )
 
@@ -28,27 +28,27 @@ type buildRunner struct {
 	dependencies []target.NodeModule
 }
 
-func (r *buildRunner) Run(ctx context.Context, project target.ProjectNpm_, args ...string) (err error) {
+func (r *buildRunner) Run(ctx context.Context, projectNpm target.ProjectNpm_, args ...string) (err error) {
 	plog.Get(ctx).Type(r).Set(&ctx)
 
 	if err = r.setup(); err != nil {
 		return
 	}
-	if r.skip(project, args...) {
+	if r.skip(projectNpm, args...) {
 		return
 	}
-	if err = r.prepare(ctx, project); err != nil {
+	if err = r.prepare(ctx, projectNpm); err != nil {
 		return
 	}
-	if err = r.build(ctx, project); err != nil {
+	if err = r.build(ctx, projectNpm); err != nil {
 		return
 	}
-	if err = dist.Dist(ctx, project); err != nil {
+	if err = project.Dist(ctx, projectNpm); err != nil {
 		return
 	}
 
 	if slices.Contains(args, "pack") {
-		if err = dist2.Pack(project.Dist_()); err != nil {
+		if err = dist.Pack(projectNpm.Dist_()); err != nil {
 			return
 		}
 	}

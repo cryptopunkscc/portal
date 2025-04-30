@@ -1,4 +1,4 @@
-package dist
+package project
 
 import (
 	"context"
@@ -11,16 +11,16 @@ import (
 )
 
 func Dist(ctx context.Context, project target.Project_) (err error) {
-	if err = CopyIcon(ctx, project); err != nil {
+	if err = copyIcon(ctx, project); err != nil {
 		return
 	}
-	if err = CopyManifest(ctx, project); err != nil {
+	if err = copyManifest(ctx, project); err != nil {
 		return
 	}
 	return
 }
 
-func CopyIcon(_ context.Context, project target.Project_) (err error) {
+func copyIcon(_ context.Context, project target.Project_) (err error) {
 	if project.Manifest().Icon == "" {
 		return
 	}
@@ -34,7 +34,7 @@ func CopyIcon(_ context.Context, project target.Project_) (err error) {
 	return
 }
 
-func CopyManifest(_ context.Context, project target.Portal_) (err error) {
+func copyManifest(_ context.Context, project target.Portal_) (err error) {
 	bytes, err := json.Marshal(project.Manifest())
 	if err != nil {
 		return err
