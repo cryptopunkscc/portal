@@ -1,4 +1,4 @@
-package apps_build
+package apps
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-func Run(args ...string) error {
+func Build(args ...string) error {
 	ctx := context.Background()
 	root, err := golang.FindProjectRoot()
 	if err != nil {

@@ -5,10 +5,10 @@ package main
 import (
 	"errors"
 	"github.com/cryptopunkscc/portal/api"
+	"github.com/cryptopunkscc/portal/apps"
 	"github.com/cryptopunkscc/portal/core/js"
 	"github.com/cryptopunkscc/portal/pkg/gpg"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runner/apps_build"
 	"github.com/cryptopunkscc/portal/runner/astrald_build"
 	"github.com/cryptopunkscc/portal/runner/version"
 	"github.com/magefile/mage/mg"
@@ -111,7 +111,7 @@ func (Build) Apps() (err error) {
 	if clean {
 		args = append(args, "clean")
 	}
-	return apps_build.Run(args...)
+	return apps.Build(args...)
 }
 
 func (Build) Cli() error {
