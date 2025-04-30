@@ -1,4 +1,4 @@
-package any_build
+package all
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 
 func Test_provider(t *testing.T) {
 	plog.Verbosity = 100
-	for i, runnable := range provider.Provide("../../apps") {
+	for i, runnable := range buildDispatcher.Provide("../../apps") {
 		log.Printf("%d. %T %s", i, runnable.Source(), runnable.Manifest().Package)
 	}
 }
@@ -22,7 +22,7 @@ func Test_dispatch_sync(t *testing.T) {
 	ctx := context.Background()
 	wg := &sync.WaitGroup{}
 	d := target.Dispatcher{
-		Provider: provider,
+		Provider: buildDispatcher.Provider,
 		Runner:   target.RunSeq,
 	}
 	err := d.Run(ctx, "../../apps", "pack", "clean")
@@ -38,7 +38,7 @@ func Test_dispatch_async(t *testing.T) {
 	ctx := context.Background()
 	wg := &sync.WaitGroup{}
 	d := target.Dispatcher{
-		Provider: provider,
+		Provider: buildDispatcher.Provider,
 		Runner:   &target.AsyncRunner{WaitGroup: wg},
 	}
 	err := d.Run(ctx, "../../apps", "pack", "clean")

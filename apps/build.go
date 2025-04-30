@@ -3,7 +3,7 @@ package apps
 import (
 	"context"
 	golang "github.com/cryptopunkscc/portal/pkg/go"
-	"github.com/cryptopunkscc/portal/runner/any_build"
+	"github.com/cryptopunkscc/portal/target/all"
 	"path/filepath"
 )
 
@@ -14,5 +14,5 @@ func Build(args ...string) error {
 		return err
 	}
 	appsDir := filepath.Join(root, "apps")
-	return any_build.Run(ctx, appsDir, args...)
+	return all.BuildRecursive(ctx, appsDir, args...)
 }
