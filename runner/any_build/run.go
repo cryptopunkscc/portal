@@ -2,8 +2,8 @@ package any_build
 
 import (
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/runner/go_build"
 	"github.com/cryptopunkscc/portal/target/dist"
+	"github.com/cryptopunkscc/portal/target/go"
 	"github.com/cryptopunkscc/portal/target/npm"
 	"github.com/cryptopunkscc/portal/target/source"
 )
@@ -26,7 +26,7 @@ var provider = target.Provider[target.Runnable]{
 	Resolve: target.Any[target.Runnable](
 		target.Skip("node_modules"),
 		npm.BuildRunner().Try,
-		go_build.Runner().Try,
+		golang.BuildRunner().Try,
 		dist.PackRunner.Try,
 	),
 }

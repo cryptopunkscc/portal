@@ -1,4 +1,4 @@
-package go_build
+package golang
 
 import (
 	"context"
@@ -8,7 +8,6 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target/dist"
-	golang "github.com/cryptopunkscc/portal/target/go"
 	"github.com/cryptopunkscc/portal/target/project"
 	"os"
 	"path/filepath"
@@ -16,20 +15,20 @@ import (
 	"slices"
 )
 
-func Runner(platforms ...string) *target.SourceRunner[target.ProjectGo] {
+func BuildRunner(platforms ...string) *target.SourceRunner[target.ProjectGo] {
 	return &target.SourceRunner[target.ProjectGo]{
-		Resolve: target.Any[target.ProjectGo](target.Try(golang.ResolveProject)),
-		Runner:  runner{platforms: platforms},
+		Resolve: ResolveProject,
+		Runner:  buildRunner{platforms: platforms},
 	}
 }
 
-type runner struct{ platforms []string }
-
-func NewRun(platforms ...string) target.Run[target.ProjectGo] {
-	return runner{platforms}.Run
+func BuildProject(platforms ...string) target.Run[target.ProjectGo] {
+	return buildRunner{platforms}.Run
 }
 
-func (g runner) Run(ctx context.Context, projectGo target.ProjectGo, args ...string) (err error) {
+type buildRunner struct{ platforms []string }
+
+func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args ...string) (err error) {
 	log := plog.Get(ctx).Type(g).Set(&ctx)
 	if err = deps.RequireBinary("go"); err != nil {
 		return
