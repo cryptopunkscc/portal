@@ -33,7 +33,7 @@ func Run() (err error) {
 		if err := npm.Install(ctx, p); err != nil {
 			log.Fatalln(err)
 		}
-		if err := npm.Build(ctx, p); err != nil {
+		if err := npm.BuildModule(ctx, p); err != nil {
 			log.Fatalln(err)
 		}
 	}

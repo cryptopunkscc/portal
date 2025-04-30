@@ -127,16 +127,18 @@ func (Build) Portald() error {
 }
 
 func (Build) JsLib() error {
-	if changed, err := target.Path(
-		"./core/js/embed/",
-		"./core/js/src/",
-		"./core/js/all.js",
-		"./core/js/common.js",
-		"./core/js/package.json",
-	); err != nil {
-		return err
-	} else if !changed {
-		return nil
+	if !clean {
+		if changed, err := target.Path(
+			"./core/js/embed/",
+			"./core/js/src/",
+			"./core/js/all.js",
+			"./core/js/common.js",
+			"./core/js/package.json",
+		); err != nil {
+			return err
+		} else if !changed {
+			return nil
+		}
 	}
 	return js_lib_build.Run()
 }

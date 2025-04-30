@@ -7,7 +7,6 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/goja_dist"
-	"github.com/cryptopunkscc/portal/runner/npm_build"
 	"github.com/cryptopunkscc/portal/target/js"
 	"github.com/cryptopunkscc/portal/target/npm"
 	"time"
@@ -40,8 +39,7 @@ func (r *ReRunner) Run(ctx context.Context, projectJs target.ProjectJs, args ...
 		return
 	}
 
-	build := npm_build.NewRun()
-	if err = build(ctx, projectJs); err != nil {
+	if err = npm.BuildProject().Run(ctx, projectJs); err != nil {
 		return
 	}
 

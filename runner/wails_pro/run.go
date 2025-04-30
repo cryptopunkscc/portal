@@ -8,10 +8,10 @@ import (
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runner/npm_build"
 	"github.com/cryptopunkscc/portal/runner/reload"
 	"github.com/cryptopunkscc/portal/runner/wails"
 	"github.com/cryptopunkscc/portal/target/html"
+	"github.com/cryptopunkscc/portal/target/npm"
 	"github.com/wailsapp/wails/v2/pkg/application"
 	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 	"os"
@@ -45,8 +45,7 @@ func (r *reRunner) Run(ctx context.Context, projectHtml target.ProjectHtml, args
 		return
 	}
 
-	build := npm_build.NewRun()
-	if err = build(ctx, projectHtml); err != nil {
+	if err = npm.BuildProject().Run(ctx, projectHtml); err != nil {
 		return
 	}
 
