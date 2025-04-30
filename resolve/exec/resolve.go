@@ -10,13 +10,21 @@ import (
 	"io/fs"
 )
 
-type exec struct{ exec target.Source }
+var ResolveDist = dist.Resolver[target.Exec](ResolveExec)
+var ResolveBundle = bundle.Resolver[target.Exec](ResolveDist)
+var ResolveProject = project.Resolver[target.Exec](ResolveProjectExec)
 
-func (e exec) Executable() target.Source { return e.exec }
+func ResolveExec(source target.Source) (t target.Exec, err error) {
+	defer plog.TraceErr(&err)
 
-func New(portal target.Portal_) (t target.Exec, err error) {
-	file := portal.Manifest().Exec
-	stat, err := fs.Stat(portal.FS(), file)
+	p, err := portal.Resolve_(source)
+	if err != nil {
+		return
+	}
+	defer plog.TraceErr(&err)
+
+	file := p.Manifest().Exec
+	stat, err := fs.Stat(p.FS(), file)
 	if err != nil {
 		return
 	}
@@ -24,23 +32,16 @@ func New(portal target.Portal_) (t target.Exec, err error) {
 		err = plog.Errorf("not executable %s", file)
 		return
 	}
-	sub, err := portal.Sub(file)
+	sub, err := p.Sub(file)
 	if err != nil {
 		return
 	}
-	t = &exec{exec: sub}
+	t = Source{exec: sub}
 	return
 }
 
-func ResolveExec(source target.Source) (t target.Exec, err error) {
-	b, err := portal.Resolve_(source)
-	if err != nil {
-		return
-	}
-	return New(b)
-}
-
 func ResolveProjectExec(source target.Source) (out target.Exec, err error) {
+	defer plog.TraceErr(&err)
 	p, err := project.Resolve_(source)
 	if err != nil {
 		return
@@ -54,12 +55,6 @@ func ResolveProjectExec(source target.Source) (out target.Exec, err error) {
 		}
 		m.Exec = e
 	}
-	out = exec{exec: p}
+	out = Source{exec: p}
 	return
 }
-
-var _ target.Exec = exec{}
-
-var ResolveDist = dist.Resolver[target.Exec](ResolveExec)
-var ResolveBundle = bundle.Resolver[target.Exec](ResolveDist)
-var ResolveProject = project.Resolver[target.Exec](ResolveProjectExec)

@@ -30,7 +30,7 @@ func (resolve Resolve[T]) list(from Source) (out []T) {
 			return append(out, t)
 		}
 	}
-	_ = fs.WalkDir(from.FS(), from.Path(), func(src string, d fs.DirEntry, err error) error {
+	_ = fs.WalkDir(from.FS(), ".", func(src string, d fs.DirEntry, err error) error {
 		if err != nil {
 			log.Println("Resolve list", err)
 			return err
@@ -41,7 +41,7 @@ func (resolve Resolve[T]) list(from Source) (out []T) {
 			return nil
 		}
 		s, err := resolve(m)
-		if any(s) != nil && !reflect.ValueOf(s).IsNil() {
+		if any(s) != nil && !reflect.ValueOf(s).IsZero() {
 			out = append(out, s)
 		}
 		if errors.Is(err, fs.SkipDir) || errors.Is(err, fs.SkipAll) {
@@ -66,6 +66,11 @@ func (resolve Resolve[T]) Try(src Source) (result Source, err error) {
 
 func Any[T Source](of ...Resolve[Source]) Resolve[T] {
 	return func(entry Source) (s T, err error) {
+		var ok bool
+		if s, ok = any(err).(T); ok {
+			return
+		}
+
 		for _, f := range of {
 			var v Source
 			if v, err = f(entry); err != nil {
@@ -75,7 +80,6 @@ func Any[T Source](of ...Resolve[Source]) Resolve[T] {
 				err = nil
 				continue
 			}
-			var ok bool
 			if s, ok = any(v).(T); ok {
 				return
 			}

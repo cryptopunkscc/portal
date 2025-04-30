@@ -2,28 +2,27 @@ package html
 
 import (
 	"errors"
-	. "github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/bundle"
 	"github.com/cryptopunkscc/portal/resolve/dist"
 	"github.com/cryptopunkscc/portal/resolve/npm"
 	"io/fs"
 )
 
-type html struct{ Source }
+var ResolveDist = dist.Resolver[target.Html](ResolveHtml)
+var ResolveBundle = bundle.Resolver[target.Html](ResolveDist)
+var ResolveProject = npm.Resolver[target.Html](ResolveHtml)
 
-func (h html) IndexHtml() {}
-
-func ResolveHtml(src Source) (t Html, err error) {
-	stat, err := fs.Stat(src.FS(), "index.html")
+func ResolveHtml(source target.Source) (html target.Html, err error) {
+	defer plog.TraceErr(&err)
+	s, err := fs.Stat(source.FS(), "index.html")
 	if err != nil {
 		return
 	}
-	if stat.IsDir() {
+	if s.IsDir() {
 		return nil, errors.New("index.html is not a file")
 	}
-	return html{Source: src}, nil
+	html = Source{source}
+	return
 }
-
-var ResolveDist = dist.Resolver[Html](ResolveHtml)
-var ResolveBundle = bundle.Resolver[Html](ResolveDist)
-var ResolveProject = npm.Resolver[Html](ResolveHtml)

@@ -1,52 +1,18 @@
 package portal
 
 import (
-	"encoding/json"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/pkg/dec/all"
+	"github.com/cryptopunkscc/portal/resolve/app"
+	"github.com/cryptopunkscc/portal/resolve/project"
 )
 
-type of[T any] struct{ target.Portal_ }
+var Resolve_ = target.Any[target.Portal_](
+	Resolver(target.Resolve_).Try,
+)
 
-func (a *of[T]) IsApp()        {}
-func (a *of[T]) Target() (t T) { return }
-
-func Resolve[T any](src target.Source) (t target.Portal[T], err error) {
-	b, err := resolve(src)
-	if err != nil {
-		err = target.ErrNotTarget
-		return
-	}
-	t = &of[T]{b}
-	return
+func Resolver[T any](resolveT target.Resolve[T]) target.Resolve[target.Portal[T]] {
+	return target.Any[target.Portal[T]](
+		app.Resolver[T](resolveT).Try,
+		project.Resolver(resolveT).Try,
+	)
 }
-
-type of_ struct {
-	target.Source
-	manifest target.Manifest
-}
-
-func (p *of_) Manifest() *target.Manifest {
-	return &p.manifest
-}
-func (p *of_) LoadManifest() error {
-	return all.Unmarshalers.Load(&p.manifest, p.FS(), target.ManifestFilename)
-}
-func (p *of_) MarshalJSON() ([]byte, error) {
-	return json.Marshal(p.manifest)
-}
-
-func resolve(src target.Source) (t target.Portal_, err error) {
-	t, ok := src.(target.Portal_)
-	if ok {
-		return
-	}
-	p := of_{Source: src}
-	if err = p.LoadManifest(); err != nil {
-		return
-	}
-	t = &p
-	return
-}
-
-var Resolve_ target.Resolve[target.Portal_] = resolve

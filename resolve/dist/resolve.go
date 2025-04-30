@@ -2,33 +2,55 @@ package dist
 
 import (
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/resolve/app"
+	"github.com/cryptopunkscc/portal/pkg/dec/all"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
-type of[T any] struct {
-	t T
-	target.App[T]
+var Resolve_ target.Resolve[target.Dist_] = resolve_
+
+func resolve_(source target.Source) (portal target.Dist_, err error) {
+	defer plog.TraceErr(&err)
+
+	portal, ok := source.(target.Dist_)
+	if ok {
+		return
+	}
+
+	m := &target.Manifest{}
+	if err = all.Unmarshalers.Load(m, source.FS(), target.ManifestFilename); err != nil {
+		return
+	}
+
+	portal = &Source_{
+		Source:   source,
+		manifest: m,
+	}
+	return
 }
 
-func (d *of[T]) Target() T {
-	return d.t
-}
+func Resolver[T any](resolveT target.Resolve[T]) target.Resolve[target.Dist[T]] {
+	return func(source target.Source) (portal target.Dist[T], err error) {
+		defer plog.TraceErr(&err)
 
-func (d *of[T]) IsDist() {}
+		portal, ok := source.(target.Dist[T])
+		if ok {
+			return
+		}
 
-func Resolver[T any](resolve target.Resolve[T]) target.Resolve[target.Dist[T]] {
-	return func(src target.Source) (result target.Dist[T], err error) {
-		a, err := app.Resolve[T](src)
+		p, err := resolve_(source)
 		if err != nil {
 			return
 		}
-		t, err := resolve(a)
+
+		t, err := resolveT(p)
 		if err != nil {
 			return
 		}
-		result = &of[T]{App: a, t: t}
+
+		portal = &Source[T]{
+			Dist_:  p,
+			target: t,
+		}
 		return
 	}
 }
-
-var Resolve_ = Resolver(target.Resolve_)

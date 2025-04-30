@@ -2,8 +2,7 @@ package uninstall
 
 import (
 	"fmt"
-	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/resolve/apps"
+	"github.com/cryptopunkscc/portal/resolve/app"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"log"
 	"os"
@@ -12,7 +11,7 @@ import (
 func Runner(dir string) func(id string) (err error) {
 	return func(id string) (err error) {
 		src := source.Dir(dir)
-		for _, t := range apps.Resolver[target.Bundle_]().List(src) {
+		for _, t := range app.Resolve_.List(src) {
 			if t.Manifest().Match(id) {
 				log.Println("Uninstalling", t.Manifest().Package, "from", t.Abs())
 				err = os.Remove(t.Abs())

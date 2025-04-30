@@ -132,6 +132,7 @@ func (s *testService) testAwaitDescribe(t *testing.T, id object.ID) {
 	t.Run(s.name+" await describe", func(t *testing.T) {
 		c := objects.Client(s.Apphost.Rpc())
 		args := objects.DescribeArgs{ID: id}
+		limit := 10
 		for {
 			time.Sleep(200 * time.Millisecond)
 			if obj, err := c.Describe(args); obj != nil {
@@ -139,6 +140,11 @@ func (s *testService) testAwaitDescribe(t *testing.T, id object.ID) {
 				break
 			} else if err != nil {
 				plog.Println(err)
+				t.FailNow()
+			}
+			if limit > 0 {
+				limit--
+			} else {
 				t.FailNow()
 			}
 		}

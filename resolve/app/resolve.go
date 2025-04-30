@@ -2,17 +2,17 @@ package app
 
 import (
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/resolve/portal"
+	"github.com/cryptopunkscc/portal/resolve/bundle"
+	"github.com/cryptopunkscc/portal/resolve/dist"
 )
 
-type of[T any] struct{ target.Portal[T] }
+var Resolve_ = Resolver(target.Resolve_)
 
-func (a *of[T]) IsApp() {}
-
-func Resolve[T any](src target.Source) (t target.App[T], err error) {
-	p, err := portal.Resolve[T](src)
-	if err == nil {
-		t = &of[T]{p}
-	}
-	return
+func Resolver[T any](resolveType target.Resolve[T]) target.Resolve[target.App[T]] {
+	resolveDist := dist.Resolver[T](resolveType)
+	resolveBundle := bundle.Resolver[T](resolveDist)
+	return target.Any[target.App[T]](
+		target.Try(resolveDist),
+		target.Try(resolveBundle),
+	)
 }

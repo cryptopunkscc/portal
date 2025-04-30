@@ -5,7 +5,7 @@ import (
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/fs2"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/resolve/apps"
+	"github.com/cryptopunkscc/portal/resolve/app"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/fsnotify/fsnotify"
 )
@@ -23,8 +23,7 @@ func (s *Service[T]) ObserveApps(ctx context.Context, opts ListAppsOpts) (out <-
 	out = results
 	go func() {
 		defer close(results)
-		resolve := apps.Resolver[target.App_]()
-
+		resolve := app.Resolve_
 		for _, bundle := range resolve.List(s.apps()) {
 			if opts.Hidden || !bundle.Manifest().Hidden {
 				results <- bundle

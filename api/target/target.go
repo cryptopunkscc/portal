@@ -9,7 +9,7 @@ type Source interface {
 	Path() string
 	File() (fs.File, error)
 	FS() fs.FS
-	Sub(dir string) (Source, error)
+	Sub(dir ...string) (Source, error)
 	IsDir() bool
 }
 
@@ -80,11 +80,6 @@ type Bundle_ interface {
 	App_
 }
 
-type AppBundle[T any] interface {
-	Package() Source
-	App[T]
-}
-
 type Dist_ interface {
 	IsDist()
 	App_
@@ -93,6 +88,11 @@ type Dist_ interface {
 type Dist[T any] interface {
 	IsDist()
 	App[T]
+}
+
+type AppBundle[T any] interface {
+	Package() Source
+	Dist[T]
 }
 
 type Html interface{ IndexHtml() }

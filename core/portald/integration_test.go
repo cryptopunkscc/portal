@@ -1,8 +1,8 @@
 package portald
 
 import (
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/test"
 	"testing"
 	"time"
 )
@@ -37,7 +37,7 @@ func TestService_Integration(t *testing.T) {
 				it.s1.testCreateUser(t)
 
 				t.Run("app write", func(t *testing.T) {
-					obj := test.EmbedGoProjectManifest
+					obj := &target.Manifest{Name: "go", Package: "test.go", Title: "test go"}
 					id := *it.s1.testWriteObject(t, obj) // write object to data directory
 					it.s1.testReconnectAsUser(t)         // setup object clients with user auth token
 					time.Sleep(2000 * time.Millisecond)  // time for mod content to identify written object

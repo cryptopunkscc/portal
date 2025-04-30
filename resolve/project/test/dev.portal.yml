@@ -1,0 +1,14 @@
+name: name
+package: package
+title: title
+description: description
+version: version
+schema: schema
+build:
+  default:
+    out: out
+    cmd: cmd
+    exec: exec
+  linux:
+    deps: [ dep ]
+    env: [ DEP=1 ]

@@ -1,0 +1,7 @@
+name: name
+package: package
+title: title
+description: description
+version: version
+schema: schema
+exec: exec

@@ -5,22 +5,7 @@ import (
 	"errors"
 	"github.com/cryptopunkscc/portal/api/target"
 	"io/fs"
-	"path/filepath"
 )
-
-type source struct {
-	target.Source
-	info target.TemplateInfo
-}
-
-func (t *source) Info() target.TemplateInfo { return t.info }
-func (t *source) Name() (name string) {
-	name = t.info.ShortName
-	if name == "" {
-		name = filepath.Base(t.Abs())
-	}
-	return
-}
 
 var Resolve target.Resolve[target.Template] = resolve
 
@@ -32,7 +17,7 @@ func resolve(src target.Source) (template target.Template, err error) {
 	if err != nil {
 		return
 	}
-	template = &source{
+	template = &Source{
 		Source: src,
 		info:   info,
 	}

@@ -6,27 +6,23 @@ import (
 	"github.com/cryptopunkscc/portal/resolve/zip"
 )
 
-type of[T any] struct {
-	target.App[T]
-	bundle target.Bundle
-}
-
-func (t of[T]) Package() target.Source { return t.bundle.Package() }
+var Resolve_ = Resolver(dist.Resolver(target.Resolve_))
 
 func Resolver[T any](resolve target.Resolve[target.Dist[T]]) target.Resolve[target.AppBundle[T]] {
-	return func(src target.Source) (app target.AppBundle[T], err error) {
-		b, err := zip.Resolve(src)
-		if err != nil {
+	return func(src target.Source) (bundle target.AppBundle[T], err error) {
+		bundle, ok := src.(target.AppBundle[T])
+		if ok {
 			return
 		}
-		td := &of[T]{}
-		if td.App, err = resolve(b); err != nil {
+
+		s := Source[T]{}
+		if s.bundle, err = zip.Resolve(src); err != nil {
 			return
 		}
-		td.bundle = b
-		app = td
+		if s.Dist, err = resolve(s.bundle); err != nil {
+			return
+		}
+		bundle = s
 		return
 	}
 }
-
-var Resolve_ = Resolver(dist.Resolve_)

@@ -2,7 +2,7 @@ package template
 
 import (
 	"embed"
-	targetSource "github.com/cryptopunkscc/portal/resolve/source"
+	"github.com/cryptopunkscc/portal/resolve/source"
 	"io/fs"
 )
 
@@ -12,7 +12,7 @@ var TemplatesFs embed.FS
 var CommonsFs fs.FS
 
 func init() {
-	sub, err := targetSource.Embed(TemplatesFs).Sub("tmpl/common")
+	sub, err := source.Embed(TemplatesFs).Sub("tmpl/common")
 	if err != nil {
 		return
 	}

@@ -3,7 +3,7 @@ package install
 import (
 	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/resolve/apps"
+	"github.com/cryptopunkscc/portal/resolve/bundle"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"io"
 	"os"
@@ -23,12 +23,12 @@ func (i Runner) BundlesByPath(src string) (c <-chan Result, err error) {
 
 func (i Runner) installBundles(source target.Source, c chan<- Result) {
 	defer close(c)
-	for id, bundle := range apps.Resolver[target.Bundle_]().List(source) {
-		err := i.Bundle(bundle)
+	for id, b := range bundle.Resolve_.List(source) {
+		err := i.Bundle(b)
 		c <- Result{
 			Id:       id,
 			Error:    err,
-			Manifest: *bundle.Manifest(),
+			Manifest: *b.Manifest(),
 		}
 	}
 	return

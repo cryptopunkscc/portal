@@ -1,10 +1,11 @@
 package dec
 
 import (
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io/fs"
 )
 
-type Unmarshal func(in []byte, out interface{}) (err error)
+type Unmarshal func(in []byte, out any) (err error)
 
 type Unmarshalers map[string]Unmarshal
 
@@ -18,16 +19,26 @@ func From(unmarshalers ...Unmarshalers) (out Unmarshalers) {
 	return
 }
 
-func (u Unmarshalers) Load(dst any, src fs.FS, name string) (err error) {
-	for ext, unmarshal := range u {
-		if err = load(unmarshal, dst, src, name, ext); err == nil {
+func (u Unmarshalers) Unmarshal(in []byte, out any) (err error) {
+	defer plog.TraceErr(&err)
+	for _, unmarshal := range u {
+		if err = unmarshal(in, out); err == nil {
 			return
 		}
 	}
-	if err == nil {
-		err = fs.ErrNotExist
+	return fs.ErrNotExist
+}
+
+func (u Unmarshalers) Load(dst any, src fs.FS, names ...string) (err error) {
+	defer plog.TraceErr(&err)
+	for _, name := range names {
+		for ext, unmarshal := range u {
+			if err = load(unmarshal, dst, src, name, ext); err == nil {
+				return
+			}
+		}
 	}
-	return err
+	return fs.ErrNotExist
 }
 
 func load(

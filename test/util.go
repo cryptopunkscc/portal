@@ -2,6 +2,7 @@ package test
 
 import (
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/resolve/source"
 	"io"
 	"io/fs"
@@ -10,6 +11,12 @@ import (
 	"strings"
 	"testing"
 )
+
+func init() {
+	plog.Verbosity = 100
+}
+
+var DefaultTestDir = ".test"
 
 func CleanDir(t *testing.T, path ...string) string {
 	Clean(path...)
@@ -21,7 +28,7 @@ func Dir(t *testing.T, path ...string) string {
 	if err != nil {
 		t.Fatal(err)
 	}
-	dir := ".test"
+	dir := DefaultTestDir
 	if len(path) > 0 {
 		dir = filepath.Join(path...)
 	}
@@ -36,6 +43,11 @@ func Mkdir(t *testing.T, path ...string) (d string) {
 	return
 }
 
+func CleanMkdir(t *testing.T, path ...string) (d string) {
+	Clean(path...)
+	return Mkdir(t, path...)
+}
+
 func Assert[T any](value T, err error) T {
 	if err != nil {
 		panic(err)
@@ -44,7 +56,7 @@ func Assert[T any](value T, err error) T {
 }
 
 func Copy(src target.Source, path ...string) target.Source {
-	out := "test_data"
+	out := DefaultTestDir
 	if len(path) > 0 {
 		out = filepath.Join(path...)
 	}
@@ -113,9 +125,24 @@ func copyFileAndClose(src fs.FS, mod fs.FileMode, srcPath, dstPath string) (err 
 }
 
 func Clean(path ...string) {
-	dir := "test_data"
+	dir := DefaultTestDir
 	if len(path) > 0 {
 		dir = filepath.Join(path...)
 	}
 	_ = os.RemoveAll(dir)
+}
+
+func AssertErr(t *testing.T, err error) {
+	if err != nil {
+		plog.Println(err)
+		t.FailNow()
+	}
+}
+
+func AssertF[T any](t *testing.T, a T, err error) T {
+	if err != nil {
+		plog.Println(err)
+		t.FailNow()
+	}
+	return a
 }
