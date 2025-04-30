@@ -3,9 +3,9 @@ package main
 import (
 	"github.com/cryptopunkscc/portal/api/version"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/runner/clean"
 	"github.com/cryptopunkscc/portal/runner/cli"
 	"github.com/cryptopunkscc/portal/target/all"
+	"github.com/cryptopunkscc/portal/target/project"
 )
 
 func main() { cli.Run(Application{}.handler()) }
@@ -22,7 +22,7 @@ func (a Application) handler() cmd.Handler {
 		},
 		Sub: cmd.Handlers{
 			{
-				Func: clean.Runner(),
+				Func: project.Cleaner(),
 				Name: "clean c",
 				Desc: "Clean target directories from build artifacts without building.",
 				Params: cmd.Params{

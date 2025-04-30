@@ -1,4 +1,4 @@
-package clean
+package project
 
 import (
 	"io/fs"
@@ -9,22 +9,22 @@ import (
 
 var Defaults = []string{"build", "dist", "node_modules"}
 
-type runner struct{ names map[string]any }
-
-func Runner(names ...string) func(string) error {
+func Cleaner(names ...string) func(string) error {
 	if len(names) == 0 {
 		names = Defaults
 	}
-	r := &runner{names: make(map[string]any)}
+	r := &cleaner{names: make(map[string]any)}
 	for _, name := range names {
 		r.names[name] = name
 	}
 	return r.call
 }
 
-func (r runner) match(name string) bool { return r.names[name] != nil }
+type cleaner struct{ names map[string]any }
 
-func (r runner) call(dir string) error {
+func (r cleaner) match(name string) bool { return r.names[name] != nil }
+
+func (r cleaner) call(dir string) error {
 	return filepath.Walk(dir, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
 			return err
