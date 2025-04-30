@@ -1,13 +1,13 @@
 package main
 
 import (
+	"github.com/cryptopunkscc/portal/api/version"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/runner/cli"
 	"github.com/cryptopunkscc/portal/runner/goja"
 	"github.com/cryptopunkscc/portal/runner/goja_dist"
 	"github.com/cryptopunkscc/portal/runner/goja_pro"
-	"github.com/cryptopunkscc/portal/runner/version"
 	"github.com/cryptopunkscc/portal/target/source"
 )
 
@@ -28,7 +28,7 @@ func (a Application) handler() cmd.Handler {
 			{Type: "string", Desc: "Absolute path to app bundle or directory."},
 		},
 		Sub: cmd.Handlers{
-			{Name: "v", Desc: "Print version.", Func: version.Run},
+			{Name: "v", Desc: "Print version.", Func: version.Name},
 		},
 	}
 }

@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/cryptopunkscc/portal/api/version"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/runner/version"
 )
 
 func (a *Application) Handler() (h cmd.Handler) {
@@ -18,7 +18,7 @@ func (a *Application) Handler() (h cmd.Handler) {
 			{Type: "...string", Desc: "Optional application arguments."},
 		},
 		Sub: cmd.Handlers{
-			{Name: "v", Desc: "Print version.", Func: version.Run},
+			{Name: "v", Desc: "Print version.", Func: version.Name},
 			{
 				Func: a.Arg,
 				Name: "arg a",

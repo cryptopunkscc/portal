@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	. "github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/api/version"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/runner/cli"
-	"github.com/cryptopunkscc/portal/runner/version"
 	"github.com/cryptopunkscc/portal/runner/wails"
 	"github.com/cryptopunkscc/portal/target/source"
 )
@@ -24,7 +24,7 @@ func (a Application) Handler() cmd.Handler {
 			{Type: "string", Desc: "Absolute path to app bundle or directory."},
 		},
 		Sub: cmd.Handlers{
-			{Name: "v", Desc: "Print version.", Func: version.Run},
+			{Name: "v", Desc: "Print version.", Func: version.Name},
 		},
 	}
 }

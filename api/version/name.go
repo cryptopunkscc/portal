@@ -11,7 +11,7 @@ import (
 //go:embed name
 var version string
 
-func Run() string {
+func Name() string {
 	if version = strings.TrimSpace(version); version == "" {
 		version = Resolve()
 	}

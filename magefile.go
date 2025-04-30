@@ -5,12 +5,12 @@ package main
 import (
 	"errors"
 	"github.com/cryptopunkscc/portal/api"
+	"github.com/cryptopunkscc/portal/api/version"
 	"github.com/cryptopunkscc/portal/apps"
 	"github.com/cryptopunkscc/portal/core/js"
 	golang "github.com/cryptopunkscc/portal/pkg/go"
 	"github.com/cryptopunkscc/portal/pkg/gpg"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runner/version"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/magefile/mage/target"
