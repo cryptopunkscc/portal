@@ -2,24 +2,21 @@ package test
 
 import (
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/pkg/dec/all"
 	"github.com/cryptopunkscc/portal/target/dist"
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/cryptopunkscc/portal/test"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/yaml.v3"
 	"testing"
 )
 
 func TestResolve(t *testing.T) {
-	m := PortalYaml
-	assert.NotEmpty(t, m)
-
 	expected := target.Manifest{}
-	err := yaml.Unmarshal(PortalYaml, &expected)
+	err := all.Unmarshalers.Unmarshal(PortalYaml, &expected)
 	test.AssertErr(t, err)
 
-	dir := CreatePortal(t, m)
-	s := source.Dir(dir)
+	s, err := source.Embed(DistFS).Sub("test_dist")
+	test.AssertErr(t, err)
 
 	p, err := dist.Resolve_(s)
 	test.AssertErr(t, err)

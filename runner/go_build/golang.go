@@ -8,7 +8,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/dist"
-	"github.com/cryptopunkscc/portal/runner/pack"
+	dist2 "github.com/cryptopunkscc/portal/target/dist"
 	golang "github.com/cryptopunkscc/portal/target/go"
 	"os"
 	"path/filepath"
@@ -75,7 +75,7 @@ func (g runner) Run(ctx context.Context, project target.ProjectGo, args ...strin
 		}
 
 		if slices.Contains(args, "pack") {
-			if err = pack.Run(ctx, project.Dist_()); err != nil {
+			if err = dist2.Pack(project.Dist_()); err != nil {
 				return
 			}
 		}

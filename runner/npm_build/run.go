@@ -7,7 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/dist"
 	"github.com/cryptopunkscc/portal/runner/npm"
-	"github.com/cryptopunkscc/portal/runner/pack"
+	dist2 "github.com/cryptopunkscc/portal/target/dist"
 	npm2 "github.com/cryptopunkscc/portal/target/npm"
 	"slices"
 )
@@ -47,7 +47,7 @@ func (r *runner) Run(ctx context.Context, project target.ProjectNpm_, args ...st
 	}
 
 	if slices.Contains(args, "pack") {
-		if err = pack.Run(ctx, project.Dist_()); err != nil {
+		if err = dist2.Pack(project.Dist_()); err != nil {
 			return
 		}
 	}

@@ -4,7 +4,7 @@ import (
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/runner/go_build"
 	"github.com/cryptopunkscc/portal/runner/npm_build"
-	"github.com/cryptopunkscc/portal/runner/pack"
+	"github.com/cryptopunkscc/portal/target/dist"
 	"github.com/cryptopunkscc/portal/target/source"
 )
 
@@ -27,6 +27,6 @@ var provider = target.Provider[target.Runnable]{
 		target.Skip("node_modules"),
 		npm_build.Runner().Try,
 		go_build.Runner().Try,
-		pack.Runner.Try,
+		dist.PackRunner.Try,
 	),
 }

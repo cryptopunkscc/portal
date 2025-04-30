@@ -1,24 +1,30 @@
-package pack
+package dist
 
 import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/zip"
-	"github.com/cryptopunkscc/portal/target/dist"
 	"os"
 	"path/filepath"
 )
 
-var Runner = target.SourceRunner[target.Dist_]{
-	Resolve: target.Any[target.Dist_](target.Try(dist.Resolve_)),
-	Runner:  Run,
+var PackRunner = target.SourceRunner[target.Dist_]{
+	Resolve: Resolve_,
+	Runner:  PackRun,
 }
 
-var Run target.Run[target.Dist_] = run
+var PackRun target.Run[target.Dist_] = packRun
 
-func run(_ context.Context, app target.Dist_, _ ...string) (err error) {
+func packRun(_ context.Context, src target.Dist_, args ...string) (err error) {
+	return Pack(src, args...)
+}
+
+func Pack(app target.Dist_, path ...string) (err error) {
 	// create build dir
+	//buildDir := filepath.Join(path...)
+	//if buildDir == "" {
+	//}
 	buildDir := filepath.Join(app.Abs(), "..", "build")
 	if err = os.MkdirAll(buildDir, 0775); err != nil && !os.IsExist(err) {
 		return fmt.Errorf("os.MkdirAll: %v", err)
