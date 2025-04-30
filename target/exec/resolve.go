@@ -41,6 +41,10 @@ func ResolveExec(source target.Source) (t target.Exec, err error) {
 }
 
 func ResolveProjectExec(source target.Source) (out target.Exec, err error) {
+	if out, err = ResolveExec(source); err == nil {
+		return
+	}
+
 	defer plog.TraceErr(&err)
 	p, err := project.Resolve_(source)
 	if err != nil {

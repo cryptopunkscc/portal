@@ -7,9 +7,9 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/goja_dist"
-	"github.com/cryptopunkscc/portal/runner/npm"
 	"github.com/cryptopunkscc/portal/runner/npm_build"
 	"github.com/cryptopunkscc/portal/target/js"
+	"github.com/cryptopunkscc/portal/target/npm"
 	"time"
 )
 

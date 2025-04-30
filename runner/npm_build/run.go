@@ -6,15 +6,14 @@ import (
 	js "github.com/cryptopunkscc/portal/core/js/embed"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/dist"
-	"github.com/cryptopunkscc/portal/runner/npm"
 	dist2 "github.com/cryptopunkscc/portal/target/dist"
-	npm2 "github.com/cryptopunkscc/portal/target/npm"
+	"github.com/cryptopunkscc/portal/target/npm"
 	"slices"
 )
 
 func Runner(dependencies ...target.NodeModule) *target.SourceRunner[target.ProjectNpm_] {
 	return &target.SourceRunner[target.ProjectNpm_]{
-		Resolve: target.Any[target.ProjectNpm_](target.Try(npm2.Resolve_)),
+		Resolve: target.Any[target.ProjectNpm_](target.Try(npm.Resolve_)),
 		Runner:  &runner{dependencies: dependencies},
 	}
 }

@@ -4,8 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/runner/npm"
-	npm2 "github.com/cryptopunkscc/portal/target/npm"
+	"github.com/cryptopunkscc/portal/target/npm"
 	"github.com/cryptopunkscc/portal/target/source"
 	"log"
 	"os"
@@ -25,7 +24,7 @@ func Run() (err error) {
 	ctx := context.Background()
 	for _, p := range target.Any[target.NodeModule](
 		target.Skip("node_modules"),
-		target.Try(npm2.ResolveNodeModule),
+		target.Try(npm.ResolveNodeModule),
 	).List(libs) {
 		if !p.PkgJson().CanBuild() {
 			continue
