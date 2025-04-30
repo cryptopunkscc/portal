@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func TestRunner_Start(t *testing.T) {
+func TestInitializer_Start(t *testing.T) {
 	plog.Verbosity = plog.Debug
 	dir := test.Dir(t)
 	test.Clean(dir)

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
 	golang "github.com/cryptopunkscc/portal/pkg/go"
-	"github.com/cryptopunkscc/portal/resolve/npm"
-	"github.com/cryptopunkscc/portal/resolve/source"
+	"github.com/cryptopunkscc/portal/target/npm"
+	"github.com/cryptopunkscc/portal/target/source"
 	"os"
 )
 

@@ -11,8 +11,8 @@ import (
 	"github.com/cryptopunkscc/portal/core/token"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/resources"
-	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/install"
+	"github.com/cryptopunkscc/portal/target/source"
 	"sync"
 )
 

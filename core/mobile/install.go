@@ -2,7 +2,7 @@ package core
 
 import (
 	"github.com/cryptopunkscc/portal/apps"
-	"github.com/cryptopunkscc/portal/resolve/source"
+	"github.com/cryptopunkscc/portal/target/source"
 )
 
 func (m *service) Install() (err error) {

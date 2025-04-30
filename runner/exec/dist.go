@@ -3,7 +3,7 @@ package exec
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/resolve/exec"
+	"github.com/cryptopunkscc/portal/target/exec"
 )
 
 func (r Runner) Dist() *target.SourceRunner[target.DistExec] {

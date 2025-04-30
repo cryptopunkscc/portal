@@ -2,8 +2,8 @@ package uninstall
 
 import (
 	"fmt"
-	"github.com/cryptopunkscc/portal/resolve/app"
-	"github.com/cryptopunkscc/portal/resolve/source"
+	"github.com/cryptopunkscc/portal/target/app"
+	"github.com/cryptopunkscc/portal/target/source"
 	"log"
 	"os"
 )

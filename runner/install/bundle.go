@@ -3,8 +3,8 @@ package install
 import (
 	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/resolve/bundle"
-	"github.com/cryptopunkscc/portal/resolve/source"
+	"github.com/cryptopunkscc/portal/target/bundle"
+	"github.com/cryptopunkscc/portal/target/source"
 	"io"
 	"os"
 	"path/filepath"

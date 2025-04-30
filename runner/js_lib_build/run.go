@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
-	npm2 "github.com/cryptopunkscc/portal/resolve/npm"
-	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/npm"
+	npm2 "github.com/cryptopunkscc/portal/target/npm"
+	"github.com/cryptopunkscc/portal/target/source"
 	"log"
 	"os"
 )

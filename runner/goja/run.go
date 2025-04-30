@@ -5,7 +5,7 @@ import (
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/resolve/js"
+	"github.com/cryptopunkscc/portal/target/js"
 )
 
 func Runner(newCore bind.NewCore) *target.SourceRunner[target.AppJs] {

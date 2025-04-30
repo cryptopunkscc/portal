@@ -3,9 +3,9 @@ package basic
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/core/bind"
-	"github.com/cryptopunkscc/portal/resolve/js"
-	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/goja"
+	"github.com/cryptopunkscc/portal/target/js"
+	"github.com/cryptopunkscc/portal/target/source"
 	"testing"
 )
 

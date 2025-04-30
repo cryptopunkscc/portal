@@ -3,8 +3,8 @@ package template
 import (
 	"bytes"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/resolve/source"
-	"github.com/cryptopunkscc/portal/resolve/template"
+	"github.com/cryptopunkscc/portal/target/source"
+	"github.com/cryptopunkscc/portal/target/template"
 	"github.com/pterm/pterm"
 )
 

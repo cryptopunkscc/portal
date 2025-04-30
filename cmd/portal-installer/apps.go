@@ -3,9 +3,9 @@ package main
 import (
 	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/apps"
-	"github.com/cryptopunkscc/portal/resolve/exec"
-	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/install"
+	"github.com/cryptopunkscc/portal/target/exec"
+	"github.com/cryptopunkscc/portal/target/source"
 )
 
 func installApps() {

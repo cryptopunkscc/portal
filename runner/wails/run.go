@@ -7,7 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/core/js/embed/wails"
 	"github.com/cryptopunkscc/portal/pkg/assets"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/resolve/html"
+	"github.com/cryptopunkscc/portal/target/html"
 	"github.com/wailsapp/wails/v2/pkg/application"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"

@@ -5,10 +5,10 @@ import (
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/resolve/html"
 	"github.com/cryptopunkscc/portal/runner/reload"
 	"github.com/cryptopunkscc/portal/runner/wails"
 	"github.com/cryptopunkscc/portal/runner/watcher"
+	"github.com/cryptopunkscc/portal/target/html"
 	"path/filepath"
 )
 

@@ -3,12 +3,12 @@ package main
 import (
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/cli"
 	"github.com/cryptopunkscc/portal/runner/goja"
 	"github.com/cryptopunkscc/portal/runner/goja_dist"
 	"github.com/cryptopunkscc/portal/runner/goja_pro"
 	"github.com/cryptopunkscc/portal/runner/version"
+	"github.com/cryptopunkscc/portal/target/source"
 )
 
 func main() { cli.Run(Application{}.handler()) }

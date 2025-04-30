@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/exec"
-	exec2 "github.com/cryptopunkscc/portal/resolve/exec"
+	exec2 "github.com/cryptopunkscc/portal/target/exec"
 	"strings"
 )
 

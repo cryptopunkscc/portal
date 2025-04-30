@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	. "github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/resolve/html"
+	"github.com/cryptopunkscc/portal/target/html"
 )
 
 func (m *service) htmlRunner() *SourceRunner[AppHtml] {

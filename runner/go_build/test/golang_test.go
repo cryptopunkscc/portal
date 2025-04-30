@@ -3,9 +3,9 @@ package test
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/target"
-	golang "github.com/cryptopunkscc/portal/resolve/go"
-	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/go_build"
+	golang "github.com/cryptopunkscc/portal/target/go"
+	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/cryptopunkscc/portal/test"
 	"github.com/stretchr/testify/assert"
 	"io/fs"

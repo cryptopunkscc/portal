@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/cli"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/version"
+	"github.com/cryptopunkscc/portal/target/source"
 )
 
 func main() { cli.Run(Application{}.handler()) }

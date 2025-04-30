@@ -7,10 +7,10 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	golang "github.com/cryptopunkscc/portal/pkg/go"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	golang2 "github.com/cryptopunkscc/portal/resolve/go"
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/runner/go_build"
 	"github.com/cryptopunkscc/portal/runner/reload"
+	golang2 "github.com/cryptopunkscc/portal/target/go"
 	"time"
 )
 

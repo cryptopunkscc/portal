@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/resolve/exec"
+	"github.com/cryptopunkscc/portal/target/exec"
 	"io"
 	"os"
 	"path/filepath"

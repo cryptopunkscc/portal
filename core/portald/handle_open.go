@@ -6,8 +6,8 @@ import (
 	"github.com/cryptopunkscc/portal/api/portald"
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/resolve/portal"
-	"github.com/cryptopunkscc/portal/resolve/source"
+	"github.com/cryptopunkscc/portal/target/portal"
+	"github.com/cryptopunkscc/portal/target/source"
 )
 
 func (s *Service[T]) Open() Run[portald.OpenOpt] {

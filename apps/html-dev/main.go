@@ -5,12 +5,12 @@ import (
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/resolve/source"
 	"github.com/cryptopunkscc/portal/runner/cli"
 	"github.com/cryptopunkscc/portal/runner/version"
 	"github.com/cryptopunkscc/portal/runner/wails"
 	"github.com/cryptopunkscc/portal/runner/wails_dist"
 	"github.com/cryptopunkscc/portal/runner/wails_pro"
+	"github.com/cryptopunkscc/portal/target/source"
 )
 
 func main() { cli.Run(Application{}.handler()) }

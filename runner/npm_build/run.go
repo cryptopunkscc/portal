@@ -5,10 +5,10 @@ import (
 	"github.com/cryptopunkscc/portal/api/target"
 	js "github.com/cryptopunkscc/portal/core/js/embed"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	npm2 "github.com/cryptopunkscc/portal/resolve/npm"
 	"github.com/cryptopunkscc/portal/runner/dist"
 	"github.com/cryptopunkscc/portal/runner/npm"
 	"github.com/cryptopunkscc/portal/runner/pack"
+	npm2 "github.com/cryptopunkscc/portal/target/npm"
 	"slices"
 )
 
