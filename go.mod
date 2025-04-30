@@ -4,7 +4,7 @@ go 1.23.7
 
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
-	github.com/cryptopunkscc/astrald v0.0.0-20250425231037-7d91fdc06d04
+	github.com/cryptopunkscc/astrald v0.0.0-20250429235614-31fa54293830
 	github.com/dop251/goja v0.0.0-20240220182346-e401ed450204
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/getlantern/systray v1.2.2

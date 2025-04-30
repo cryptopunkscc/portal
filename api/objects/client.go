@@ -47,39 +47,52 @@ func (c Conn) Read(args ReadArgs) (r io.ReadCloser, err error) {
 	return rpc.NewCall(c.Conn, "read", args)
 }
 
+type SearchArgs struct {
+	Query string `query:"q"`
+	Zone  astral.Zone
+	Out   string
+	Ext   string
+}
+
 func (c Conn) Search(args SearchArgs) (out <-chan ObjectResponse[objects.SearchResult], err error) {
-	args.Format = "json"
+	args.Out = "json"
 	return rpc.Subscribe[ObjectResponse[objects.SearchResult]](c.Conn, "search", args)
 }
 
-type ObjectResponse[T any] struct {
-	Payload T        `json:"payload"`
-	Type    string   `json:"type"`
-	Data    []string `json:"data"`
-}
-
-type SearchArgs struct {
-	Query  string `query:"q"`
+type ScanArgs struct {
+	Type   string
+	Repo   string
+	Out    string
+	Follow bool
 	Zone   astral.Zone
-	Format string
-	Ext    string
 }
 
-func (c Conn) Describe(args DescribeArgs) (r map[string]any, err error) {
-	args.Format = "json"
-	return rpc.Query[map[string]any](c.Conn, "describe", args)
+func (c Conn) Scan(args ScanArgs) (out <-chan ObjectResponse[objects.SearchResult], err error) {
+	args.Out = "json"
+	return rpc.Subscribe[ObjectResponse[objects.SearchResult]](c.Conn, "scan", args)
 }
 
 type DescribeArgs struct {
-	ID     object.ID
-	Format string
-	Zones  astral.Zone
+	ID    object.ID
+	Out   string
+	Zones astral.Zone
+}
+
+func (c Conn) Describe(args DescribeArgs) (r map[string]any, err error) {
+	args.Out = "json"
+	return rpc.Query[map[string]any](c.Conn, "describe", args)
+}
+
+type showArgs struct {
+	ID object.ID
 }
 
 func (c Conn) Show(id object.ID) (r string, err error) {
 	return rpc.Query[string](c.Conn, "show_object", showArgs{ID: id})
 }
 
-type showArgs struct {
-	ID object.ID
+type ObjectResponse[T any] struct {
+	Payload T        `json:"payload"`
+	Type    string   `json:"type"`
+	Data    []string `json:"data"`
 }

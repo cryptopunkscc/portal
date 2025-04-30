@@ -17,17 +17,22 @@ type TokenConn struct{ rpc.Conn }
 type CreateTokenArgs struct {
 	ID       *astral.Identity `query:"id" cli:"id"`
 	Duration *astral.Duration `query:"duration" cli:"duration d"`
-	Format   astral.String    `query:"format" cli:"format f"`
+	Out      astral.String    `query:"out" cli:"out o"`
 }
 
-func (c TokenConn) Create(args CreateTokenArgs) (*mod.AccessToken, error) {
+func (c TokenConn) Create(args CreateTokenArgs) (ac *mod.AccessToken, err error) {
 	if args.ID == nil {
 		return nil, errors.New("id is required")
 	}
-	if args.Format == "" {
-		args.Format = "json"
+	if args.Out == "" {
+		args.Out = "json"
 	}
-	return rpc.Query[*mod.AccessToken](c, "apphost.create_token", args)
+	r, err := rpc.Query[rpc.JsonObject[*mod.AccessToken]](c, "apphost.create_token", args)
+	if err != nil {
+		return
+	}
+	ac = r.Payload
+	return
 }
 
 type ListTokensArgs struct {

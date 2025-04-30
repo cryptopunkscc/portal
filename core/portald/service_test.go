@@ -98,7 +98,7 @@ func (s *testService) testAddEndpoint(t *testing.T, s2 *testService) {
 	})
 }
 
-func (s *testService) testWriteObject(t *testing.T, obj astral.Object) (id object.ID) {
+func (s *testService) testWriteObject(t *testing.T, obj astral.Object) (id *object.ID) {
 	t.Run(s.name+" write object", func(t *testing.T) {
 		buf := bytes.NewBuffer(nil)
 		_, err := astral.WriteCanonical(buf, obj)
@@ -174,9 +174,9 @@ func (s *testService) testReadObject(t *testing.T, id object.ID) {
 func (s *testService) testSearchObjects(t *testing.T, query string) {
 	t.Run(s.name+" search objects", func(t *testing.T) {
 		c := objects.Client(s.Apphost.Rpc())
-		search, err := c.Search(objects.SearchArgs{
-			Query: query,
-			Zone:  astral.AllZones,
+		search, err := c.Scan(objects.ScanArgs{
+			Type: query,
+			Zone: astral.AllZones,
 		})
 		if err != nil {
 			plog.Println(err)

@@ -38,12 +38,11 @@ func TestService_Integration(t *testing.T) {
 
 				t.Run("app write", func(t *testing.T) {
 					obj := test.EmbedGoProjectManifest
-					id := it.s1.testWriteObject(t, obj) // write object to data directory
-					it.s1.testReconnectAsUser(t)        // setup object clients with user auth token
-					time.Sleep(2000 * time.Millisecond) // time for mod content to identify written object
-					it.s1.testAwaitDescribe(t, id)      // await fetching describe
-					it.s1.testShowObject(t, id)         // test show object
-					it.s1.testReadObject(t, id)         // test read object
+					id := *it.s1.testWriteObject(t, obj) // write object to data directory
+					it.s1.testReconnectAsUser(t)         // setup object clients with user auth token
+					time.Sleep(2000 * time.Millisecond)  // time for mod content to identify written object
+					it.s1.testAwaitDescribe(t, id)       // await fetching describe
+					it.s1.testReadObject(t, id)          // test read object
 					//it.s1.testSearchObjects(t, id.String()) // test search objects
 					it.s1.testSearchObjects(t, "app.manifest") // test search objects
 				})

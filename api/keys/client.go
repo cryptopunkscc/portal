@@ -11,17 +11,22 @@ func Client(rpc rpc.Rpc) Conn { return Conn{rpc.Request("localnode", "keys")} }
 type Conn struct{ rpc.Conn }
 
 type createKeyArgs struct {
-	Alias  string `query:"alias" cli:"alias a"`
-	Format string `query:"format" cli:"format f"`
+	Alias string `query:"alias" cli:"alias a"`
+	Out   string `query:"out" cli:"out o"`
 }
 
-func (c Conn) Create(alias string) (*astral.Identity, error) {
+func (c Conn) Create(alias string) (id *astral.Identity, err error) {
 	if alias == "" {
 		return nil, errors.New("alias is required")
 	}
 	args := &createKeyArgs{
-		Alias:  alias,
-		Format: "json",
+		Alias: alias,
+		Out:   "json",
 	}
-	return rpc.Query[*astral.Identity](c, "create_key", args)
+	o, err := rpc.Query[rpc.JsonObject[*astral.Identity]](c, "create_key", args)
+	if err != nil {
+		return
+	}
+	id = o.Payload
+	return
 }
