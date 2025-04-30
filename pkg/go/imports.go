@@ -25,16 +25,25 @@ func withProjectPath(imports []string, abs string) (modified []string) {
 	return
 }
 
-func FindProjectRoot(abs string) (s string, err error) {
-	if abs == "." || abs == "" || abs == "/" {
+func FindProjectRoot(abs ...string) (s string, err error) {
+	path := filepath.Join(abs...)
+
+	if len(path) == 0 {
+		path, err = os.Getwd()
+		if err != nil {
+			return
+		}
+	}
+
+	if path == "." || path == "" || path == "/" {
 		err = plog.Errorf("cannot find root")
 		return
 	}
-	if _, err = os.Stat(filepath.Join(abs, "go.mod")); err == nil {
-		s = abs
+	if _, err = os.Stat(filepath.Join(path, "go.mod")); err == nil {
+		s = path
 		return
 	}
-	dir := filepath.Dir(abs)
+	dir := filepath.Dir(path)
 	return FindProjectRoot(dir)
 }
 

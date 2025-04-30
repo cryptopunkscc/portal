@@ -46,11 +46,7 @@ func (imp *imports) List() (l []ImportRefs) {
 }
 
 func (imp *imports) Collect(path string) (err error) {
-	wd, err := os.Getwd()
-	if err != nil {
-		return
-	}
-	imp.root, err = FindProjectRoot(wd)
+	imp.root, err = FindProjectRoot()
 	if err != nil {
 		return
 	}

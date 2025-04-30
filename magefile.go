@@ -5,11 +5,11 @@ package main
 import (
 	"errors"
 	"github.com/cryptopunkscc/portal/api"
+	"github.com/cryptopunkscc/portal/core/js"
 	"github.com/cryptopunkscc/portal/pkg/gpg"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/apps_build"
 	"github.com/cryptopunkscc/portal/runner/astrald_build"
-	"github.com/cryptopunkscc/portal/runner/js_lib_build"
 	"github.com/cryptopunkscc/portal/runner/version"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -140,7 +140,7 @@ func (Build) JsLib() error {
 			return nil
 		}
 	}
-	return js_lib_build.Run()
+	return js.BuildPortalLib()
 }
 
 func resolveVersion() {

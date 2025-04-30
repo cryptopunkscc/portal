@@ -1,19 +1,21 @@
-package js_lib_build
+package js
 
 import (
 	"context"
-	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
+	golang "github.com/cryptopunkscc/portal/pkg/go"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target/npm"
 	"github.com/cryptopunkscc/portal/target/source"
 	"log"
-	"os"
 )
 
-func Run() (err error) {
-	wd, err := os.Getwd()
+func BuildPortalLib() (err error) {
+	defer plog.TraceErr(&err)
+
+	wd, err := golang.FindProjectRoot()
 	if err != nil {
-		return fmt.Errorf("cannot resolve working dir: %v", err)
+		return
 	}
 
 	libs, err := source.File(wd, "core", "js")
@@ -30,11 +32,11 @@ func Run() (err error) {
 			continue
 		}
 		log.Printf("building js libs for %s", p.Abs())
-		if err := npm.Install(ctx, p); err != nil {
-			log.Fatalln(err)
+		if err = npm.Install(ctx, p); err != nil {
+			return
 		}
-		if err := npm.BuildModule(ctx, p); err != nil {
-			log.Fatalln(err)
+		if err = npm.BuildModule(ctx, p); err != nil {
+			return
 		}
 	}
 	return
