@@ -7,9 +7,9 @@ import (
 	"github.com/cryptopunkscc/portal/api"
 	"github.com/cryptopunkscc/portal/apps"
 	"github.com/cryptopunkscc/portal/core/js"
+	golang "github.com/cryptopunkscc/portal/pkg/go"
 	"github.com/cryptopunkscc/portal/pkg/gpg"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runner/astrald_build"
 	"github.com/cryptopunkscc/portal/runner/version"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -119,7 +119,15 @@ func (Build) Cli() error {
 }
 
 func (Build) Astrald() error {
-	return astrald_build.Run()
+	wd, err := golang.FindProjectRoot()
+	if err != nil {
+		return err
+	}
+	out := "cmd/portal-installer/bin/"
+	return golang.GoPkgMod{
+		Url:     "github.com/cryptopunkscc/astrald",
+		Version: api.AstralVersion,
+	}.Build("./cmd/astrald", filepath.Join(wd, out))
 }
 
 func (Build) Portald() error {
