@@ -6,8 +6,8 @@ import (
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/runner/cli"
-	"github.com/cryptopunkscc/portal/runner/template"
 	"github.com/cryptopunkscc/portal/target/all"
+	"github.com/cryptopunkscc/portal/target/template"
 	"log"
 	"strings"
 )
@@ -47,7 +47,7 @@ func createProject(ctx context.Context, targets string, dir string) (err error) 
 	if len(parsedTargets) == 0 {
 		return errors.New("no targets specified")
 	}
-	if err = template.NewRunner(dir).GenerateProjects(parsedTargets); err != nil {
+	if err = template.ProjectFactory(dir).CreateProjects(parsedTargets); err != nil {
 		return
 	}
 	if err = all.BuildRecursive(ctx, dir); err != nil {

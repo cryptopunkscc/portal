@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/target/source"
-	"github.com/cryptopunkscc/portal/target/template"
 	"github.com/pterm/pterm"
 )
 
@@ -17,8 +16,8 @@ func Map() (templates map[string]target.Template) {
 }
 
 func List() Templates {
-	src := source.Embed(template.TemplatesFs)
-	return template.Resolve.List(src)
+	src := source.Embed(TemplatesFs)
+	return Resolve.List(src)
 }
 
 type Templates []target.Template

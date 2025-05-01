@@ -5,13 +5,23 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/git"
 )
 
-type Runner struct {
+type Factory struct {
 	dir  string
 	args Args
 }
 
-func NewRunner(dir string) *Runner {
-	r := &Runner{
+// Args will be embedded into the tmpl files during the installation
+type Args struct {
+	ProjectName string
+	PackageName string
+	AuthorName  string
+	AuthorEmail string
+	Description string
+	Url         string
+}
+
+func ProjectFactory(dir string) *Factory {
+	r := &Factory{
 		dir:  target.Abs(dir),
 		args: defaultTemplateArgs(),
 	}
