@@ -1,4 +1,4 @@
-package go_project
+package golang
 
 import (
 	"context"
