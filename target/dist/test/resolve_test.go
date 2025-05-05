@@ -1,7 +1,7 @@
 package test
 
 import (
-	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/pkg/dec/all"
 	"github.com/cryptopunkscc/portal/target/dist"
 	"github.com/cryptopunkscc/portal/target/source"
@@ -11,7 +11,7 @@ import (
 )
 
 func TestResolve(t *testing.T) {
-	expected := target.Manifest{}
+	expected := manifest.App{}
 	err := all.Unmarshalers.Unmarshal(PortalYaml, &expected)
 	test.AssertErr(t, err)
 

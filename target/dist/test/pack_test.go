@@ -22,7 +22,7 @@ func TestPack(t *testing.T) {
 	err = dist.Pack(d)
 	test.AssertErr(t, err)
 
-	n := "package_version.portal"
+	n := "package_1.2.3.portal"
 	p := filepath.Join("build", n)
 	stat, err := os.Stat(p)
 	test.AssertErr(t, err)

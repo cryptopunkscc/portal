@@ -1,0 +1,15 @@
+build:
+  out: main1
+  cmd: cmd1
+  exec: exec1
+  default:
+    cmd: cmd2
+    exec: exec2
+  os1:
+  os2:
+    out: main3
+    exec: exec3
+    arch1:
+    arch2:
+      out: main4
+      cmd: cmd4

@@ -2,6 +2,7 @@ package install
 
 import (
 	"fmt"
+	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/target/bundle"
 	"github.com/cryptopunkscc/portal/target/source"
@@ -57,7 +58,7 @@ func (i Runner) Bundle(bundle target.Bundle_) error {
 
 type Result struct {
 	Id       int
-	Manifest target.Manifest
+	Manifest manifest.App
 	Error    error
 }
 

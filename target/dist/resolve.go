@@ -2,7 +2,6 @@ package dist
 
 import (
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/pkg/dec/all"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
@@ -16,15 +15,12 @@ func resolve_(source target.Source) (portal target.Dist_, err error) {
 		return
 	}
 
-	m := &target.Manifest{}
-	if err = all.Unmarshalers.Load(m, source.FS(), target.ManifestFilename); err != nil {
+	s := &Source_{}
+	s.Source = source
+	if err = s.manifest.LoadFrom(source.FS()); err != nil {
 		return
 	}
-
-	portal = &Source_{
-		Source:   source,
-		manifest: m,
-	}
+	portal = s
 	return
 }
 

@@ -23,7 +23,7 @@ type BundleHostRunner struct{ BundleRunner }
 
 func (r *BundleHostRunner) Run(ctx context.Context, src target.Portal_, args ...string) (err error) {
 	defer plog.TraceErr(&err)
-	if src.Manifest().Schema == "" {
+	if src.Manifest().Runtime == "" {
 		return errors.New("BundleHostRunner requires a schema declared in manifest")
 	}
 
@@ -32,7 +32,7 @@ func (r *BundleHostRunner) Run(ctx context.Context, src target.Portal_, args ...
 		Sources: []target.Source{source.Dir(r.Apps)},
 		Resolve: target.Any[target.BundleExec](exec.ResolveBundle.Try),
 	}
-	hostId := src.Manifest().Schema
+	hostId := src.Manifest().Runtime
 	opt := portald.OpenOpt{}
 	if opt.Load(ctx); len(opt.Schema) > 0 {
 		hostId = hostId + "." + opt.Schema

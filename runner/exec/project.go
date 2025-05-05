@@ -18,8 +18,10 @@ func (r Runner) Project() *target.SourceRunner[target.ProjectExec] {
 type ProjectRunner struct{ Runner }
 
 func (r *ProjectRunner) Run(ctx context.Context, src target.ProjectExec, args ...string) (err error) {
-	e := src.Manifest().Exec
-	c, err := exec.Cmd{}.Parse(e, src.Abs(), strings.Join(args, " "))
+	cmd := src.Build().Get().Exec
+	abs := src.Abs()
+	arg := strings.Join(args, " ")
+	c, err := exec.Cmd{}.Parse(cmd, abs, arg)
 	if err != nil {
 		return
 	}

@@ -49,9 +49,9 @@ func load(
 	ext string,
 ) (err error) {
 	name = name + "." + ext
-	file, err := fs.ReadFile(src, name)
+	b, err := fs.ReadFile(src, name)
 	if err != nil {
 		return
 	}
-	return unmarshal(file, dst)
+	return unmarshal(b, dst)
 }

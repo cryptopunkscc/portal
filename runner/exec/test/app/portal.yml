@@ -1,0 +1,10 @@
+name: name
+title: title
+description: description
+package: package
+version: 1
+schema: project_host_runner
+api:
+  version: 2
+release:
+  version: 3

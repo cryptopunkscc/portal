@@ -56,7 +56,7 @@ func (a *app_) Manifest() *mobile.Manifest {
 		Title:       manifest.Title,
 		Description: manifest.Description,
 		Package:     manifest.Package,
-		Version:     manifest.Version,
+		Version:     a.source.Version(),
 		Icon:        manifest.Icon,
 	}
 }

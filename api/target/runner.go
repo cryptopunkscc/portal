@@ -2,6 +2,7 @@ package target
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 type Runner[T any] interface {
@@ -52,6 +53,7 @@ func (r *SourceRunner[T]) setupReloader() {
 }
 
 func (r *SourceRunner[T]) Run(ctx context.Context, src Source, args ...string) (err error) {
+	defer plog.TraceErr(&err)
 	r.setupReloader()
 	t, err := r.Resolve(src)
 	if err != nil {

@@ -1,6 +1,7 @@
 package test
 
 import (
+	"embed"
 	_ "embed"
 	"github.com/cryptopunkscc/portal/test"
 	"os"
@@ -8,8 +9,11 @@ import (
 	"testing"
 )
 
-//go:embed dev.portal.yml
+//go:embed test_project/dev.portal.yml
 var DevPortalYaml []byte
+
+//go:embed test_project
+var ProjectFS embed.FS
 
 func CreateProject(t *testing.T, manifest []byte, path ...string) (dir string) {
 	dir = test.CleanMkdir(t, path...)

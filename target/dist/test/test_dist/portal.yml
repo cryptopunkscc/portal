@@ -2,5 +2,9 @@ name: name
 title: title
 description: description
 package: package
-version: version
+version: 1
 schema: schema
+api:
+  version: 2
+release:
+  version: 3

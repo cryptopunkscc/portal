@@ -1,0 +1,4 @@
+name: project_host_runner
+package: project.host.runner
+build:
+  exec: go run

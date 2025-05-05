@@ -2,46 +2,24 @@ package project
 
 import (
 	json2 "encoding/json"
+	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/pkg/dec/all"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/target/dist"
 )
-
-func New[T any](
-	source target.Source,
-	resolve target.Resolve[T],
-) (project target.Project[T], err error) {
-	defer plog.TraceErr(&err)
-	if _, err = resolve(source); err != nil {
-		return
-	}
-	s := &Source[T]{}
-	if err = all.Unmarshalers.Load(&s.manifest, source.FS(), target.BuildFilename); err != nil {
-		return
-	}
-	s.build = target.LoadBuilds(source)
-	s.resolveDist = dist.Resolver(resolve)
-	s.Source = source
-	if s.manifest.Exec == "" {
-		s.manifest.Exec = target.GetBuild(s).Exec
-	}
-	project = s
-	return
-}
 
 type Source[T any] struct {
 	target.Source
-	build       target.Builds
-	manifest    target.Manifest
+	manifest    manifest.Dev
 	resolveDist target.Resolve[target.Dist[T]]
 }
 
+func (s *Source[T]) Api() *manifest.Api           { return &s.manifest.Api }
+func (s *Source[T]) Build() *manifest.Builds      { return &s.manifest.Builds }
+func (s *Source[T]) Config() *manifest.Config     { return &s.manifest.Config }
+func (s *Source[T]) Manifest() *manifest.App      { return &s.manifest.App }
+func (s *Source[T]) Runtime() T                   { return s.Dist().Runtime() }
 func (s *Source[T]) Changed(skip ...string) bool  { return target.Changed(s, skip...) }
 func (s *Source[T]) MarshalJSON() ([]byte, error) { return json2.Marshal(s.Manifest()) }
-func (s *Source[T]) Manifest() *target.Manifest   { return &s.manifest }
-func (s *Source[T]) Target() T                    { return s.Dist().Target() }
-func (s *Source[T]) Build() target.Builds         { return s.build }
 func (s *Source[T]) Dist_() (t target.Dist_)      { return s.Dist() }
 func (s *Source[T]) Dist() (t target.Dist[T]) {
 	sub, err := s.Sub("dist")

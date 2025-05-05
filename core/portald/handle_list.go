@@ -14,7 +14,7 @@ type ListAppsOpts struct {
 func (s *Service[T]) ListApps(opts ListAppsOpts) Apps {
 	a := target.Portals[target.Portal_]{}
 	for _, app := range s.Resolve.List(s.apps()) {
-		if opts.Hidden || !app.Manifest().Hidden {
+		if opts.Hidden || !app.Config().Hidden {
 			a = append(a, app)
 		}
 	}
@@ -29,7 +29,13 @@ func (a Apps) MarshalCLI() string {
 	w := tabwriter.NewWriter(b, 4, 4, 2, ' ', 0)
 	for _, app := range a {
 		m := app.Manifest()
-		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\n", m.Name, m.Version, m.Title, m.Description, m.Package, m.Schema)
+		v := ""
+		if d, ok := app.(target.Dist_); ok {
+			v = d.Version()
+		} else {
+			v = fmt.Sprintf("%d.%d", m.Version, app.Api().Version)
+		}
+		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\n", m.Name, v, m.Title, m.Description, m.Package, m.Runtime)
 	}
 	_ = w.Flush()
 	return b.String()

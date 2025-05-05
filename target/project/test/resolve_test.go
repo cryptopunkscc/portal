@@ -1,7 +1,7 @@
 package test
 
 import (
-	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/target/project"
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/cryptopunkscc/portal/test"
@@ -14,19 +14,17 @@ func TestResolve_(t *testing.T) {
 	m := DevPortalYaml
 	assert.NotEmpty(t, m)
 
-	expected := target.Manifest{}
+	expected := manifest.App{}
 	err := yaml.Unmarshal(m, &expected)
 	test.AssertErr(t, err)
 
-	dir := CreateProject(t, m)
-	s := source.Dir(dir)
+	sub, err := source.Embed(ProjectFS).Sub("test_project")
+	test.AssertErr(t, err)
 
-	p, err := project.Resolve_(s)
+	p, err := project.Resolve_(sub)
 	test.AssertErr(t, err)
 
 	actual := *p.Manifest()
-	assert.Equal(t, "exec", actual.Exec)
 
-	actual.Exec = ""
 	assert.Equal(t, expected, actual)
 }

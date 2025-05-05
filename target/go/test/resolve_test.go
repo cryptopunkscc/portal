@@ -1,7 +1,7 @@
 package test
 
 import (
-	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/api/manifest"
 	golang "github.com/cryptopunkscc/portal/target/go"
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/cryptopunkscc/portal/test"
@@ -16,11 +16,29 @@ func TestResolve(t *testing.T) {
 	p, err := golang.ResolveProject(s)
 	test.AssertErr(t, err)
 
-	build := target.Builds{
-		"default": target.Build{Out: "main", Cmd: "go build -o dist/main"},
-		"linux":   target.Build{Out: "main", Cmd: "go build -o dist/main", Deps: []string{"gcc", "libgtk-3-dev", "libayatana-appindicator3-dev"}},
-		"windows": target.Build{Out: "main.exe", Cmd: "go build -ldflags -H=windowsgui -o dist/main.exe", Env: []string{"CGO_ENABLED=1"}},
+	expected := manifest.Builds{
+		Builds: manifest.InnerBuilds{
+			Default: manifest.Build{
+				Out:  "main",
+				Cmd:  "go build -o dist/main",
+				Exec: "go run",
+			},
+			Builds: map[string]manifest.InnerBuilds{
+				"linux": {
+					Build: manifest.Build{
+						Deps: []string{"gcc"},
+					},
+				},
+				"windows": {
+					Build: manifest.Build{
+						Out: "main.exe",
+						Env: []string{"CGO_ENABLED=1"},
+						Cmd: "go build -o dist/main.exe",
+					},
+				},
+			},
+		},
 	}
-	assert.Equal(t, build, p.Build())
-	assert.Equal(t, "go", p.Manifest().Schema)
+	assert.Equal(t, expected, *p.Build())
+	assert.Equal(t, "go", p.Manifest().Runtime)
 }

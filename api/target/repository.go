@@ -47,7 +47,8 @@ func (r *SourcesRepository[T]) Get(src string) (out []Source) {
 }
 
 func (r *SourcesRepository[T]) First(src string) (out T) {
-	for _, out = range r.Resolve.List(r.Sources...) {
+	list := r.Resolve.List(r.Sources...)
+	for _, out = range list {
 		if out.Manifest().Match(src) {
 			return
 		}

@@ -8,8 +8,8 @@ build:
     out: main
     exec: go run
   linux:
-    deps: [ gcc, libgtk-3-dev, libayatana-appindicator3-dev ]
+    deps: [ gcc ]
   windows:
-    cmd: go build -ldflags -H=windowsgui -o dist/main.exe
+    cmd: go build -o dist/main.exe
     env: [ CGO_ENABLED=1 ]
     out: main.exe

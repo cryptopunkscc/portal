@@ -2,13 +2,12 @@ name: name
 package: package
 title: title
 description: description
-version: version
+version: 1
 schema: schema
 build:
-  default:
-    out: out
-    cmd: cmd
-    exec: exec
+  out: out
+  cmd: cmd
+  exec: exec
   linux:
     deps: [ dep ]
     env: [ DEP=1 ]

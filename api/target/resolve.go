@@ -2,6 +2,7 @@ package target
 
 import (
 	"errors"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io/fs"
 	"log"
 	"path/filepath"
@@ -66,6 +67,7 @@ func (resolve Resolve[T]) Try(src Source) (result Source, err error) {
 
 func Any[T Source](of ...Resolve[Source]) Resolve[T] {
 	return func(entry Source) (s T, err error) {
+		defer plog.TraceErr(&err)
 		var ok bool
 		if s, ok = any(err).(T); ok {
 			return

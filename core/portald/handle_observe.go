@@ -25,7 +25,7 @@ func (s *Service[T]) ObserveApps(ctx context.Context, opts ListAppsOpts) (out <-
 		defer close(results)
 		resolve := app.Resolve_
 		for _, bundle := range resolve.List(s.apps()) {
-			if opts.Hidden || !bundle.Manifest().Hidden {
+			if opts.Hidden || !bundle.Config().Hidden {
 				results <- bundle
 			}
 		}
@@ -37,7 +37,7 @@ func (s *Service[T]) ObserveApps(ctx context.Context, opts ListAppsOpts) (out <-
 			}
 			if file, err := source.File(event.Name); err == nil {
 				for _, bundle := range resolve.List(file) {
-					if opts.Hidden || !bundle.Manifest().Hidden {
+					if opts.Hidden || !bundle.Config().Hidden {
 						results <- bundle
 					}
 					break

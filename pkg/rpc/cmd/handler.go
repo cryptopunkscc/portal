@@ -9,11 +9,11 @@ type Handlers []Handler
 type Params []Param
 
 type Handler struct {
-	Func   any
-	Name   string
-	Desc   string
-	Params []Param
-	Sub    []Handler
+	Func   any       `json:"func,omitempty" yaml:"func,omitempty"`
+	Name   string    `json:"name,omitempty" yaml:"name,omitempty"`
+	Desc   string    `json:"description,omitempty" yaml:"description,omitempty"`
+	Params []Param   `json:"params,omitempty" yaml:"params,omitempty"`
+	Sub    []Handler `json:"sub,omitempty" yaml:"sub,omitempty"`
 }
 
 type Param struct {

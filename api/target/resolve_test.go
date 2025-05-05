@@ -43,9 +43,9 @@ func TestAny_nil(t *testing.T) {
 
 type testSource struct{}
 
-func (t testSource) Abs() (v string)                  { return }
-func (t testSource) Path() (v string)                 { return }
-func (t testSource) File() (v fs.File, err error)     { return }
-func (t testSource) FS() (v fs.FS)                    { return }
-func (t testSource) IsDir() (v bool)                  { return }
-func (t testSource) Sub(string) (v Source, err error) { return }
+func (t testSource) Abs() (v string)                     { return }
+func (t testSource) Path() (v string)                    { return }
+func (t testSource) File() (v fs.File, err error)        { return }
+func (t testSource) FS() (v fs.FS)                       { return }
+func (t testSource) IsDir() (v bool)                     { return }
+func (t testSource) Sub(...string) (v Source, err error) { return }

@@ -14,16 +14,20 @@ var ResolveDist = dist.Resolver[target.Exec](ResolveExec)
 var ResolveBundle = bundle.Resolver[target.Exec](ResolveDist)
 var ResolveProject = project.Resolver[target.Exec](ResolveProjectExec)
 
-func ResolveExec(source target.Source) (t target.Exec, err error) {
+func ResolveExec(source target.Source) (exec target.Exec, err error) {
 	defer plog.TraceErr(&err)
 
 	p, err := portal.Resolve_(source)
 	if err != nil {
 		return
 	}
-	defer plog.TraceErr(&err)
 
-	file := p.Manifest().Exec
+	s := Source{}
+	if err = s.target.LoadFrom(p.FS()); err != nil {
+		return
+	}
+
+	file := s.target.Exec
 	stat, err := fs.Stat(p.FS(), file)
 	if err != nil {
 		return
@@ -32,11 +36,11 @@ func ResolveExec(source target.Source) (t target.Exec, err error) {
 		err = plog.Errorf("not executable %s", file)
 		return
 	}
-	sub, err := p.Sub(file)
-	if err != nil {
+	if s.executable, err = p.Sub(file); err != nil {
 		return
 	}
-	t = Source{exec: sub}
+
+	exec = s
 	return
 }
 
@@ -50,15 +54,7 @@ func ResolveProjectExec(source target.Source) (out target.Exec, err error) {
 	if err != nil {
 		return
 	}
-	m := p.Manifest()
-	if m.Exec == "" {
-		e := target.GetBuild(p).Exec
-		if e == "" {
-			err = plog.Errorf("exec not specified for %s", source.Abs())
-			return
-		}
-		m.Exec = e
-	}
-	out = Source{exec: p}
+
+	out = Source{executable: p}
 	return
 }

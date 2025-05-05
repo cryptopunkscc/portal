@@ -11,4 +11,4 @@ type Source[T any] struct {
 
 var _ target.Dist[any] = &Source[any]{}
 
-func (s Source[T]) Target() T { return s.target }
+func (s Source[T]) Runtime() T { return s.target }

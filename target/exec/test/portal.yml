@@ -2,6 +2,6 @@ name: name
 package: package
 title: title
 description: description
-version: version
+version: 1
 schema: schema
 exec: exec

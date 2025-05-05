@@ -1,6 +1,7 @@
 package target
 
 import (
+	"github.com/cryptopunkscc/portal/api/manifest"
 	"io/fs"
 )
 
@@ -21,13 +22,15 @@ type Template interface {
 
 type Portal_ interface {
 	Source
-	Manifest() *Manifest
+	Api() *manifest.Api
+	Config() *manifest.Config
+	Manifest() *manifest.App
 	MarshalJSON() ([]byte, error)
 }
 
 type Portal[T any] interface {
 	Portal_
-	Target() T
+	Runtime() T
 }
 
 type Portals[T Portal_] []T
@@ -39,7 +42,7 @@ type NodeModule interface {
 
 type Project_ interface {
 	Portal_
-	Build() Builds
+	Build() *manifest.Builds
 	Dist_() Dist_
 	Changed(skip ...string) bool
 }
@@ -63,11 +66,14 @@ type ProjectNpm[T any] interface {
 type App_ interface {
 	Portal_
 	IsApp()
+	Release() *manifest.Release
+	Version() string
 }
 
 type App[T any] interface {
-	Portal[T]
+	App_
 	IsApp()
+	Runtime() T
 }
 
 type Bundle interface {
@@ -109,7 +115,10 @@ type DistJs Dist[Js]
 type BundleJs AppBundle[Js]
 type ProjectJs ProjectNpm[Js]
 
-type Exec interface{ Executable() Source }
+type Exec interface {
+	Target() manifest.Target
+	Executable() Source
+}
 type PortalExec Portal[Exec]
 type AppExec App[Exec]
 type DistExec Dist[Exec]

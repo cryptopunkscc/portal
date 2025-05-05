@@ -38,7 +38,7 @@ func (r *BundleRunner) Run(ctx context.Context, bundle target.BundleExec, args .
 func (r *BundleRunner) unpackExecutable(bundle target.BundleExec) (execFile *os.File, err error) {
 	defer plog.TraceErr(&err)
 
-	src := bundle.Target().Executable()
+	src := bundle.Runtime().Executable()
 	srcFile, err := src.File()
 	defer srcFile.Close()
 	if err != nil {

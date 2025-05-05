@@ -11,22 +11,26 @@ import (
 	"github.com/cryptopunkscc/portal/target/project"
 	"os"
 	"path/filepath"
-	"runtime"
 	"slices"
+	"strings"
 )
 
 func BuildRunner(platforms ...string) *target.SourceRunner[target.ProjectGo] {
 	return &target.SourceRunner[target.ProjectGo]{
 		Resolve: ResolveProject,
-		Runner:  buildRunner{platforms: platforms},
+		Runner:  BuildProject(platforms...),
 	}
 }
 
 func BuildProject(platforms ...string) target.Run[target.ProjectGo] {
-	return buildRunner{platforms}.Run
+	p := make([][]string, len(platforms))
+	for i, platform := range platforms {
+		p[i] = strings.SplitN(platform, "/", 2)
+	}
+	return buildRunner{p}.Run
 }
 
-type buildRunner struct{ platforms []string }
+type buildRunner struct{ platforms [][]string }
 
 func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args ...string) (err error) {
 	log := plog.Get(ctx).Type(g).Set(&ctx)
@@ -38,38 +42,31 @@ func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args .
 		return
 	}
 
-	if len(g.platforms) == 0 {
-		g.platforms = []string{runtime.GOOS}
-	}
-
 	log.Printf("go build %T %s %v", projectGo, projectGo.Abs(), g.platforms)
-	cmd := exec.Cmd{
-		Cmd:  "go",
-		Args: []string{"build", "-o", "dist/main"},
-		Dir:  projectGo.Abs(),
-	}.Default()
 
 	if slices.Contains(args, "clean") {
 		if err = os.RemoveAll(filepath.Join(projectGo.Abs(), "dist")); err != nil {
 			log.W().Println(err)
 		}
 	}
-	for _, platform := range g.platforms {
-		build, ok := projectGo.Build()[platform]
-		if !ok {
-			build, ok = projectGo.Build()["default"]
+
+	platforms := g.platforms
+	if len(platforms) == 0 {
+		platforms = [][]string{{}}
+	}
+
+	var cmd exec.Cmd
+	for _, platform := range platforms {
+		cmd, err = goBuild(projectGo, platform...)
+		if err != nil {
+			return
 		}
-		if ok {
-			if cmd, err = cmd.Parse(build.Cmd); err != nil {
-				return
-			}
-			cmd = cmd.AddEnv(build.Env...).AddEnv("GOOS=" + platform)
-		}
+
 		if err = cmd.Build().Run(); err != nil {
 			return fmt.Errorf("run golang build %s: %s", projectGo.Abs(), err)
 		}
-		projectGo.Manifest().Exec = build.Out
-		if err = project.Dist(ctx, projectGo); err != nil {
+
+		if err = project.Dist2(ctx, projectGo); err != nil {
 			return
 		}
 
@@ -78,6 +75,31 @@ func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args .
 				return
 			}
 		}
+	}
+	return
+}
+
+func goBuild(projectGo target.ProjectGo, platform ...string) (cmd exec.Cmd, err error) {
+	defer plog.TraceErr(&err)
+	cmd = exec.Cmd{
+		Cmd:  "go",
+		Args: []string{"build", "-o", "dist/main"},
+		Dir:  projectGo.Abs(),
+	}.Default()
+
+	b := projectGo.Build().Get(platform...)
+	cmd, err = cmd.Parse(b.Cmd)
+	if err != nil {
+		return
+	}
+
+	if cmd, err = cmd.Parse(b.Cmd); err != nil {
+		return
+	}
+	cmd = cmd.AddEnv(b.Env...).AddEnv("GOOS="+b.Target.OS, "GOARCH="+b.Target.Arch)
+	if err = cmd.Build().Run(); err != nil {
+		err = fmt.Errorf("run golang build %s: %s", projectGo.Abs(), err)
+		return
 	}
 	return
 }

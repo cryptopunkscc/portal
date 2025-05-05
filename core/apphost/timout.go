@@ -15,7 +15,7 @@ func Timeout(ctx context.Context, apphost apphost.Cache, portal target.Portal_) 
 	if ConnectionsThreshold < 0 {
 		return
 	}
-	timeout := portal.Manifest().Env.Timeout
+	timeout := portal.Config().Timeout
 	if timeout < 0 {
 		return
 	}
