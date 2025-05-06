@@ -61,7 +61,7 @@ func (r *buildRunner) skip(project target.Project_, args ...string) bool {
 
 func (r *buildRunner) setup() (err error) {
 	if r.dependencies == nil {
-		r.dependencies = LibsDefault
+		r.dependencies = LibsEmbed()
 	}
 	if len(r.dependencies) == 0 {
 		return plog.Errorf("missing js dependencies")

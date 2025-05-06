@@ -4,12 +4,12 @@ title: test go
 schema: go
 build:
   default:
-    cmd: go build -o dist/main
+    cmd: go build -o $OUT
     out: main
     exec: go run
   linux:
     deps: [ gcc ]
   windows:
-    cmd: go build -o dist/main.exe
+    cmd: go build -o $OUT.exe
     env: [ CGO_ENABLED=1 ]
     out: main.exe

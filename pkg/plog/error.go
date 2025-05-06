@@ -22,6 +22,14 @@ func TraceErr(errPtr *error) {
 	}
 }
 
+func PrintTrace(errPtr *error) {
+	if errPtr != nil && *errPtr != nil {
+		err := *errPtr
+		err = wrapErrStack(err)
+		Println(err)
+	}
+}
+
 type ErrStack struct {
 	error
 	stack []byte

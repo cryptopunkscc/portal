@@ -4,6 +4,8 @@ import (
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io/fs"
+	"os"
+	"path/filepath"
 )
 
 type Dir_ struct {
@@ -11,6 +13,8 @@ type Dir_ struct {
 	join    func(...string) string
 	absToFS string
 }
+
+var _ target.Source = Dir_{}
 
 func (d Dir_) Abs() string            { return d.Path() }
 func (d Dir_) Path() string           { return d.absToFS }
@@ -32,17 +36,38 @@ func (d Dir_) Sub(src ...string) (source target.Source, err error) {
 		return
 	}
 
-	if s.IsDir() {
-		if d.fs, err = fs.Sub(d.fs, p); err == nil {
-			d.absToFS = d.join(d.absToFS, p)
-			source = d
-		}
+	if !s.IsDir() {
+		source = File_{parent: d, pathToFile: p}
 		return
 	}
 
-	source = File_{
-		parent:     d,
-		pathToFile: p,
+	if d.fs, err = fs.Sub(d.fs, p); err == nil {
+		d.absToFS = d.join(d.absToFS, p)
+		source = d
 	}
 	return
+}
+
+func (d Dir_) CopyTo(path ...string) (err error) {
+	targetDir := filepath.Join(path...)
+	return fs.WalkDir(d.FS(), ".", func(path string, entry fs.DirEntry, err error) error {
+		defer plog.TraceErr(&err)
+
+		if err != nil {
+			return err
+		}
+
+		targetPath := filepath.Join(targetDir, filepath.FromSlash(path))
+
+		if entry.IsDir() {
+			return os.MkdirAll(targetPath, 0755)
+		}
+
+		sub, err := d.Sub(path)
+		if err != nil {
+			return err
+		}
+
+		return sub.CopyTo(targetPath)
+	})
 }

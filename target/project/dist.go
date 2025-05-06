@@ -7,6 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/fs2"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"
 	"path/filepath"
 )
@@ -47,24 +48,24 @@ func copyManifest(_ context.Context, project target.Project_) (err error) {
 	return
 }
 
-func Dist2(ctx context.Context, project target.Project_, platform ...string) (err error) {
+func Dist2(ctx context.Context, project target.Project_, target manifest.Target) (err error) {
+	defer plog.TraceErr(&err)
 	if err = copyIcon(ctx, project); err != nil {
 		return
 	}
-	distManifest := buildDistManifest(project, platform...)
-	if err = writeDistManifest(project, distManifest); err != nil {
+	dist := buildDistManifest(project, target)
+	if err = writeDistManifest(project, dist); err != nil {
 		return
 	}
 	return
 }
 
-func buildDistManifest(project target.Project_, platform ...string) (out manifest.Dist) {
-	b := project.Build().Get(platform...)
+func buildDistManifest(project target.Project_, target manifest.Target) (out manifest.Dist) {
 	out = manifest.Dist{
 		App:    *project.Manifest(),
 		Api:    *project.Api(),
 		Config: *project.Config(),
-		Target: b.Target,
+		Target: target,
 		Release: manifest.Release{
 			Version: 0, // TODO
 		},
@@ -72,14 +73,23 @@ func buildDistManifest(project target.Project_, platform ...string) (out manifes
 	return
 }
 
-func writeDistManifest(project target.Project_, distManifest manifest.Dist) (err error) {
-	bytes, err := json.Marshal(distManifest)
+func writeDistManifest(project target.Project_, dist manifest.Dist) (err error) {
+	defer plog.TraceErr(&err)
+
+	bytes, err := json.Marshal(dist)
 	if err != nil {
 		return err
 	}
-	name := filepath.Join(project.Abs(), "dist", manifest.AppFilename+".json")
-	if err = os.WriteFile(name, bytes, 0644); err != nil {
-		return fmt.Errorf("os.WriteFile: %v", err)
+
+	path := []string{project.Abs(), "dist"}
+	if len(dist.Target.OS) > 0 {
+		path = append(path, dist.Target.OS)
 	}
-	return
+	if len(dist.Target.Arch) > 0 {
+		path = append(path, dist.Target.Arch)
+	}
+	path = append(path, manifest.AppFilename+".json")
+	name := filepath.Join(path...)
+
+	return os.WriteFile(name, bytes, 0644)
 }

@@ -20,7 +20,7 @@ func TestResolve(t *testing.T) {
 		Builds: manifest.InnerBuilds{
 			Default: manifest.Build{
 				Out:  "main",
-				Cmd:  "go build -o dist/main",
+				Cmd:  "go build -o $OUT",
 				Exec: "go run",
 			},
 			Builds: map[string]manifest.InnerBuilds{
@@ -33,7 +33,7 @@ func TestResolve(t *testing.T) {
 					Build: manifest.Build{
 						Out: "main.exe",
 						Env: []string{"CGO_ENABLED=1"},
-						Cmd: "go build -o dist/main.exe",
+						Cmd: "go build -o $OUT.exe",
 					},
 				},
 			},

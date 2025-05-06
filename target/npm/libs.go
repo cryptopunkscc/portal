@@ -11,8 +11,11 @@ var resolveLibs = target.Any[target.NodeModule](
 	target.Try(ResolveNodeModule),
 )
 
-var LibsDefault = LibsEmbed()
+var libsDefault []target.NodeModule
 
 func LibsEmbed() []target.NodeModule {
-	return resolveLibs.List(source.Embed(js.PortalLibFS))
+	if len(libsDefault) == 0 {
+		libsDefault = resolveLibs.List(source.Embed(js.PortalLibFS))
+	}
+	return libsDefault
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/config"
 	"github.com/cryptopunkscc/portal/pkg/dec/all"
 	"io/fs"
+	"path"
 	"runtime"
 	"slices"
 )
@@ -28,13 +29,10 @@ type Build struct {
 	Target Target   `json:"target,omitempty" yaml:"target,omitempty"`
 }
 
-type TargetBuild struct {
-}
-
 func (b *Builds) UnmarshalFrom(bytes []byte) error { return all.Unmarshalers.Unmarshal(bytes, b) }
 func (b *Builds) LoadFrom(fs fs.FS) error          { return all.Unmarshalers.Load(b, fs, DevFilename) }
 
-func (b Builds) Targets() (targets [][]string) {
+func (b Builds) Targets() (targets Targets) {
 	for os, n := range b.Builds.Builds {
 		if len(n.Builds) == 0 {
 			targets = append(targets, []string{os})
@@ -42,6 +40,16 @@ func (b Builds) Targets() (targets [][]string) {
 		for arch := range n.Builds {
 			targets = append(targets, []string{os, arch})
 		}
+	}
+	return
+}
+
+type Targets [][]string
+
+func (t Targets) Flatten() (out []string) {
+	out = make([]string, len(t))
+	for i, s := range t {
+		out[i] = path.Join(s...)
 	}
 	return
 }
@@ -57,9 +65,9 @@ func (b Builds) Get(targets ...string) (build Build) {
 	}
 	merge := []*Build{&b.Builds.Build, &b.Builds.Default}
 	if n, ok := b.Builds.Builds[os]; ok {
-		merge = append(merge, &n.Build)
-		if n, ok = n.Builds[arch]; ok {
-			merge = append(merge, &n.Build)
+		merge = append(merge, &n.Build, &n.Default)
+		if n, ok := n.Builds[arch]; ok {
+			merge = append(merge, &n.Build, &n.Default)
 		}
 	}
 	slices.Reverse(merge)

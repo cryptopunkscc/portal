@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "rollup main.js -o dist/main.js -f iife" ,
+    "build": "rollup main.js -o dist/main.js -f iife"
   },
   "devDependencies": {
     "rollup": "^4.12.0"

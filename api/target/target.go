@@ -10,7 +10,8 @@ type Source interface {
 	Path() string
 	File() (fs.File, error)
 	FS() fs.FS
-	Sub(dir ...string) (Source, error)
+	Sub(path ...string) (Source, error)
+	CopyTo(path ...string) (err error)
 	IsDir() bool
 }
 
@@ -43,14 +44,14 @@ type NodeModule interface {
 type Project_ interface {
 	Portal_
 	Build() *manifest.Builds
-	Dist_() Dist_
+	Dist_(platform ...string) Dist_
 	Changed(skip ...string) bool
 }
 
 type Project[T any] interface {
 	Project_
 	Portal[T]
-	Dist() Dist[T]
+	Dist(platform ...string) Dist[T]
 }
 
 type ProjectNpm_ interface {

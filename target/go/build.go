@@ -3,6 +3,7 @@ package golang
 import (
 	"context"
 	"fmt"
+	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/exec"
@@ -57,7 +58,9 @@ func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args .
 
 	var cmd exec.Cmd
 	for _, platform := range platforms {
-		cmd, err = goBuild(projectGo, platform...)
+		b := projectGo.Build().Get(platform...)
+
+		cmd, err = goBuildCmd(b, projectGo.Abs())
 		if err != nil {
 			return
 		}
@@ -66,7 +69,7 @@ func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args .
 			return fmt.Errorf("run golang build %s: %s", projectGo.Abs(), err)
 		}
 
-		if err = project.Dist2(ctx, projectGo); err != nil {
+		if err = project.Dist2(ctx, projectGo, b.Target); err != nil {
 			return
 		}
 
@@ -79,26 +82,23 @@ func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args .
 	return
 }
 
-func goBuild(projectGo target.ProjectGo, platform ...string) (cmd exec.Cmd, err error) {
+func goBuildCmd(build manifest.Build, abs string) (cmd exec.Cmd, err error) {
 	defer plog.TraceErr(&err)
+	t := build.Target
+	o := filepath.Join("dist", t.OS, t.Arch, "main")
 	cmd = exec.Cmd{
 		Cmd:  "go",
-		Args: []string{"build", "-o", "dist/main"},
-		Dir:  projectGo.Abs(),
+		Args: []string{"build", "-o", o},
+		Dir:  abs,
 	}.Default()
 
-	b := projectGo.Build().Get(platform...)
-	cmd, err = cmd.Parse(b.Cmd)
-	if err != nil {
+	build.Cmd = strings.ReplaceAll(build.Cmd, "$OUT", o)
+	if cmd, err = cmd.Parse(build.Cmd); err != nil {
 		return
 	}
-
-	if cmd, err = cmd.Parse(b.Cmd); err != nil {
-		return
-	}
-	cmd = cmd.AddEnv(b.Env...).AddEnv("GOOS="+b.Target.OS, "GOARCH="+b.Target.Arch)
+	cmd = cmd.AddEnv(build.Env...).AddEnv("GOOS="+t.OS, "GOARCH="+t.Arch)
 	if err = cmd.Build().Run(); err != nil {
-		err = fmt.Errorf("run golang build %s: %s", projectGo.Abs(), err)
+		err = fmt.Errorf("run golang build %s: %s", abs, err)
 		return
 	}
 	return
