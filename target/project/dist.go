@@ -3,7 +3,6 @@ package project
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/fs2"
@@ -12,11 +11,13 @@ import (
 	"path/filepath"
 )
 
-func Dist(ctx context.Context, project target.Project_) (err error) {
+func Dist(ctx context.Context, project target.Project_, target manifest.Target) (err error) {
+	defer plog.TraceErr(&err)
 	if err = copyIcon(ctx, project); err != nil {
 		return
 	}
-	if err = copyManifest(ctx, project); err != nil {
+	dist := buildDistManifest(project, target)
+	if err = writeDistManifest(project, dist); err != nil {
 		return
 	}
 	return
@@ -33,30 +34,6 @@ func copyIcon(_ context.Context, project target.Project_) (err error) {
 		return
 	}
 	project.Manifest().Icon = iconName
-	return
-}
-
-func copyManifest(_ context.Context, project target.Project_) (err error) {
-	bytes, err := json.Marshal(project.Manifest())
-	if err != nil {
-		return err
-	}
-	name := filepath.Join(project.Abs(), "dist", manifest.AppFilename+".json")
-	if err = os.WriteFile(name, bytes, 0644); err != nil {
-		return fmt.Errorf("os.WriteFile: %v", err)
-	}
-	return
-}
-
-func Dist2(ctx context.Context, project target.Project_, target manifest.Target) (err error) {
-	defer plog.TraceErr(&err)
-	if err = copyIcon(ctx, project); err != nil {
-		return
-	}
-	dist := buildDistManifest(project, target)
-	if err = writeDistManifest(project, dist); err != nil {
-		return
-	}
 	return
 }
 

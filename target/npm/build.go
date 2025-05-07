@@ -4,12 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target/dist"
 	"github.com/cryptopunkscc/portal/target/project"
+	"os"
+	"path/filepath"
 	"slices"
 )
 
@@ -29,7 +32,14 @@ type buildRunner struct {
 }
 
 func (r *buildRunner) Run(ctx context.Context, projectNpm target.ProjectNpm_, args ...string) (err error) {
-	plog.Get(ctx).Type(r).Set(&ctx)
+	args = slices.Clone(args)
+	log := plog.Get(ctx).Type(r).Set(&ctx)
+
+	if target.Op(&args, "clean") {
+		if err = os.RemoveAll(filepath.Join(projectNpm.Abs(), "dist")); err != nil {
+			log.W().Println(err)
+		}
+	}
 
 	if err = r.setup(); err != nil {
 		return
@@ -43,12 +53,20 @@ func (r *buildRunner) Run(ctx context.Context, projectNpm target.ProjectNpm_, ar
 	if err = r.build(ctx, projectNpm); err != nil {
 		return
 	}
-	if err = project.Dist(ctx, projectNpm); err != nil {
+
+	t := manifest.Target{}
+
+	if err = project.Dist(ctx, projectNpm, t); err != nil {
 		return
 	}
 
-	if slices.Contains(args, "pack") {
-		if err = dist.Pack(projectNpm.Dist_()); err != nil {
+	if target.Op(&args, "pack") {
+		d := projectNpm.Dist_()
+		abs := projectNpm.Abs()
+		if len(args) > 0 {
+			abs = args[0]
+		}
+		if err = dist.Pack(d, abs); err != nil {
 			return
 		}
 	}

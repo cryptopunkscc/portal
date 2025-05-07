@@ -33,19 +33,6 @@ func BuildProject(platforms ...string) target.Run[target.ProjectGo] {
 
 type buildRunner struct{ platforms [][]string }
 
-func op(args *[]string, arg string) (ok bool) {
-	a := *args
-	for i, s := range a {
-		if s == arg {
-			a = slices.Delete(a, i, i+1)
-			*args = a
-			ok = true
-			break
-		}
-	}
-	return
-}
-
 func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args ...string) (err error) {
 	args = slices.Clone(args)
 	log := plog.Get(ctx).Type(g).Set(&ctx)
@@ -53,7 +40,7 @@ func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args .
 		return
 	}
 
-	clean := op(&args, "clean")
+	clean := target.Op(&args, "clean")
 
 	if !clean && !projectGo.Changed() {
 		return
@@ -85,11 +72,11 @@ func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args .
 			return fmt.Errorf("run golang build %s: %s", projectGo.Abs(), err)
 		}
 
-		if err = project.Dist2(ctx, projectGo, b.Target); err != nil {
+		if err = project.Dist(ctx, projectGo, b.Target); err != nil {
 			return
 		}
 
-		if op(&args, "pack") {
+		if target.Op(&args, "pack") {
 			p := project.DistPath(b.Target)
 			d := projectGo.Dist_(p...)
 			abs := projectGo.Abs()

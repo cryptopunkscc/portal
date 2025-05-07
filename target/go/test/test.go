@@ -15,7 +15,11 @@ var goProjectFS embed.FS
 
 var dir = source.Dir(".")
 
-func ResolveGoProject(t *testing.T) {
+func ResolveGoProject(t *testing.T, path ...string) {
+	if len(path) == 0 {
+		path = append(path, ".")
+	}
+	dir := source.Dir(path...)
 	project, err := golang.ResolveProject(dir)
 	test.AssertErr(t, err)
 	println(target.Sprint(project))

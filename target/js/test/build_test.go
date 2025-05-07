@@ -1,0 +1,20 @@
+package test
+
+import (
+	"context"
+	"github.com/cryptopunkscc/portal/target/js"
+	"github.com/cryptopunkscc/portal/target/npm"
+	"github.com/cryptopunkscc/portal/target/source"
+	"github.com/cryptopunkscc/portal/test"
+	"testing"
+)
+
+func TestBuild(t *testing.T) {
+	ctx := context.Background()
+	s := source.Dir("project")
+	p, err := js.ResolveProject(s)
+	test.AssertErr(t, err)
+
+	err = npm.BuildProject().Run(ctx, p, "clean", "pack", "build")
+	test.AssertErr(t, err)
+}
