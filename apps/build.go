@@ -14,5 +14,6 @@ func Build(args ...string) error {
 		return err
 	}
 	appsDir := filepath.Join(root, "apps")
+	args = append(args, appsDir)
 	return all.BuildRecursive(ctx, appsDir, args...)
 }

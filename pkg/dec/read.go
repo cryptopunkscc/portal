@@ -1,6 +1,7 @@
 package dec
 
 import (
+	"errors"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io/fs"
 )
@@ -31,14 +32,16 @@ func (u Unmarshalers) Unmarshal(in []byte, out any) (err error) {
 
 func (u Unmarshalers) Load(dst any, src fs.FS, names ...string) (err error) {
 	defer plog.TraceErr(&err)
+	var errs []error
 	for _, name := range names {
 		for ext, unmarshal := range u {
 			if err = load(unmarshal, dst, src, name, ext); err == nil {
 				return
 			}
+			errs = append(errs, err)
 		}
 	}
-	return fs.ErrNotExist
+	return errors.Join(errs...)
 }
 
 func load(

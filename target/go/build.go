@@ -33,19 +33,35 @@ func BuildProject(platforms ...string) target.Run[target.ProjectGo] {
 
 type buildRunner struct{ platforms [][]string }
 
+func op(args *[]string, arg string) (ok bool) {
+	a := *args
+	for i, s := range a {
+		if s == arg {
+			a = slices.Delete(a, i, i+1)
+			*args = a
+			ok = true
+			break
+		}
+	}
+	return
+}
+
 func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args ...string) (err error) {
+	args = slices.Clone(args)
 	log := plog.Get(ctx).Type(g).Set(&ctx)
 	if err = deps.RequireBinary("go"); err != nil {
 		return
 	}
 
-	if !projectGo.Changed() && !slices.Contains(args, "clean") {
+	clean := op(&args, "clean")
+
+	if !clean && !projectGo.Changed() {
 		return
 	}
 
 	log.Printf("go build %T %s %v", projectGo, projectGo.Abs(), g.platforms)
 
-	if slices.Contains(args, "clean") {
+	if clean {
 		if err = os.RemoveAll(filepath.Join(projectGo.Abs(), "dist")); err != nil {
 			log.W().Println(err)
 		}
@@ -73,10 +89,14 @@ func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args .
 			return
 		}
 
-		if slices.Contains(args, "pack") {
+		if op(&args, "pack") {
 			p := project.DistPath(b.Target)
 			d := projectGo.Dist_(p...)
-			if err = dist.Pack(d, projectGo.Abs()); err != nil {
+			abs := projectGo.Abs()
+			if len(args) > 0 {
+				abs = args[0]
+			}
+			if err = dist.Pack(d, abs); err != nil {
 				return
 			}
 		}

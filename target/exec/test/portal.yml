@@ -4,4 +4,5 @@ title: title
 description: description
 version: 1
 schema: schema
-exec: exec
+target:
+  exec: exec

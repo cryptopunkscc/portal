@@ -4,7 +4,7 @@ import (
 	"embed"
 )
 
-//go:embed */build */**/build
+//go:embed build
 var Builds embed.FS
 
 //go:embed launcher

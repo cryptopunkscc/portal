@@ -11,7 +11,7 @@ import (
 var BuildRecursive target.Run[string] = buildDispatcher.Run
 
 var buildDispatcher = target.Dispatcher{
-	Runner: target.RunSeq,
+	Runner: &target.AsyncRunner{},
 	Provider: target.Provider[target.Runnable]{
 		Repository: target.Repositories{
 			source.Repository,

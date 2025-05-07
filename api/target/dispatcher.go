@@ -46,13 +46,17 @@ type AsyncRunner struct {
 func (r *AsyncRunner) Run(ctx context.Context, runnables []Runnable, args ...string) error {
 	waitGroup := sync.WaitGroup{}
 	waitGroup.Add(len(runnables))
-	r.WaitGroup.Add(len(runnables))
+	if r.WaitGroup != nil {
+		r.WaitGroup.Add(len(runnables))
+	}
 	for _, rr := range runnables {
 		go func() {
 			if err := rr.Run(ctx, args...); err != nil {
 				plog.Get(ctx).Println(err)
 			}
-			r.WaitGroup.Done()
+			if r.WaitGroup != nil {
+				r.WaitGroup.Done()
+			}
 			waitGroup.Done()
 		}()
 	}

@@ -83,8 +83,13 @@ func writeDistManifest(project target.Project_, dist manifest.Dist) (err error) 
 
 	path := []string{project.Abs(), "dist"}
 	path = append(path, DistPath(dist.Target)...)
-	path = append(path, manifest.AppFilename+".json")
 	name := filepath.Join(path...)
+	if err = os.MkdirAll(name, 0755); err != nil {
+		return
+	}
+
+	path = append(path, manifest.AppFilename+".json")
+	name = filepath.Join(path...)
 
 	return os.WriteFile(name, bytes, 0644)
 }

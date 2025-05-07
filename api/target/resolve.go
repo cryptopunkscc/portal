@@ -46,7 +46,7 @@ func (resolve Resolve[T]) list(from Source) (out []T) {
 			out = append(out, s)
 		}
 		if errors.Is(err, fs.SkipDir) || errors.Is(err, fs.SkipAll) {
-			return err
+			return errors.Unwrap(err)
 		}
 		return nil
 	})

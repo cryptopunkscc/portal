@@ -2,15 +2,14 @@ name: dev.html
 package: portal.dev.html
 title: Portal HTML
 description: Portal HTML development runner
-version: 0.0.0
 hidden: true
 build:
   default:
     out: main
-#    cmd: go build -tags='desktop,wv2runtime.download,production,webkit2_41' -ldflags='-w -s' -o dist/main
-    cmd: go build -tags='dev,webkit2_41' -o dist/main
+#    cmd: go build -tags='desktop,wv2runtime.download,production,webkit2_41' -ldflags='-w -s' -o $OUT
+    cmd: go build -tags='dev,webkit2_41' -o $OUT
     exec: go run -tags='dev,webkit2_41'
   windows:
     out: main.exe
-    cmd: go build -tags='desktop,wv2runtime.download,production,webkit2_41' -ldflags='-w -s' -o dist/main.exe
+    cmd: go build -tags='desktop,wv2runtime.download,production,webkit2_41' -ldflags='-w -s' -o $OUT.exe
     exec: go run -tags='desktop,wv2runtime.download,production,webkit2_41' -ldflags='-w -s'

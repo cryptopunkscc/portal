@@ -1,12 +1,11 @@
 name: test
 package: portal.test
 title: Portal test
-version: 0.0.0
 schema: go
 exec: go run
 build:
   default:
     out: main
-    cmd: go build -o dist/main
+    cmd: go build -o $OUT
   windows:
     out: main.exe
