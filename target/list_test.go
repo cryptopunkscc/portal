@@ -1,6 +1,7 @@
 package resolve
 
 import (
+	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target/exec"
@@ -20,40 +21,42 @@ func init() {
 func TestResolve_List(t *testing.T) {
 	for _, tt := range []struct {
 		name string
-		target.Resolve[target.Source]
+		target.Resolve[target.Portal_]
 	}{
 		{
-			name:    "dist",
-			Resolve: target.Try(portal.Resolve_),
+			name: "dist",
+			Resolve: target.Any[target.Portal_](
+				portal.Resolve_.Try,
+			),
 		},
 		{
 			name: "js/test/project",
-			Resolve: target.Any[target.Source](
-				target.Try(golang.ResolveProject),
-				target.Try(js.ResolveDist),
-				target.Try(js.ResolveBundle),
-				target.Try(js.ResolveProject),
-				target.Try(html.ResolveDist),
-				target.Try(html.ResolveBundle),
-				target.Try(html.ResolveProject),
-				target.Try(exec.ResolveDist),
-				target.Try(exec.ResolveBundle),
-				target.Try(exec.ResolveProject),
+			Resolve: target.Any[target.Portal_](
+				golang.ResolveProject.Try,
+				js.ResolveDist.Try,
+				js.ResolveBundle.Try,
+				js.ResolveProject.Try,
+				html.ResolveDist.Try,
+				html.ResolveBundle.Try,
+				html.ResolveProject.Try,
+				exec.ResolveDist.Try,
+				exec.ResolveBundle.Try,
+				exec.ResolveProject.Try,
 			),
 		},
 		{
 			name: ".",
-			Resolve: target.Any[target.Source](
-				target.Try(golang.ResolveProject),
-				target.Try(js.ResolveDist),
-				target.Try(js.ResolveBundle),
-				target.Try(js.ResolveProject),
-				target.Try(html.ResolveDist),
-				target.Try(html.ResolveBundle),
-				target.Try(html.ResolveProject),
-				target.Try(exec.ResolveDist),
-				target.Try(exec.ResolveBundle),
-				target.Try(exec.ResolveProject),
+			Resolve: target.Any[target.Portal_](
+				golang.ResolveProject.Try,
+				js.ResolveDist.Try,
+				js.ResolveBundle.Try,
+				js.ResolveProject.Try,
+				html.ResolveDist.Try,
+				html.ResolveBundle.Try,
+				html.ResolveProject.Try,
+				exec.ResolveDist.Try,
+				exec.ResolveBundle.Try,
+				exec.ResolveProject.Try,
 			),
 		},
 	} {
@@ -62,7 +65,9 @@ func TestResolve_List(t *testing.T) {
 			l := tt.List(d)
 			assert.NotEmpty(t, l)
 			for i, p := range l {
-				plog.Printf("%d %T %v", i, p, p)
+				s := target.Sprint(p)
+				s = fmt.Sprintf(" - %d. %s", i, s)
+				println(s)
 			}
 		})
 	}

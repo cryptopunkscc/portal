@@ -1,6 +1,7 @@
 package exec
 
 import (
+	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target/bundle"
@@ -23,10 +24,11 @@ func ResolveExec(source target.Source) (exec target.Exec, err error) {
 	}
 
 	s := Source{}
-	if err = s.target.LoadFrom(p.FS()); err != nil {
+	var t manifest.Dist
+	if err = t.LoadFrom(p.FS()); err != nil {
 		return
 	}
-
+	s.target = t.Target
 	file := s.target.Exec
 	stat, err := fs.Stat(p.FS(), file)
 	if err != nil {

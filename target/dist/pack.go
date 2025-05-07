@@ -21,17 +21,29 @@ func packRun(_ context.Context, src target.Dist_, args ...string) (err error) {
 }
 
 func Pack(app target.Dist_, path ...string) (err error) {
-	// create build dir
-	//buildDir := filepath.Join(path...)
-	//if buildDir == "" {
-	//}
-	buildDir := filepath.Join(app.Abs(), "..", "build")
+	if len(path) == 0 {
+		path = []string{app.Abs(), ".."}
+	}
+
+	path = append(path, "build")
+	buildDir := target.Abs(path...)
+
 	if err = os.MkdirAll(buildDir, 0775); err != nil && !os.IsExist(err) {
 		return fmt.Errorf("os.MkdirAll: %v", err)
 	}
 
 	// pack dist dir
-	bundleName := fmt.Sprintf("%s_%s.portal", app.Manifest().Package, app.Version())
+	platform := ""
+	if d, ok := app.(target.DistExec); ok {
+		t := d.Runtime().Target()
+		if len(t.OS) > 0 {
+			platform += "_" + t.OS
+		}
+		if len(t.Arch) > 0 {
+			platform += "_" + t.Arch
+		}
+	}
+	bundleName := fmt.Sprintf("%s_%s%s.portal", app.Manifest().Package, app.Version(), platform)
 	if err = zip.Pack(app.Abs(), filepath.Join(buildDir, bundleName)); err != nil {
 		return fmt.Errorf("pack.Run: %v", err)
 	}

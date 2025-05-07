@@ -21,6 +21,6 @@ func TestBuildProject(t *testing.T) {
 	test.AssertErr(t, err)
 
 	ctx := context.Background()
-	err = golang.BuildProject("linux", "linux/arm64", "windows").Run(ctx, project, "clean")
+	err = golang.BuildProject("linux", "linux/arm64", "windows").Run(ctx, project, "clean", "pack")
 	test.AssertErr(t, err)
 }

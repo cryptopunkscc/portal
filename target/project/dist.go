@@ -82,14 +82,19 @@ func writeDistManifest(project target.Project_, dist manifest.Dist) (err error) 
 	}
 
 	path := []string{project.Abs(), "dist"}
-	if len(dist.Target.OS) > 0 {
-		path = append(path, dist.Target.OS)
-	}
-	if len(dist.Target.Arch) > 0 {
-		path = append(path, dist.Target.Arch)
-	}
+	path = append(path, DistPath(dist.Target)...)
 	path = append(path, manifest.AppFilename+".json")
 	name := filepath.Join(path...)
 
 	return os.WriteFile(name, bytes, 0644)
+}
+
+func DistPath(target manifest.Target) (path []string) {
+	if len(target.OS) > 0 {
+		path = append(path, target.OS)
+	}
+	if len(target.Arch) > 0 {
+		path = append(path, target.Arch)
+	}
+	return
 }

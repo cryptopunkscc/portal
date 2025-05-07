@@ -74,7 +74,9 @@ func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args .
 		}
 
 		if slices.Contains(args, "pack") {
-			if err = dist.Pack(projectGo.Dist_()); err != nil {
+			p := project.DistPath(b.Target)
+			d := projectGo.Dist_(p...)
+			if err = dist.Pack(d, projectGo.Abs()); err != nil {
 				return
 			}
 		}
