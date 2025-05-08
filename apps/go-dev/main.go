@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/cryptopunkscc/portal/api/version"
+	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/runner/cli"
 	"github.com/cryptopunkscc/portal/runner/go"
 	"github.com/cryptopunkscc/portal/target/source"
 )

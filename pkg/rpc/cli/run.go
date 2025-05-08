@@ -3,7 +3,6 @@ package cli
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/pkg/sig"
 )
@@ -15,7 +14,7 @@ func Run(handler cmd.Handler) {
 	if !cmd.HasHelp(handler) {
 		cmd.InjectHelp(&handler)
 	}
-	err := cli.New(handler).Run(ctx)
+	err := New(handler).Run(ctx)
 	if err != nil {
 		log.Println(err)
 	}
