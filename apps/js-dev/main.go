@@ -6,8 +6,8 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/runner/goja"
-	"github.com/cryptopunkscc/portal/runner/goja_dist"
-	"github.com/cryptopunkscc/portal/runner/goja_pro"
+	"github.com/cryptopunkscc/portal/runner/goja/dist"
+	"github.com/cryptopunkscc/portal/runner/goja/pro"
 	"github.com/cryptopunkscc/portal/target/source"
 )
 

@@ -6,7 +6,7 @@ import (
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runner/goja_dist"
+	"github.com/cryptopunkscc/portal/runner/goja/dist"
 	"github.com/cryptopunkscc/portal/target/js"
 	"github.com/cryptopunkscc/portal/target/npm"
 	"time"

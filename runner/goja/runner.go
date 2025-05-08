@@ -29,10 +29,6 @@ func NewRunner(newCore bind.NewCore) target.ReRunner[target.AppJs] {
 	return &runner{newCore: newCore}
 }
 
-func NewRun(newCore bind.NewCore) target.Run[target.AppJs] {
-	return NewRunner(newCore).Run
-}
-
 func (r *runner) Reload() (err error) {
 	return r.backend.RunFs(r.app.FS(), r.args...)
 }
