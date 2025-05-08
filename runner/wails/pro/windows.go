@@ -4,9 +4,9 @@ package wails_pro
 
 import (
 	"bytes"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os/exec"
 	"strconv"
-	//"github.com/wailsapp/wails/v2/cmd/wails/internal/logutils"
 )
 
 func setParentGID(_ *exec.Cmd) {}
@@ -21,12 +21,10 @@ func killProc(cmd *exec.Cmd, devCommand string) {
 		kill.Stderr = &errorBuffer
 		kill.Stdout = &stdoutBuffer
 		err := kill.Run()
-		if err != nil {
-			if err.Error() != "exit status 1" {
-				println(stdoutBuffer.String())
-				println(errorBuffer.String())
-				//logutils.LogRed("Error from '%s': %s", devCommand, err.Error())
-			}
+		if err != nil && err.Error() != "exit status 1" {
+			println(stdoutBuffer.String())
+			println(errorBuffer.String())
+			plog.PrintTrace(&err)
 		}
 	}
 }

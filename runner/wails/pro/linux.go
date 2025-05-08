@@ -26,10 +26,8 @@ func killProc(cmd *exec.Cmd, devCommand string) {
 	// Credit: https://stackoverflow.com/a/29552044/14764450 (same page as the Windows solution above)
 	// Not tested on *nix
 	pgid, err := syscall.Getpgid(cmd.Process.Pid)
+	defer plog.PrintTrace(&err)
 	if err == nil {
-		err := syscall.Kill(-pgid, unix.SIGTERM) // note the minus sign
-		if err != nil {
-			//logutils.LogRed("Error from '%s' when attempting to kill the process: %s", devCommand, err.Error())
-		}
+		err = syscall.Kill(-pgid, unix.SIGTERM) // note the minus sign
 	}
 }

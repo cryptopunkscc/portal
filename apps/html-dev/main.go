@@ -8,8 +8,8 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/runner/wails"
-	"github.com/cryptopunkscc/portal/runner/wails_dist"
-	"github.com/cryptopunkscc/portal/runner/wails_pro"
+	"github.com/cryptopunkscc/portal/runner/wails/dist"
+	"github.com/cryptopunkscc/portal/runner/wails/pro"
 	"github.com/cryptopunkscc/portal/target/source"
 )
 
