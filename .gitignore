@@ -2,8 +2,12 @@ node_modules
 build
 bin
 dist
-!target/dist
-!runner/build
 .idea/
 .test*
 .portal
+
+!target/dist
+!runner/build
+!apps/build
+
+apps/build/*.portal
