@@ -8,7 +8,7 @@ import (
 	golang "github.com/cryptopunkscc/portal/pkg/go"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/exec"
-	"github.com/cryptopunkscc/portal/runner/reload"
+	"github.com/cryptopunkscc/portal/target/dev/reload"
 	golang2 "github.com/cryptopunkscc/portal/target/go"
 	"time"
 )

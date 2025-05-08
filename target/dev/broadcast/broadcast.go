@@ -1,4 +1,4 @@
-package dev
+package broadcast
 
 import (
 	"context"
@@ -8,17 +8,17 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 )
 
-func NewBroadcast() *Broadcast {
-	return &Broadcast{
+func New() *Service {
+	return &Service{
 		targets: &sig.Map[string, rpc.Conn]{},
 	}
 }
 
-type Broadcast struct {
+type Service struct {
 	targets *sig.Map[string, rpc.Conn]
 }
 
-func (b *Broadcast) BroadcastMsg(ctx context.Context, conn rpc.Conn) {
+func (b *Service) BroadcastMsg(ctx context.Context, conn rpc.Conn) {
 	log := plog.Get(ctx).Type(b)
 
 	// get caller package

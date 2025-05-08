@@ -6,7 +6,7 @@ import (
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/goja"
-	"github.com/cryptopunkscc/portal/runner/reload"
+	"github.com/cryptopunkscc/portal/target/dev/reload"
 	"github.com/cryptopunkscc/portal/target/dist"
 	"github.com/cryptopunkscc/portal/target/js"
 	"path/filepath"

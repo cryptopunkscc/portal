@@ -4,7 +4,7 @@ import (
 	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/runner/cli"
-	"github.com/cryptopunkscc/portal/runner/dev"
+	"github.com/cryptopunkscc/portal/target/dev/broadcast"
 )
 
 func main() { cli.Run(Application{}.cliHandler()) }
@@ -23,7 +23,7 @@ func (a Application) netHandler() cmd.Handler {
 	return cmd.Handler{
 		Name: "dev.portal",
 		Sub: cmd.Handlers{{
-			Func: dev.NewBroadcast().BroadcastMsg,
+			Func: broadcast.New().BroadcastMsg,
 			Name: "broadcast",
 		}},
 	}
