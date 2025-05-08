@@ -8,7 +8,6 @@ import (
 	core "github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/core/token"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runner/request"
 )
 
 var coreFactory = CoreFactory{}
@@ -36,19 +35,15 @@ func (f CoreFactory) api(newApphost newApphost) NewCore {
 }
 
 func (f CoreFactory) cachedInvoker(ctx context.Context, portal target.Portal_) apphost.Cached {
-	a := &core.Adapter{}
+	i := &core.Invoker{Ctx: ctx}
+	i.Log = plog.Get(ctx).Type(i)
 	if f.Adapter != nil {
-		a.Endpoint = f.Adapter.Endpoint
+		i.Endpoint = f.Adapter.Endpoint
 	}
 	if t, err := f.Repository.Get(portal.Manifest().Package); err == nil {
-		a.AuthToken = string(t.Token)
+		i.AuthToken = string(t.Token)
 	}
-	return core.Cached(core.Invoker{
-		Client: a,
-		Invoke: request.Open,
-		Ctx:    ctx,
-		Log:    plog.Get(ctx).Type(core.Invoker{}),
-	})
+	return core.Cached(i)
 }
 
 type newApphost func(ctx context.Context, portal target.Portal_) Apphost

@@ -2,27 +2,27 @@ package apphost
 
 import (
 	"context"
+	"fmt"
 	"github.com/cryptopunkscc/portal/api/apphost"
-	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"time"
 )
 
 type Invoker struct {
-	apphost.Client
-	Invoke target.Run[string]
-	Log    plog.Logger
-	Ctx    context.Context
+	Adapter
+	Log plog.Logger
+	Ctx context.Context
 }
 
-func (i Invoker) Query(target string, method string, args any) (conn apphost.Conn, err error) {
-	if conn, err = i.Client.Query(target, method, args); err == nil {
+func (i *Invoker) Query(target string, method string, args any) (conn apphost.Conn, err error) {
+	if conn, err = i.Adapter.Query(target, method, args); err == nil {
 		return
 	}
 
 	i.Log.Println("invoking app for:", target, method, args)
-	if err = i.Invoke(i.Ctx, target); err != nil {
+	if err = i.Open(target); err != nil {
 		return
 	}
 
@@ -33,10 +33,22 @@ func (i Invoker) Query(target string, method string, args any) (conn apphost.Con
 	}
 	for in := range await.Chan() {
 		i.Log.Println("retry:", in)
-		if conn, err = i.Client.Query(target, method, args); err == nil {
+		if conn, err = i.Adapter.Query(target, method, args); err == nil {
 			i.Log.Println("query succeed", conn.Query())
 			return
 		}
 	}
+	return
+}
+
+func (i *Invoker) Open(src string) (err error) {
+	i.Log.Println("starting query", "portald.open", src)
+	request := i.Adapter.Rpc().Request("portald")
+	err = rpc.Command(request, "open", src)
+	if err != nil {
+		i.Log.E().Printf("cannot query %s: %v", src, err)
+		return fmt.Errorf("cannot query %s: %w", src, err)
+	}
+	i.Log.Println("started query", "portald.open", src)
 	return
 }

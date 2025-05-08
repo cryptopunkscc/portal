@@ -52,7 +52,6 @@ func TestResolveDist(t *testing.T) {
 	test.AssertErr(t, err)
 
 	AssertDist(t, expected, actual)
-
 }
 
 func TestResolveBundle(t *testing.T) {
