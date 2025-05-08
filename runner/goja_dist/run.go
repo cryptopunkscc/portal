@@ -7,7 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/goja"
 	"github.com/cryptopunkscc/portal/runner/reload"
-	"github.com/cryptopunkscc/portal/runner/watcher"
+	"github.com/cryptopunkscc/portal/target/dist"
 	"github.com/cryptopunkscc/portal/target/js"
 	"path/filepath"
 	"time"
@@ -34,23 +34,23 @@ func (r *ReRunner) Reload() (err error) {
 	return r.backend.RunFs(r.dist.FS())
 }
 
-func (r *ReRunner) Run(ctx context.Context, dist target.DistJs, args ...string) (err error) {
+func (r *ReRunner) Run(ctx context.Context, distJs target.DistJs, args ...string) (err error) {
 	if any(r.NewCore) == nil {
 		panic("newCore cannot be nil")
 	}
-	if !filepath.IsAbs(dist.Abs()) {
-		return plog.Errorf("ReRunner needs absolute path: %s", dist.Abs())
+	if !filepath.IsAbs(distJs.Abs()) {
+		return plog.Errorf("ReRunner needs absolute path: %s", distJs.Abs())
 	}
 	log := plog.Get(ctx).Type(r).Set(&ctx)
-	log.Printf("run %T %s", dist, dist.Abs())
-	core, ctx := r.NewCore(ctx, dist)
+	log.Printf("run %T %s", distJs, distJs.Abs())
+	core, ctx := r.NewCore(ctx, distJs)
 	r.backend = goja.NewBackend(core)
-	r.dist = dist
+	r.dist = distJs
 	if err = r.Reload(); err != nil {
 		log.E().Println(err.Error())
 	}
-	pkg := dist.Manifest().Package
-	watch := watcher.ReRunner[target.DistJs](func(...string) error {
+	pkg := distJs.Manifest().Package
+	watch := dist.ReRunner[target.DistJs](func(...string) error {
 		if err := r.send(target.NewMsg(pkg, target.DevChanged)); err != nil {
 			log.E().Println(err)
 		}
@@ -65,6 +65,6 @@ func (r *ReRunner) Run(ctx context.Context, dist target.DistJs, args ...string) 
 		}
 		return nil
 	})
-	r.send = reload.Start(ctx, dist, r.Reload, core)
-	return watch.Run(ctx, dist, args...)
+	r.send = reload.Start(ctx, distJs, r.Reload, core)
+	return watch.Run(ctx, distJs, args...)
 }

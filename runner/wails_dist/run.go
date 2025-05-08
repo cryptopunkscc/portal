@@ -7,7 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/reload"
 	"github.com/cryptopunkscc/portal/runner/wails"
-	"github.com/cryptopunkscc/portal/runner/watcher"
+	"github.com/cryptopunkscc/portal/target/dist"
 	"github.com/cryptopunkscc/portal/target/html"
 	"path/filepath"
 )
@@ -35,15 +35,15 @@ func (r *ReRunner) Reload() (err error) {
 	return r.ReRunner.Reload()
 }
 
-func (r *ReRunner) Run(ctx context.Context, dist target.DistHtml, args ...string) (err error) {
-	if !filepath.IsAbs(dist.Abs()) {
-		return plog.Errorf("ReRunner needs absolute path: %s", dist.Abs())
+func (r *ReRunner) Run(ctx context.Context, distHtml target.DistHtml, args ...string) (err error) {
+	if !filepath.IsAbs(distHtml.Abs()) {
+		return plog.Errorf("ReRunner needs absolute path: %s", distHtml.Abs())
 	}
 	log := plog.Get(ctx).Type(r)
 
 	go func() {
-		pkg := dist.Manifest().Package
-		watch := watcher.ReRunner[target.DistHtml](func(...string) (err error) {
+		pkg := distHtml.Manifest().Package
+		watch := dist.ReRunner[target.DistHtml](func(...string) (err error) {
 			if err := r.send(target.NewMsg(pkg, target.DevChanged)); err != nil {
 				log.F().Println(err)
 			}
@@ -53,15 +53,15 @@ func (r *ReRunner) Run(ctx context.Context, dist target.DistHtml, args ...string
 			}
 			return err
 		})
-		err := watch.Run(ctx, dist)
+		err := watch.Run(ctx, distHtml)
 		if err != nil {
 			log.F().Println(err)
 		}
 	}()
 
-	r.Core, ctx = r.newCore(ctx, dist)
-	r.send = reload.Start(ctx, dist, r.Reload, r.Core)
-	if err = r.ReRunner.Run(ctx, dist, args...); err != nil {
+	r.Core, ctx = r.newCore(ctx, distHtml)
+	r.send = reload.Start(ctx, distHtml, r.Reload, r.Core)
+	if err = r.ReRunner.Run(ctx, distHtml, args...); err != nil {
 		return
 	}
 

@@ -1,4 +1,4 @@
-package watcher
+package dist
 
 import (
 	"context"
@@ -9,13 +9,13 @@ import (
 	"time"
 )
 
+func ReRunner[T target.Dist_](reload func(...string) error) target.ReRunner[T] {
+	return &reRunner[T]{reload: reload}
+}
+
 type reRunner[T target.Dist_] struct {
 	reload func(...string) error
 	args   []string
-}
-
-func ReRunner[T target.Dist_](reload func(...string) error) target.ReRunner[T] {
-	return &reRunner[T]{reload: reload}
 }
 
 func (r *reRunner[T]) Run(ctx context.Context, dist T, args ...string) (err error) {
