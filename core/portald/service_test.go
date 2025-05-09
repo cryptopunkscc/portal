@@ -27,6 +27,7 @@ type testService struct {
 	alias  string
 	config portal.Config
 	*Service[target.Portal_]
+	apps []target.Portal_
 }
 
 func (s *testService) cleanDir(t *testing.T) {
@@ -206,7 +207,19 @@ func (s *testService) testInstallApps(t *testing.T) {
 		for _, r := range s.Installer().Dispatcher().List(l) {
 			err := r.Run(ctx)
 			test.AssertErr(t, err)
+			s.apps = append(s.apps, r)
 		}
+	})
+}
+
+func (s *testService) testUninstallApp(t *testing.T) {
+	t.Run(s.name+" uninstall app", func(t *testing.T) {
+		if len(s.apps) == 0 {
+			t.FailNow()
+		}
+		p := s.apps[0].Manifest().Package
+		err := s.Installer().Uninstall(p)
+		test.AssertErr(t, err)
 	})
 }
 

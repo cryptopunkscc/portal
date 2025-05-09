@@ -2,9 +2,12 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target/source"
+	"log"
+	"os"
 	"path/filepath"
 )
 
@@ -83,4 +86,16 @@ func (i Installer) prepare(src target.App_) (err error) {
 
 func (i Installer) dstPath(src target.App_) (out string) {
 	return filepath.Join(i.Dir, src.Manifest().Package)
+}
+
+func (i Installer) Uninstall(id string) (err error) {
+	defer plog.TraceErr(&err)
+	src := source.Dir(i.Dir)
+	for _, t := range Resolve_.List(src) {
+		if t.Manifest().Match(id) {
+			log.Println("Uninstalling", t.Manifest().Package, "from", t.Abs())
+			return os.RemoveAll(t.Abs())
+		}
+	}
+	return fmt.Errorf("%s not found", id)
 }

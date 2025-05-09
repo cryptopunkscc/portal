@@ -36,6 +36,7 @@ func TestService_Integration(t *testing.T) {
 				it.s1.testNodeAlias(t)
 				it.s1.testCreateUser(t)
 				it.s1.testInstallApps(t)
+				it.s1.testUninstallApp(t)
 
 				t.Run("app write", func(t *testing.T) {
 					obj := &manifest.App{Name: "go", Package: "test.go", Title: "test go"}

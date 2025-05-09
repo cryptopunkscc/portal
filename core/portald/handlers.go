@@ -3,7 +3,6 @@ package portald
 import (
 	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/runner/uninstall"
 )
 
 func (s *Service[T]) handlers() cmd.Handlers {
@@ -93,7 +92,7 @@ func (s *Service[T]) publicHandlers() cmd.Handlers {
 			},
 		},
 		{
-			Func: uninstall.Runner(s.Config.Apps),
+			Func: s.Installer().Uninstall,
 			Name: "uninstall d",
 			Desc: "Uninstall app.",
 			Params: cmd.Params{
