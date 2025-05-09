@@ -1,7 +1,6 @@
 package portald
 
 import (
-	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"testing"
 	"time"
@@ -37,17 +36,12 @@ func TestService_Integration(t *testing.T) {
 				it.s1.testCreateUser(t)
 				it.s1.testInstallApps(t)
 				it.s1.testUninstallApp(t)
-
-				t.Run("app write", func(t *testing.T) {
-					obj := &manifest.App{Name: "go", Package: "test.go", Title: "test go"}
-					id := *it.s1.testWriteObject(t, obj) // write object to data directory
-					it.s1.testReconnectAsUser(t)         // setup object clients with user auth token
-					time.Sleep(2000 * time.Millisecond)  // time for mod content to identify written object
-					it.s1.testAwaitDescribe(t, id)       // await fetching describe
-					it.s1.testReadObject(t, id)          // test read object
-					//it.s1.testSearchObjects(t, id.String()) // test search objects
-					it.s1.testSearchObjects(t, "app.manifest") // test search objects
-				})
+				it.s1.testPublishAppBundle(t)
+				time.Sleep(2000 * time.Millisecond)
+				it.s1.testReconnectAsUser(t)
+				it.s1.awaitPublishedObjects(t)
+				it.s1.testSearchObjects(t, "app.manifest")
+				it.s1.testFetchReleases(t)
 
 				t.Run("claim", func(t *testing.T) {
 					it.s2.configure(t)

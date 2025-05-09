@@ -46,7 +46,7 @@ func (a *App) ReadFrom(r io.Reader) (n int64, err error) {
 	if err != nil {
 		return
 	}
-	if err = a.UnmarshalFrom(b); err != nil {
+	if err = json.Unmarshal(b, a); err != nil {
 		return
 	}
 	n = int64(len(b))

@@ -12,7 +12,9 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/resources"
 	"github.com/cryptopunkscc/portal/target/app"
+	"github.com/cryptopunkscc/portal/target/bundle"
 	"github.com/cryptopunkscc/portal/target/source"
+	"path/filepath"
 	"sync"
 )
 
@@ -69,6 +71,12 @@ func (s *Service[T]) Installer() app.Installer {
 	return app.Installer{
 		Dir:     s.Config.Apps,
 		Prepare: s.SetupToken,
+	}
+}
+
+func (s *Service[T]) Publisher() bundle.Publisher {
+	return bundle.Publisher{
+		Dir: filepath.Join(s.Config.Astrald, "data"),
 	}
 }
 

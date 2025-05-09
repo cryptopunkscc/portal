@@ -82,14 +82,14 @@ type Bundle interface {
 	Package() Source
 }
 
-type Bundle_ interface {
-	Package() Source
-	App_
-}
-
 type Dist_ interface {
 	IsDist()
 	App_
+}
+
+type Bundle_ interface {
+	Package() Source
+	Dist_
 }
 
 type Dist[T any] interface {

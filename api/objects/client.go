@@ -3,6 +3,7 @@ package objects
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/mod/objects"
 	"github.com/cryptopunkscc/astrald/object"
@@ -45,6 +46,22 @@ type ReadArgs struct {
 
 func (c Conn) Read(args ReadArgs) (r io.ReadCloser, err error) {
 	return rpc.NewCall(c.Conn, "read", args)
+}
+
+func (c Conn) Fetch(args ReadArgs, obj astral.Object) (err error) {
+	b, err := c.Read(args)
+	if err != nil {
+		return
+	}
+	t, r, err := astral.OpenCanonical(b)
+	if err != nil {
+		return err
+	}
+	if t != obj.ObjectType() {
+		return fmt.Errorf("expected object type %s, got %s", obj.ObjectType(), t)
+	}
+	_, err = obj.ReadFrom(r)
+	return
 }
 
 type SearchArgs struct {

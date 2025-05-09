@@ -13,6 +13,8 @@ import (
 	"github.com/cryptopunkscc/portal/apps"
 	"github.com/cryptopunkscc/portal/core/portald/debug"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/target/bundle"
+	"github.com/cryptopunkscc/portal/target/exec"
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/cryptopunkscc/portal/test"
 	"github.com/stretchr/testify/assert"
@@ -27,7 +29,8 @@ type testService struct {
 	alias  string
 	config portal.Config
 	*Service[target.Portal_]
-	apps []target.Portal_
+	apps      []target.Portal_
+	published map[object.ID]bundle.Release
 }
 
 func (s *testService) cleanDir(t *testing.T) {
@@ -137,7 +140,6 @@ func (s *testService) testAwaitDescribe(t *testing.T, id object.ID) {
 		args := objects.DescribeArgs{ID: id}
 		limit := 10
 		for {
-			time.Sleep(200 * time.Millisecond)
 			if obj, err := c.Describe(args); obj != nil {
 				plog.Println(id, obj)
 				break
@@ -150,6 +152,7 @@ func (s *testService) testAwaitDescribe(t *testing.T, id object.ID) {
 			} else {
 				t.FailNow()
 			}
+			time.Sleep(200 * time.Millisecond)
 		}
 	})
 }
@@ -196,7 +199,7 @@ func (s *testService) testSearchObjects(t *testing.T, query string) {
 			count++
 			plog.Println(result)
 		}
-		assert.Equal(t, 1, count)
+		assert.Greater(t, count, 0)
 	})
 }
 
@@ -220,6 +223,54 @@ func (s *testService) testUninstallApp(t *testing.T) {
 		p := s.apps[0].Manifest().Package
 		err := s.Installer().Uninstall(p)
 		test.AssertErr(t, err)
+	})
+}
+
+func (s *testService) testPublishAppBundle(t *testing.T) {
+	t.Run(s.name+" publish app bundles", func(t *testing.T) {
+		b := source.Embed(apps.Builds)
+		s.published = map[object.ID]bundle.Release{}
+		for _, o := range exec.ResolveBundle.List(b) {
+			id, r, err := s.Publisher().Publish(o)
+			test.AssertErr(t, err)
+			s.published[*id] = *r
+		}
+	})
+}
+
+func (s *testService) awaitPublishedObjects(t *testing.T) {
+	t.Run(s.name+" await published objects", func(t *testing.T) {
+		for id := range s.published {
+			s.testAwaitDescribe(t, id) // await fetching describe
+			s.testReadObject(t, id)    // test read object
+		}
+	})
+}
+
+func (s *testService) testFetchReleases(t *testing.T) {
+	t.Run(s.name+" fetch app release", func(t *testing.T) {
+		for id, release := range s.published {
+			c := objects.Client(s.Apphost.Rpc())
+			r := &bundle.Release{}
+			err := c.Fetch(objects.ReadArgs{ID: id}, r)
+			test.AssertErr(t, err)
+			assert.Equal(t, *release.BundleID, *r.BundleID)
+			assert.Equal(t, *release.ManifestID, *r.ManifestID)
+			assert.Equal(t, release.Release, r.Release)
+			assert.Equal(t, release.Target, r.Target)
+		}
+	})
+}
+
+func (s *testService) testFetchAppBundleExecs(t *testing.T) {
+	t.Run(s.name+" fetch app bundle", func(t *testing.T) {
+		for id := range s.published {
+			c := objects.Client(s.Apphost.Rpc())
+			o := &bundle.Object[target.Exec]{}
+			o.Resolve = exec.ResolveBundle
+			err := c.Fetch(objects.ReadArgs{ID: id}, o)
+			test.AssertErr(t, err)
+		}
 	})
 }
 
