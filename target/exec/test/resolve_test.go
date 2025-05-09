@@ -1,6 +1,7 @@
 package test
 
 import (
+	"bytes"
 	_ "embed"
 	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/api/target"
@@ -9,16 +10,14 @@ import (
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/cryptopunkscc/portal/test"
 	"github.com/stretchr/testify/assert"
-	"os"
 	"testing"
 )
 
 func TestResolveManifest(t *testing.T) {
-	open, err := os.Open("portal.yml")
-	test.AssertErr(t, err)
+	r := bytes.NewReader(PortalYaml)
 	m := manifest.App{}
 
-	_, err = m.ReadFrom(open)
+	_, err := m.ReadFrom(r)
 	test.AssertErr(t, err)
 }
 

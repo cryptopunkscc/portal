@@ -20,26 +20,24 @@ func TestApplication_loadConfig_custom(t *testing.T) {
 	c := portal.Config{}
 	c.Dir = dir
 	c.Node.Log.Level = 100
-	c.Apphost.Listen = []string{"tcp:127.0.0.1:8635"}
-	if err := writeConfig(c, dir, portal.DefaultConfigFile); err != nil {
-		plog.P().Println(err)
-	}
+	c.Apphost.Listen = []string{"tcp:127.0.0.1:8638"}
+	err := writeConfig(t, c, dir, portal.DefaultConfigFile)
+	test.AssertErr(t, err)
 
+	a := testApplication()
 	args := RunArgs{ConfigPath: dir}
-	err := application.loadConfig(args)
-	if err != nil {
-		plog.P().Println(err)
-	}
-	assert.Equal(t, c, application.Config)
+	err = a.loadConfig(args)
+	test.AssertErr(t, err)
+	assert.Equal(t, c, a.Config)
 }
 
 func TestApplication_loadConfig_platformDefault(t *testing.T) {
-	if err := application.loadConfig(RunArgs{}); err != nil {
-		plog.P().Println(err)
-	}
-	if err := application.Configure(); err != nil {
-		plog.P().Println(err)
-	}
+	a := testApplication()
+	err := a.loadConfig(RunArgs{})
+	test.AssertErr(t, err)
+
+	err = a.Configure()
+	test.AssertErr(t, err)
 }
 
 func unsetEnv() {
@@ -56,15 +54,12 @@ func unsetEnv() {
 	}
 }
 
-func writeConfig(c portal.Config, path ...string) (err error) {
+func writeConfig(t *testing.T, c portal.Config, path ...string) (err error) {
 	defer plog.TraceErr(&err)
 	p := filepath.Join(path...)
 	bytes, err := yaml.Marshal(c)
-	if err != nil {
-		return
-	}
-	if err = os.WriteFile(p, bytes, 0644); err != nil {
-		return
-	}
+	test.AssertErr(t, err)
+	err = os.WriteFile(p, bytes, 0644)
+	test.AssertErr(t, err)
 	return
 }

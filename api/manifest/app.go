@@ -3,6 +3,7 @@ package manifest
 import (
 	"encoding/json"
 	"github.com/cryptopunkscc/portal/pkg/dec/all"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 	"io/fs"
 	"strings"
@@ -42,11 +43,12 @@ func (a App) Match(id string) bool {
 func (App) ObjectType() string { return "app.manifest" }
 
 func (a *App) ReadFrom(r io.Reader) (n int64, err error) {
+	defer plog.TraceErr(&err)
 	b, err := io.ReadAll(r)
 	if err != nil {
 		return
 	}
-	if err = json.Unmarshal(b, a); err != nil {
+	if err = all.Unmarshalers.Unmarshal(b, a); err != nil {
 		return
 	}
 	n = int64(len(b))

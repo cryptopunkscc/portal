@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/test"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v3"
 	"os"
@@ -142,12 +141,24 @@ func TestLoader_Load(t *testing.T) {
 }
 
 func initTestDir(t *testing.T) (dir string) {
-	dir = test.Mkdir(t)
-	if err := os.WriteFile(filepath.Join(dir, "config"), []byte{}, 0755); err != nil {
-		panic(err)
+	err := os.RemoveAll(".test")
+	if err != nil {
+		t.Fatal(err)
 	}
-	if err := os.MkdirAll(filepath.Join(dir, "foo", "bar", "baz"), 0755); err != nil {
-		panic(err)
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	dir = filepath.Join(wd, ".test")
+	err = os.MkdirAll(dir, 0777)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = os.WriteFile(filepath.Join(dir, "config"), []byte{}, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err = os.MkdirAll(filepath.Join(dir, "foo", "bar", "baz"), 0755); err != nil {
+		t.Fatal(err)
 	}
 	return
 }

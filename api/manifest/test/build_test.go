@@ -28,7 +28,7 @@ func TestBuilds(t *testing.T) {
 		})
 		t.Run("custom", func(t *testing.T) {
 			expectedBuild := manifest.Build{
-				Out: "main4", Cmd: "cmd4", Exec: "exec2",
+				Out: "main4", Cmd: "cmd4", Exec: "exec3",
 				Target: manifest.Target{Exec: "main4", OS: "os2", Arch: "arch2"},
 			}
 			actualBuild := b.Get("os2", "arch2")

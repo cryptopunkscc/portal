@@ -55,7 +55,7 @@ func (r *BundleRunner) unpackExecutable(bundle target.BundleExec) (execFile *os.
 
 	execName := fmt.Sprintf("%s_%s_%s",
 		bundle.Manifest().Package,
-		bundle.Manifest().Version,
+		bundle.Version(),
 		srcId,
 	)
 

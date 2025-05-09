@@ -43,6 +43,7 @@ func TestAny_nil(t *testing.T) {
 
 type testSource struct{}
 
+func (t testSource) CopyTo(...string) (err error)        { return }
 func (t testSource) Abs() (v string)                     { return }
 func (t testSource) Path() (v string)                    { return }
 func (t testSource) File() (v fs.File, err error)        { return }

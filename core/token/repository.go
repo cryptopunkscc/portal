@@ -54,6 +54,7 @@ func (r *Repository) List(args *api.ListTokensArgs) (api.AccessTokens, error) {
 }
 
 func (r *Repository) Resolve(pkg string) (accessToken *mod.AccessToken, err error) {
+	defer plog.TraceErr(&err)
 	if r.Adapter == nil {
 		r.Adapter = apphost.Default
 	}

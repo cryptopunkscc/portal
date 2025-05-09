@@ -3,6 +3,7 @@
 package wails_pro
 
 import (
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os/exec"
 	"syscall"
 

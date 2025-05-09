@@ -50,6 +50,12 @@ func TestService_Integration(t *testing.T) {
 					it.s1.testAddEndpoint(t, &it.s2)
 					it.s1.testUserClaim(t, &it.s2)
 				})
+
+				t.Run("WIP", func(t *testing.T) {
+					t.SkipNow() // FIXME
+					it.s2.testAddEndpoint(t, &it.s1)
+					it.s2.testSearchObjects(t, "app.manifest")
+				})
 			},
 		},
 	} {

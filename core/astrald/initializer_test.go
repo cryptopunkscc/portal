@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/portal/core/apphost"
+	"github.com/cryptopunkscc/portal/core/portald/debug"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/test"
 	"testing"
 	"time"
@@ -22,9 +22,12 @@ func TestInitializer_Start(t *testing.T) {
 			r.NodeRoot = dir
 			r.TokensDir = dir
 			r.Apphost = &apphost.Adapter{}
-			r.Runner = &exec.Astrald{NodeRoot: dir}
+			//r.Runner = &exec.Astrald{NodeRoot: dir}
+			r.Runner = &debug.Astrald{NodeRoot: dir}
 			r.Config.Node.Log.Level = 100
-			r.Config.Apphost.Listen = []string{"tcp:127.0.0.1:8635"}
+			r.Config.Apphost.Listen = []string{"tcp:127.0.0.1:8639"}
+			r.Config.Ether.UDPPort = 8823
+			r.Config.TCP.ListenPort = 1792
 
 			ctx, cancel := context.WithCancel(context.Background())
 			t.Cleanup(func() {
@@ -32,10 +35,7 @@ func TestInitializer_Start(t *testing.T) {
 				time.Sleep(10 * time.Millisecond) // give a time to kill astrald process
 			})
 			err := r.Start(ctx)
-			if err != nil {
-				plog.New().Println(err)
-				t.Error(err)
-			}
+			test.AssertErr(t, err)
 		})
 	}
 }
