@@ -1,18 +1,26 @@
 package core
 
 import (
+	"errors"
 	"github.com/cryptopunkscc/portal/apps"
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/target/bundle"
 	"github.com/cryptopunkscc/portal/target/source"
 )
 
 func (m *service) Install() (err error) {
-	for _, dist := range m.Resolve.List(
+	defer plog.TraceErr(&err)
+	var errs []error
+	i := m.Installer()
+	for _, b := range bundle.Resolve_.List(
 		source.Embed(apps.LauncherSvelteFS),
 		source.Embed(apps.ProfileFS),
 	) {
-		if err = m.Service.Install().CopyOf(dist); err != nil {
-			return
+		if err = m.SetupToken(b); err != nil {
+			errs = append(errs, err)
+		} else if err = i.Install(b); err != nil {
+			errs = append(errs, err)
 		}
 	}
-	return
+	return errors.Join(errs...)
 }

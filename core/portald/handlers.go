@@ -85,7 +85,7 @@ func (s *Service[T]) publicHandlers() cmd.Handlers {
 			},
 		},
 		{
-			Func: s.Install().BundlesByPath,
+			Func: s.Installer().Dispatcher().Run,
 			Name: "install i",
 			Desc: "Install app.",
 			Params: cmd.Params{

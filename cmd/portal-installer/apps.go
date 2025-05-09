@@ -1,23 +1,16 @@
 package main
 
-import (
-	"github.com/cryptopunkscc/portal/api/env"
-	"github.com/cryptopunkscc/portal/apps"
-	"github.com/cryptopunkscc/portal/runner/install"
-	"github.com/cryptopunkscc/portal/target/exec"
-	"github.com/cryptopunkscc/portal/target/source"
-)
-
 func installApps() {
-	bundle, err := exec.ResolveBundle(source.Embed(apps.Builds))
-	if err != nil {
-		panic(err)
-	}
-	r := install.Runner{}
-	r.AppsDir = env.PortaldApps.MkdirAll()
-	r.Tokens.Dir = env.PortaldTokens.MkdirAll()
-	err = r.Bundle(bundle)
-	if err != nil {
-		panic(err)
-	}
+	panic("TODO")
+	//bundle, err := exec.ResolveBundle(source.Embed(apps.Builds))
+	//if err != nil {
+	//	panic(err)
+	//}
+	//r := app.Installer{}
+	//r.Dir = env.PortaldApps.MkdirAll()
+	//r.Tokens.Dir = env.PortaldTokens.MkdirAll()
+	//err = r.Bundle(bundle)
+	//if err != nil {
+	//	panic(err)
+	//}
 }

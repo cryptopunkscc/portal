@@ -11,7 +11,7 @@ import (
 	"github.com/cryptopunkscc/portal/core/token"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/resources"
-	"github.com/cryptopunkscc/portal/runner/install"
+	"github.com/cryptopunkscc/portal/target/app"
 	"github.com/cryptopunkscc/portal/target/source"
 	"sync"
 )
@@ -60,10 +60,15 @@ func (s *Service[T]) Wait() (err error) {
 	return
 }
 
-func (s *Service[T]) Install() install.Runner {
-	return install.Runner{
-		AppsDir: s.Config.Apps,
-		Tokens:  *s.Tokens(),
+func (s *Service[T]) SetupToken(app App_) (err error) {
+	_, err = s.Tokens().Resolve(app.Manifest().Package)
+	return
+}
+
+func (s *Service[T]) Installer() app.Installer {
+	return app.Installer{
+		Dir:     s.Config.Apps,
+		Prepare: s.SetupToken,
 	}
 }
 

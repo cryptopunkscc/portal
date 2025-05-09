@@ -10,8 +10,10 @@ import (
 	"github.com/cryptopunkscc/portal/api/objects"
 	"github.com/cryptopunkscc/portal/api/portal"
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/apps"
 	"github.com/cryptopunkscc/portal/core/portald/debug"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/cryptopunkscc/portal/test"
 	"github.com/stretchr/testify/assert"
 	"os"
@@ -194,6 +196,17 @@ func (s *testService) testSearchObjects(t *testing.T, query string) {
 			plog.Println(result)
 		}
 		assert.Equal(t, 1, count)
+	})
+}
+
+func (s *testService) testInstallApps(t *testing.T) {
+	t.Run(s.name+" install apps", func(t *testing.T) {
+		l := source.Embed(apps.Builds)
+		ctx := context.Background()
+		for _, r := range s.Installer().Dispatcher().List(l) {
+			err := r.Run(ctx)
+			test.AssertErr(t, err)
+		}
 	})
 }
 

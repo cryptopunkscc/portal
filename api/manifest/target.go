@@ -2,6 +2,7 @@ package manifest
 
 import (
 	"github.com/cryptopunkscc/portal/pkg/dec/all"
+	"runtime"
 )
 
 type Target struct {
@@ -11,3 +12,5 @@ type Target struct {
 }
 
 func (r *Target) UnmarshalFrom(bytes []byte) error { return all.Unmarshalers.Unmarshal(bytes, r) }
+
+func (r Target) Match() bool { return r.OS == runtime.GOOS && r.Arch == runtime.GOARCH }
