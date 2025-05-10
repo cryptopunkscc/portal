@@ -34,14 +34,17 @@ func TestService_Integration(t *testing.T) {
 				it.s1.testNodeStart(t, ctx)
 				it.s1.testNodeAlias(t)
 				it.s1.testCreateUser(t)
-				it.s1.testInstallApps(t)
-				it.s1.testUninstallApp(t)
-				it.s1.testPublishAppBundle(t)
-				time.Sleep(2000 * time.Millisecond)
-				it.s1.testReconnectAsUser(t)
-				it.s1.awaitPublishedObjects(t)
-				it.s1.testSearchObjects(t, "app.manifest")
-				it.s1.testFetchReleases(t)
+
+				t.Run("basic", func(t *testing.T) {
+					it.s1.testInstallApps(t)
+					it.s1.testUninstallApp(t)
+					it.s1.testPublishAppBundle(t)
+					it.s1.testReconnectAsUser(t)
+					time.Sleep(2000 * time.Millisecond)
+					it.s1.awaitPublishedObjects(t)
+					it.s1.testSearchObjects(t, "app.manifest")
+					it.s1.testFetchReleases(t)
+				})
 
 				t.Run("claim", func(t *testing.T) {
 					it.s2.configure(t)

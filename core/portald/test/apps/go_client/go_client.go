@@ -1,9 +1,10 @@
-package rpc
+package go_client
 
 import (
 	"errors"
 	apphost2 "github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/core/apphost"
+	rpc2 "github.com/cryptopunkscc/portal/core/portald/test/apps/go_service"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"github.com/cryptopunkscc/portal/pkg/rpc/stream/query"
@@ -89,14 +90,14 @@ func (c TestClient) Run(t *testing.T) {
 
 					t.Run("func3", func(t *testing.T) {
 						t.Run("a", func(t *testing.T) {
-							expected := TestStruct1{
+							expected := rpc2.TestStruct1{
 								B: false,
 								I: 1,
 								F: 0,
 								S: "",
 							}
 
-							actual, err := rpc.Query[TestStruct1](request, "func3", expected)
+							actual, err := rpc.Query[rpc2.TestStruct1](request, "func3", expected)
 							if err != nil {
 								t.Fatal(err)
 							}
@@ -104,7 +105,7 @@ func (c TestClient) Run(t *testing.T) {
 						})
 
 						t.Run("b", func(t *testing.T) {
-							actual, err := rpc.Query[*TestStruct1](request, "func3", []byte{})
+							actual, err := rpc.Query[*rpc2.TestStruct1](request, "func3", []byte{})
 							assert.Zero(t, actual)
 							assert.Equal(t, query.ErrorEmptyValue, err)
 						})
@@ -112,13 +113,13 @@ func (c TestClient) Run(t *testing.T) {
 
 					t.Run("func4", func(t *testing.T) {
 						arg := []any{true, 1, 99.99, "text"}
-						expected := TestStruct1{
+						expected := rpc2.TestStruct1{
 							B: true,
 							I: 1,
 							F: 99.99,
 							S: "text",
 						}
-						actual, err := rpc.Query[TestStruct1](request, "func4", arg...)
+						actual, err := rpc.Query[rpc2.TestStruct1](request, "func4", arg...)
 						if err != nil {
 							t.Fatal(err)
 						}

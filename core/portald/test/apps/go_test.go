@@ -1,7 +1,9 @@
-package rpc
+package apps
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/core/portald/test/apps/go_client"
+	"github.com/cryptopunkscc/portal/core/portald/test/apps/go_service"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"testing"
 	"time"
@@ -12,7 +14,7 @@ func TestGoRpc(t *testing.T) {
 
 	ctx := context.Background()
 	log := plog.New().Set(&ctx)
-	srv := NewTestGoService("test.go")
+	srv := go_service.NewTestGoService("test.go")
 
 	if err := srv.Router.Start(ctx); err != nil {
 		log.P().Println(err)
@@ -20,5 +22,5 @@ func TestGoRpc(t *testing.T) {
 
 	time.Sleep(100 * time.Millisecond)
 
-	NewTestClient("test", "go").Run(t)
+	go_client.NewTestClient("test", "go").Run(t)
 }

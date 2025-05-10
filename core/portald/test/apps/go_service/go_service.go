@@ -1,4 +1,4 @@
-package rpc
+package go_service
 
 import (
 	"errors"

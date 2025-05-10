@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/cryptopunkscc/portal/test/rpc"
+	"github.com/cryptopunkscc/portal/core/portald/test/apps/go_client"
 	"log"
 	"testing"
 	"time"
@@ -12,7 +12,7 @@ func Test(t *testing.T) {
 
 	log.Println("\n=================================================================")
 	time.Sleep(300 * time.Millisecond)
-	rpc.NewTestClient(
+	go_client.NewTestClient(
 		"test",
 		"go",
 		"js",
