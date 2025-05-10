@@ -44,6 +44,7 @@ func TestService_Integration(t *testing.T) {
 					it.s1.awaitPublishedObjects(t)
 					it.s1.testSearchObjects(t, "app.manifest")
 					it.s1.testFetchReleases(t)
+					it.s1.testFetchAppBundleExecs(t)
 				})
 
 				t.Run("claim", func(t *testing.T) {

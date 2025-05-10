@@ -235,12 +235,12 @@ func (s *testService) testFetchReleases(t *testing.T) {
 }
 
 func (s *testService) testFetchAppBundleExecs(t *testing.T) {
-	t.Run(s.name+" fetch app bundle", func(t *testing.T) {
-		for id := range s.published {
+	t.Run(s.name+" fetch app bundle exes", func(t *testing.T) {
+		for _, r := range s.published {
 			c := objects.Client(s.Apphost.Rpc())
 			o := &bundle.Object[target.Exec]{}
 			o.Resolve = exec.ResolveBundle
-			err := c.Fetch(objects.ReadArgs{ID: id}, o)
+			err := c.Fetch(objects.ReadArgs{ID: *r.BundleID}, o)
 			test.AssertErr(t, err)
 		}
 	})
