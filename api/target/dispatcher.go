@@ -2,7 +2,7 @@ package target
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/pkg/plog"
+	"errors"
 	"slices"
 	"sync"
 )
@@ -13,8 +13,10 @@ type Dispatcher struct {
 }
 
 func (r Dispatcher) Run(ctx context.Context, src string, args ...string) (err error) {
-	rr := r.Provide(src)
-	return r.Runner.Run(ctx, rr, args...)
+	if rr := r.Provide(src); rr != nil {
+		return r.Runner.Run(ctx, rr, args...)
+	}
+	return ErrNotFound
 }
 
 type CachedRunner[T Portal_] struct {
@@ -50,11 +52,12 @@ func (r *AsyncRunner) Run(ctx context.Context, runnables []Runnable, args ...str
 	if r.WaitGroup != nil {
 		r.WaitGroup.Add(len(runnables))
 	}
+	var errs []error
 	for _, rr := range runnables {
 		go func() {
 			a := slices.Clone(args)
 			if err := rr.Run(ctx, a...); err != nil {
-				plog.Get(ctx).Println(err)
+				errs = append(errs, err)
 			}
 			if r.WaitGroup != nil {
 				r.WaitGroup.Done()
@@ -63,5 +66,5 @@ func (r *AsyncRunner) Run(ctx context.Context, runnables []Runnable, args ...str
 		}()
 	}
 	waitGroup.Wait()
-	return nil
+	return errors.Join(errs...)
 }

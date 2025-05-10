@@ -9,12 +9,15 @@ import (
 	"github.com/cryptopunkscc/portal/api/nodes"
 	"github.com/cryptopunkscc/portal/api/objects"
 	"github.com/cryptopunkscc/portal/api/portal"
+	portald2 "github.com/cryptopunkscc/portal/api/portald"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/apps"
 	"github.com/cryptopunkscc/portal/core/astrald/debug"
+	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/core/portald"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/test"
+	"github.com/cryptopunkscc/portal/runner/goja"
 	"github.com/cryptopunkscc/portal/target/bundle"
 	"github.com/cryptopunkscc/portal/target/exec"
 	"github.com/cryptopunkscc/portal/target/source"
@@ -48,6 +51,9 @@ func (s *testService) configure(t *testing.T) {
 		test.AssertErr(t, err)
 		//s.Astrald = &exec.Astrald{NodeRoot: s.Config.Astrald} // Faster testing
 		s.Astrald = &debug.Astrald{NodeRoot: s.Config.Astrald} // Debugging astrald
+
+		f := bind.CoreFactory{Repository: *s.Tokens()}
+		s.Resolve = target.Any[target.Runnable](goja.Runner(f.NewBackendFunc()).Try)
 	})
 }
 
@@ -194,6 +200,21 @@ func (s *testService) testUninstallApp(t *testing.T) {
 		}
 		p := s.apps[0].Manifest().Package
 		err := s.Installer().Uninstall(p)
+		test.AssertErr(t, err)
+	})
+}
+
+func (s *testService) testSetupToken(t *testing.T, pkg string) {
+	t.Run(s.name+" setup token  "+pkg, func(t *testing.T) {
+		_, err := s.Tokens().Resolve(pkg)
+		test.AssertErr(t, err)
+	})
+}
+
+func (s *testService) testOpen(t *testing.T, ctx context.Context, pkg string) {
+	t.Run(s.name+" open  "+pkg, func(t *testing.T) {
+		o := portald2.OpenOpt{}
+		err := s.Open().Run(ctx, o, pkg)
 		test.AssertErr(t, err)
 	})
 }

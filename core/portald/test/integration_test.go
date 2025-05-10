@@ -1,6 +1,7 @@
 package portald
 
 import (
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"testing"
 	"time"
@@ -60,6 +61,19 @@ func TestService_Integration(t *testing.T) {
 					it.s2.testAddEndpoint(t, &it.s1)
 					it.s2.testSearchObjects(t, "app.manifest")
 				})
+			},
+		},
+		{
+			name: "basic js",
+			test: func(t *testing.T) {
+				pkg := "test.basic.js"
+				ctx := testServiceContext(t)
+				s := it.s1
+				s.config.Apps = target.Abs("./apps")
+				s.configure(t)
+				s.testNodeStart(t, ctx)
+				s.testSetupToken(t, pkg)
+				s.testOpen(t, ctx, pkg)
 			},
 		},
 	} {
