@@ -11,6 +11,7 @@ import (
 	"github.com/cryptopunkscc/portal/api/portal"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/apps"
+	"github.com/cryptopunkscc/portal/core/portald"
 	"github.com/cryptopunkscc/portal/core/portald/debug"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target/bundle"
@@ -28,7 +29,7 @@ type testService struct {
 	name   string
 	alias  string
 	config portal.Config
-	*Service[target.Portal_]
+	*portald.Service[target.Portal_]
 	apps      []target.Portal_
 	published map[object.ID]bundle.Release
 }
@@ -39,7 +40,7 @@ func (s *testService) cleanDir(t *testing.T) {
 
 func (s *testService) configure(t *testing.T) {
 	t.Run(s.name+" configure", func(t *testing.T) {
-		s.Service = &Service[target.Portal_]{}
+		s.Service = &portald.Service[target.Portal_]{}
 		s.Config = s.config
 		s.Config.Node.Log.Level = 100
 		s.ExtraTokens = []string{"portal"}
