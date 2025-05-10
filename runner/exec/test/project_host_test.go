@@ -9,6 +9,7 @@ import (
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/cryptopunkscc/portal/test"
 	"github.com/stretchr/testify/assert"
+	"os"
 	"path/filepath"
 	"testing"
 )
@@ -65,7 +66,12 @@ func TestProjectHostRunner_Run(t *testing.T) {
 
 	ss, err := source.Embed(AppsFS).Sub("apps")
 	test.AssertErr(t, err)
-	test.Copy(ss, config.Apps)
+
+	err = os.RemoveAll(config.Apps)
+	test.AssertErr(t, err)
+
+	err = ss.CopyTo(config.Apps)
+	test.AssertErr(t, err)
 
 	err = runner.ProjectHost().Run(ctx, s, "foo", "bar")
 	test.AssertErr(t, err)
