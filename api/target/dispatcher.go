@@ -3,6 +3,7 @@ package target
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"slices"
 	"sync"
 )
 
@@ -51,7 +52,8 @@ func (r *AsyncRunner) Run(ctx context.Context, runnables []Runnable, args ...str
 	}
 	for _, rr := range runnables {
 		go func() {
-			if err := rr.Run(ctx, args...); err != nil {
+			a := slices.Clone(args)
+			if err := rr.Run(ctx, a...); err != nil {
 				plog.Get(ctx).Println(err)
 			}
 			if r.WaitGroup != nil {

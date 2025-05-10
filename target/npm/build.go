@@ -32,7 +32,6 @@ type buildRunner struct {
 }
 
 func (r *buildRunner) Run(ctx context.Context, projectNpm target.ProjectNpm_, args ...string) (err error) {
-	args = slices.Clone(args)
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 
 	if target.Op(&args, "clean") {

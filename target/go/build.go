@@ -12,7 +12,6 @@ import (
 	"github.com/cryptopunkscc/portal/target/project"
 	"os"
 	"path/filepath"
-	"slices"
 	"strings"
 )
 
@@ -34,7 +33,6 @@ func BuildProject(platforms ...string) target.Run[target.ProjectGo] {
 type buildRunner struct{ platforms [][]string }
 
 func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args ...string) (err error) {
-	args = slices.Clone(args)
 	log := plog.Get(ctx).Type(g).Set(&ctx)
 	if err = deps.RequireBinary("go"); err != nil {
 		return
