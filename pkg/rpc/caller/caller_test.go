@@ -77,8 +77,7 @@ func TestStruct_Call(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := New(tt.function)
-			gotResult, err := c.Defaults(t).Unmarshaler(tt.unmarshal).Call(tt.data)
+			gotResult, err := New(tt.function).Set(t).Unmarshaler(tt.unmarshal).Call(tt.data)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Call() error = %v, wantErr %v", err, tt.wantErr)
 				return

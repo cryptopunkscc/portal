@@ -3,13 +3,13 @@ package caller
 import (
 	"math"
 	"reflect"
+	"strings"
 )
 
 type Func struct {
-	Names     []string
 	Unmarshal Unmarshal
+	Defaults  []any
 	function  reflect.Value
-	defaults  []any
 }
 
 func New(function any) (c *Func) {
@@ -20,21 +20,21 @@ func New(function any) (c *Func) {
 	return
 }
 
-func (c *Func) Named(names ...string) *Func {
-	c.Names = names
-	return c
-}
-
 func (c *Func) Unmarshaler(unmarshal Unmarshal) *Func {
 	cc := *c
 	cc.Unmarshal = unmarshal
 	return &cc
 }
 
-func (c *Func) Defaults(defaults ...any) *Func {
+func (c *Func) Set(defaults ...any) *Func {
 	cc := *c
-	cc.defaults = append(cc.defaults, defaults...)
+	cc.Defaults = append(cc.Defaults, defaults...)
 	return &cc
+}
+
+func (c *Func) Run(args ...string) (result []any, err error) {
+	a := strings.Join(args, " ")
+	return c.Call([]byte(a))
 }
 
 func (c *Func) Call(data []byte) (result []any, err error) {
@@ -66,7 +66,7 @@ func (c *Func) decodeArguments(data []byte) (values []reflect.Value, err error) 
 
 	// Inject dependencies
 	var initial []reflect.Value
-	for _, a := range c.defaults {
+	for _, a := range c.Defaults {
 		initial = append(initial, reflect.ValueOf(a))
 	}
 	for i := 0; i < t.NumIn() && len(initial) > 0; i++ {

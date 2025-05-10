@@ -93,8 +93,8 @@ func (r *Base) Call() (o <-chan any) {
 	in := []byte(r.args)
 	out, err := r.caller().
 		Unmarshaler(r.Unmarshal).
-		Defaults(r.Dependencies...).
-		Defaults(r.Registry.Get()).
+		Set(r.Dependencies...).
+		Set(r.Registry.Get()).
 		Call(in)
 
 	go respond(c, err, out...)
@@ -133,7 +133,6 @@ func (r *Base) caller() *caller.Func {
 		return v
 	default:
 		f := caller.New(h.Func)
-		f.Names = strings.Split(h.Name, " ")
 		h.Func = f
 		return f
 	}
