@@ -3,7 +3,7 @@ package portal
 import (
 	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/test"
+	"github.com/cryptopunkscc/portal/pkg/test"
 	"testing"
 )
 

@@ -3,10 +3,10 @@ package test
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/pkg/deps"
+	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/target/js"
 	"github.com/cryptopunkscc/portal/target/npm"
 	"github.com/cryptopunkscc/portal/target/source"
-	"github.com/cryptopunkscc/portal/test"
 	"testing"
 )
 

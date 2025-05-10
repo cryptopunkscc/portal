@@ -1,10 +1,10 @@
 package test
 
 import (
+	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/pkg/zip"
 	"github.com/cryptopunkscc/portal/target/js"
 	"github.com/cryptopunkscc/portal/target/source"
-	"github.com/cryptopunkscc/portal/test"
 	"github.com/stretchr/testify/assert"
 	"path/filepath"
 	"testing"

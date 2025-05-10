@@ -2,9 +2,9 @@ package test
 
 import (
 	"github.com/cryptopunkscc/portal/api/manifest"
+	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/target/project"
 	"github.com/cryptopunkscc/portal/target/source"
-	"github.com/cryptopunkscc/portal/test"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v3"
 	"testing"

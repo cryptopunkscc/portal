@@ -1,8 +1,8 @@
 package test
 
 import (
+	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/target/source"
-	"github.com/cryptopunkscc/portal/test"
 	"testing"
 )
 

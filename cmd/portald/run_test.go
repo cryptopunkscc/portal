@@ -5,7 +5,7 @@ import (
 	"github.com/cryptopunkscc/portal/api/portal"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/test"
+	"github.com/cryptopunkscc/portal/pkg/test"
 	"testing"
 	"time"
 )

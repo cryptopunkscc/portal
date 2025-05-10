@@ -5,10 +5,10 @@ import (
 	_ "embed"
 	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/pkg/test"
 	test2 "github.com/cryptopunkscc/portal/target/bundle/test"
 	"github.com/cryptopunkscc/portal/target/exec"
 	"github.com/cryptopunkscc/portal/target/source"
-	"github.com/cryptopunkscc/portal/test"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

@@ -2,7 +2,7 @@ package test
 
 import (
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/test"
+	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/stretchr/testify/assert"
 	"io/fs"
 	"os"

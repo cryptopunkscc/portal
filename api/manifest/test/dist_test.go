@@ -3,7 +3,7 @@ package test
 import (
 	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/test"
+	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

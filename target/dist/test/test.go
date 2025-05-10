@@ -3,7 +3,7 @@ package test
 import (
 	"embed"
 	_ "embed"
-	"github.com/cryptopunkscc/portal/test"
+	"github.com/cryptopunkscc/portal/pkg/test"
 	"os"
 	"path/filepath"
 	"testing"

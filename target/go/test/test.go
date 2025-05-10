@@ -4,9 +4,9 @@ import (
 	"context"
 	"embed"
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/pkg/test"
 	golang "github.com/cryptopunkscc/portal/target/go"
 	"github.com/cryptopunkscc/portal/target/source"
-	"github.com/cryptopunkscc/portal/test"
 	"testing"
 )
 

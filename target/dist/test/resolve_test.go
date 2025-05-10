@@ -3,9 +3,9 @@ package test
 import (
 	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/pkg/dec/all"
+	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/target/dist"
 	"github.com/cryptopunkscc/portal/target/source"
-	"github.com/cryptopunkscc/portal/test"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

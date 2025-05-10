@@ -1,9 +1,9 @@
 package test
 
 import (
+	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/pkg/zip"
 	disttest "github.com/cryptopunkscc/portal/target/dist/test"
-	"github.com/cryptopunkscc/portal/test"
 	"path/filepath"
 	"testing"
 )

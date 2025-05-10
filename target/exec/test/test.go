@@ -3,8 +3,8 @@ package test
 import (
 	"embed"
 	_ "embed"
+	"github.com/cryptopunkscc/portal/pkg/test"
 	disttest "github.com/cryptopunkscc/portal/target/dist/test"
-	"github.com/cryptopunkscc/portal/test"
 	"os"
 	"path/filepath"
 	"testing"

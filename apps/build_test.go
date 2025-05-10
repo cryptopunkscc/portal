@@ -1,7 +1,7 @@
 package apps
 
 import (
-	"github.com/cryptopunkscc/portal/test"
+	"github.com/cryptopunkscc/portal/pkg/test"
 	"testing"
 )
 

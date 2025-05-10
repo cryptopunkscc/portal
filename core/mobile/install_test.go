@@ -4,7 +4,7 @@ import (
 	ether "github.com/cryptopunkscc/astrald/mod/ether/src"
 	tcp "github.com/cryptopunkscc/astrald/mod/tcp/src"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/test"
+	"github.com/cryptopunkscc/portal/pkg/test"
 	"io"
 	"log"
 	"net"

@@ -2,10 +2,10 @@ package test
 
 import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/target/source"
 	sourceTest "github.com/cryptopunkscc/portal/target/source/test"
 	"github.com/cryptopunkscc/portal/target/zip"
-	"github.com/cryptopunkscc/portal/test"
 	"testing"
 )
 
