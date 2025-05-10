@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/cryptopunkscc/portal/core/apphost"
-	"github.com/cryptopunkscc/portal/core/portald/debug"
+	"github.com/cryptopunkscc/portal/core/astrald/debug"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/test"
 	"testing"
