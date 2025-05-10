@@ -18,7 +18,7 @@ type Serializer struct {
 
 	scanner *bufio.Reader
 	reader  io.Reader
-	logger  plog.Logger
+	log     plog.Logger
 }
 
 type Codec struct {
@@ -105,8 +105,8 @@ func (s *Serializer) ReadBytes(delim byte) (b []byte, err error) {
 		return
 	}
 	b = bytes.TrimSuffix(b, []byte{delim})
-	if s.logger != nil {
-		s.logger.Printf("< %s [%db]", strings.Trim(string(b), "\n"), len(b))
+	if s.log != nil {
+		s.log.Printf("< %s [%db]", strings.Trim(string(b), "\n"), len(b))
 	}
 	return
 }
@@ -117,28 +117,28 @@ func (s *Serializer) ReadString(delim byte) (str string, err error) {
 		return
 	}
 	str = strings.TrimSuffix(str, string([]byte{delim}))
-	if s.logger != nil {
-		s.logger.Printf("< %s [%db]", strings.Trim(str, "\n"), len(str))
+	if s.log != nil {
+		s.log.Printf("< %s [%db]", strings.Trim(str, "\n"), len(str))
 	}
 	return
 }
 
 func (s *Serializer) Read(b []byte) (n int, err error) {
 	n, err = s.Reader.Read(b)
-	if s.logger != nil {
-		s.logger.Printf("< %s [%db]", strings.Trim(string(b[:n]), "\n"), n)
+	if s.log != nil {
+		s.log.Printf("< %s [%db]", strings.Trim(string(b[:n]), "\n"), n)
 	}
 	return
 }
 
 func (s *Serializer) Write(b []byte) (n int, err error) {
 	n, err = s.Writer.Write(b)
-	if s.logger != nil {
-		s.logger.Printf("> %s [%db]", strings.Trim(string(b[:n]), "\n"), n)
+	if s.log != nil {
+		s.log.Printf("> %s [%db]", strings.Trim(string(b[:n]), "\n"), n)
 	}
 	return
 }
 
-func (s *Serializer) Logger(logger plog.Logger) {
-	s.logger = logger
+func (s *Serializer) Logger(log plog.Logger) {
+	s.log = log
 }
