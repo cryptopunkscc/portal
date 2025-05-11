@@ -50,7 +50,7 @@ func (s *Service[T]) Provider() Provider[Runnable] {
 		},
 		Repository: Repositories{
 			s.cache.Repository(),
-			portal.Repository(s.apps()),
+			portal.Repository(append(s.AppSources, s.apps())...),
 			source.Repository,
 		},
 		Resolve: s.Resolve,

@@ -1,102 +1,130 @@
 package portald
 
 import (
-	"github.com/cryptopunkscc/portal/api/target"
+	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/test"
 	"testing"
-	"time"
 )
 
-func TestService_Integration(t *testing.T) {
+func TestService_Integrations(t *testing.T) {
 	plog.Verbosity = plog.Debug
-	it := newIntegrationTest()
+	it := newIntegrationTest(t)
 	it.s1.cleanDir(t)
 	it.s2.cleanDir(t)
-	for _, tt := range []struct {
-		name string
-		test func(t *testing.T)
-	}{
+	runner := test.Runner{}
+	tests := []test.Task{
 		{
-			name: "just start",
-			test: func(t *testing.T) {
-				ctx := testServiceContext(t)
-
-				it.s1.configure(t)
-				it.s1.testNodeStart(t, ctx)
-				it.s1.testNodeAlias(t)
-			},
+			Name: "should configure portald",
+			Test: it.s1.configure(),
 		},
 		{
-			name: "start",
-			test: func(t *testing.T) {
-				ctx := testServiceContext(t)
-
-				it.s1.configure(t)
-				it.s1.testNodeStart(t, ctx)
-				it.s1.testNodeAlias(t)
-				it.s1.testCreateUser(t)
-
-				t.Run("basic", func(t *testing.T) {
-					it.s1.testInstallApps(t)
-					it.s1.testUninstallApp(t)
-					it.s1.testPublishAppBundle(t)
-					it.s1.testReconnectAsUser(t)
-					time.Sleep(2000 * time.Millisecond)
-					it.s1.awaitPublishedObjects(t)
-					it.s1.testSearchObjects(t, "app.manifest")
-					it.s1.testFetchReleases(t)
-					it.s1.testFetchAppBundleExecs(t)
-				})
-
-				t.Run("claim", func(t *testing.T) {
-					it.s2.configure(t)
-					it.s2.testNodeStart(t, ctx)
-
-					it.s1.testAddEndpoint(t, &it.s2)
-					it.s1.testUserClaim(t, &it.s2)
-				})
-
-				t.Run("WIP", func(t *testing.T) {
-					t.SkipNow() // FIXME
-					it.s2.testAddEndpoint(t, &it.s1)
-					it.s2.testSearchObjects(t, "app.manifest")
-				})
-			},
+			Name:    "should start node",
+			Test:    it.s1.start(),
+			Require: test.Tests{it.s1.configure()},
 		},
 		{
-			name: "basic js",
-			test: func(t *testing.T) {
-				pkg := "test.basic.js"
-				ctx := testServiceContext(t)
-				s := it.s1
-				s.config.Apps = target.Abs("./apps")
-				s.configure(t)
-				s.testNodeStart(t, ctx)
-				s.testSetupToken(t, pkg)
-				s.testOpen(t, ctx, pkg)
-			},
+			Name:    "should get alias",
+			Test:    it.s1.nodeAlias(),
+			Require: test.Tests{it.s1.start()},
 		},
-	} {
-		t.Run(tt.name, tt.test)
+		{
+			Name:    "should create user",
+			Test:    it.s1.createUser(),
+			Require: test.Tests{it.s1.start()},
+		},
+		{
+			Name:    "should add endpoint",
+			Test:    it.s1.addEndpoint(&it.s2),
+			Require: test.Tests{it.s1.start(), it.s2.start()},
+		},
+		{
+			Name:    "should claim",
+			Test:    it.s1.userClaim(&it.s2),
+			Require: test.Tests{it.s1.createUser(), it.s1.addEndpoint(&it.s2)},
+		},
+		{
+			Name:    "should install apps",
+			Test:    it.s1.installApps(),
+			Require: test.Tests{it.s1.start()},
+		},
+		{
+			Name:    "should uninstall app",
+			Test:    it.s1.uninstallApp(),
+			Require: test.Tests{it.s1.installApps()},
+		},
+		{
+			Name:    "should publish app bundles",
+			Test:    it.s1.publishAppBundles(),
+			Require: test.Tests{it.s1.start()},
+		},
+		{
+			Name:    "should reconnect as user",
+			Test:    it.s1.reconnectAsUser(),
+			Require: test.Tests{it.s1.createUser()},
+		},
+		{
+			Name:    "should await published app bundles",
+			Test:    it.s1.awaitPublishedBundles(),
+			Require: test.Tests{it.s1.publishAppBundles(), it.s1.reconnectAsUser()},
+		},
+		{
+			Name:    "should search objects",
+			Test:    it.s1.searchObjects("app.manifest"),
+			Require: test.Tests{it.s1.awaitPublishedBundles()},
+		},
+		{
+			Name:    "should fetch releases",
+			Test:    it.s1.fetchReleases(),
+			Require: test.Tests{it.s1.awaitPublishedBundles()},
+		},
+		{
+			Name:    "should fetch executable app bundles",
+			Test:    it.s1.fetchAppBundleExecs(),
+			Require: test.Tests{it.s1.awaitPublishedBundles()},
+		},
+		{
+			Name:    "should run basic js app",
+			Test:    it.s1.openApp("test.basic.js"),
+			Require: test.Tests{it.s1.setupToken("test.basic.js")},
+		},
+		{
+			Name:    "should search object from parent node WIP",
+			Test:    it.s2.searchObjects("app.manifest"),
+			Require: test.Tests{it.s1.awaitPublishedBundles(), it.s2.addEndpoint(&it.s1)},
+		},
+
+		{Test: it.s1.setupToken("test.basic.js"), Require: test.Tests{it.s1.start()}},
+		{Test: it.s2.start(), Require: test.Tests{it.s2.configure()}},
+		{Test: it.s2.addEndpoint(&it.s1), Require: test.Tests{it.s1.start(), it.s2.start()}},
+		{Test: it.s2.configure()},
+	}
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("%d  %s", i, tt.Name), runner.Run(tests, tt))
 	}
 }
 
-func newIntegrationTest() (i integrationTest) {
+type integrationTest struct {
+	s1 testService
+	s2 testService
+}
+
+func newIntegrationTest(t *testing.T) (i integrationTest) {
+	ctx := testServiceContext(t)
+
+	i.s1.ctx = ctx
 	i.s1.name = ".test1"
 	i.s1.config.ApphostAddr = "tcp:127.0.0.1:8636"
 	i.s1.config.Apphost.Listen = []string{"tcp:127.0.0.1:8636"}
 	i.s1.config.Ether.UDPPort = 8833
 	i.s1.config.TCP.ListenPort = 1796
 
+	i.s2.ctx = ctx
 	i.s2.name = ".test2"
 	i.s2.config.ApphostAddr = "tcp:127.0.0.1:8637"
 	i.s2.config.Apphost.Listen = []string{"tcp:127.0.0.1:8637"}
 	i.s2.config.Ether.UDPPort = 8834
 	i.s2.config.TCP.ListenPort = 1797
-	return
-}
 
-type integrationTest struct {
-	s1 testService
-	s2 testService
+	return
 }

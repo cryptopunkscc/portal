@@ -27,6 +27,7 @@ type Service[T Portal_] struct {
 	Config      portal.Config
 	configured  bool
 	ExtraTokens []string
+	AppSources  []Source
 
 	Apphost   apphost.Adapter
 	Astrald   astrald.Runner

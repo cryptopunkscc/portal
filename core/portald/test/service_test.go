@@ -3,6 +3,7 @@ package portald
 import (
 	"bytes"
 	"context"
+	"embed"
 	"fmt"
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/object"
@@ -22,8 +23,6 @@ import (
 	"github.com/cryptopunkscc/portal/target/exec"
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/stretchr/testify/assert"
-	"os"
-	"path/filepath"
 	"testing"
 	"time"
 )
@@ -31,22 +30,40 @@ import (
 type testService struct {
 	name   string
 	alias  string
+	ctx    context.Context
 	config portal.Config
 	*portald.Service[target.Portal_]
 	apps      []target.Portal_
 	published map[object.ID]bundle.Release
 }
 
+func testServiceContext(t *testing.T) context.Context {
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(func() {
+		cancel()
+		time.Sleep(10 * time.Millisecond) // give a time to kill astrald process
+	})
+	return ctx
+}
+
 func (s *testService) cleanDir(t *testing.T) {
 	s.config.Dir = test.CleanDir(t, s.name)
 }
 
-func (s *testService) configure(t *testing.T) {
-	t.Run(s.name+" configure", func(t *testing.T) {
+func (s *testService) test(name string, run func(t *testing.T)) test.Test {
+	return test.New(s.name+" "+name, run)
+}
+
+//go:embed apps
+var AppsFS embed.FS
+
+func (s *testService) configure() test.Test {
+	return s.test("configure", func(t *testing.T) {
 		s.Service = &portald.Service[target.Portal_]{}
 		s.Config = s.config
 		s.Config.Node.Log.Level = 100
 		s.ExtraTokens = []string{"portal"}
+		s.AppSources = []target.Source{source.Embed(AppsFS)}
 		err := s.Configure()
 		test.AssertErr(t, err)
 		//s.Astrald = &exec.Astrald{NodeRoot: s.Config.Astrald} // Faster testing
@@ -57,15 +74,15 @@ func (s *testService) configure(t *testing.T) {
 	})
 }
 
-func (s *testService) testNodeStart(t *testing.T, ctx context.Context) {
-	t.Run(s.name+" start", func(t *testing.T) {
-		err := s.Start(ctx)
+func (s *testService) start() test.Test {
+	return s.test("start", func(t *testing.T) {
+		err := s.Start(s.ctx)
 		test.AssertErr(t, err)
 	})
 }
 
-func (s *testService) testNodeAlias(t *testing.T) {
-	t.Run(s.name+" get node alias", func(t *testing.T) {
+func (s *testService) nodeAlias() test.Test {
+	return s.test("get node alias", func(t *testing.T) {
 		alias, err := s.Apphost.NodeAlias()
 		test.AssertErr(t, err)
 		assert.NotZero(t, alias)
@@ -73,22 +90,22 @@ func (s *testService) testNodeAlias(t *testing.T) {
 	})
 }
 
-func (s *testService) testCreateUser(t *testing.T) {
-	t.Run(s.name+" create user", func(t *testing.T) {
+func (s *testService) createUser() test.Test {
+	return s.test("create user", func(t *testing.T) {
 		err := s.CreateUser("test_user")
 		test.AssertErr(t, err)
 	})
 }
 
-func (s *testService) testUserClaim(t *testing.T, s2 *testService) {
-	t.Run(s.name+" claim", func(t *testing.T) {
+func (s *testService) userClaim(s2 *testService) test.Test {
+	return s.test("claim", func(t *testing.T) {
 		err := s.Claim(s2.Apphost.HostID.String())
 		test.AssertErr(t, err)
 	})
 }
 
-func (s *testService) testAddEndpoint(t *testing.T, s2 *testService) {
-	t.Run(s.name+" add endpoint", func(t *testing.T) {
+func (s *testService) addEndpoint(s2 *testService) test.Test {
+	return s.test("add endpoint "+s2.name, func(t *testing.T) {
 		id := s2.Apphost.HostID.String()
 		port := s2.Config.TCP.ListenPort
 		endpoint := fmt.Sprintf("tcp:127.0.0.1:%d", port)
@@ -97,26 +114,48 @@ func (s *testService) testAddEndpoint(t *testing.T, s2 *testService) {
 	})
 }
 
-func (s *testService) testWriteObject(t *testing.T, obj astral.Object) (id *object.ID) {
-	t.Run(s.name+" write object", func(t *testing.T) {
-		buf := bytes.NewBuffer(nil)
-		_, err := astral.WriteCanonical(buf, obj)
-		test.AssertErr(t, err)
-
-		id, err = astral.ResolveObjectID(obj)
-		test.AssertErr(t, err)
-
-		path := filepath.Join(s.Config.Astrald, "data", id.String())
-		err = os.WriteFile(path, buf.Bytes(), 0644)
+func (s *testService) installApps() test.Test {
+	return s.test("install apps", func(t *testing.T) {
+		l := source.Embed(apps.Builds)
+		ctx := context.Background()
+		for _, r := range s.Installer().Dispatcher().List(l) {
+			err := r.Run(ctx)
+			test.AssertErr(t, err)
+			s.apps = append(s.apps, r)
+		}
 	})
-	return
 }
 
-func (s *testService) testReconnectAsUser(t *testing.T) {
-	t.Run(s.name+" reconnect user", func(t *testing.T) {
-		s.Apphost.AuthToken = s.UserInfo.AccessToken
-		err := s.Apphost.Reconnect()
+func (s *testService) uninstallApp() test.Test {
+	return s.test("uninstall app", func(t *testing.T) {
+		if len(s.apps) == 0 {
+			t.FailNow()
+		}
+		p := s.apps[0].Manifest().Package
+		err := s.Installer().Uninstall(p)
 		test.AssertErr(t, err)
+	})
+}
+
+func (s *testService) publishAppBundles() test.Test {
+	return s.test("publish app bundles", func(t *testing.T) {
+		b := source.Embed(apps.Builds)
+		s.published = map[object.ID]bundle.Release{}
+		for _, o := range exec.ResolveBundle.List(b) {
+			id, r, err := s.Publisher().Publish(o)
+			test.AssertErr(t, err)
+			s.published[*id] = *r
+		}
+	})
+}
+
+func (s *testService) awaitPublishedBundles() test.Test {
+	return s.test("await bundles", func(t *testing.T) {
+		time.Sleep(2000 * time.Millisecond)
+		for id := range s.published {
+			s.testAwaitDescribe(t, id) // await fetching describe
+			s.testReadObject(t, id)    // test read object
+		}
 	})
 }
 
@@ -142,15 +181,6 @@ func (s *testService) testAwaitDescribe(t *testing.T, id object.ID) {
 	})
 }
 
-func (s *testService) testShowObject(t *testing.T, id object.ID) {
-	t.Run(s.name+" show object", func(t *testing.T) {
-		c := objects.Client(s.Apphost.Rpc())
-		objStr, err := c.Show(id)
-		test.AssertErr(t, err)
-		plog.Println(id, objStr)
-	})
-}
-
 func (s *testService) testReadObject(t *testing.T, id object.ID) {
 	t.Run(s.name+" read object", func(t *testing.T) {
 		c := objects.Client(s.Apphost.Rpc())
@@ -163,8 +193,16 @@ func (s *testService) testReadObject(t *testing.T, id object.ID) {
 	})
 }
 
-func (s *testService) testSearchObjects(t *testing.T, query string) {
-	t.Run(s.name+" search objects", func(t *testing.T) {
+func (s *testService) reconnectAsUser() test.Test {
+	return s.test("reconnect user", func(t *testing.T) {
+		s.Apphost.AuthToken = s.UserInfo.AccessToken
+		err := s.Apphost.Reconnect()
+		test.AssertErr(t, err)
+	})
+}
+
+func (s *testService) searchObjects(query string) test.Test {
+	return s.test("search objects", func(t *testing.T) {
 		c := objects.Client(s.Apphost.Rpc())
 		search, err := c.Scan(objects.ScanArgs{
 			Type: query,
@@ -181,67 +219,8 @@ func (s *testService) testSearchObjects(t *testing.T, query string) {
 	})
 }
 
-func (s *testService) testInstallApps(t *testing.T) {
-	t.Run(s.name+" install apps", func(t *testing.T) {
-		l := source.Embed(apps.Builds)
-		ctx := context.Background()
-		for _, r := range s.Installer().Dispatcher().List(l) {
-			err := r.Run(ctx)
-			test.AssertErr(t, err)
-			s.apps = append(s.apps, r)
-		}
-	})
-}
-
-func (s *testService) testUninstallApp(t *testing.T) {
-	t.Run(s.name+" uninstall app", func(t *testing.T) {
-		if len(s.apps) == 0 {
-			t.FailNow()
-		}
-		p := s.apps[0].Manifest().Package
-		err := s.Installer().Uninstall(p)
-		test.AssertErr(t, err)
-	})
-}
-
-func (s *testService) testSetupToken(t *testing.T, pkg string) {
-	t.Run(s.name+" setup token  "+pkg, func(t *testing.T) {
-		_, err := s.Tokens().Resolve(pkg)
-		test.AssertErr(t, err)
-	})
-}
-
-func (s *testService) testOpen(t *testing.T, ctx context.Context, pkg string) {
-	t.Run(s.name+" open  "+pkg, func(t *testing.T) {
-		o := portald2.OpenOpt{}
-		err := s.Open().Run(ctx, o, pkg)
-		test.AssertErr(t, err)
-	})
-}
-
-func (s *testService) testPublishAppBundle(t *testing.T) {
-	t.Run(s.name+" publish app bundles", func(t *testing.T) {
-		b := source.Embed(apps.Builds)
-		s.published = map[object.ID]bundle.Release{}
-		for _, o := range exec.ResolveBundle.List(b) {
-			id, r, err := s.Publisher().Publish(o)
-			test.AssertErr(t, err)
-			s.published[*id] = *r
-		}
-	})
-}
-
-func (s *testService) awaitPublishedObjects(t *testing.T) {
-	t.Run(s.name+" await published objects", func(t *testing.T) {
-		for id := range s.published {
-			s.testAwaitDescribe(t, id) // await fetching describe
-			s.testReadObject(t, id)    // test read object
-		}
-	})
-}
-
-func (s *testService) testFetchReleases(t *testing.T) {
-	t.Run(s.name+" fetch app release", func(t *testing.T) {
+func (s *testService) fetchReleases() test.Test {
+	return s.test("fetch app release", func(t *testing.T) {
 		for id, release := range s.published {
 			c := objects.Client(s.Apphost.Rpc())
 			r := &bundle.Release{}
@@ -255,8 +234,8 @@ func (s *testService) testFetchReleases(t *testing.T) {
 	})
 }
 
-func (s *testService) testFetchAppBundleExecs(t *testing.T) {
-	t.Run(s.name+" fetch app bundle exes", func(t *testing.T) {
+func (s *testService) fetchAppBundleExecs() test.Test {
+	return s.test("fetch app bundle exes", func(t *testing.T) {
 		for _, r := range s.published {
 			c := objects.Client(s.Apphost.Rpc())
 			o := &bundle.Object[target.Exec]{}
@@ -267,11 +246,17 @@ func (s *testService) testFetchAppBundleExecs(t *testing.T) {
 	})
 }
 
-func testServiceContext(t *testing.T) context.Context {
-	ctx, cancel := context.WithCancel(context.Background())
-	t.Cleanup(func() {
-		cancel()
-		time.Sleep(10 * time.Millisecond) // give a time to kill astrald process
+func (s *testService) openApp(pkg string) test.Test {
+	return s.test("open  "+pkg, func(t *testing.T) {
+		o := portald2.OpenOpt{}
+		err := s.Open().Run(s.ctx, o, pkg)
+		test.AssertErr(t, err)
 	})
-	return ctx
+}
+
+func (s *testService) setupToken(pkg string) test.Test {
+	return s.test("setup token  "+pkg, func(t *testing.T) {
+		_, err := s.Tokens().Resolve(pkg)
+		test.AssertErr(t, err)
+	})
 }
