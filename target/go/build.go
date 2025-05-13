@@ -39,14 +39,18 @@ func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args .
 	}
 
 	clean := target.Op(&args, "clean")
+	pack := target.Op(&args, "pack")
 
-	if !clean && !projectGo.Changed() {
+	changed := projectGo.Changed()
+	build := clean || changed
+
+	if !build && !pack {
 		return
 	}
 
 	log.Printf("go build %T %s %v", projectGo, projectGo.Abs(), g.platforms)
 
-	if clean {
+	if build {
 		if err = os.RemoveAll(filepath.Join(projectGo.Abs(), "dist")); err != nil {
 			log.W().Println(err)
 		}
@@ -61,20 +65,22 @@ func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args .
 	for _, platform := range platforms {
 		b := projectGo.Build().Get(platform...)
 
-		cmd, err = goBuildCmd(b, projectGo.Abs())
-		if err != nil {
-			return
+		if build {
+			cmd, err = goBuildCmd(b, projectGo.Abs())
+			if err != nil {
+				return
+			}
+
+			if err = cmd.Build().Run(); err != nil {
+				return fmt.Errorf("run golang build %s: %s", projectGo.Abs(), err)
+			}
+
+			if err = project.Dist(ctx, projectGo, b.Target); err != nil {
+				return
+			}
 		}
 
-		if err = cmd.Build().Run(); err != nil {
-			return fmt.Errorf("run golang build %s: %s", projectGo.Abs(), err)
-		}
-
-		if err = project.Dist(ctx, projectGo, b.Target); err != nil {
-			return
-		}
-
-		if target.Op(&args, "pack") {
+		if pack {
 			p := project.DistPath(b.Target)
 			d := projectGo.Dist_(p...)
 			abs := projectGo.Abs()

@@ -43,6 +43,11 @@ func TestService_Integrations(t *testing.T) {
 			Test:    it.s1.userClaim(&it.s2),
 			Require: test.Tests{it.s1.createUser(), it.s1.addEndpoint(&it.s2)},
 		},
+		//{
+		//	Name:    "should build apps",
+		//	Test:    it.s1.buildApps(),
+		//	Require: test.Tests{it.s1.start()},
+		//},
 		{
 			Name:    "should install apps",
 			Test:    it.s1.installApps(),

@@ -9,11 +9,19 @@ import (
 
 func Build(args ...string) error {
 	ctx := context.Background()
-	root, err := golang.FindProjectRoot()
+	appsDir, err := Dir()
 	if err != nil {
 		return err
 	}
-	appsDir := filepath.Join(root, "apps")
 	args = append(args, appsDir)
 	return all.BuildRecursive(ctx, appsDir, args...)
+}
+
+func Dir() (d string, err error) {
+	root, err := golang.FindProjectRoot()
+	if err != nil {
+		return
+	}
+	d = filepath.Join(root, "apps")
+	return
 }

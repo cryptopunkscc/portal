@@ -114,6 +114,15 @@ func (s *testService) addEndpoint(s2 *testService) test.Test {
 	})
 }
 
+func (s *testService) buildApps() test.Test {
+	return s.test("build apps", func(t *testing.T) {
+		err := apps.Build("pack")
+		if err.Error() != "npm is required but not installed" {
+			test.AssertErr(t, err)
+		}
+	})
+}
+
 func (s *testService) installApps() test.Test {
 	return s.test("install apps", func(t *testing.T) {
 		l := source.Embed(apps.Builds)
@@ -129,7 +138,7 @@ func (s *testService) installApps() test.Test {
 func (s *testService) uninstallApp() test.Test {
 	return s.test("uninstall app", func(t *testing.T) {
 		if len(s.apps) == 0 {
-			t.FailNow()
+			test.AssertErr(t, plog.Errorf("no apps installed"))
 		}
 		p := s.apps[0].Manifest().Package
 		err := s.Installer().Uninstall(p)
@@ -197,6 +206,16 @@ func (s *testService) reconnectAsUser() test.Test {
 	return s.test("reconnect user", func(t *testing.T) {
 		s.Apphost.AuthToken = s.UserInfo.AccessToken
 		err := s.Apphost.Reconnect()
+		test.AssertErr(t, err)
+	})
+}
+
+func (s *testService) reconnectAsPortal() test.Test {
+	return s.test("reconnect portal", func(t *testing.T) {
+		pt, err := s.Tokens().Resolve("portald")
+		test.AssertErr(t, err)
+		s.Apphost.AuthToken = pt.Token.String()
+		err = s.Apphost.Reconnect()
 		test.AssertErr(t, err)
 	})
 }
