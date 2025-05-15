@@ -4,7 +4,7 @@ go 1.23.7
 
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
-	github.com/cryptopunkscc/astrald v0.0.0-20250429235614-31fa54293830
+	github.com/cryptopunkscc/astrald v0.0.0-20250514192319-b9491571a05d
 	github.com/dop251/goja v0.0.0-20240220182346-e401ed450204
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/getlantern/systray v1.2.2
@@ -15,7 +15,7 @@ require (
 	github.com/leaanthony/slicer v1.6.0
 	github.com/magefile/mage v1.15.0
 	github.com/matryer/is v1.4.1
-	github.com/pterm/pterm v0.12.79
+	github.com/pterm/pterm v0.12.49
 	github.com/samber/lo v1.39.0
 	github.com/stretchr/testify v1.10.0
 	github.com/wailsapp/wails/v2 v2.9.0
@@ -30,7 +30,6 @@ require (
 require (
 	atomicgo.dev/cursor v0.2.0 // indirect
 	atomicgo.dev/keyboard v0.2.9 // indirect
-	atomicgo.dev/schedule v0.1.0 // indirect
 	bitbucket.org/creachadair/shell v0.0.7 // indirect
 	github.com/akutz/memconn v0.1.0 // indirect
 	github.com/bep/debounce v1.2.1 // indirect

@@ -3,11 +3,9 @@ package core
 // this file includes all modules that should be compiled into the node
 
 import (
-	_ "github.com/cryptopunkscc/astrald/mod/admin/src"
 	_ "github.com/cryptopunkscc/astrald/mod/apphost/src"
 	_ "github.com/cryptopunkscc/astrald/mod/archives/src"
 	_ "github.com/cryptopunkscc/astrald/mod/auth/src"
-	_ "github.com/cryptopunkscc/astrald/mod/content/src"
 	_ "github.com/cryptopunkscc/astrald/mod/dir/src"
 	_ "github.com/cryptopunkscc/astrald/mod/ether/src"
 	_ "github.com/cryptopunkscc/astrald/mod/exonet/src"

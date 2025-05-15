@@ -121,6 +121,7 @@ func newIntegrationTest(t *testing.T) (i integrationTest) {
 	i.s1.name = ".test1"
 	i.s1.config.ApphostAddr = "tcp:127.0.0.1:8636"
 	i.s1.config.Apphost.Listen = []string{"tcp:127.0.0.1:8636"}
+	i.s1.config.Apphost.ObjectServer.Bind = []string{"tcp:127.0.0.1:8625"}
 	i.s1.config.Ether.UDPPort = 8833
 	i.s1.config.TCP.ListenPort = 1796
 
@@ -128,6 +129,7 @@ func newIntegrationTest(t *testing.T) (i integrationTest) {
 	i.s2.name = ".test2"
 	i.s2.config.ApphostAddr = "tcp:127.0.0.1:8637"
 	i.s2.config.Apphost.Listen = []string{"tcp:127.0.0.1:8637"}
+	i.s2.config.Apphost.ObjectServer.Bind = []string{"tcp:127.0.0.1:8626"}
 	i.s2.config.Ether.UDPPort = 8834
 	i.s2.config.TCP.ListenPort = 1797
 

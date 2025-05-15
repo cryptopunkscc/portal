@@ -31,7 +31,7 @@ func (c TokenConn) Create(args CreateTokenArgs) (ac *mod.AccessToken, err error)
 	if err != nil {
 		return
 	}
-	ac = r.Payload
+	ac = r.Object
 	return
 }
 

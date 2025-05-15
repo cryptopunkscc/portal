@@ -27,6 +27,6 @@ func (c Conn) Create(alias string) (id *astral.Identity, err error) {
 	if err != nil {
 		return
 	}
-	id = o.Payload
+	id = o.Object
 	return
 }
