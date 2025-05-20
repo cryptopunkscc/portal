@@ -22,6 +22,10 @@ func TestService_Integrations(t *testing.T) {
 			Test:    it.s1.start(),
 			Require: test.Tests{it.s1.configure()},
 		}, {
+			Name:    "should run basic js app",
+			Test:    it.s1.openApp("test.basic.js"),
+			Require: test.Tests{it.s1.setupToken("test.basic.js")},
+		}, {
 			Name:    "should get alias",
 			Test:    it.s1.nodeAlias(),
 			Require: test.Tests{it.s1.start()},
@@ -62,10 +66,6 @@ func TestService_Integrations(t *testing.T) {
 			Test:    it.s1.awaitPublishedBundles(),
 			Require: test.Tests{it.s1.publishAppBundles(), it.s1.reconnectAsUser()},
 		}, {
-			Name:    "should scan objects",
-			Test:    it.s1.scanObjects("app.manifest"),
-			Require: test.Tests{it.s1.awaitPublishedBundles()},
-		}, {
 			Name:    "should fetch releases",
 			Test:    it.s1.fetchReleases(),
 			Require: test.Tests{it.s1.awaitPublishedBundles()},
@@ -74,11 +74,11 @@ func TestService_Integrations(t *testing.T) {
 			Test:    it.s1.fetchAppBundleExecs(),
 			Require: test.Tests{it.s1.awaitPublishedBundles()},
 		}, {
-			Name:    "should run basic js app",
-			Test:    it.s1.openApp("test.basic.js"),
-			Require: test.Tests{it.s1.setupToken("test.basic.js")},
+			Name:    "should scan its own objects",
+			Test:    it.s1.scanObjects("app.manifest"),
+			Require: test.Tests{it.s1.awaitPublishedBundles()},
 		}, {
-			Name:    "should scan object from parent node WIP",
+			Name:    "should scan another node's objects WIP",
 			Test:    it.s2.scanObjects("app.manifest"),
 			Require: test.Tests{it.s1.awaitPublishedBundles(), it.s2.addEndpoint(&it.s1)},
 		},
