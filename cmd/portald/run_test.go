@@ -15,7 +15,7 @@ func init() {
 }
 
 func TestApplication_start(t *testing.T) {
-	dir := test.Mkdir(t)
+	dir := test.CleanMkdir(t)
 	c := portal.Config{}
 	c.Dir = dir
 	c.Node.Log.Level = 100

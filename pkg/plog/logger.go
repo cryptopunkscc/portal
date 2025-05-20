@@ -153,7 +153,12 @@ func (l logger) Flush() {
 
 func (l logger) appendErrors(args ...any) logger {
 	for _, arg := range args {
-		if e, ok := arg.(error); ok {
+		switch e := arg.(type) {
+		case []error:
+			for _, err := range e {
+				l.Errors = append(l.Errors, err)
+			}
+		case error:
 			l.Errors = append(l.Errors, e)
 		}
 	}

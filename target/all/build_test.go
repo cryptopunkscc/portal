@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/test"
 	"log"
 	"sync"
 	"testing"
@@ -43,8 +44,7 @@ func Test_dispatch_async(t *testing.T) {
 	}
 	err := d.Run(ctx, "../../apps", "pack", "clean")
 	wg.Wait()
-	if err != nil {
-		plog.Println(err)
-		t.Error(err)
+	if err != nil && err.Error() != "npm is required but not installed" {
+		test.AssertErr(t, err)
 	}
 }
