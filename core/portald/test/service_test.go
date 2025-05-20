@@ -159,32 +159,38 @@ func (s *testService) publishAppBundles() test.Test {
 
 func (s *testService) awaitPublishedBundles() test.Test {
 	return s.test("await bundles", func(t *testing.T) {
-		time.Sleep(2000 * time.Millisecond)
+		if len(s.published) == 0 {
+			t.Fatalf("no published bundles")
+		}
 		for id := range s.published {
-			s.testAwaitDescribe(t, id) // await fetching describe
-			s.testReadObject(t, id)    // test read object
+			s.testAwaitObject(t, id) // await fetching describe
+			break
 		}
 	})
 }
 
-func (s *testService) testAwaitDescribe(t *testing.T, id astral.ObjectID) {
+func (s *testService) testAwaitObject(t *testing.T, id astral.ObjectID) {
 	t.Run(s.name+" await describe", func(t *testing.T) {
 		c := objects.Client(s.Apphost.Rpc())
-		args := objects.DescribeArgs{ID: id}
+		args := objects.ReadArgs{ID: id}
 		limit := 10
 		for {
-			obj, err := c.Describe(args)
-			if obj != nil {
-				plog.Println(id, obj)
-				break
+			rc, err := c.Read(args)
+			if err != nil {
+				if limit > 0 {
+					limit--
+					time.Sleep(200 * time.Millisecond)
+					continue
+				}
+				test.AssertErr(t, err)
 			}
+
+			buf := bytes.NewBuffer(nil)
+			_, err = buf.ReadFrom(rc)
 			test.AssertErr(t, err)
-			if limit > 0 {
-				limit--
-			} else {
-				t.FailNow()
-			}
-			time.Sleep(200 * time.Millisecond)
+
+			plog.Println(id, buf.String())
+			break
 		}
 	})
 }
@@ -219,11 +225,11 @@ func (s *testService) reconnectAsPortal() test.Test {
 	})
 }
 
-func (s *testService) searchObjects(query string) test.Test {
-	return s.test("search objects", func(t *testing.T) {
+func (s *testService) scanObjects(typ string) test.Test {
+	return s.test("scan objects", func(t *testing.T) {
 		c := objects.Client(s.Apphost.Rpc())
 		search, err := c.Scan(objects.ScanArgs{
-			Type: query,
+			Type: typ,
 			Zone: astral.ZoneAll,
 		})
 		test.AssertErr(t, err)
