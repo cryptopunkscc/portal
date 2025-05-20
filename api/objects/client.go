@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/mod/objects"
-	"github.com/cryptopunkscc/astrald/object"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"io"
@@ -39,7 +38,7 @@ func (c Conn) Push(obj astral.Object) (ok bool, err error) {
 }
 
 type ReadArgs struct {
-	ID     object.ID
+	ID     astral.ObjectID
 	Offset astral.Uint64
 	Zone   astral.Zone
 }
@@ -90,7 +89,7 @@ func (c Conn) Scan(args ScanArgs) (out <-chan ObjectResponse[objects.SearchResul
 }
 
 type DescribeArgs struct {
-	ID    object.ID
+	ID    astral.ObjectID
 	Out   string
 	Zones astral.Zone
 }
@@ -101,10 +100,10 @@ func (c Conn) Describe(args DescribeArgs) (r map[string]any, err error) {
 }
 
 type showArgs struct {
-	ID object.ID
+	ID astral.ObjectID
 }
 
-func (c Conn) Show(id object.ID) (r string, err error) {
+func (c Conn) Show(id astral.ObjectID) (r string, err error) {
 	return rpc.Query[string](c.Conn, "show_object", showArgs{ID: id})
 }
 

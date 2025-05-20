@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/cryptopunkscc/astrald/astral"
-	"github.com/cryptopunkscc/astrald/object"
 	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -14,8 +13,8 @@ import (
 )
 
 type Release struct {
-	ManifestID *object.ID
-	BundleID   *object.ID
+	ManifestID *astral.ObjectID
+	BundleID   *astral.ObjectID
 	manifest.Release
 	manifest.Target
 }
@@ -52,7 +51,7 @@ type Publisher struct {
 	Dir string
 }
 
-func (p Publisher) Publish(bundle target.Bundle_) (i *object.ID, r *Release, err error) {
+func (p Publisher) Publish(bundle target.Bundle_) (i *astral.ObjectID, r *Release, err error) {
 	defer plog.TraceErr(&err)
 
 	o := &Object[any]{Bundle_: bundle}
@@ -74,7 +73,7 @@ func (p Publisher) Publish(bundle target.Bundle_) (i *object.ID, r *Release, err
 	return
 }
 
-func (p Publisher) publishObject(obj astral.Object) (id *object.ID, err error) {
+func (p Publisher) publishObject(obj astral.Object) (id *astral.ObjectID, err error) {
 	defer plog.TraceErr(&err)
 
 	buf := bytes.NewBuffer(nil)

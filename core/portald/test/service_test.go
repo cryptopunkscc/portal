@@ -6,7 +6,6 @@ import (
 	"embed"
 	"fmt"
 	"github.com/cryptopunkscc/astrald/astral"
-	"github.com/cryptopunkscc/astrald/object"
 	"github.com/cryptopunkscc/portal/api/nodes"
 	"github.com/cryptopunkscc/portal/api/objects"
 	"github.com/cryptopunkscc/portal/api/portal"
@@ -34,7 +33,7 @@ type testService struct {
 	config portal.Config
 	*portald.Service[target.Portal_]
 	apps      []target.Portal_
-	published map[object.ID]bundle.Release
+	published map[astral.ObjectID]bundle.Release
 }
 
 func testServiceContext(t *testing.T) context.Context {
@@ -149,7 +148,7 @@ func (s *testService) uninstallApp() test.Test {
 func (s *testService) publishAppBundles() test.Test {
 	return s.test("publish app bundles", func(t *testing.T) {
 		b := source.Embed(apps.Builds)
-		s.published = map[object.ID]bundle.Release{}
+		s.published = map[astral.ObjectID]bundle.Release{}
 		for _, o := range exec.ResolveBundle.List(b) {
 			id, r, err := s.Publisher().Publish(o)
 			test.AssertErr(t, err)
@@ -168,7 +167,7 @@ func (s *testService) awaitPublishedBundles() test.Test {
 	})
 }
 
-func (s *testService) testAwaitDescribe(t *testing.T, id object.ID) {
+func (s *testService) testAwaitDescribe(t *testing.T, id astral.ObjectID) {
 	t.Run(s.name+" await describe", func(t *testing.T) {
 		c := objects.Client(s.Apphost.Rpc())
 		args := objects.DescribeArgs{ID: id}
@@ -190,7 +189,7 @@ func (s *testService) testAwaitDescribe(t *testing.T, id object.ID) {
 	})
 }
 
-func (s *testService) testReadObject(t *testing.T, id object.ID) {
+func (s *testService) testReadObject(t *testing.T, id astral.ObjectID) {
 	t.Run(s.name+" read object", func(t *testing.T) {
 		c := objects.Client(s.Apphost.Rpc())
 		rc, err := c.Read(objects.ReadArgs{ID: id})
@@ -225,7 +224,7 @@ func (s *testService) searchObjects(query string) test.Test {
 		c := objects.Client(s.Apphost.Rpc())
 		search, err := c.Scan(objects.ScanArgs{
 			Type: query,
-			Zone: astral.AllZones,
+			Zone: astral.ZoneAll,
 		})
 		test.AssertErr(t, err)
 
