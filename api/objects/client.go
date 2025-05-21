@@ -83,9 +83,9 @@ type ScanArgs struct {
 	Zone   astral.Zone
 }
 
-func (c Conn) Scan(args ScanArgs) (out <-chan ObjectResponse[objects.SearchResult], err error) {
+func (c Conn) Scan(args ScanArgs) (out <-chan ObjectResponse[astral.ObjectID], err error) {
 	args.Out = "json"
-	return rpc.Subscribe[ObjectResponse[objects.SearchResult]](c.Conn, "scan", args)
+	return rpc.Subscribe[ObjectResponse[astral.ObjectID]](c.Conn, "scan", args)
 }
 
 type DescribeArgs struct {
@@ -108,7 +108,7 @@ func (c Conn) Show(id astral.ObjectID) (r string, err error) {
 }
 
 type ObjectResponse[T any] struct {
-	Payload T        `json:"payload"`
-	Type    string   `json:"type"`
-	Data    []string `json:"data"`
+	Type    string `json:"type"`
+	Object  T      `json:"object"`
+	Payload []byte `json:"payload"`
 }
