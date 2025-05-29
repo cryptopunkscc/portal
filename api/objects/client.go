@@ -11,8 +11,11 @@ import (
 	"io"
 )
 
-func Client(rpc rpc.Rpc) Conn {
-	return Conn{rpc.Format("json").Request("localnode", "objects")}
+func Client(rpc rpc.Rpc, target ...string) Conn {
+	if len(target) == 0 {
+		target = append(target, "localnode")
+	}
+	return Conn{rpc.Format("json").Request(target[0], "objects")} // change node ID to call foreign node
 }
 
 type Conn struct{ rpc.Conn }

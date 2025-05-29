@@ -9,7 +9,7 @@ import (
 )
 
 func TokenClient(rpc rpc.Rpc) TokenConn {
-	return TokenConn{rpc.Request("localnode")}
+	return TokenConn{rpc.Request("localnode", "apphost")}
 }
 
 type TokenConn struct{ rpc.Conn }
@@ -27,7 +27,7 @@ func (c TokenConn) Create(args CreateTokenArgs) (ac *mod.AccessToken, err error)
 	if args.Out == "" {
 		args.Out = "json"
 	}
-	r, err := rpc.Query[rpc.JsonObject[*mod.AccessToken]](c, "apphost.create_token", args)
+	r, err := rpc.Query[rpc.JsonObject[*mod.AccessToken]](c, "create_token", args)
 	if err != nil {
 		return
 	}
@@ -47,7 +47,7 @@ func (c TokenConn) List(args *ListTokensArgs) (AccessTokens, error) {
 	if args.Format == "" {
 		args.Format = "json"
 	}
-	return rpc.Query[AccessTokens](c, "apphost.list_tokens", args)
+	return rpc.Query[AccessTokens](c, "list_tokens", args)
 }
 
 type AccessTokens []mod.AccessToken
@@ -57,4 +57,23 @@ func (t AccessTokens) MarshalCLI() (s string) {
 		s += fmt.Sprintf("%d: %s %s\n", i, token.Token, token.Identity)
 	}
 	return
+}
+
+func (c TokenConn) SignAppContract(id *astral.Identity) (out *astral.ObjectID, err error) {
+	args := opSignAppContractArgs{
+		ID:  id,
+		Out: "json",
+	}
+	s, err := rpc.Query[rpc.JsonObject[*astral.ObjectID]](c, "sign_app_contract", args)
+	if err != nil {
+		return
+	}
+	out = s.Object
+	return
+}
+
+type opSignAppContractArgs struct {
+	ID       *astral.Identity
+	Out      string           `query:"out"`
+	Duration *astral.Duration `query:"duration"`
 }

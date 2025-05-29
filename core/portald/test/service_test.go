@@ -6,6 +6,7 @@ import (
 	"embed"
 	"fmt"
 	"github.com/cryptopunkscc/astrald/astral"
+	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/nodes"
 	"github.com/cryptopunkscc/portal/api/objects"
 	"github.com/cryptopunkscc/portal/api/portal"
@@ -22,6 +23,8 @@ import (
 	"github.com/cryptopunkscc/portal/target/exec"
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/stretchr/testify/assert"
+	"runtime"
+	"strings"
 	"testing"
 	"time"
 )
@@ -46,18 +49,47 @@ func testServiceContext(t *testing.T) context.Context {
 }
 
 func (s *testService) cleanDir(t *testing.T) {
-	s.config.Dir = test.CleanDir(t, s.name)
+	s.config.Dir = test.CleanDir(t, ".test_"+s.name)
 }
 
-func (s *testService) test(name string, run func(t *testing.T)) test.Test {
-	return test.New(s.name+" "+name, run)
+func (s *testService) test(run func(t *testing.T)) test.Test {
+	name := fmt.Sprintf("%s.%s", s.name, callerName())
+	return test.New(name, run)
+}
+
+func (s *testService) arg(name string) testBuilder {
+	return testBuilder{
+		testService: s,
+		Suffix:      name,
+	}
+}
+
+type testBuilder struct {
+	*testService
+	Suffix string
+}
+
+func (s testBuilder) test(run func(t *testing.T)) test.Test {
+	name := fmt.Sprintf("%s.%s(%s)", s.name, callerName(), s.Suffix)
+	return test.New(name, run)
+}
+
+func callerName() (name string) {
+	if pc, _, _, ok := runtime.Caller(2); ok {
+		if funcObj := runtime.FuncForPC(pc); funcObj != nil {
+			name = funcObj.Name()
+			c := strings.Split(name, ".")
+			name = c[len(c)-1]
+		}
+	}
+	return
 }
 
 //go:embed apps
 var AppsFS embed.FS
 
 func (s *testService) configure() test.Test {
-	return s.test("configure", func(t *testing.T) {
+	return s.test(func(t *testing.T) {
 		s.Service = &portald.Service[target.Portal_]{}
 		s.Config = s.config
 		s.Config.Node.Log.Level = 100
@@ -74,14 +106,14 @@ func (s *testService) configure() test.Test {
 }
 
 func (s *testService) start() test.Test {
-	return s.test("start", func(t *testing.T) {
+	return s.test(func(t *testing.T) {
 		err := s.Start(s.ctx)
 		test.AssertErr(t, err)
 	})
 }
 
 func (s *testService) nodeAlias() test.Test {
-	return s.test("get node alias", func(t *testing.T) {
+	return s.test(func(t *testing.T) {
 		alias, err := s.Apphost.NodeAlias()
 		test.AssertErr(t, err)
 		assert.NotZero(t, alias)
@@ -90,21 +122,21 @@ func (s *testService) nodeAlias() test.Test {
 }
 
 func (s *testService) createUser() test.Test {
-	return s.test("create user", func(t *testing.T) {
+	return s.test(func(t *testing.T) {
 		err := s.CreateUser("test_user")
 		test.AssertErr(t, err)
 	})
 }
 
 func (s *testService) userClaim(s2 *testService) test.Test {
-	return s.test("claim", func(t *testing.T) {
+	return s.test(func(t *testing.T) {
 		err := s.Claim(s2.Apphost.HostID.String())
 		test.AssertErr(t, err)
 	})
 }
 
 func (s *testService) addEndpoint(s2 *testService) test.Test {
-	return s.test("add endpoint "+s2.name, func(t *testing.T) {
+	return s.arg(s2.name).test(func(t *testing.T) {
 		id := s2.Apphost.HostID.String()
 		port := s2.Config.TCP.ListenPort
 		endpoint := fmt.Sprintf("tcp:127.0.0.1:%d", port)
@@ -114,7 +146,7 @@ func (s *testService) addEndpoint(s2 *testService) test.Test {
 }
 
 func (s *testService) buildApps() test.Test {
-	return s.test("build apps", func(t *testing.T) {
+	return s.test(func(t *testing.T) {
 		err := apps.Build("pack")
 		if err.Error() != "npm is required but not installed" {
 			test.AssertErr(t, err)
@@ -123,7 +155,7 @@ func (s *testService) buildApps() test.Test {
 }
 
 func (s *testService) installApps() test.Test {
-	return s.test("install apps", func(t *testing.T) {
+	return s.test(func(t *testing.T) {
 		l := source.Embed(apps.Builds)
 		ctx := context.Background()
 		for _, r := range s.Installer().Dispatcher().List(l) {
@@ -135,7 +167,7 @@ func (s *testService) installApps() test.Test {
 }
 
 func (s *testService) uninstallApp() test.Test {
-	return s.test("uninstall app", func(t *testing.T) {
+	return s.test(func(t *testing.T) {
 		if len(s.apps) == 0 {
 			test.AssertErr(t, plog.Errorf("no apps installed"))
 		}
@@ -146,7 +178,7 @@ func (s *testService) uninstallApp() test.Test {
 }
 
 func (s *testService) publishAppBundles() test.Test {
-	return s.test("publish app bundles", func(t *testing.T) {
+	return s.test(func(t *testing.T) {
 		b := source.Embed(apps.Builds)
 		s.published = map[astral.ObjectID]bundle.Release{}
 		for _, o := range exec.ResolveBundle.List(b) {
@@ -158,19 +190,19 @@ func (s *testService) publishAppBundles() test.Test {
 }
 
 func (s *testService) awaitPublishedBundles() test.Test {
-	return s.test("await bundles", func(t *testing.T) {
+	return s.test(func(t *testing.T) {
 		if len(s.published) == 0 {
 			t.Fatalf("no published bundles")
 		}
 		for id := range s.published {
-			s.testAwaitObject(t, id) // await fetching describe
+			s.awaitObject(id).Run(t)
 			break
 		}
 	})
 }
 
-func (s *testService) testAwaitObject(t *testing.T, id astral.ObjectID) {
-	t.Run(s.name+" await describe", func(t *testing.T) {
+func (s *testService) awaitObject(id astral.ObjectID) test.Test {
+	return s.test(func(t *testing.T) {
 		c := objects.Client(s.Apphost.Rpc())
 		args := objects.ReadArgs{ID: id}
 		limit := 10
@@ -195,8 +227,8 @@ func (s *testService) testAwaitObject(t *testing.T, id astral.ObjectID) {
 	})
 }
 
-func (s *testService) testReadObject(t *testing.T, id astral.ObjectID) {
-	t.Run(s.name+" read object", func(t *testing.T) {
+func (s *testService) readObject(id astral.ObjectID) test.Test {
+	return s.test(func(t *testing.T) {
 		c := objects.Client(s.Apphost.Rpc())
 		rc, err := c.Read(objects.ReadArgs{ID: id})
 		buf := bytes.NewBuffer(nil)
@@ -208,15 +240,33 @@ func (s *testService) testReadObject(t *testing.T, id astral.ObjectID) {
 }
 
 func (s *testService) reconnectAsUser() test.Test {
-	return s.test("reconnect user", func(t *testing.T) {
+	return s.test(func(t *testing.T) {
 		s.Apphost.AuthToken = s.UserInfo.AccessToken
 		err := s.Apphost.Reconnect()
 		test.AssertErr(t, err)
 	})
 }
 
+func (s *testService) reconnectAsUser2(s2 *testService) test.Test {
+	return s.test(func(t *testing.T) {
+		s.Apphost.AuthToken = s2.UserInfo.AccessToken
+		err := s.Apphost.Reconnect()
+		test.AssertErr(t, err)
+	})
+}
+
+func (s *testService) reconnectAs(alias string) test.Test {
+	return s.arg(alias).test(func(t *testing.T) {
+		pt, err := s.Tokens().Resolve(alias)
+		test.AssertErr(t, err)
+		s.Apphost.AuthToken = pt.Token.String()
+		err = s.Apphost.Reconnect()
+		test.AssertErr(t, err)
+	})
+}
+
 func (s *testService) reconnectAsPortal() test.Test {
-	return s.test("reconnect portal", func(t *testing.T) {
+	return s.test(func(t *testing.T) {
 		pt, err := s.Tokens().Resolve("portald")
 		test.AssertErr(t, err)
 		s.Apphost.AuthToken = pt.Token.String()
@@ -225,9 +275,13 @@ func (s *testService) reconnectAsPortal() test.Test {
 	})
 }
 
-func (s *testService) scanObjects(typ string) test.Test {
-	return s.test("scan objects", func(t *testing.T) {
-		c := objects.Client(s.Apphost.Rpc())
+func (s *testService) scanObjects(typ string, s2 ...*testService) test.Test {
+	o := s2
+	if len(o) == 0 {
+		o = append(o, s)
+	}
+	return s.arg(typ).test(func(t *testing.T) {
+		c := objects.Client(s.Apphost.Rpc(), o[0].Apphost.HostID.String())
 		search, err := c.Scan(objects.ScanArgs{
 			Type: typ,
 			Zone: astral.ZoneAll,
@@ -243,8 +297,26 @@ func (s *testService) scanObjects(typ string) test.Test {
 	})
 }
 
+func (s *testService) searchObjects(query string) test.Test {
+	return s.arg(query).test(func(t *testing.T) {
+		c := objects.Client(s.Apphost.Rpc())
+		search, err := c.Search(objects.SearchArgs{
+			Query: query,
+			Zone:  astral.ZoneAll,
+		})
+		test.AssertErr(t, err)
+
+		count := 0
+		for result := range search {
+			count++
+			plog.Println(result)
+		}
+		assert.Greater(t, count, 0)
+	})
+}
+
 func (s *testService) fetchReleases() test.Test {
-	return s.test("fetch app release", func(t *testing.T) {
+	return s.test(func(t *testing.T) {
 		for id, release := range s.published {
 			c := objects.Client(s.Apphost.Rpc())
 			r := &bundle.Release{}
@@ -258,8 +330,18 @@ func (s *testService) fetchReleases() test.Test {
 	})
 }
 
+func (s *testService) signAppContract(pkg string) test.Test {
+	return s.arg(pkg).test(func(t *testing.T) {
+		id, err := s.Apphost.Resolve(pkg)
+		test.AssertErr(t, err)
+		contract, err := apphost.TokenClient(&s.Apphost).SignAppContract(id)
+		test.AssertErr(t, err)
+		plog.Println(contract)
+	})
+}
+
 func (s *testService) fetchAppBundleExecs() test.Test {
-	return s.test("fetch app bundle exes", func(t *testing.T) {
+	return s.test(func(t *testing.T) {
 		for _, r := range s.published {
 			c := objects.Client(s.Apphost.Rpc())
 			o := &bundle.Object[target.Exec]{}
@@ -271,7 +353,7 @@ func (s *testService) fetchAppBundleExecs() test.Test {
 }
 
 func (s *testService) openApp(pkg string) test.Test {
-	return s.test("open  "+pkg, func(t *testing.T) {
+	return s.arg(pkg).test(func(t *testing.T) {
 		o := portald2.OpenOpt{}
 		err := s.Open().Run(s.ctx, o, pkg)
 		test.AssertErr(t, err)
@@ -279,7 +361,7 @@ func (s *testService) openApp(pkg string) test.Test {
 }
 
 func (s *testService) setupToken(pkg string) test.Test {
-	return s.test("setup token  "+pkg, func(t *testing.T) {
+	return s.arg(pkg).test(func(t *testing.T) {
 		_, err := s.Tokens().Resolve(pkg)
 		test.AssertErr(t, err)
 	})

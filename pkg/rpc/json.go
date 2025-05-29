@@ -1,6 +1,7 @@
 package rpc
 
 type JsonObject[T any] struct {
-	Type   string `json:"type"`
-	Object T      `json:"object"`
+	Type    string `json:"type"`
+	Object  T      `json:"object"`
+	Payload []bool
 }

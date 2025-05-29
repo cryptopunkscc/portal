@@ -86,6 +86,8 @@ func (r *Repository) Resolve(pkg string) (accessToken *mod.AccessToken, err erro
 		return
 	}
 
-	err = r.Set(pkg, accessToken)
+	if err = r.Set(pkg, accessToken); err != nil {
+		return
+	}
 	return
 }

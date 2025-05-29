@@ -20,7 +20,7 @@ func (r *Runner) Run(tasks []Task, task Task) func(t *testing.T) {
 		}
 		r.Tasks = tasks
 		r.init()
-		tt, _ := r.Get(task.Test.Name)
+		tt, _ := r.Get(task.Test.name)
 		r.run(t, tt)
 	}
 }
@@ -31,12 +31,12 @@ func (r *Runner) init() {
 	}
 	for _, t := range r.Tasks {
 		t.mu = &sync.Mutex{}
-		r.Map.Set(t.Test.Name, &t)
+		r.Map.Set(t.Test.name, &t)
 	}
 	for _, t := range r.Map.Values() {
 		t.tasks = make([]*Task, len(t.Require))
 		for i, s := range t.Require {
-			t.tasks[i], _ = r.Get(s.Name)
+			t.tasks[i], _ = r.Get(s.name)
 		}
 	}
 }
@@ -45,7 +45,7 @@ func (r *Runner) run(t *testing.T, task *Task) {
 	if task.status != Initial {
 		return
 	}
-	t.Run(task.Test.Name, func(t *testing.T) {
+	t.Run(task.Test.name, func(t *testing.T) {
 		for _, tt := range task.tasks {
 			r.run(t, tt)
 			if tt.status == Failure {
@@ -57,8 +57,12 @@ func (r *Runner) run(t *testing.T, task *Task) {
 }
 
 type Test struct {
-	Name string
-	Run  func(t *testing.T)
+	name string
+	run  func(t *testing.T)
+}
+
+func (test Test) Run(t *testing.T) {
+	t.Run(test.name, test.run)
 }
 
 func New(name string, run func(t *testing.T)) Test {
@@ -102,5 +106,5 @@ func (t *Task) run(tt *testing.T) {
 		}
 		t.mu.Unlock()
 	})
-	t.Test.Run(tt)
+	t.Test.run(tt)
 }
