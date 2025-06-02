@@ -30,6 +30,7 @@ func Map[T1 any, T2 any](from <-chan T1, transform func(T1) (T2, bool)) (to Inpu
 	c := make(chan T2)
 	to = c
 	go func() {
+		defer close(c)
 		for v1 := range from {
 			if v2, ok := transform(v1); ok {
 				c <- v2

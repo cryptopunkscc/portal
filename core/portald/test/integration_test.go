@@ -127,6 +127,16 @@ func TestService_Integrations(t *testing.T) {
 			Test:    it.s2.reconnectAsUser2(&it.s1),
 			Require: test.Tests{it.s1.userClaim(&it.s2)},
 		},
+		{
+			Name:    "should list siblings",
+			Test:    it.s1.listSiblings(),
+			Require: test.Tests{it.s1.userClaim(&it.s2)},
+		},
+		{
+			Name:    "should list siblings 2",
+			Test:    it.s2.listSiblings(),
+			Require: test.Tests{it.s1.listSiblings()},
+		},
 
 		{Test: it.s1.setupToken("test.basic.js"), Require: test.Tests{it.s1.start()}},
 		{Test: it.s2.start(), Require: test.Tests{it.s2.configure()}},

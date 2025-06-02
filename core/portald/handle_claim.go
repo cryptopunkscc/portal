@@ -9,5 +9,5 @@ func (s *Service[T]) Claim(alias string) (err error) {
 		return
 	}
 
-	return user.Client{a}.Claim(alias)
+	return user.Client{Client: a}.Claim(alias)
 }

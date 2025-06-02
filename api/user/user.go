@@ -2,12 +2,18 @@ package user
 
 import (
 	"encoding/json"
+	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/portal/api/apphost"
+	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"io"
 )
 
-type Client struct{ apphost.Client }
+type Client struct {
+	apphost.Client
+	rpc.Rpc
+}
 
 type Info struct {
 	AccessToken string `json:"access_token" yaml:"access_token"`
@@ -47,5 +53,24 @@ func (u Client) Claim(alias string) (err error) {
 	}
 
 	println(string(all))
+	return
+}
+
+func (u Client) Siblings() (out <-chan astral.Identity, err error) {
+	args := struct {
+		Out  string      `query:"out"`
+		Zone astral.Zone `query:"zone"`
+	}{
+		Out:  "json",
+		Zone: astral.ZoneAll,
+	}
+	r := u.Format("json").Request("localnode", "user")
+	c, err := rpc.Subscribe[apphost.Json[astral.Identity]](r, "list_siblings", args)
+	if err != nil {
+		return
+	}
+	out = flow.Map(c, func(j apphost.Json[astral.Identity]) (astral.Identity, bool) {
+		return j.Object, true
+	})
 	return
 }

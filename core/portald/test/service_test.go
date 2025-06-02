@@ -12,6 +12,7 @@ import (
 	"github.com/cryptopunkscc/portal/api/portal"
 	portald2 "github.com/cryptopunkscc/portal/api/portald"
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/api/user"
 	"github.com/cryptopunkscc/portal/apps"
 	"github.com/cryptopunkscc/portal/core/astrald/debug"
 	"github.com/cryptopunkscc/portal/core/bind"
@@ -297,9 +298,13 @@ func (s *testService) scanObjects(typ string, s2 ...*testService) test.Test {
 	})
 }
 
-func (s *testService) searchObjects(query string) test.Test {
+func (s *testService) searchObjects(query string, s2 ...*testService) test.Test {
+	o := s2
+	if len(o) == 0 {
+		o = append(o, s)
+	}
 	return s.arg(query).test(func(t *testing.T) {
-		c := objects.Client(s.Apphost.Rpc())
+		c := objects.Client(s.Apphost.Rpc(), o[0].Apphost.HostID.String())
 		search, err := c.Search(objects.SearchArgs{
 			Query: query,
 			Zone:  astral.ZoneAll,
@@ -364,5 +369,19 @@ func (s *testService) setupToken(pkg string) test.Test {
 	return s.arg(pkg).test(func(t *testing.T) {
 		_, err := s.Tokens().Resolve(pkg)
 		test.AssertErr(t, err)
+	})
+}
+
+func (s *testService) listSiblings() test.Test {
+	return s.test(func(t *testing.T) {
+		c := user.Client{Rpc: s.Apphost.Rpc()}
+		siblings, err := c.Siblings()
+		test.AssertErr(t, err)
+		count := 0
+		for sibling := range siblings {
+			count++
+			plog.Println(sibling.String())
+		}
+		assert.Equal(t, 1, count)
 	})
 }
