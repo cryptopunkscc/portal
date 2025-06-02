@@ -27,7 +27,7 @@ func (c TokenConn) Create(args CreateTokenArgs) (ac *mod.AccessToken, err error)
 	if args.Out == "" {
 		args.Out = "json"
 	}
-	r, err := rpc.Query[rpc.JsonObject[*mod.AccessToken]](c, "create_token", args)
+	r, err := rpc.Query[rpc.Json[*mod.AccessToken]](c, "create_token", args)
 	if err != nil {
 		return
 	}
@@ -64,7 +64,7 @@ func (c TokenConn) SignAppContract(id *astral.Identity) (out *astral.ObjectID, e
 		ID:  id,
 		Out: "json",
 	}
-	s, err := rpc.Query[rpc.JsonObject[*astral.ObjectID]](c, "sign_app_contract", args)
+	s, err := rpc.Query[rpc.Json[*astral.ObjectID]](c, "sign_app_contract", args)
 	if err != nil {
 		return
 	}

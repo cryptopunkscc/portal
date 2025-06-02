@@ -65,11 +65,11 @@ func (u Client) Siblings() (out <-chan astral.Identity, err error) {
 		Zone: astral.ZoneAll,
 	}
 	r := u.Format("json").Request("localnode", "user")
-	c, err := rpc.Subscribe[apphost.Json[astral.Identity]](r, "list_siblings", args)
+	c, err := rpc.Subscribe[rpc.Json[astral.Identity]](r, "list_siblings", args)
 	if err != nil {
 		return
 	}
-	out = flow.Map(c, func(j apphost.Json[astral.Identity]) (astral.Identity, bool) {
+	out = flow.Map(c, func(j rpc.Json[astral.Identity]) (astral.Identity, bool) {
 		return j.Object, true
 	})
 	return

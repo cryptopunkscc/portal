@@ -23,7 +23,7 @@ func (c Conn) Create(alias string) (id *astral.Identity, err error) {
 		Alias: alias,
 		Out:   "json",
 	}
-	o, err := rpc.Query[rpc.JsonObject[*astral.Identity]](c, "create_key", args)
+	o, err := rpc.Query[rpc.Json[*astral.Identity]](c, "create_key", args)
 	if err != nil {
 		return
 	}
