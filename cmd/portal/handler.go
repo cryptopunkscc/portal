@@ -21,7 +21,7 @@ func (a *Application) Handler() (h cmd.Handler) {
 			{Name: "v", Desc: "Print version.", Func: version.Name},
 			{
 				Func: a.Arg,
-				Name: "arg a",
+				Name: "arg",
 				Desc: "Execute list of commands with given arg.",
 				Params: cmd.Params{
 					{Type: "string", Desc: "Argument value."},

@@ -18,7 +18,7 @@ func (s *Service[T]) portaldApi() (handlers cmd.Handlers) {
 }
 
 func (s *Service[T]) appApi() (handlers cmd.Handlers) {
-	for _, app := range s.ListApps(ListAppsOpts{}) {
+	for _, app := range s.InstalledApps(ListAppsOpts{}) {
 		m := app.Manifest()
 		h := cmd.Handler{
 			Func: "app",
