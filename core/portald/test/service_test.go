@@ -102,7 +102,10 @@ func (s *testService) configure() test.Test {
 		s.Astrald = &debug.Astrald{NodeRoot: s.Config.Astrald} // Debugging astrald
 
 		f := bind.CoreFactory{Repository: *s.Tokens()}
-		s.Resolve = target.Any[target.Runnable](goja.Runner(f.NewBackendFunc()).Try)
+		s.Resolve = target.Any[target.Runnable](
+			target.Skip("node_modules"),
+			goja.Runner(f.NewBackendFunc()).Try,
+		)
 	})
 }
 
@@ -259,16 +262,6 @@ func (s *testService) reconnectAsUser2(s2 *testService) test.Test {
 func (s *testService) reconnectAs(alias string) test.Test {
 	return s.arg(alias).test(func(t *testing.T) {
 		pt, err := s.Tokens().Resolve(alias)
-		test.AssertErr(t, err)
-		s.Apphost.AuthToken = pt.Token.String()
-		err = s.Apphost.Reconnect()
-		test.AssertErr(t, err)
-	})
-}
-
-func (s *testService) reconnectAsPortal() test.Test {
-	return s.test(func(t *testing.T) {
-		pt, err := s.Tokens().Resolve("portald")
 		test.AssertErr(t, err)
 		s.Apphost.AuthToken = pt.Token.String()
 		err = s.Apphost.Reconnect()

@@ -35,6 +35,7 @@ func Create(api mobile.Api) mobile.Core {
 		"portal.launcher",
 	}
 	m.Resolve = Any[Runnable](
+		Skip("node_modules"),
 		goja.Runner(m.cores().NewBackendFunc()).Try,
 		m.htmlRunner().Try,
 		exec2.Runner{Config: m.Config}.Dist().Try,

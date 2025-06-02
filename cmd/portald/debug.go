@@ -10,6 +10,7 @@ import (
 func (a *Application[T]) init() {
 	a.Order = []int{2, 1, 0}
 	a.Resolve = Any[Runnable](
+		Skip("node_modules"),
 		exec.Runner{Config: a.Config}.Dist().Try,
 		exec.Runner{Config: a.Config}.Bundle().Try,
 		exec.Runner{Config: a.Config}.Project().Try,
