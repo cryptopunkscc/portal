@@ -40,7 +40,7 @@ func (a Await) exp() (delays []time.Duration) {
 	return
 }
 
-func (a Await) Chan() <-chan RetryIn {
+func (a Await) Chan() Input[RetryIn] {
 	if a.Ctx == nil {
 		a.Ctx = context.Background()
 	}

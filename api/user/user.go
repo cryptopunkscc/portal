@@ -56,7 +56,7 @@ func (u Client) Claim(alias string) (err error) {
 	return
 }
 
-func (u Client) Siblings() (out <-chan astral.Identity, err error) {
+func (u Client) Siblings() (out flow.Input[astral.Identity], err error) {
 	args := struct {
 		Out  string      `query:"out"`
 		Zone astral.Zone `query:"zone"`

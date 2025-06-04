@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/mod/objects"
+	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"io"
@@ -86,9 +87,14 @@ type ScanArgs struct {
 	Zone   astral.Zone
 }
 
-func (c Conn) Scan(args ScanArgs) (out <-chan rpc.Json[astral.ObjectID], err error) {
+func (c Conn) Scan(args ScanArgs) (out <-chan astral.ObjectID, err error) {
 	args.Out = "json"
-	return rpc.Subscribe[rpc.Json[astral.ObjectID]](c.Conn, "scan", args)
+	o, err := rpc.Subscribe[rpc.Json[astral.ObjectID]](c.Conn, "scan", args)
+	if err != nil {
+		return
+	}
+	out = flow.Map(o, func(t1 rpc.Json[astral.ObjectID]) (astral.ObjectID, bool) { return t1.Object, true })
+	return
 }
 
 type DescribeArgs struct {

@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"github.com/cryptopunkscc/astrald/sig"
 	"sync"
 	"testing"
@@ -94,11 +95,11 @@ func (t *Task) run(tt *testing.T) {
 		if t.status == Failure {
 			tt.FailNow()
 		}
-		tt.Log(t.Name + " already done")
+		println(fmt.Sprintf("--- ALREADY DONE: %s", t.Test.name))
 		return
 	}
 	tt.Cleanup(func() {
-		tt.Log(t.Name + " done")
+		println(fmt.Sprintf("--- DONE: %s", t.Test.name))
 		if tt.Failed() || tt.Skipped() {
 			t.status = Failure
 		} else {
@@ -106,5 +107,6 @@ func (t *Task) run(tt *testing.T) {
 		}
 		t.mu.Unlock()
 	})
+	println(fmt.Sprintf("=== START: %s", t.Test.name))
 	t.Test.run(tt)
 }

@@ -125,6 +125,14 @@ func (s *Service[T]) publicHandlers() cmd.Handlers {
 						},
 					}},
 				},
+				{
+					Func: s.AvailableApps,
+					Name: "available a",
+					Desc: "List available apps.",
+					Params: cmd.Params{
+						{Type: "boolean", Desc: "subscribe."},
+					},
+				},
 			},
 		},
 		{

@@ -291,6 +291,20 @@ func (s *testService) scanObjects(typ string, s2 ...*testService) test.Test {
 	})
 }
 
+func (s *testService) availableApps() test.Test {
+	return s.test(func(t *testing.T) {
+		aa, err := s.AvailableApps(s.ctx, false)
+		test.AssertErr(t, err)
+
+		count := 0
+		for app := range aa {
+			count++
+			plog.Println("available app:", app)
+		}
+		assert.Greater(t, count, 0)
+	})
+}
+
 func (s *testService) searchObjects(query string, s2 ...*testService) test.Test {
 	o := s2
 	if len(o) == 0 {

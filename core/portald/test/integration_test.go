@@ -137,6 +137,23 @@ func TestService_Integrations(t *testing.T) {
 			Test:    it.s2.listSiblings(),
 			Require: test.Tests{it.s1.listSiblings()},
 		},
+		{
+			Name: "should list available apps 1",
+			Test: it.s1.availableApps(),
+			Require: test.Tests{
+				it.s1.awaitPublishedBundles(),
+				it.s1.reconnectAs("portald"),
+			},
+		},
+		{
+			Name: "should list available apps 2",
+			Test: it.s2.availableApps(),
+			Require: test.Tests{
+				it.s1.awaitPublishedBundles(),
+				it.s2.addEndpoint(&it.s1),
+				it.s2.reconnectAs("portald"),
+			},
+		},
 
 		{Test: it.s1.setupToken("test.basic.js"), Require: test.Tests{it.s1.start()}},
 		{Test: it.s2.start(), Require: test.Tests{it.s2.configure()}},

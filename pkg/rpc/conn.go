@@ -87,6 +87,7 @@ func Subscribe[R any](conn Conn, method string, args ...any) (c <-chan R, err er
 		return
 	}
 	cc := make(chan R)
+	c = cc
 	go func() {
 		defer close(cc)
 		defer conn.Flush()
@@ -98,6 +99,5 @@ func Subscribe[R any](conn Conn, method string, args ...any) (c <-chan R, err er
 			cc <- r
 		}
 	}()
-	c = cc
 	return
 }
