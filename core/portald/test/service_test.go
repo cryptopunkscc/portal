@@ -21,7 +21,6 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/runner/goja"
 	"github.com/cryptopunkscc/portal/target/bundle"
-	"github.com/cryptopunkscc/portal/target/exec"
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/stretchr/testify/assert"
 	"runtime"
@@ -185,10 +184,11 @@ func (s *testService) publishAppBundles() test.Test {
 	return s.test(func(t *testing.T) {
 		b := source.Embed(apps.Builds)
 		s.published = map[astral.ObjectID]bundle.Release{}
-		for _, o := range exec.ResolveBundle.List(b) {
-			id, r, err := s.Publisher().Publish(o)
-			test.AssertErr(t, err)
-			s.published[*id] = *r
+
+		l, err := s.PublishAppsFS(b)
+		test.AssertErr(t, err)
+		for _, app := range l {
+			s.published[*app.ReleaseID] = app.Release
 		}
 	})
 }
@@ -356,8 +356,8 @@ func (s *testService) fetchAppBundleExecs() test.Test {
 	return s.test(func(t *testing.T) {
 		for _, r := range s.published {
 			c := objects.Client(s.Apphost.Rpc())
-			o := &bundle.Object[target.Exec]{}
-			o.Resolve = exec.ResolveBundle
+			o := &bundle.Object[any]{}
+			o.Resolve = target.Any[target.AppBundle[any]](bundle.Resolve_.Try)
 			err := c.Fetch(objects.ReadArgs{ID: *r.BundleID}, o)
 			test.AssertErr(t, err)
 		}

@@ -133,6 +133,14 @@ func (s *Service[T]) publicHandlers() cmd.Handlers {
 						{Type: "boolean", Desc: "subscribe."},
 					},
 				},
+				{
+					Func: s.PublishApps,
+					Name: "publish p",
+					Desc: "Publish app bundles.",
+					Params: cmd.Params{
+						{Type: "string", Desc: "Path to app bundle or directory."},
+					},
+				},
 			},
 		},
 		{

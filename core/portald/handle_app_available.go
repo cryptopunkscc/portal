@@ -14,13 +14,7 @@ import (
 	"sync"
 )
 
-type AvailableApp struct {
-	manifest.App
-	bundle.Release
-	ReleaseID *astral.ObjectID
-}
-
-func (s *Service[T]) AvailableApps(ctx context.Context, follow bool) (out flow.Input[AvailableApp], err error) {
+func (s *Service[T]) AvailableApps(ctx context.Context, follow bool) (out flow.Input[bundle.Info], err error) {
 	a := availableAppsScanner{}
 	a.log = plog.Get(ctx)
 	a.rpc = s.Apphost.Rpc()
@@ -29,7 +23,7 @@ func (s *Service[T]) AvailableApps(ctx context.Context, follow bool) (out flow.I
 		Zone:   astral.ZoneAll,
 		Follow: follow,
 	}
-	a.out = make(chan AvailableApp)
+	a.out = make(chan bundle.Info)
 	a.wg = &sync.WaitGroup{}
 	out = a.out
 
@@ -63,7 +57,7 @@ type availableAppsScanner struct {
 	rpc rpc.Rpc
 	wg  *sync.WaitGroup
 	arg objects.ScanArgs
-	out chan AvailableApp
+	out chan bundle.Info
 }
 
 func (a availableAppsScanner) scan(target ...string) {
@@ -94,13 +88,11 @@ func (a availableAppsScanner) scan(target ...string) {
 				log.Println(err)
 				continue
 			}
-
-			aa := AvailableApp{
-				App:       ma,
+			a.out <- bundle.Info{
+				Manifest:  ma,
 				Release:   br,
 				ReleaseID: &id,
 			}
-			a.out <- aa
 		}
 	}()
 }
