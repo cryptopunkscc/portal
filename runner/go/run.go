@@ -2,6 +2,7 @@ package golang
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/api/dev"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/flow"
@@ -26,7 +27,7 @@ func Runner() *target.SourceRunner[target.ProjectGo] {
 type ReRunner struct {
 	watcher *golang.Watcher
 	run     target.Run[target.DistExec]
-	send    target.MsgSend
+	send    dev.SendMsg
 	dist    target.DistExec
 	ctx     context.Context
 	cancel  context.CancelFunc
@@ -73,7 +74,7 @@ func (r *ReRunner) Run(ctx context.Context, project target.ProjectGo, args ...st
 	pkg := project.Manifest().Package
 	r.send = reload.Start(ctx, project, r.Reload, nil)
 	for range flow.From(events).Debounce(200 * time.Millisecond) {
-		if err := r.sendMsg(pkg, target.DevChanged); err != nil {
+		if err := r.sendMsg(pkg, dev.Changed); err != nil {
 			log.E().Println(err)
 		}
 		if err = build(ctx, project); err == nil {
@@ -82,16 +83,16 @@ func (r *ReRunner) Run(ctx context.Context, project target.ProjectGo, args ...st
 			}
 		}
 		time.Sleep(2 * time.Second)
-		if err := r.sendMsg(pkg, target.DevRefreshed); err != nil {
+		if err := r.sendMsg(pkg, dev.Refreshed); err != nil {
 			log.E().Println(err)
 		}
 	}
 	return
 }
 
-func (r *ReRunner) sendMsg(pkg string, event target.Event) (err error) {
+func (r *ReRunner) sendMsg(pkg string, event dev.Event) (err error) {
 	if r.send != nil {
-		return r.send(target.NewMsg(pkg, event))
+		return r.send(dev.NewMsg(pkg, event))
 	}
 	return
 }

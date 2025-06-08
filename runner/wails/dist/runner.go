@@ -2,6 +2,7 @@ package wails_dist
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/api/dev"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -27,7 +28,7 @@ func Runner(newCore bind.NewCore) *target.SourceRunner[target.DistHtml] {
 
 type ReRunner struct {
 	*wails.ReRunner
-	send    target.MsgSend
+	send    dev.SendMsg
 	newCore bind.NewCore
 }
 
@@ -44,11 +45,11 @@ func (r *ReRunner) Run(ctx context.Context, distHtml target.DistHtml, args ...st
 	go func() {
 		pkg := distHtml.Manifest().Package
 		watch := dist.ReRunner[target.DistHtml](func(...string) (err error) {
-			if err := r.send(target.NewMsg(pkg, target.DevChanged)); err != nil {
+			if err := r.send(dev.NewMsg(pkg, dev.Changed)); err != nil {
 				log.F().Println(err)
 			}
 			err = r.Reload()
-			if err := r.send(target.NewMsg(pkg, target.DevRefreshed)); err != nil {
+			if err := r.send(dev.NewMsg(pkg, dev.Refreshed)); err != nil {
 				log.F().Println(err)
 			}
 			return err

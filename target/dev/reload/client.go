@@ -3,6 +3,7 @@ package reload
 import (
 	"context"
 	api "github.com/cryptopunkscc/portal/api/apphost"
+	"github.com/cryptopunkscc/portal/api/dev"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/mem"
@@ -17,7 +18,7 @@ func Start(
 	portal target.Portal_,
 	reload Reload,
 	cache api.Cache,
-) (send target.MsgSend) {
+) (send dev.SendMsg) {
 	c := &client{
 		reload:  reload,
 		cache:   cache,
@@ -48,7 +49,7 @@ type client struct {
 
 type Reload func() error
 
-func (s *client) Send(msg target.Msg) (err error) {
+func (s *client) Send(msg dev.Msg) (err error) {
 	if err = s.conn.Encode(msg); err != nil && err.Error() == "EOF" {
 		_ = s.Close()
 		return
@@ -67,11 +68,11 @@ func (s *client) Handle(ctx context.Context) {
 		<-ctx.Done()
 		_ = s.conn.Close()
 	}()
-	var msg target.Msg
+	var msg dev.Msg
 	var err error
 	log := plog.Get(ctx).Type(s)
 	for {
-		if msg, err = rpc.Decode[target.Msg](s.conn); err != nil {
+		if msg, err = rpc.Decode[dev.Msg](s.conn); err != nil {
 			break
 		}
 		log.Println("got message", msg)
@@ -82,11 +83,11 @@ func (s *client) Handle(ctx context.Context) {
 	}
 }
 
-func (s *client) HandleMsg(ctx context.Context, msg target.Msg) {
+func (s *client) HandleMsg(ctx context.Context, msg dev.Msg) {
 	log := plog.Get(ctx).D()
 	log.Println("received broadcast message:", msg)
 	switch msg.Event {
-	case target.DevChanged:
+	case dev.Changed:
 		if s.cache == nil {
 			return
 		}
@@ -99,7 +100,7 @@ func (s *client) HandleMsg(ctx context.Context, msg target.Msg) {
 				s.changes.Set(msg.Pkg, msg.Time)
 			}
 		}
-	case target.DevRefreshed:
+	case dev.Refreshed:
 		if ok := s.changes.Delete(msg.Pkg); !ok || s.changes.Size() > 0 {
 			log.Println("cannot reload", ok, s.changes.Size())
 			return

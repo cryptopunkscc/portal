@@ -2,6 +2,7 @@ package goja_dist
 
 import (
 	"context"
+	"github.com/cryptopunkscc/portal/api/dev"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -25,7 +26,7 @@ func Runner(newCore bind.NewCore) *target.SourceRunner[target.DistJs] {
 
 type ReRunner struct {
 	bind.NewCore
-	send    target.MsgSend
+	send    dev.SendMsg
 	dist    target.DistJs
 	backend *goja.Backend
 }
@@ -51,7 +52,7 @@ func (r *ReRunner) Run(ctx context.Context, distJs target.DistJs, args ...string
 	}
 	pkg := distJs.Manifest().Package
 	watch := dist.ReRunner[target.DistJs](func(...string) error {
-		if err := r.send(target.NewMsg(pkg, target.DevChanged)); err != nil {
+		if err := r.send(dev.NewMsg(pkg, dev.Changed)); err != nil {
 			log.E().Println(err)
 		}
 		if err := r.Reload(); err != nil {
@@ -60,7 +61,7 @@ func (r *ReRunner) Run(ctx context.Context, distJs target.DistJs, args ...string
 		// TODO find better solution then sleep
 		// target.DevRefreshed msg must be delayed until backend is fully refreshed (all ports registered).
 		time.Sleep(2 * time.Second)
-		if err := r.send(target.NewMsg(pkg, target.DevRefreshed)); err != nil {
+		if err := r.send(dev.NewMsg(pkg, dev.Refreshed)); err != nil {
 			log.E().Println(err)
 		}
 		return nil

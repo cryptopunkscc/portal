@@ -3,7 +3,7 @@ package broadcast
 import (
 	"context"
 	"github.com/cryptopunkscc/astrald/sig"
-	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/api/dev"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 )
@@ -34,9 +34,9 @@ func (b *Service) BroadcastMsg(ctx context.Context, conn rpc.Conn) {
 	b.targets.Set(pkg, conn)
 
 	// read messages
-	var msg target.Msg
+	var msg dev.Msg
 	for {
-		if msg, err = rpc.Decode[target.Msg](conn); err != nil {
+		if msg, err = rpc.Decode[dev.Msg](conn); err != nil {
 			b.targets.Delete(pkg)
 			return
 		}

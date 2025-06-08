@@ -1,15 +1,14 @@
-package target
+package dev
 
 import (
-	"github.com/cryptopunkscc/portal/api/apphost"
 	"time"
 )
 
 type Event int
 
 const (
-	DevChanged Event = iota
-	DevRefreshed
+	Changed Event = iota
+	Refreshed
 )
 
 type Msg struct {
@@ -22,6 +21,4 @@ func NewMsg(pkg string, event Event) Msg {
 	return Msg{Pkg: pkg, Event: event, Time: time.Now()}
 }
 
-type MsgSend func(msg Msg) error
-
-type MsgSender func(apphost.Port) MsgSend
+type SendMsg func(msg Msg) error
