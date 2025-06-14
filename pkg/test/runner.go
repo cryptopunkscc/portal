@@ -37,7 +37,11 @@ func (r *Runner) init() {
 	for _, t := range r.Map.Values() {
 		t.tasks = make([]*Task, len(t.Require))
 		for i, s := range t.Require {
-			t.tasks[i], _ = r.Get(s.name)
+			ok := false
+			t.tasks[i], ok = r.Get(s.name)
+			if !ok {
+				t.tasks[i] = &Task{Test: s, mu: &sync.Mutex{}}
+			}
 		}
 	}
 }

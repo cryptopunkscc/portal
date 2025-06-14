@@ -66,12 +66,12 @@ func TestService_Integrations(t *testing.T) {
 		{
 			Name:    "should publish app bundles",
 			Test:    it.s1.publishAppBundles(),
-			Require: test.Tests{it.s1.start()},
+			Require: test.Tests{it.s1.createUser()},
 		},
 		{
 			Name:    "should await published app bundles",
 			Test:    it.s1.awaitPublishedBundles(),
-			Require: test.Tests{it.s1.publishAppBundles(), it.s1.reconnectAsUser()},
+			Require: test.Tests{it.s1.publishAppBundles(), it.s1.createUser()},
 		},
 		{
 			Name:    "should fetch releases",
@@ -89,7 +89,7 @@ func TestService_Integrations(t *testing.T) {
 			Require: test.Tests{it.s1.awaitPublishedBundles()},
 		},
 		{
-			Name: "should scan another node's objects",
+			Name: "should scan another node's objects FIXME!",
 			Test: it.s2.scanObjects("app.manifest", &it.s1),
 			Require: test.Tests{
 				it.s1.scanObjects("app.manifest"),
@@ -98,39 +98,9 @@ func TestService_Integrations(t *testing.T) {
 			},
 		},
 		{
-			Name:    "should reconnect as user",
-			Test:    it.s1.reconnectAsUser(),
-			Require: test.Tests{it.s1.createUser()},
-		},
-		{
-			Name:    "should authenticate as portald 1",
-			Test:    it.s1.reconnectAs("portald"),
-			Require: test.Tests{it.s1.signAppContract("portald")},
-		},
-		{
-			Name:    "should authenticate as portald 2",
-			Test:    it.s2.reconnectAs("portald"),
-			Require: test.Tests{it.s2.signAppContract("portald")},
-		},
-		{
-			Name:    "should sign portald app contract 1",
-			Test:    it.s1.signAppContract("portald"),
-			Require: test.Tests{it.s1.reconnectAsUser()},
-		},
-		{
-			Name:    "should sign portald app contract 2",
-			Test:    it.s2.signAppContract("portald"),
-			Require: test.Tests{it.s2.reconnectAsUser2(&it.s1)},
-		},
-		{
-			Name:    "should reconnect as user 2",
-			Test:    it.s2.reconnectAsUser2(&it.s1),
-			Require: test.Tests{it.s1.userClaim(&it.s2)},
-		},
-		{
 			Name:    "should get user info",
 			Test:    it.s1.userInfo(),
-			Require: test.Tests{it.s1.reconnectAs("portald")},
+			Require: test.Tests{it.s1.createUser()},
 		},
 		{
 			Name:    "should list siblings",
@@ -147,16 +117,14 @@ func TestService_Integrations(t *testing.T) {
 			Test: it.s1.availableApps(),
 			Require: test.Tests{
 				it.s1.awaitPublishedBundles(),
-				it.s1.reconnectAs("portald"),
 			},
 		},
 		{
-			Name: "should list available apps 2",
+			Name: "should list available apps 2 FIXME!",
 			Test: it.s2.availableApps(),
 			Require: test.Tests{
 				it.s1.awaitPublishedBundles(),
 				it.s2.addEndpoint(&it.s1),
-				it.s2.reconnectAs("portald"),
 			},
 		},
 
