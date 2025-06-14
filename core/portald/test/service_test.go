@@ -166,6 +166,7 @@ func (s *testService) installApps() test.Test {
 			test.AssertErr(t, err)
 			s.apps = append(s.apps, r)
 		}
+		assert.NotEmpty(t, s.apps)
 	})
 }
 
@@ -187,9 +188,12 @@ func (s *testService) publishAppBundles() test.Test {
 
 		l, err := s.PublishAppsFS(b)
 		test.AssertErr(t, err)
+		count := 0
 		for _, app := range l {
 			s.published[*app.ReleaseID] = app.Release
+			count++
 		}
+		assert.NotZero(t, count)
 	})
 }
 
@@ -301,7 +305,7 @@ func (s *testService) availableApps() test.Test {
 			count++
 			plog.Println("available app:", app)
 		}
-		assert.Greater(t, count, 0)
+		assert.NotZero(t, count)
 	})
 }
 
@@ -323,7 +327,7 @@ func (s *testService) searchObjects(query string, s2 ...*testService) test.Test 
 			count++
 			plog.Println(result)
 		}
-		assert.Greater(t, count, 0)
+		assert.NotZero(t, count)
 	})
 }
 
