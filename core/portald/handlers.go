@@ -56,6 +56,11 @@ func (s *Service[T]) publicHandlers() cmd.Handlers {
 						{Type: "string", Desc: "alias"},
 					},
 				},
+				{
+					Func: s.PrintCreatedUser,
+					Name: "info i",
+					Desc: "Print user info.",
+				},
 			},
 		},
 		{

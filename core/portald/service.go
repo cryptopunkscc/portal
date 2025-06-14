@@ -37,7 +37,7 @@ type Service[T Portal_] struct {
 
 	Order []int
 
-	UserInfo *user.Info
+	UserCreated *user.Created
 }
 
 func (s *Service[T]) Configure() (err error) {
@@ -47,7 +47,7 @@ func (s *Service[T]) Configure() (err error) {
 	if s.Resources, err = resources.NewFileResources(s.Config.Portald, true); err != nil {
 		return
 	}
-	_ = s.ReadUserInfo()
+	_ = s.ReadCreatedUser()
 	s.configured = true
 	plog.D().Printf("config:\n%s", s.Config.Yaml())
 	return

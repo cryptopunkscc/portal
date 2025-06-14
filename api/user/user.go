@@ -7,6 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
+	"gopkg.in/yaml.v3"
 	"io"
 )
 
@@ -15,7 +16,7 @@ type Client struct {
 	rpc.Rpc
 }
 
-type Info struct {
+type Created struct {
 	AccessToken string `json:"access_token" yaml:"access_token"`
 	ContractId  string `json:"contract_id" yaml:"contract_id"`
 	KeyId       string `json:"key_id" yaml:"key_id"`
@@ -23,7 +24,15 @@ type Info struct {
 	UserId      string `json:"user_id" yaml:"user_id"`
 }
 
-func (u Client) Create(alias string) (ui *Info, err error) {
+func (i Created) MarshalCLI() string {
+	b, err := yaml.Marshal(i)
+	if err != nil {
+		return err.Error()
+	}
+	return string(b)
+}
+
+func (u Client) Create(alias string) (ui *Created, err error) {
 	c, err := u.Query("localnode", "user.create", "alias="+alias)
 	if err != nil {
 		return
