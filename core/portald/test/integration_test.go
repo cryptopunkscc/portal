@@ -128,6 +128,11 @@ func TestService_Integrations(t *testing.T) {
 			Require: test.Tests{it.s1.userClaim(&it.s2)},
 		},
 		{
+			Name:    "should get user info",
+			Test:    it.s1.userInfo(),
+			Require: test.Tests{it.s1.reconnectAs("portald")},
+		},
+		{
 			Name:    "should list siblings",
 			Test:    it.s1.listSiblings(),
 			Require: test.Tests{it.s1.userClaim(&it.s2)},

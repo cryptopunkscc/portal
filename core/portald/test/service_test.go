@@ -131,6 +131,15 @@ func (s *testService) createUser() test.Test {
 	})
 }
 
+func (s *testService) userInfo() test.Test {
+	return s.test(func(t *testing.T) {
+		info, err := s.UserInfo()
+		test.AssertErr(t, err)
+		assert.NotZero(t, info)
+		plog.Println(*info)
+	})
+}
+
 func (s *testService) userClaim(s2 *testService) test.Test {
 	return s.test(func(t *testing.T) {
 		err := s.Claim(s2.Apphost.HostID.String())

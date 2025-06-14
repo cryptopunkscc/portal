@@ -57,7 +57,7 @@ func (s *Service[T]) publicHandlers() cmd.Handlers {
 					},
 				},
 				{
-					Func: s.PrintCreatedUser,
+					Func: s.UserInfo,
 					Name: "info i",
 					Desc: "Print user info.",
 				},

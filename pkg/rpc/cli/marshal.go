@@ -2,9 +2,9 @@ package cli
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/rpc/stream"
+	"gopkg.in/yaml.v3"
 )
 
 type Marshaler interface {
@@ -27,7 +27,7 @@ func Marshal(a any) (result []byte, err error) {
 	case stream.Failure:
 		result = fmt.Appendf(nil, "API: %s", t.Error)
 	default:
-		result, err = json.Marshal(a)
+		result, err = yaml.Marshal(a)
 	}
 	if !bytes.HasSuffix(result, []byte("\n")) {
 		result = append(result, '\n')
