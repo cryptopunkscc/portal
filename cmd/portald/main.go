@@ -6,7 +6,7 @@ import (
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
-	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
+	"github.com/cryptopunkscc/portal/pkg/rpc/cmd/help"
 	singal "github.com/cryptopunkscc/portal/pkg/sig"
 )
 
@@ -22,7 +22,7 @@ func main() {
 	go singal.OnShutdown(log, application.Stop)
 
 	c := application.commands()
-	cmd.InjectHelp(&c)
+	help.Inject(&c)
 	err := cli.New(c).Run(ctx)
 	if err != nil {
 		log.E().Println("finished with error:", err)

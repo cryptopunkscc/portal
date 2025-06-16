@@ -5,6 +5,7 @@ import (
 	"github.com/cryptopunkscc/portal/core/astrald"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
+	"github.com/cryptopunkscc/portal/pkg/rpc/cmd/help"
 )
 
 func (s *Service[T]) Start(ctx context.Context) (err error) {
@@ -41,7 +42,7 @@ func (s *Service[T]) startAstrald(ctx context.Context) (err error) {
 func (s *Service[T]) startPortald(ctx context.Context) error {
 	log := plog.Get(ctx)
 	handler := cmd.Handler{Sub: s.handlers()}
-	cmd.InjectHelp(&handler)
+	help.Inject(&handler)
 	router := s.Apphost.Rpc().Router(handler)
 	router.Log = log
 	if err := router.Init(ctx); err != nil {

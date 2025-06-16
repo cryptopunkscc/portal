@@ -1,52 +1,53 @@
-package cmd
+package help
 
 import (
 	"bytes"
 	"fmt"
+	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"slices"
 	"strconv"
 	"strings"
 	"text/tabwriter"
 )
 
-func HasHelp(handler Handler) bool {
-	if handler.Name == HelpName {
+func In(handler cmd.Handler) bool {
+	if handler.Name == Name {
 		return true
 	}
 	for _, h := range handler.Sub {
-		if HasHelp(h) {
+		if In(h) {
 			return true
 		}
 	}
 	return false
 }
 
-func InjectHelp(handler *Handler) {
+func Inject(handler *cmd.Handler) {
 	for i := range handler.Sub {
-		InjectHelp(&handler.Sub[i])
+		Inject(&handler.Sub[i])
 	}
-	help := NewHelpHandler(handler)
+	help := NewHandler(handler)
 	handler.AddSub(help)
 	if handler.Func == nil {
 		handler.Func = help.Func
 	}
 }
 
-func NewHelpHandler(handler *Handler) Handler {
-	return Handler{
-		Name: HelpName, Desc: "Print help.",
-		Func: NewHelpFunc(handler),
+func NewHandler(handler *cmd.Handler) cmd.Handler {
+	return cmd.Handler{
+		Name: Name, Desc: "Print help.",
+		Func: NewFunc(handler),
 	}
 }
 
-const HelpName = "help h"
+const Name = "help h"
 
-func NewHelpFunc(handler *Handler) func() Help { return func() Help { return Help{*handler} } }
+func NewFunc(handler *cmd.Handler) func() Handler { return func() Handler { return Handler{*handler} } }
 
-type Help struct{ Handler }
+type Handler struct{ cmd.Handler }
 
 //goland:noinspection GoUnhandledErrorResult
-func (h Help) MarshalCLI() (help string) {
+func (h Handler) MarshalCLI() (help string) {
 	buffer := &bytes.Buffer{}
 	w := tabwriter.NewWriter(buffer, 4, 4, 2, ' ', 0)
 

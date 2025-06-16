@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/portald"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
+	"github.com/cryptopunkscc/portal/pkg/rpc/cmd/help"
 	"slices"
 )
 
@@ -41,8 +42,8 @@ func (a *Application) setupFunctions(handlers cmd.Handlers) {
 
 func fixHelp(handler *cmd.Handler) {
 	for i, h := range handler.Sub {
-		if h.Name == cmd.HelpName {
-			handler.Sub[i].Func = cmd.NewHelpFunc(handler)
+		if h.Name == help.Name {
+			handler.Sub[i].Func = help.NewFunc(handler)
 		}
 	}
 }

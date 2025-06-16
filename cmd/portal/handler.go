@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/cryptopunkscc/portal/api/version"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
+	"github.com/cryptopunkscc/portal/pkg/rpc/cmd/help"
 )
 
 func (a *Application) Handler() (h cmd.Handler) {
@@ -38,7 +39,7 @@ func (a *Application) Handler() (h cmd.Handler) {
 			},
 		},
 	}
-	cmd.InjectHelp(&h)
+	help.Inject(&h)
 	a.injectPortaldApi(&h)
 	return
 }
