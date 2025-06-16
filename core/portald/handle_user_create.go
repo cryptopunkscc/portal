@@ -11,7 +11,7 @@ func (s *Service[T]) CreateUser(alias string) (err error) {
 	defer plog.TraceErr(&err)
 
 	// create user
-	c := user.Client{Client: &s.Apphost}
+	c := user.Op(&s.Apphost)
 	if s.UserCreated, err = c.Create(alias); err != nil {
 		return
 	}
@@ -43,7 +43,7 @@ func (s *Service[T]) signAppContract(identifier string) (err error) {
 	if err != nil {
 		return
 	}
-	c, err := apphost.TokenClient(&s.Apphost).SignAppContract(id)
+	c, err := apphost.Op(&s.Apphost).SignAppContract(id)
 	if err != nil {
 		return
 	}

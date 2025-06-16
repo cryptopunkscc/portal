@@ -359,7 +359,7 @@ func (s *testService) signAppContract(pkg string) test.Test {
 	return s.arg(pkg).test(func(t *testing.T) {
 		id, err := s.Apphost.Resolve(pkg)
 		test.AssertErr(t, err)
-		contract, err := apphost.TokenClient(&s.Apphost).SignAppContract(id)
+		contract, err := apphost.Op(&s.Apphost).SignAppContract(id)
 		test.AssertErr(t, err)
 		plog.Println(contract)
 	})
@@ -394,7 +394,7 @@ func (s *testService) setupToken(pkg string) test.Test {
 
 func (s *testService) listSiblings() test.Test {
 	return s.test(func(t *testing.T) {
-		c := user.Client{Rpc: s.Apphost.Rpc()}
+		c := user.Op(&s.Apphost)
 		siblings, err := c.Siblings()
 		test.AssertErr(t, err)
 		count := 0

@@ -26,47 +26,53 @@ func NewRepository(
 	return &Repository{Dir: dir, Adapter: adapter}
 }
 
-func (r *Repository) Set(pkg string, token *mod.AccessToken) (err error) {
+func (r *Repository) dir() string {
 	if r.Dir == "" {
 		r.Dir = env.PortaldTokens.MkdirAll()
 	}
-	if err = pkgOs.WriteJson[*mod.AccessToken](token, r.Dir, pkg); err != nil {
+	return r.Dir
+}
+
+func (r *Repository) apphost() api.Client {
+	if r.Adapter == nil {
+		r.Adapter = apphost.Default
+	}
+	return r.Adapter
+}
+
+func (r *Repository) op() api.OpClient {
+	return api.Op(r.apphost())
+}
+
+func (r *Repository) Set(pkg string, token *mod.AccessToken) (err error) {
+	if err = pkgOs.WriteJson[*mod.AccessToken](token, r.dir(), pkg); err != nil {
 		err = plog.Err(err)
 	}
 	return
 }
 
 func (r *Repository) Get(pkg string) (token *mod.AccessToken, err error) {
-	if r.Dir == "" {
-		r.Dir = env.PortaldTokens.MkdirAll()
-	}
-	if token, err = pkgOs.ReadJson[*mod.AccessToken](r.Dir, pkg); err != nil {
+	if token, err = pkgOs.ReadJson[*mod.AccessToken](r.dir(), pkg); err != nil {
 		err = plog.Err(err)
 	}
 	return
 }
 
 func (r *Repository) List(args *api.ListTokensArgs) (api.AccessTokens, error) {
-	if r.Adapter == nil {
-		r.Adapter = apphost.Default
-	}
-	return api.TokenClient(r).List(args)
+	return r.op().ListTokens(args)
 }
 
 func (r *Repository) Resolve(pkg string) (accessToken *mod.AccessToken, err error) {
 	defer plog.TraceErr(&err)
-	if r.Adapter == nil {
-		r.Adapter = apphost.Default
-	}
 	if accessToken, err = r.Get(pkg); err == nil {
 		return
 	}
 
-	id, _ := r.Adapter.Resolve(pkg)
+	id, _ := r.apphost().Resolve(pkg)
 
 	if id != nil {
 		var tokens []mod.AccessToken
-		if tokens, err = api.TokenClient(r).List(nil); err != nil {
+		if tokens, err = r.op().ListTokens(nil); err != nil {
 			return
 		}
 
@@ -82,7 +88,7 @@ func (r *Repository) Resolve(pkg string) (accessToken *mod.AccessToken, err erro
 	}
 
 	args := api.CreateTokenArgs{ID: id}
-	if accessToken, err = api.TokenClient(r).Create(args); err != nil {
+	if accessToken, err = r.op().CreateToken(args); err != nil {
 		return
 	}
 

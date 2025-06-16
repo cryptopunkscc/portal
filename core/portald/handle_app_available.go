@@ -39,7 +39,7 @@ func (s *Service[T]) AvailableApps(ctx context.Context, follow bool) (out flow.I
 		a.scan()
 
 		// remote apps
-		uc := user.Client{Rpc: a.rpc}
+		uc := user.Op(&s.Apphost)
 		ss, err := uc.Siblings()
 		if err != nil {
 			log.Println(err)

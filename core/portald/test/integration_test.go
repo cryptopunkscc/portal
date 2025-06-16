@@ -89,12 +89,12 @@ func TestService_Integrations(t *testing.T) {
 			Require: test.Tests{it.s1.awaitPublishedBundles()},
 		},
 		{
-			Name: "should scan another node's objects FIXME!",
+			Name: "should scan another node's objects",
 			Test: it.s2.scanObjects("app.manifest", &it.s1),
 			Require: test.Tests{
 				it.s1.scanObjects("app.manifest"),
+				it.s1.userClaim(&it.s2),
 				it.s2.addEndpoint(&it.s1),
-				it.s2.reconnectAs("portald"),
 			},
 		},
 		{
@@ -120,10 +120,11 @@ func TestService_Integrations(t *testing.T) {
 			},
 		},
 		{
-			Name: "should list available apps 2 FIXME!",
+			Name: "should list available apps 2",
 			Test: it.s2.availableApps(),
 			Require: test.Tests{
 				it.s1.awaitPublishedBundles(),
+				it.s1.userClaim(&it.s2),
 				it.s2.addEndpoint(&it.s1),
 			},
 		},

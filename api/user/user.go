@@ -12,12 +12,16 @@ import (
 	"io"
 )
 
-type Client struct {
+type OpClient struct {
 	apphost.Client
-	rpc.Rpc
+	Target string
 }
 
-func (u Client) r() rpc.Conn { return u.Rpc.Format("json").Request("localnode", "user") }
+func Op(client apphost.Client, target ...string) OpClient {
+	return OpClient{client, apphost.Target(target...)}
+}
+
+func (u OpClient) r() rpc.Conn { return u.Rpc().Format("json").Request(u.Target, "user") }
 
 type Created struct {
 	AccessToken string `json:"access_token" yaml:"access_token"`
@@ -35,8 +39,8 @@ func (i Created) MarshalCLI() string {
 	return string(b)
 }
 
-func (u Client) Create(alias string) (ui *Created, err error) {
-	c, err := u.Query("localnode", "user.create", "alias="+alias)
+func (u OpClient) Create(alias string) (ui *Created, err error) {
+	c, err := u.Query(u.Target, "user.create", "alias="+alias)
 	if err != nil {
 		return
 	}
@@ -46,8 +50,8 @@ func (u Client) Create(alias string) (ui *Created, err error) {
 	return
 }
 
-func (u Client) Claim(alias string) (err error) {
-	c, err := u.Query("localnode", "user.claim", "target="+alias)
+func (u OpClient) Claim(alias string) (err error) {
+	c, err := u.Query(u.Target, "user.claim", "target="+alias)
 	if err != nil {
 		return
 	}
@@ -68,7 +72,7 @@ func (u Client) Claim(alias string) (err error) {
 	return
 }
 
-func (u Client) Siblings() (out flow.Input[astral.Identity], err error) {
+func (u OpClient) Siblings() (out flow.Input[astral.Identity], err error) {
 	args := struct {
 		Out  string      `query:"out"`
 		Zone astral.Zone `query:"zone"`
@@ -88,7 +92,7 @@ func (u Client) Siblings() (out flow.Input[astral.Identity], err error) {
 
 type Info user.Info
 
-func (u Client) Info() (info *Info, err error) {
+func (u OpClient) Info() (info *Info, err error) {
 	r, err := rpc.Query[rpc.Json[*Info]](u.r(), "info", rpc.Opt{"out": "json"})
 	if err != nil {
 		return nil, err

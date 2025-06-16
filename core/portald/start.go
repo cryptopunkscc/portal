@@ -12,7 +12,7 @@ func (s *Service[T]) Start(ctx context.Context) (err error) {
 	log := plog.Get(ctx).Type(s)
 	log.Println("starting portald...")
 	ctx, s.shutdown = context.WithCancel(ctx)
-	s.Apphost.Log = log
+	//s.Apphost.Log = log FIXME prints binary data & breaks tests
 	if !s.configured {
 		if err = s.Configure(); err != nil {
 			return
