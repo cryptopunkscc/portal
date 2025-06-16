@@ -83,7 +83,7 @@ func (r *Repository) Resolve(pkg string) (accessToken *mod.AccessToken, err erro
 				return
 			}
 		}
-	} else if id, err = keys.Client(r).Create(pkg); err != nil {
+	} else if id, err = keys.Op(r.apphost()).CreateKey(pkg); err != nil {
 		return
 	}
 
