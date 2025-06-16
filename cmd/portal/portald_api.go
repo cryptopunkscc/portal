@@ -8,8 +8,8 @@ import (
 	"slices"
 )
 
-func (a *Application) portald() portald.Conn {
-	return portald.Client(&a.Apphost)
+func (a *Application) portald() portald.OpClient {
+	return portald.Op(&a.Apphost)
 }
 
 func (a *Application) injectPortaldApi(handler *cmd.Handler) {

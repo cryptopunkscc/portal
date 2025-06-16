@@ -7,14 +7,14 @@ import (
 	"io"
 )
 
-func Client(rpc rpc.Rpc) Conn { return Conn{rpc.Request("portald")} }
+func Op(rpc rpc.Rpc) OpClient { return OpClient{rpc.Request("portald")} }
 
-type Conn struct{ rpc.Conn }
+type OpClient struct{ rpc.Conn }
 
-func (p Conn) Join()        { _ = rpc.Command(p, "join") }
-func (p Conn) Ping() error  { return rpc.Command(p, "ping") }
-func (p Conn) Close() error { return rpc.Command(p, "close") }
-func (p Conn) Open(opt *OpenOpt, args ...string) error {
+func (p OpClient) Join()        { _ = rpc.Command(p, "join") }
+func (p OpClient) Ping() error  { return rpc.Command(p, "ping") }
+func (p OpClient) Close() error { return rpc.Command(p, "close") }
+func (p OpClient) Open(opt *OpenOpt, args ...string) error {
 	var argv []any
 	if opt != nil {
 		argv = []any{opt}
@@ -24,7 +24,7 @@ func (p Conn) Open(opt *OpenOpt, args ...string) error {
 	}
 	return rpc.Call(p.Copy(), "open", argv...)
 }
-func (p Conn) Connect(opt *OpenOpt, args ...string) (rwc io.ReadWriteCloser, err error) {
+func (p OpClient) Connect(opt *OpenOpt, args ...string) (rwc io.ReadWriteCloser, err error) {
 	var argv []any
 	if opt != nil {
 		argv = []any{opt}
@@ -39,7 +39,7 @@ func (p Conn) Connect(opt *OpenOpt, args ...string) (rwc io.ReadWriteCloser, err
 	rwc = c
 	return
 }
-func (p Conn) Api() (cmd.Handlers, error) { return rpc.Query[cmd.Handlers](p, "api") }
+func (p OpClient) Api() (cmd.Handlers, error) { return rpc.Query[cmd.Handlers](p, "api") }
 
 type OpenOpt struct {
 	Schema string `query:"s"`

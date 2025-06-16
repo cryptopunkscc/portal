@@ -10,13 +10,13 @@ import (
 )
 
 type Tray struct {
-	Portald portald.Conn
+	Portald portald.OpClient
 	log     plog.Logger
 }
 
 func (t *Tray) Run(ctx context.Context) (err error) {
 	if t.Portald.Conn == nil {
-		t.Portald = portald.Client(apphost.Default)
+		t.Portald = portald.Op(apphost.Default)
 	}
 
 	if err = t.Portald.Ping(); err != nil {

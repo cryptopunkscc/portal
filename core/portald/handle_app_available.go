@@ -61,7 +61,7 @@ type availableAppsScanner struct {
 }
 
 func (a availableAppsScanner) scan(target ...string) {
-	oc := objects.Client(a.rpc, target...)
+	oc := objects.Op(a.rpc, target...)
 	ids, err := oc.Scan(a.arg)
 	if err != nil {
 		log.Println(err)

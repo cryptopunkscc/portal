@@ -12,25 +12,23 @@ import (
 	"io"
 )
 
-func Client(rpc rpc.Rpc, target ...string) Conn {
+func Op(rpc rpc.Rpc, target ...string) OpClient {
 	if len(target) == 0 {
 		target = append(target, "localnode")
 	}
-	return Conn{rpc.Format("json").Request(target[0], "objects")} // change node ID to call foreign node
+	return OpClient{rpc.Format("json").Request(target[0], "objects")} // change node ID to call foreign node
 }
 
-type Conn struct{ rpc.Conn }
+type OpClient struct{ rpc.Conn }
 
-type pushArgs struct{ Size int }
-
-func (c Conn) Push(obj astral.Object) (ok bool, err error) {
+func (c OpClient) Push(obj astral.Object) (ok bool, err error) {
 	defer plog.TraceErr(&err)
 	buf := bytes.NewBuffer(nil)
 	if _, err = astral.WriteCanonical(buf, obj); err != nil {
 		return
 	}
 	conn := c.Copy()
-	if err = rpc.Call(conn, "push", pushArgs{Size: buf.Len()}); err != nil {
+	if err = rpc.Call(conn, "push", rpc.Opt{"size": buf.Len()}); err != nil {
 		return
 	}
 	defer conn.Close()
@@ -47,11 +45,11 @@ type ReadArgs struct {
 	Zone   astral.Zone
 }
 
-func (c Conn) Read(args ReadArgs) (r io.ReadCloser, err error) {
+func (c OpClient) Read(args ReadArgs) (r io.ReadCloser, err error) {
 	return rpc.NewCall(c.Conn, "read", args)
 }
 
-func (c Conn) Fetch(args ReadArgs, obj astral.Object) (err error) {
+func (c OpClient) Fetch(args ReadArgs, obj astral.Object) (err error) {
 	b, err := c.Read(args)
 	if err != nil {
 		return
@@ -74,7 +72,7 @@ type SearchArgs struct {
 	Ext   string
 }
 
-func (c Conn) Search(args SearchArgs) (out <-chan rpc.Json[objects.SearchResult], err error) {
+func (c OpClient) Search(args SearchArgs) (out <-chan rpc.Json[objects.SearchResult], err error) {
 	args.Out = "json"
 	return rpc.Subscribe[rpc.Json[objects.SearchResult]](c.Conn, "search", args)
 }
@@ -87,7 +85,7 @@ type ScanArgs struct {
 	Zone   astral.Zone
 }
 
-func (c Conn) Scan(args ScanArgs) (out <-chan astral.ObjectID, err error) {
+func (c OpClient) Scan(args ScanArgs) (out <-chan astral.ObjectID, err error) {
 	args.Out = "json"
 	o, err := rpc.Subscribe[rpc.Json[astral.ObjectID]](c.Conn, "scan", args)
 	if err != nil {
@@ -103,15 +101,11 @@ type DescribeArgs struct {
 	Zones astral.Zone
 }
 
-func (c Conn) Describe(args DescribeArgs) (r map[string]any, err error) {
+func (c OpClient) Describe(args DescribeArgs) (r map[string]any, err error) {
 	args.Out = "json"
 	return rpc.Query[map[string]any](c.Conn, "describe", args)
 }
 
-type showArgs struct {
-	ID astral.ObjectID
-}
-
-func (c Conn) Show(id astral.ObjectID) (r string, err error) {
-	return rpc.Query[string](c.Conn, "show_object", showArgs{ID: id})
+func (c OpClient) Show(id astral.ObjectID) (r string, err error) {
+	return rpc.Query[string](c.Conn, "show_object", rpc.Opt{"id": id})
 }

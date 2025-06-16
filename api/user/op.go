@@ -12,13 +12,13 @@ import (
 	"io"
 )
 
+func Op(client apphost.Client, target ...string) OpClient {
+	return OpClient{client, apphost.Target(target...)}
+}
+
 type OpClient struct {
 	apphost.Client
 	Target string
-}
-
-func Op(client apphost.Client, target ...string) OpClient {
-	return OpClient{client, apphost.Target(target...)}
 }
 
 func (u OpClient) r() rpc.Conn { return u.Rpc().Format("json").Request(u.Target, "user") }

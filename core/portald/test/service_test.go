@@ -152,7 +152,7 @@ func (s *testService) addEndpoint(s2 *testService) test.Test {
 		id := s2.Apphost.HostID.String()
 		port := s2.Config.TCP.ListenPort
 		endpoint := fmt.Sprintf("tcp:127.0.0.1:%d", port)
-		err := nodes.Client(&s.Apphost).AddEndpoint(id, endpoint)
+		err := nodes.Op(&s.Apphost).AddEndpoint(id, endpoint)
 		test.AssertErr(t, err)
 	})
 }
@@ -220,7 +220,7 @@ func (s *testService) awaitPublishedBundles() test.Test {
 
 func (s *testService) awaitObject(id astral.ObjectID) test.Test {
 	return s.test(func(t *testing.T) {
-		c := objects.Client(s.Apphost.Rpc())
+		c := objects.Op(s.Apphost.Rpc())
 		args := objects.ReadArgs{ID: id}
 		limit := 10
 		for {
@@ -246,7 +246,7 @@ func (s *testService) awaitObject(id astral.ObjectID) test.Test {
 
 func (s *testService) readObject(id astral.ObjectID) test.Test {
 	return s.test(func(t *testing.T) {
-		c := objects.Client(s.Apphost.Rpc())
+		c := objects.Op(s.Apphost.Rpc())
 		rc, err := c.Read(objects.ReadArgs{ID: id})
 		buf := bytes.NewBuffer(nil)
 		_, err = buf.ReadFrom(rc)
@@ -288,7 +288,7 @@ func (s *testService) scanObjects(typ string, s2 ...*testService) test.Test {
 		o = append(o, s)
 	}
 	return s.arg(typ).test(func(t *testing.T) {
-		c := objects.Client(s.Apphost.Rpc(), o[0].Apphost.HostID.String())
+		c := objects.Op(s.Apphost.Rpc(), o[0].Apphost.HostID.String())
 		search, err := c.Scan(objects.ScanArgs{
 			Type: typ,
 			Zone: astral.ZoneAll,
@@ -324,7 +324,7 @@ func (s *testService) searchObjects(query string, s2 ...*testService) test.Test 
 		o = append(o, s)
 	}
 	return s.arg(query).test(func(t *testing.T) {
-		c := objects.Client(s.Apphost.Rpc(), o[0].Apphost.HostID.String())
+		c := objects.Op(s.Apphost.Rpc(), o[0].Apphost.HostID.String())
 		search, err := c.Search(objects.SearchArgs{
 			Query: query,
 			Zone:  astral.ZoneAll,
@@ -343,7 +343,7 @@ func (s *testService) searchObjects(query string, s2 ...*testService) test.Test 
 func (s *testService) fetchReleases() test.Test {
 	return s.test(func(t *testing.T) {
 		for id, release := range s.published {
-			c := objects.Client(s.Apphost.Rpc())
+			c := objects.Op(s.Apphost.Rpc())
 			r := &bundle.Release{}
 			err := c.Fetch(objects.ReadArgs{ID: id}, r)
 			test.AssertErr(t, err)
@@ -368,7 +368,7 @@ func (s *testService) signAppContract(pkg string) test.Test {
 func (s *testService) fetchAppBundleExecs() test.Test {
 	return s.test(func(t *testing.T) {
 		for _, r := range s.published {
-			c := objects.Client(s.Apphost.Rpc())
+			c := objects.Op(s.Apphost.Rpc())
 			o := &bundle.Object[any]{}
 			o.Resolve = target.Any[target.AppBundle[any]](bundle.Resolve_.Try)
 			err := c.Fetch(objects.ReadArgs{ID: *r.BundleID}, o)
