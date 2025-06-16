@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/cryptopunkscc/portal/core/apphost"
+	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/target/dev/broadcast"
@@ -13,7 +14,7 @@ type Application struct{}
 
 func (a Application) cliHandler() cmd.Handler {
 	return cmd.Handler{
-		Func: apphost.Default.Rpc().Router(a.netHandler()).Run,
+		Func: rpc.Run(apphost.Default.Rpc().Router(a.netHandler())),
 		Name: "dev",
 		Desc: "Portal development service.",
 	}

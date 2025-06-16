@@ -26,11 +26,15 @@ func main() {
 				Desc: "serve",
 				Func: func() (s string, err error) {
 					log.Println("test serve")
-					err = apphost.Default.Rpc().Router(
+					router := apphost.Default.Rpc().Router(
 						cmd.Handler{
 							Func: echo,
 						},
-					).Run(context.Background())
+					)
+					if err = router.Init(context.Background()); err != nil {
+						return
+					}
+					err = router.Listen()
 					return "serve_end", err
 				},
 			},

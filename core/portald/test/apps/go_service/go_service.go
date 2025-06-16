@@ -3,12 +3,12 @@ package go_service
 import (
 	"errors"
 	"github.com/cryptopunkscc/portal/core/apphost"
-	"github.com/cryptopunkscc/portal/core/apphost/rpc"
+	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 )
 
 type TestGoService struct {
-	*rpc.Router
+	rpc.Router
 }
 
 func NewTestGoService(p string) *TestGoService {

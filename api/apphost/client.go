@@ -2,6 +2,7 @@ package apphost
 
 import (
 	"github.com/cryptopunkscc/astrald/astral"
+	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"io"
 	"net"
 )
@@ -13,6 +14,7 @@ type Client interface {
 	Protocol() string
 	DisplayName(identity *astral.Identity) string
 	Session() (Session, error)
+	Rpc() rpc.Rpc
 }
 
 type Session interface {

@@ -12,6 +12,7 @@ func (s *Service[T]) Start(ctx context.Context) (err error) {
 	log := plog.Get(ctx).Type(s)
 	log.Println("starting portald...")
 	ctx, s.shutdown = context.WithCancel(ctx)
+	s.Apphost.Log = log
 	if !s.configured {
 		if err = s.Configure(); err != nil {
 			return
@@ -44,7 +45,6 @@ func (s *Service[T]) startPortald(ctx context.Context) error {
 	handler := cmd.Handler{Sub: s.handlers()}
 	help.Inject(&handler)
 	router := s.Apphost.Rpc().Router(handler)
-	router.Log = log
 	if err := router.Init(ctx); err != nil {
 		return err
 	}
