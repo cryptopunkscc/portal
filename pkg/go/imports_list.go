@@ -29,11 +29,10 @@ func ListImports(path string) (l []ImportRefs, err error) {
 }
 
 type imports struct {
-	c    chan []string
-	wg   sync.WaitGroup
-	mod  string
-	root string
-	set  map[string][]string
+	Project
+	c   chan []string
+	wg  sync.WaitGroup
+	set map[string][]string
 }
 
 func (imp *imports) List() (l []ImportRefs) {
@@ -46,19 +45,14 @@ func (imp *imports) List() (l []ImportRefs) {
 }
 
 func (imp *imports) Collect(path string) (err error) {
-	imp.root, err = FindProjectRoot()
-	if err != nil {
-		return
-	}
-	imp.mod, err = GetModuleRoot(imp.root)
-	if err != nil {
+	if err = imp.Resolve(path); err != nil {
 		return
 	}
 	imp.c = make(chan []string)
 	imp.set = make(map[string][]string)
 
 	if filepath.IsAbs(path) {
-		path = strings.TrimPrefix(path, imp.root)
+		path = strings.TrimPrefix(path, imp.Dir)
 		path = strings.TrimPrefix(path, "/")
 	}
 	path = filepath.Clean(path)
@@ -75,12 +69,12 @@ func (imp *imports) Collect(path string) (err error) {
 		i := isrc[0]
 		src := isrc[1]
 
-		if strings.HasPrefix(i, imp.mod) {
+		if strings.HasPrefix(i, imp.Name) {
 			if n, ok := imp.set[i]; ok {
 				imp.set[i] = append(n, src)
 				continue
 			}
-			p := strings.TrimPrefix(i, imp.mod)
+			p := strings.TrimPrefix(i, imp.Name)
 			p = strings.Replace(p, "/", "", 1)
 			go imp.collect(p)
 		}
@@ -93,7 +87,7 @@ func (imp *imports) Collect(path string) (err error) {
 func (imp *imports) collect(path string) {
 	imp.wg.Add(1)
 	defer imp.wg.Done()
-	_ = fs.WalkDir(os.DirFS(imp.root), path, func(path2 string, d fs.DirEntry, err error) error {
+	_ = fs.WalkDir(os.DirFS(imp.Dir), path, func(path2 string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -106,7 +100,7 @@ func (imp *imports) collect(path string) {
 		if strings.HasSuffix(path2, "_test.go") {
 			return nil
 		}
-		src := filepath.Join(imp.root, path2)
+		src := filepath.Join(imp.Dir, path2)
 		imps, err := Imports(src)
 		if err != nil {
 			return nil

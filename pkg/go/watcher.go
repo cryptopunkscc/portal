@@ -8,13 +8,11 @@ import (
 )
 
 type Watcher struct {
-	filterExt   []string
-	abs         string
-	projectRoot string
-	moduleName  string
-	cache       *WatchCache
-	watcher     *fsnotify.Watcher
-	events      chan fsnotify.Event
+	Project
+	filterExt []string
+	cache     *WatchCache
+	watcher   *fsnotify.Watcher
+	events    chan fsnotify.Event
 }
 
 func NewWatcher() *Watcher {
@@ -26,10 +24,7 @@ func NewWatcher() *Watcher {
 func (w *Watcher) Run(ctx context.Context, abs string) (c <-chan fsnotify.Event, err error) {
 	log := plog.Get(ctx).Type(w).Set(&ctx)
 	log.Println("starting watcher", abs)
-	if w.projectRoot, err = FindProjectRoot(abs); err != nil {
-		return
-	}
-	if w.moduleName, err = GetModuleRoot(w.projectRoot); err != nil {
+	if err = w.Resolve(abs); err != nil {
 		return
 	}
 	if w.watcher, err = fsnotify.NewWatcher(); err != nil {
@@ -38,9 +33,8 @@ func (w *Watcher) Run(ctx context.Context, abs string) (c <-chan fsnotify.Event,
 	if err = w.watcher.Add(abs); err != nil {
 		return
 	}
-	log.Println("starting watcher", abs, w.projectRoot, w.moduleName)
-	w.abs = abs
-	w.cache = NewWatchCache(w.projectRoot, w.moduleName)
+	log.Println("starting watcher", abs, w.Dir, w.Name)
+	w.cache = NewWatchCache(w.Dir, w.Name)
 	for s := range w.cache.AddDir(abs) {
 		_ = w.watcher.Add(s)
 	}

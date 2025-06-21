@@ -25,49 +25,12 @@ func withProjectPath(imports []string, abs string) (modified []string) {
 	return
 }
 
-func FindProjectRoot(abs ...string) (s string, err error) {
-	path := filepath.Join(abs...)
-
-	if len(path) == 0 {
-		path, err = os.Getwd()
-		if err != nil {
-			return
-		}
+func FindProjectRoot(abs ...string) (string, error) {
+	if p, err := ResolveProject(abs...); err != nil {
+		return "", err
+	} else {
+		return p.Dir, nil
 	}
-
-	if path == "." || path == "" || path == "/" {
-		err = plog.Errorf("cannot find root")
-		return
-	}
-	if _, err = os.Stat(filepath.Join(path, "go.mod")); err == nil {
-		s = path
-		return
-	}
-	dir := filepath.Dir(path)
-	return FindProjectRoot(dir)
-}
-
-func GetModuleRoot(root string) (s string, err error) {
-	goMod := filepath.Join(root, "go.mod")
-	file, err := os.Open(goMod)
-	if err != nil {
-		err = plog.Err(err)
-		return
-	}
-	defer file.Close()
-	scanner := bufio.NewScanner(file)
-	if !scanner.Scan() {
-		return "", plog.Errorf("cannot find module name")
-	}
-
-	line := strings.TrimSpace(scanner.Text())
-	s = strings.TrimPrefix(line, "module ")
-
-	if s == line {
-		return "", plog.Errorf("cannot find module name")
-	}
-
-	return
 }
 
 func sameImports(i1, i2 []string) bool {
