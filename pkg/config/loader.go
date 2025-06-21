@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"
 	"path/filepath"
@@ -15,7 +16,7 @@ type Loader[T any] struct {
 }
 
 func (l *Loader[T]) Load(path ...string) (err error) {
-	plog.TraceErr(&err)
+	defer plog.TraceErr(&err)
 	p := ""
 	if p, err = l.abs(path...); err != nil {
 		return
@@ -37,12 +38,13 @@ func (l *Loader[T]) Load(path ...string) (err error) {
 		if err = l.load(l.Dir, l.File); err == nil {
 			return
 		}
-		// If the root directory is reached, end the search.
 		if p = filepath.Dir(l.Dir); p == l.Dir {
-			return plog.Errorf("file not found")
+			return ErrNotFound // end search when the root directory is reached
 		}
 	}
 }
+
+var ErrNotFound = errors.New("config not found")
 
 func (l *Loader[T]) load(path ...string) (err error) {
 	defer plog.TraceErr(&err)

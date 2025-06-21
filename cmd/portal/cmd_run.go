@@ -20,7 +20,9 @@ type Opt struct {
 func (a *Application) Run(ctx context.Context, opt Opt, cmd ...string) (err error) {
 	defer plog.TraceErr(&err)
 	if err = a.Configure(); err != nil {
-		return
+		if err = a.handleConfigurationError(ctx, err); err != nil {
+			return
+		}
 	}
 	opt.Open = opt.Open || opt.Query != ""
 	log := plog.Get(ctx).Type(a).Set(&ctx)

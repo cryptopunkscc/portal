@@ -1,6 +1,7 @@
 package token
 
 import (
+	"errors"
 	mod "github.com/cryptopunkscc/astrald/mod/apphost"
 	api "github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/env"
@@ -53,10 +54,12 @@ func (r *Repository) Set(pkg string, token *mod.AccessToken) (err error) {
 
 func (r *Repository) Get(pkg string) (token *mod.AccessToken, err error) {
 	if token, err = pkgOs.ReadJson[*mod.AccessToken](r.dir(), pkg); err != nil {
-		err = plog.Err(err)
+		err = plog.Err(ErrNotCached)
 	}
 	return
 }
+
+var ErrNotCached = errors.New("apphost auth token is not cached or cannot be loaded")
 
 func (r *Repository) List(args *api.ListTokensArgs) (api.AccessTokens, error) {
 	return r.op().ListTokens(args)

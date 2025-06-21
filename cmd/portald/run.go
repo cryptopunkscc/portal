@@ -32,5 +32,9 @@ func (a *Application[T]) start(ctx context.Context, args RunArgs) (err error) {
 }
 
 func (a *Application[T]) loadConfig(args RunArgs) (err error) {
-	return a.Config.Load(args.ConfigPath)
+	err = a.Config.Load(args.ConfigPath)
+	if len(args.ConfigPath) == 0 {
+		err = nil
+	}
+	return
 }

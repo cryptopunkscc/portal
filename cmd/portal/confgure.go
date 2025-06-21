@@ -1,10 +1,14 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"github.com/cryptopunkscc/astrald/mod/apphost"
-	"github.com/cryptopunkscc/portal/api/portal"
 	"github.com/cryptopunkscc/portal/core/token"
+	"github.com/cryptopunkscc/portal/pkg/config"
+	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"time"
 )
 
 func (a *Application) Configure() (err error) {
@@ -24,8 +28,11 @@ func (a *Application) Configure() (err error) {
 }
 
 func (a *Application) resolveConfig() (err error) {
+	defer plog.TraceErr(&err)
 	if err = a.Config.Load(); err != nil {
-		return
+		if !errors.Is(err, config.ErrNotFound) {
+			return // abort when config exist but cannot be loaded for some reason
+		}
 	}
 	if err = a.Config.Build(); err != nil {
 		return
@@ -43,10 +50,32 @@ func (a *Application) setupEndpoint() (err error) {
 }
 
 func (a *Application) setupAuthToken() (err error) {
+	defer plog.TraceErr(&err)
 	var t *apphost.AccessToken
 	tokens := token.Repository{Dir: a.Config.Tokens}
 	if t, err = tokens.Get("portal"); err == nil {
 		a.Apphost.AuthToken = string(t.Token)
 	}
 	return
+}
+
+func (a *Application) handleConfigurationError(ctx context.Context, err error) error {
+	if !errors.Is(err, token.ErrNotCached) {
+		return err
+	}
+	if err = a.startPortald(ctx); err != nil {
+		return err
+	}
+	await := flow.Await{
+		UpTo:  5 * time.Second,
+		Delay: 50 * time.Millisecond,
+		Mod:   6,
+		Ctx:   ctx,
+	}
+	for range await.Chan() {
+		if err = a.setupAuthToken(); err == nil {
+			break
+		}
+	}
+	return err
 }
