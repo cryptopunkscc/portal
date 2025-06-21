@@ -13,12 +13,13 @@ import (
 var application = &Application[Portal_]{}
 
 func init() {
+	plog.Default = plog.New().Scope("portald")
 	application.ExtraTokens = []string{"portal"}
 }
 
 func main() {
 	ctx := context.Background()
-	log := plog.New().D().Scope("portald").Set(&ctx)
+	log := plog.Default.D().Set(&ctx)
 	go singal.OnShutdown(log, application.Stop)
 
 	c := application.commands()

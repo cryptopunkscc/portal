@@ -30,7 +30,7 @@ func (a *Application) resolveConfig() (err error) {
 	if err = a.Config.Build(); err != nil {
 		return
 	}
-	plog.D().Scope(portal.DefaultConfigFile).Printf("\n%s", a.Config.Yaml())
+	plog.D().Scope("config").Printf("\n%s", a.Config.Yaml())
 	return
 }
 

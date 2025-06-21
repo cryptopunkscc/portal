@@ -49,7 +49,7 @@ func (s *Service[T]) Configure() (err error) {
 	}
 	_ = s.ReadCreatedUser()
 	s.configured = true
-	plog.D().Printf("config:\n%s", s.Config.Yaml())
+	plog.D().Scope("config").Printf("\n%s", s.Config.Yaml())
 	return
 }
 
