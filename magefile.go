@@ -119,15 +119,15 @@ func (Build) Cli() error {
 }
 
 func (Build) Astrald() error {
-	wd, err := golang.FindProjectRoot()
+	n := "cryptopunkscc/astrald"
+	c := "./cmd/astrald"
+	o := "cmd/portal-installer/bin/"
+	d, err := golang.ProjectDependency(n)
 	if err != nil {
 		return err
 	}
-	out := "cmd/portal-installer/bin/"
-	return golang.GoPkgMod{
-		Url:     "github.com/cryptopunkscc/astrald",
-		Version: api.AstralVersion,
-	}.Build("./cmd/astrald", filepath.Join(wd, out))
+	o = filepath.Join(d.Dir, o)
+	return d.Build(c, o)
 }
 
 func (Build) Portald() error {
