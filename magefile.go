@@ -88,6 +88,10 @@ func (Install) All() {
 
 type Build mg.Namespace
 
+var out string
+
+func (Build) Out(dir string) { out = dir }
+
 func (Build) Installer() error {
 	defer clearVersion()
 	defer gpgSignPortalInstallers()
@@ -99,7 +103,11 @@ func (Build) Installer() error {
 		Build.Cli,
 		Build.Apps,
 	)
-	return sh.RunV("go", "build", "-o", "./bin", "./cmd/portal-installer/")
+	o := "./bin"
+	if len(out) > 0 {
+		o = out
+	}
+	return sh.RunV("go", "build", "-o", o, "./cmd/portal-installer/")
 }
 
 func (Build) Apps() (err error) {
@@ -152,7 +160,7 @@ func (Build) JsLib() error {
 }
 
 func resolveVersion() {
-	file, err := os.Create("./runner/version/name")
+	file, err := os.Create("./api/version/name")
 	if err != nil {
 		return
 	}
@@ -164,7 +172,7 @@ func resolveVersion() {
 }
 
 func clearVersion() {
-	file, err := os.Create("./runner/version/name")
+	file, err := os.Create("./api/version/name")
 	if err != nil {
 		panic(err)
 	}

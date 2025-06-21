@@ -22,3 +22,19 @@ func CopyFile(source string, target string) error {
 	}
 	return d.Close()
 }
+
+func CanWriteToDir(dir string) bool {
+	info, err := os.Stat(dir)
+	if os.IsNotExist(err) {
+		return false
+	}
+	if !info.IsDir() {
+		return false
+	}
+	tempFile, err := os.CreateTemp(dir, "tempfile-*.txt")
+	if err != nil {
+		return false
+	}
+	_ = os.Remove(tempFile.Name())
+	return true
+}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"os"
 	"os/exec"
 	"time"
 )
@@ -21,6 +22,10 @@ func (a *Application) startPortald(ctx context.Context) (err error) {
 func (a *Application) startPortaldProcess(ctx context.Context) (err error) {
 	plog.Get(ctx).Println("starting portald")
 	c := exec.Command("portald")
+	if plog.Verbosity >= plog.Debug {
+		c.Stdout = os.Stdout
+		c.Stderr = os.Stderr
+	}
 	err = c.Start()
 	return
 }
