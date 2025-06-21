@@ -38,10 +38,6 @@ func (r Read) Read(p []byte) (n int, err error)   { return r(p) }
 func (w Write) Write(p []byte) (n int, err error) { return w(p) }
 func (c Closer) Close() error                     { return c() }
 
-type Failure struct {
-	Error string `json:"error"`
-}
-
 func NewSerializer(rwc io.ReadWriteCloser) *Serializer {
 	return &Serializer{Reader: rwc, Writer: rwc, Closer: rwc}
 }
@@ -68,7 +64,7 @@ func (s *Serializer) Encode(value any) (err error) {
 	if value != End {
 		switch v := value.(type) {
 		case error:
-			r = Failure{v.Error()}
+			r = Failure{v}
 		}
 	}
 	var data []byte
@@ -91,7 +87,7 @@ func (s *Serializer) Decode(value any) (err error) {
 
 	// try decode as failure
 	f := Failure{}
-	if err = s.Unmarshal(b, &f); err == nil && f.Error != "" {
+	if err = s.Unmarshal(b, &f); err == nil && f.Error != nil {
 		return fmt.Errorf("RPC: %s", f.Error)
 	}
 

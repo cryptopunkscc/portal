@@ -9,6 +9,10 @@ import (
 	"testing"
 )
 
+func init() {
+	Verbosity = all
+}
+
 func TestErr_stack(t *testing.T) {
 	expect := debug.Stack()
 	actual := Err(errors.New("error")).stack
@@ -44,6 +48,11 @@ func TestErr_Error_2(t *testing.T) {
 func TestTraceErr(t *testing.T) {
 	err := errorWithTrace()
 	assert.ErrorAs(t, err, &ErrStack{})
+}
+
+func TestPrintln(t *testing.T) {
+	err := errorWithTrace()
+	Println(err)
 }
 
 func errorWithTrace() (err error) {

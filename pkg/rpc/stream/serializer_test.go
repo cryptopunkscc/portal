@@ -3,12 +3,13 @@ package stream
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/stretchr/testify/assert"
 	"io"
-	"log"
 	"strings"
 	"testing"
-	"time"
 )
 
 func TestSerializer_Decode(t *testing.T) {
@@ -88,16 +89,12 @@ func TestSerializer_Encode(t *testing.T) {
 	}
 }
 
-func TestTest(t *testing.T) {
-	reader, writer := io.Pipe()
-
-	go func() {
-		write, err := writer.Write([]byte{})
-		log.Println("write", write, err)
-	}()
-
-	b := make([]byte, 10)
-	read, err := reader.Read(b)
-	log.Println("read", read, err)
-	time.Sleep(100 * time.Millisecond)
+func TestFailure_Json_Marshal_Unmarshal(t *testing.T) {
+	e := &Failure{Error: errors.New("==test_error==")}
+	b, err := json.Marshal(e)
+	test.AssertErr(t, err)
+	plog.Println(string(b))
+	e = nil
+	err = json.Unmarshal(b, &e)
+	test.AssertErr(t, err)
 }
