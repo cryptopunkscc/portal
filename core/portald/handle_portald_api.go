@@ -4,11 +4,11 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 )
 
-func (s *Service[T]) Api() cmd.Handlers {
+func (s *Service) Api() cmd.Handlers {
 	return s.portaldApi().Plus(s.appApi()...)
 }
 
-func (s *Service[T]) portaldApi() (handlers cmd.Handlers) {
+func (s *Service) portaldApi() (handlers cmd.Handlers) {
 	for _, handler := range s.publicHandlers() {
 		handler.Func = "portald"
 		handler.Sub = nil
@@ -17,7 +17,7 @@ func (s *Service[T]) portaldApi() (handlers cmd.Handlers) {
 	return handlers
 }
 
-func (s *Service[T]) appApi() (handlers cmd.Handlers) {
+func (s *Service) appApi() (handlers cmd.Handlers) {
 	for _, app := range s.InstalledApps(ListAppsOpts{}) {
 		m := app.Manifest()
 		h := cmd.Handler{

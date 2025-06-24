@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-func (s *Service[T]) Start(ctx context.Context) (err error) {
+func (s *Service) Start(ctx context.Context) (err error) {
 	log := plog.Get(ctx).Type(s)
 	log.Println("starting portald...")
 	if os.Getenv("ENABLE_PORTAL_APPHOST_LOG") == "true" {
@@ -31,7 +31,7 @@ func (s *Service[T]) Start(ctx context.Context) (err error) {
 	return
 }
 
-func (s *Service[T]) startAstrald(ctx context.Context) (err error) {
+func (s *Service) startAstrald(ctx context.Context) (err error) {
 	r := astrald.Initializer{
 		AgentAlias: "portald",
 		NodeRoot:   s.Config.Astrald,
@@ -43,7 +43,7 @@ func (s *Service[T]) startAstrald(ctx context.Context) (err error) {
 	return r.Start(ctx)
 }
 
-func (s *Service[T]) startPortald(ctx context.Context) error {
+func (s *Service) startPortald(ctx context.Context) error {
 	log := plog.Get(ctx)
 	handler := cmd.Handler{Sub: s.handlers()}
 	help.Inject(&handler)
@@ -62,7 +62,7 @@ func (s *Service[T]) startPortald(ctx context.Context) error {
 	return nil
 }
 
-func (s *Service[T]) createTokens(log plog.Logger) {
+func (s *Service) createTokens(log plog.Logger) {
 	tokens := s.Tokens()
 	for _, pkg := range s.ExtraTokens {
 		if _, err := tokens.Resolve(pkg); err != nil {

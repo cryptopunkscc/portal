@@ -18,10 +18,10 @@ import (
 	"sync"
 )
 
-type Service[T Portal_] struct {
-	cache     Cache[T]
+type Service struct {
+	cache     Cache[Portal_]
 	waitGroup sync.WaitGroup
-	processes sig.Map[string, T]
+	processes sig.Map[string, Portal_]
 	shutdown  context.CancelFunc
 
 	Config      portal.Config
@@ -40,7 +40,7 @@ type Service[T Portal_] struct {
 	UserCreated *user.Created
 }
 
-func (s *Service[T]) Configure() (err error) {
+func (s *Service) Configure() (err error) {
 	if err = s.Config.Build(); err != nil {
 		return
 	}
@@ -53,38 +53,38 @@ func (s *Service[T]) Configure() (err error) {
 	return
 }
 
-func (s *Service[T]) Stop() {
+func (s *Service) Stop() {
 	s.shutdown()
 }
 
-func (s *Service[T]) Wait() (err error) {
+func (s *Service) Wait() (err error) {
 	s.waitGroup.Wait()
 	s.shutdown()
 	return
 }
 
-func (s *Service[T]) SetupToken(app App_) (err error) {
+func (s *Service) SetupToken(app App_) (err error) {
 	_, err = s.Tokens().Resolve(app.Manifest().Package)
 	return
 }
 
-func (s *Service[T]) Installer() app.Installer {
+func (s *Service) Installer() app.Installer {
 	return app.Installer{
 		Dir:     s.Config.Apps,
 		Prepare: s.SetupToken,
 	}
 }
 
-func (s *Service[T]) Publisher() bundle.Publisher {
+func (s *Service) Publisher() bundle.Publisher {
 	return bundle.Publisher{
 		Dir: filepath.Join(s.Config.Astrald, "data"),
 	}
 }
 
-func (s *Service[T]) Tokens() *token.Repository {
+func (s *Service) Tokens() *token.Repository {
 	return token.NewRepository(s.Config.Tokens, &s.Apphost)
 }
 
-func (s *Service[T]) apps() Source {
+func (s *Service) apps() Source {
 	return source.Dir(s.Config.Apps)
 }

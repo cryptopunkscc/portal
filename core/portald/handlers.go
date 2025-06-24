@@ -5,7 +5,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 )
 
-func (s *Service[T]) handlers() cmd.Handlers {
+func (s *Service) handlers() cmd.Handlers {
 	return cmd.Handlers{
 		cli.Handler,
 		cli.EncodingHandler,
@@ -34,7 +34,7 @@ func (s *Service[T]) handlers() cmd.Handlers {
 	}.Plus(s.publicHandlers()...)
 }
 
-func (s *Service[T]) publicHandlers() cmd.Handlers {
+func (s *Service) publicHandlers() cmd.Handlers {
 	return cmd.Handlers{
 		{
 			Name: "user u",

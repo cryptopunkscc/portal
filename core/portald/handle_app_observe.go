@@ -10,7 +10,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
-func (s *Service[T]) ObserveApps(ctx context.Context, opts ListAppsOpts) (out <-chan target.Portal_, err error) {
+func (s *Service) ObserveApps(ctx context.Context, opts ListAppsOpts) (out <-chan target.Portal_, err error) {
 	log := plog.Get(ctx)
 	log.Println("Observing...")
 

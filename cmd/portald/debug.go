@@ -7,7 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/exec"
 )
 
-func (a *Application[T]) init() {
+func (a *Application) init() {
 	a.Order = []int{2, 1, 0}
 	a.Resolve = Any[Runnable](
 		Skip("node_modules"),

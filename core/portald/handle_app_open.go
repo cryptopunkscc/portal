@@ -10,7 +10,7 @@ import (
 	"github.com/cryptopunkscc/portal/target/source"
 )
 
-func (s *Service[T]) Open() Run[portald.OpenOpt] {
+func (s *Service) Open() Run[portald.OpenOpt] {
 	dispatcher := s.dispatcher()
 	return func(ctx context.Context, opt portald.OpenOpt, cmd ...string) (err error) {
 		plog.Get(ctx).Type(s).Println("open:", opt, cmd)
@@ -29,10 +29,10 @@ func (s *Service[T]) Open() Run[portald.OpenOpt] {
 	}
 }
 
-func (s *Service[T]) dispatcher() Dispatcher {
+func (s *Service) dispatcher() Dispatcher {
 	return Dispatcher{
 		Provider: s.Provider(),
-		Runner: &CachedRunner[T]{
+		Runner: &CachedRunner[Portal_]{
 			Cache: &s.cache,
 			Runner: &AsyncRunner{
 				WaitGroup: &s.waitGroup,
@@ -41,7 +41,7 @@ func (s *Service[T]) dispatcher() Dispatcher {
 	}
 }
 
-func (s *Service[T]) Provider() Provider[Runnable] {
+func (s *Service) Provider() Provider[Runnable] {
 	return Provider[Runnable]{
 		Priority: Priority{
 			Match[Bundle_],

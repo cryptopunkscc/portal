@@ -7,7 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/exec"
 )
 
-func (a *Application[T]) init() {
+func (a *Application) init() {
 	a.Resolve = Any[Runnable](
 		Skip("node_modules"),
 		exec.Runner{Config: a.Config}.Dist().Try,

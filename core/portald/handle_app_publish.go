@@ -7,7 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/target/source"
 )
 
-func (s *Service[T]) PublishApps(path string) (out []bundle.Info, err error) {
+func (s *Service) PublishApps(path string) (out []bundle.Info, err error) {
 	src, err := source.File(path)
 	if err != nil {
 		return
@@ -15,7 +15,7 @@ func (s *Service[T]) PublishApps(path string) (out []bundle.Info, err error) {
 	return s.PublishAppsFS(src)
 }
 
-func (s *Service[T]) PublishAppsFS(src target.Source) (out []bundle.Info, err error) {
+func (s *Service) PublishAppsFS(src target.Source) (out []bundle.Info, err error) {
 	p := s.Publisher()
 	l := bundle.Resolve_.List(src)
 	var id *astral.ObjectID

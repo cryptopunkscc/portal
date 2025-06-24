@@ -14,7 +14,7 @@ import (
 	"sync"
 )
 
-func (s *Service[T]) AvailableApps(ctx context.Context, follow bool) (out flow.Input[bundle.Info], err error) {
+func (s *Service) AvailableApps(ctx context.Context, follow bool) (out flow.Input[bundle.Info], err error) {
 	a := availableAppsScanner{}
 	a.log = plog.Get(ctx)
 	a.rpc = s.Apphost.Rpc()

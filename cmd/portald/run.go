@@ -9,14 +9,14 @@ type RunArgs struct {
 	ConfigPath string `cli:"config c"`
 }
 
-func (a *Application[T]) run(ctx context.Context, args RunArgs) (err error) {
+func (a *Application) run(ctx context.Context, args RunArgs) (err error) {
 	if err = a.start(ctx, args); err != nil {
 		return
 	}
 	return a.Wait()
 }
 
-func (a *Application[T]) start(ctx context.Context, args RunArgs) (err error) {
+func (a *Application) start(ctx context.Context, args RunArgs) (err error) {
 	if err = a.loadConfig(args); err != nil {
 		return
 	}
@@ -31,7 +31,7 @@ func (a *Application[T]) start(ctx context.Context, args RunArgs) (err error) {
 	return
 }
 
-func (a *Application[T]) loadConfig(args RunArgs) (err error) {
+func (a *Application) loadConfig(args RunArgs) (err error) {
 	err = a.Config.Load(args.ConfigPath)
 	if len(args.ConfigPath) == 0 {
 		err = nil

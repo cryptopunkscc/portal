@@ -34,7 +34,7 @@ type testService struct {
 	alias  string
 	ctx    context.Context
 	config portal.Config
-	*portald.Service[target.Portal_]
+	*portald.Service
 	apps      []target.Portal_
 	published map[astral.ObjectID]bundle.Release
 }
@@ -90,7 +90,7 @@ var AppsFS embed.FS
 
 func (s *testService) configure() test.Test {
 	return s.test(func(t *testing.T) {
-		s.Service = &portald.Service[target.Portal_]{}
+		s.Service = &portald.Service{}
 		s.Config = s.config
 		s.Config.Node.Log.Level = 100
 		s.ExtraTokens = []string{"portal"}

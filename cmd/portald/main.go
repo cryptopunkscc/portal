@@ -3,14 +3,13 @@ package main
 import (
 	"context"
 	_ "github.com/cryptopunkscc/portal/api/env/desktop"
-	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd/help"
 	singal "github.com/cryptopunkscc/portal/pkg/sig"
 )
 
-var application = &Application[Portal_]{}
+var application = &Application{}
 
 func init() {
 	plog.Default = plog.New().Scope("portald")

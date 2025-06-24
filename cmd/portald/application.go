@@ -1,15 +1,14 @@
 package main
 
 import (
-	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/api/version"
 	"github.com/cryptopunkscc/portal/core/portald"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 )
 
-type Application[T Portal_] struct{ portald.Service[T] }
+type Application struct{ portald.Service }
 
-func (a *Application[T]) commands() (h cmd.Handler) {
+func (a *Application) commands() (h cmd.Handler) {
 	return cmd.Handler{
 		Func: a.run,
 		Name: "portald",

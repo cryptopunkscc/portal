@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/portal"
-	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"testing"
@@ -45,8 +44,8 @@ func TestApplication_start_project_config(t *testing.T) {
 	test.AssertErr(t, err)
 }
 
-func testApplication() (a *Application[target.Portal_]) {
-	a = &Application[target.Portal_]{}
+func testApplication() (a *Application) {
+	a = &Application{}
 	a.ExtraTokens = []string{"portal"}
 	return
 }

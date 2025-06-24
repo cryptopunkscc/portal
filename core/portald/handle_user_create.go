@@ -7,7 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
-func (s *Service[T]) CreateUser(alias string) (err error) {
+func (s *Service) CreateUser(alias string) (err error) {
 	defer plog.TraceErr(&err)
 
 	// create user
@@ -38,7 +38,7 @@ func (s *Service[T]) CreateUser(alias string) (err error) {
 	return
 }
 
-func (s *Service[T]) signAppContract(identifier string) (err error) {
+func (s *Service) signAppContract(identifier string) (err error) {
 	id, err := s.Apphost.Resolve(identifier)
 	if err != nil {
 		return
@@ -51,7 +51,7 @@ func (s *Service[T]) signAppContract(identifier string) (err error) {
 	return
 }
 
-func (s *Service[T]) authenticate() (err error) {
+func (s *Service) authenticate() (err error) {
 	uat, err := s.Tokens().Resolve("portald")
 	if err != nil {
 		return
@@ -63,17 +63,17 @@ func (s *Service[T]) authenticate() (err error) {
 	return
 }
 
-func (s *Service[T]) PrintCreatedUser() (info *user.Created, err error) {
+func (s *Service) PrintCreatedUser() (info *user.Created, err error) {
 	if s.UserCreated == nil {
 		return nil, plog.Errorf("user not exists")
 	}
 	return s.UserCreated, nil
 }
 
-func (s *Service[T]) WriteCreatedUser() (err error) {
+func (s *Service) WriteCreatedUser() (err error) {
 	return s.Resources.WriteYaml("user_created.yaml", s.UserCreated)
 }
 
-func (s *Service[T]) ReadCreatedUser() (err error) {
+func (s *Service) ReadCreatedUser() (err error) {
 	return s.Resources.ReadYaml("user_created.yaml", &s.UserCreated)
 }
