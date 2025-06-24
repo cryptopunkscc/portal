@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/api/portald"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -19,13 +20,16 @@ type Opt struct {
 
 func (a *Application) Run(ctx context.Context, opt Opt, cmd ...string) (err error) {
 	defer plog.TraceErr(&err)
+	log := plog.Get(ctx).Type(a).Set(&ctx)
+	if os.Getenv("ENABLE_PORTAL_APPHOST_LOG") == "true" {
+		a.Apphost.Log = log
+	}
 	if err = a.Configure(); err != nil {
 		if err = a.handleConfigurationError(ctx, err); err != nil {
 			return
 		}
 	}
 	opt.Open = opt.Open || opt.Query != ""
-	log := plog.Get(ctx).Type(a).Set(&ctx)
 	if err = a.portald().Ping(); err != nil {
 		if err = a.startPortald(ctx); err != nil {
 			return

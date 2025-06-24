@@ -6,13 +6,16 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd/help"
+	"os"
 )
 
 func (s *Service[T]) Start(ctx context.Context) (err error) {
 	log := plog.Get(ctx).Type(s)
 	log.Println("starting portald...")
+	if os.Getenv("ENABLE_PORTAL_APPHOST_LOG") == "true" {
+		s.Apphost.Log = log
+	}
 	ctx, s.shutdown = context.WithCancel(ctx)
-	//s.Apphost.Log = log FIXME prints binary data & breaks tests
 	if !s.configured {
 		if err = s.Configure(); err != nil {
 			return

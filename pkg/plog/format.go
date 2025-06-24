@@ -3,6 +3,7 @@ package plog
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 )
@@ -11,11 +12,13 @@ const DefaultTimeFormat = "2006-01-02 15:04:05.000000"
 const DefaultLogFormat = "%s (%d) %c %v: %s"
 const DefaultLevels = "PFEWID"
 
+var DefaultWriter io.Writer = os.Stdout
+
 var DefaultFormatter = NewFormatter(DefaultLogFormat, DefaultTimeFormat, DefaultLevels)
 
 var DefaultOutput Output = func(log Log) {
 	bytes := DefaultFormatter.Bytes(log)
-	_, _ = os.Stderr.Write(bytes)
+	_, _ = DefaultWriter.Write(bytes)
 }
 
 type Formatter struct {
