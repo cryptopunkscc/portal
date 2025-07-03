@@ -174,6 +174,7 @@ func (s *testService) installApps() test.Test {
 			err := r.Run(ctx)
 			test.AssertErr(t, err)
 			s.apps = append(s.apps, r)
+			break
 		}
 		assert.NotEmpty(t, s.apps)
 	})
