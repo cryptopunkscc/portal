@@ -23,3 +23,7 @@ Run tests:
 ```shell
 go test -v e2e_test.go
 ```
+
+## Known issues
+
+* [Fixing incompatible CNI plugin for podman](https://www.michaelmcculley.com/updating-cni-plugins-for-podman-a-step-by-step-guide/)

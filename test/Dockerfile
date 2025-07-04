@@ -3,9 +3,9 @@ FROM ubuntu:24.04
 WORKDIR /portal
 
 COPY ./portal-installer ./
+COPY ./.portal.env.yml ./
 
 RUN ./portal-installer
 
 ENV PLOG=100
-
-CMD ["sh", "-c", "portal"]
+ENV ENABLE_PORTAL_APPHOST_LOG=true

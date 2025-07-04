@@ -1,48 +1,63 @@
 package test
 
 import (
-	"github.com/stretchr/testify/assert"
-	"os"
-	"os/exec"
+	"fmt"
+	"github.com/cryptopunkscc/portal/pkg/test"
 	"testing"
+	"time"
 )
 
-func TestE2E(t *testing.T) {
-	image := "e2e-test"
-	container1 := "e2e-test-1"
+func TestE2E_2(t *testing.T) {
+	c := create(2, container{
+		image:   "e2e-test",
+		network: "e2e-test-net",
+		logfile: "portald.log",
+	})
 
-	tests := []struct {
-		Name, Dir string
-		Cmd       []string
-	}{
-		{Name: "build portal installer", Dir: "../", Cmd: []string{
-			"./mage", "build:out", "./test", "build:installer"}},
-		{Name: "build_image", Cmd: []string{
-			"docker", "build", "-t", image + ":latest", "."}},
-		{Name: "run_container1", Cmd: []string{
-			"docker", "run", "--name", container1, "-p", "8081:8080", image}},
-		//"docker", "run", "-d", "--name", container1, "--network", network, "-p", "8081:8080", image}}, // FIXME custom network doesn't work for some reason
-		{Name: "stop_container1", Cmd: []string{
-			"docker", "stop", container1 /*, instance2*/}},
-		{Name: "remove_container1", Cmd: []string{
-			"docker", "rm", container1 /*, instance2*/}},
-		{Name: "remove_image", Cmd: []string{
-			"docker", "rmi", image}},
+	runner := test.Runner{}
+	tests := []test.Task{
+		{
+			Name: "start portald via portal",
+			Test: c[0].portalStart(),
+		},
+		{
+			Name: "help",
+			Test: c[0].portalHelp(),
+		},
+		{
+			Name: "create user",
+			Test: c[0].createUser(),
+		},
+		{
+			Name: "claim",
+			Test: c[0].claim(c[1]),
+		},
+		{
+			Name: "user info",
+			Test: c[0].userInfo(),
+		},
+		{
+			Name:  "close",
+			Test:  c[0].portalClose(),
+			Group: 1,
+		},
+		{
+			Name:  "print logs",
+			Group: 2,
+			Test:  c[0].printLog(),
+		},
+		{
+			Name:  "print logs",
+			Group: 3,
+			Test:  c[1].printLog(),
+		},
 	}
-	for _, test := range tests {
-		t.Run(test.Name, func(t *testing.T) {
-			assert.NotEmpty(t, test.Cmd)
-			c := exec.Command(test.Cmd[0], test.Cmd[1:]...)
-			c.Stdout = os.Stdout
-			c.Stderr = os.Stderr
-			c.Stdin = os.Stdin
-			c.Env = append(os.Environ())
-			c.Dir = "."
-			if test.Dir != "" {
-				c.Dir = test.Dir
-			}
-			err := c.Run()
-			assert.NoError(t, err)
-		})
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("%d  %s", i, tt.Name), runner.Run(tests, tt))
 	}
+
+	t.Cleanup(func() {
+		time.Sleep(1 * time.Second) // await logs
+		forceStopContainers(c...)
+	})
 }
