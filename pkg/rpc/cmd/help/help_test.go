@@ -98,7 +98,7 @@ Parameters:
     -b  [bool]    - Boolean
     $0  [string]  - String
 
-Subcommands:
+Commands:
 
     bar b  - Bar description
     baz

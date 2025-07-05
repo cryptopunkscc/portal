@@ -10,18 +10,20 @@ import (
 	"text/tabwriter"
 )
 
-func In(handler cmd.Handler) bool {
+// Check if given helper contains help printer.
+func Check(handler cmd.Handler) bool {
 	if handler.Name == Name {
 		return true
 	}
 	for _, h := range handler.Sub {
-		if In(h) {
+		if Check(h) {
 			return true
 		}
 	}
 	return false
 }
 
+// Inject help printer recursively to the given handler and all nested sub-handles.
 func Inject(handler *cmd.Handler) {
 	for i := range handler.Sub {
 		Inject(&handler.Sub[i])
@@ -81,7 +83,7 @@ func (h Handler) MarshalCLI() (help string) {
 		fmt.Fprintln(w)
 	}
 	if len(h.Sub) > 0 {
-		fmt.Fprintln(w, "Subcommands:")
+		fmt.Fprintln(w, "Commands:")
 		fmt.Fprintln(w)
 		for _, sub := range h.Sub {
 			if sub.Desc == "" {

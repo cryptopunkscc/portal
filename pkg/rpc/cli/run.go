@@ -12,7 +12,7 @@ func Run(handler cmd.Handler) {
 	ctx, cancel := context.WithCancel(context.Background())
 	log := plog.New().D().Scope(handler.Name).Set(&ctx)
 	go sig.OnShutdown(log, cancel)
-	if !help.In(handler) {
+	if !help.Check(handler) {
 		help.Inject(&handler)
 	}
 	err := New(handler).Run(ctx)
