@@ -35,6 +35,8 @@ func (s *Service) CreateUser(alias string) (err error) {
 
 	// authenticate as portald
 	err = s.authenticate()
+
+	s.User, err = s.UserInfo()
 	return
 }
 

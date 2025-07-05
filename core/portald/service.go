@@ -38,6 +38,7 @@ type Service struct {
 	Order []int
 
 	UserCreated *user.Created
+	User        *user.Info
 }
 
 func (s *Service) Configure() (err error) {
@@ -68,10 +69,24 @@ func (s *Service) SetupToken(app App_) (err error) {
 	return
 }
 
+func (s *Service) PrepareApp(app App_) (err error) {
+	t, err := s.Tokens().Resolve(app.Manifest().Package)
+	if err != nil {
+		return
+	}
+	if s.User != nil {
+		err = s.signAppContract(t.Identity.String())
+		if err != nil {
+			return
+		}
+	}
+	return
+}
+
 func (s *Service) Installer() app.Installer {
 	return app.Installer{
 		Dir:     s.Config.Apps,
-		Prepare: s.SetupToken,
+		Prepare: s.PrepareApp,
 	}
 }
 
