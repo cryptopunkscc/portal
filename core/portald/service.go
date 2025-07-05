@@ -39,6 +39,7 @@ type Service struct {
 
 	UserCreated *user.Created
 	User        *user.Info
+	*NodeInfo
 }
 
 func (s *Service) Configure() (err error) {

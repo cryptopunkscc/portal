@@ -149,6 +149,17 @@ func (s *Service) publicHandlers() cmd.Handlers {
 			},
 		},
 		{
+			Name: "node n",
+			Desc: "Manage nodes.",
+			Sub: cmd.Handlers{
+				{
+					Func: s.nodeInfo,
+					Name: "info i",
+					Desc: "Print node info.",
+				},
+			},
+		},
+		{
 			Func: s.Stop,
 			Name: "close",
 			Desc: "Shutdown portal environment and close all running apps.",

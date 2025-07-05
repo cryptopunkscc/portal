@@ -28,3 +28,15 @@ func (o OpClient) Resolve(alias string) (out *astral.Identity, err error) {
 	out = s.Object
 	return
 }
+
+func (o OpClient) GetAlias(id astral.Identity) (out string, err error) {
+	s, err := rpc.Query[rpc.Json[string]](o.r(), "get_alias", rpc.Opt{
+		"id":  id.String(),
+		"out": "json",
+	})
+	if err != nil {
+		return
+	}
+	out = s.Object
+	return
+}
