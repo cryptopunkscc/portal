@@ -10,22 +10,17 @@ type astrald struct {
 	alias    string
 }
 
-func (a *astrald) parseIdentity(logLine string) bool {
-	c := strings.Split(logLine, " [node] astral node ")
+func (a *astrald) parseNodeInfo(logLine string) bool {
+	c := strings.Split(logLine, ": NodeInfo: ")
 	if len(c) < 2 {
 		return false
 	}
-	a.identity = strings.TrimSpace(strings.Split(c[1], " ")[0])
-	plog.Println("found node identity:", a.identity)
-	return true
-}
-
-func (a *astrald) parseAlias(logLine string) bool {
-	c := strings.Split(logLine, " [dir] call me ")
+	c = strings.Split(c[1], " ")
 	if len(c) < 2 {
 		return false
 	}
+	a.identity = strings.TrimSpace(c[0])
 	a.alias = strings.TrimSpace(c[1])
-	plog.Println("found node alias:", a.alias)
+	plog.Println("found NodeInfo:", &a)
 	return true
 }

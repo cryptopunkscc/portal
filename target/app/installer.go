@@ -69,6 +69,7 @@ func (i Installer) Run(_ context.Context, src target.App_, _ ...string) (err err
 
 func (i Installer) Install(src target.App_) (err error) {
 	defer plog.TraceErr(&err)
+	plog.Println("installing", src.Manifest().Package)
 	if err = i.prepare(src); err != nil {
 		return
 	}

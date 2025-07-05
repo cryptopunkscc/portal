@@ -50,8 +50,7 @@ func (c *container) portalStartAwait() test.Test {
 	return c.test(func(t *testing.T) {},
 		c.portalStart(),
 		c.parseLogfile(
-			c.parseIdentity,
-			c.parseAlias,
+			c.parseNodeInfo,
 		),
 	)
 }

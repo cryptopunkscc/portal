@@ -25,6 +25,10 @@ func TestE2E_2(t *testing.T) {
 			Test: c[0].portalStart(),
 		},
 		{
+			Name: "start portald via portal",
+			Test: c[1].portalStartAwait(),
+		},
+		{
 			Name: "help",
 			Test: c[0].portalHelp(),
 		},
