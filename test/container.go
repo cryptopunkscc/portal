@@ -28,13 +28,13 @@ func create(amount int, base container) (cs []*container) {
 }
 
 func (c *container) new() *container {
-	c.id++
 	cc := *c
+	c.id++
 	return &cc
 }
 
 func (c *container) name() string {
-	return fmt.Sprintf("%s%d", c.image, c.id)
+	return fmt.Sprintf("%s-%d", c.image, c.id)
 }
 
 func (c *container) dockerExec(t *testing.T, args ...string) {

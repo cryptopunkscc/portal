@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"fmt"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 	"io/fs"
 	"os"
@@ -12,12 +13,13 @@ import (
 //go:embed bin
 var binFs embed.FS
 
-func installBinaries() {
+func installBinaries() (err error) {
+	defer plog.TraceErr(&err)
 	bin := binariesDir()
-	if err := os.MkdirAll(bin, 0755); err != nil {
-		panic(err)
+	if err = os.MkdirAll(bin, 0755); err != nil {
+		return
 	}
-	err := fs.WalkDir(binFs, "bin", func(srcPath string, d fs.DirEntry, err error) error {
+	err = fs.WalkDir(binFs, "bin", func(srcPath string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
 			return nil
 		}
@@ -43,7 +45,5 @@ func installBinaries() {
 		print(" [DONE]\n")
 		return nil
 	})
-	if err != nil {
-		panic(err)
-	}
+	return
 }

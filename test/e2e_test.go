@@ -17,16 +17,16 @@ func TestE2E_2(t *testing.T) {
 	runner := test.Runner{}
 	tests := []test.Task{
 		{
+			Name: "print install help",
+			Test: c[0].printInstallHelp(),
+		},
+		{
 			Name: "start portald via portal",
 			Test: c[0].portalStart(),
 		},
 		{
 			Name: "help",
 			Test: c[0].portalHelp(),
-		},
-		{
-			Name: "create user",
-			Test: c[0].createUser(),
 		},
 		{
 			Name: "claim",
