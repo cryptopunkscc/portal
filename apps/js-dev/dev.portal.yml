@@ -3,8 +3,8 @@ package: portal.dev.js
 title: Portal JS
 description: Portal JS development runner
 hidden: true
-exec: go run
 build:
+  exec: go run
   default:
     out: main
     cmd: go build -o $OUT

@@ -4,8 +4,8 @@ title: Portal Go
 description: Portal Golang development runner
 hidden: true
 schema: go
-exec: go run
 build:
+  exec: go run
   default:
     out: main
     cmd: go build -o $OUT

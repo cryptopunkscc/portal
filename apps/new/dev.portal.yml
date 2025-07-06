@@ -3,8 +3,8 @@ package: portal.new
 title: Create new astral app
 description: Command line tool for generating app project from template.
 schema: go
-exec: go run
 build:
+  exec: go run
   default:
     out: main
     cmd: go build -o $OUT

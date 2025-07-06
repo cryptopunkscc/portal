@@ -4,8 +4,8 @@ title: Portal Exec
 description: Portal development runner for executables
 hidden: true
 schema: go
-exec: go run
 build:
+  exec: go run
   default:
     out: main
     cmd: go build -o $OUT
