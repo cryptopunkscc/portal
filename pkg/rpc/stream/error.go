@@ -11,7 +11,7 @@ type Failure struct {
 }
 
 // MarshalJSON returns m as the JSON encoding of m.
-func (s *Failure) MarshalJSON() ([]byte, error) {
+func (s Failure) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]any{
 		"error": s.Error.Error(),
 	})
