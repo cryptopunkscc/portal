@@ -88,7 +88,7 @@ func (c *container) userInfo() test.Test {
 	)
 }
 
-func (c *container) claim(c2 *container) test.Test {
+func (c *container) userClaim(c2 *container) test.Test {
 	return c.test(func(t *testing.T) {
 		c.dockerExec(t, "portal", "user", "claim", c2.identity)
 	},

@@ -29,19 +29,19 @@ func TestE2E_2(t *testing.T) {
 			Test: c[1].portalStartAwait(),
 		},
 		{
-			Name: "help",
+			Name: "portal help",
 			Test: c[0].portalHelp(),
 		},
 		{
-			Name: "claim",
-			Test: c[0].claim(c[1]),
+			Name: "user claim",
+			Test: c[0].userClaim(c[1]),
 		},
 		{
 			Name: "user info",
 			Test: c[0].userInfo(),
 		},
 		{
-			Name:  "close",
+			Name:  "portal close",
 			Test:  c[0].portalClose(),
 			Group: 1,
 		},
