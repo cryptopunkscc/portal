@@ -38,7 +38,7 @@ func (c *container) name() string {
 }
 
 func (c *container) dockerExec(t *testing.T, args ...string) {
-	execCmdRun(t, "docker", append([]string{"exec", c.name()}, args...)...)
+	execCmdRun(t, "docker", append([]string{"exec", "-it", c.name()}, args...)...)
 }
 
 func (c *container) dockerExecSh(t *testing.T, args ...string) {
