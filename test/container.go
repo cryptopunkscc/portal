@@ -52,7 +52,8 @@ func (c *container) test(run func(t *testing.T), require ...test.Test) test.Test
 
 func (c *container) runContainer() test.Test {
 	return c.test(func(t *testing.T) {
-		execCmdRun(t, "docker", "run", "-di",
+		execCmdRun(t, "docker", "run", "-dit",
+			"--rm", // remove container immediately after run
 			"--name", c.name(),
 			"--network", c.network,
 			c.image)
