@@ -32,6 +32,7 @@ func WithReadWriter(ctx context.Context, rw io.ReadWriter) context.Context {
 }
 
 func (d AppRunner) run(ctx context.Context, token string, path string, args ...string) (err error) {
+	defer plog.TraceErr(&err)
 	log := plog.Get(ctx).Type(d).Set(&ctx)
 	log.Printf("Command run: %s, %v", path, args)
 	cmd := exec.CommandContext(ctx, path, args...)
