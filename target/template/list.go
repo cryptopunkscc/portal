@@ -2,6 +2,7 @@ package template
 
 import (
 	"bytes"
+	"embed"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/pterm/pterm"
@@ -17,6 +18,11 @@ func Map() (templates map[string]target.Template) {
 
 func List() Templates {
 	src := source.Embed(TemplatesFs)
+	return Resolve.List(src)
+}
+
+func ListFrom(fs embed.FS) Templates {
+	src := source.Embed(fs)
 	return Resolve.List(src)
 }
 

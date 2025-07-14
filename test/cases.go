@@ -96,3 +96,33 @@ func (c *container) userClaim(c2 *container) test.Test {
 		c2.portalStartAwait(),
 	)
 }
+
+func (c *container) listTemplates(runner string) test.Test {
+	return c.args(runner).test(func(t *testing.T) {
+		c.dockerExec(t, "portal", runner, "templates")
+	},
+		c.portalStart(),
+	)
+}
+
+type projectOpts struct {
+	runner   string
+	template string
+}
+
+func (c *container) newProject(opts projectOpts) test.Test {
+	return c.args(opts).test(func(t *testing.T) {
+		c.dockerExec(t, "portal", opts.runner, "new", "-t", opts.template, opts.template)
+	},
+		c.portalStart(),
+	)
+}
+
+func (c *container) buildProject(opts projectOpts) test.Test {
+	return c.args(opts).test(func(t *testing.T) {
+		c.dockerExecSh(t, "ls -lah")
+		c.dockerExec(t, "portal", "build", opts.template)
+	},
+		c.newProject(opts),
+	)
+}

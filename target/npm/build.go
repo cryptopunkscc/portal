@@ -3,7 +3,6 @@ package npm
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/deps"
@@ -32,6 +31,7 @@ type buildRunner struct {
 }
 
 func (r *buildRunner) Run(ctx context.Context, projectNpm target.ProjectNpm_, args ...string) (err error) {
+	defer plog.TraceErr(&err)
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 
 	if target.Op(&args, "clean") {
@@ -112,6 +112,7 @@ func (r *buildRunner) build(ctx context.Context, project target.ProjectNpm_) (er
 }
 
 func BuildModule(_ context.Context, m target.NodeModule) (err error) {
+	defer plog.TraceErr(&err)
 	if err = deps.RequireBinary("npm"); err != nil {
 		return
 	}
@@ -119,7 +120,7 @@ func BuildModule(_ context.Context, m target.NodeModule) (err error) {
 		return errors.New("missing npm build in package.json")
 	}
 	if err = exec.Run(m.Abs(), "npm", "run", "build"); err != nil {
-		return fmt.Errorf("npm.BuildModule %v: %w", m.Abs(), err)
+		return
 	}
 	return
 }

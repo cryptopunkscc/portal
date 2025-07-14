@@ -8,6 +8,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/goja"
 	"github.com/cryptopunkscc/portal/runner/goja/dist"
 	"github.com/cryptopunkscc/portal/runner/goja/pro"
+	"github.com/cryptopunkscc/portal/target/js"
 	"github.com/cryptopunkscc/portal/target/source"
 )
 
@@ -29,6 +30,20 @@ func (a Application) handler() cmd.Handler {
 		},
 		Sub: cmd.Handlers{
 			{Name: "v", Desc: "Print version.", Func: version.Name},
+			{
+				Func: js.RunCreate,
+				Name: "new n",
+				Desc: "Create a new js app.",
+				Params: cmd.Params{
+					{Name: "template t", Type: "string", Desc: "Template to use."},
+					{Type: "string", Desc: "Project destination directory."},
+				},
+			},
+			{
+				Func: js.ListTemplates,
+				Name: "templates t",
+				Desc: "List available templates.",
+			},
 		},
 	}
 }

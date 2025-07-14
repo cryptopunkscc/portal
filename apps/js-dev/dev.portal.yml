@@ -3,6 +3,7 @@ package: portal.dev.js
 title: Portal JS
 description: Portal JS development runner
 hidden: true
+schema: go
 build:
   exec: go run
   default:

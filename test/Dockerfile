@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM e2e-test-base:latest
 
 WORKDIR /portal
 

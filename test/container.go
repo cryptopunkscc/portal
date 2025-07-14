@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"io"
 	"slices"
+	"strings"
 	"testing"
 )
 
@@ -15,6 +16,7 @@ type container struct {
 	image   string
 	network string
 	logfile string
+	Args    []any
 	io.Writer
 	astrald
 }
@@ -45,8 +47,27 @@ func (c *container) dockerExecSh(t *testing.T, args ...string) {
 	c.dockerExec(t, append([]string{"sh", "-c"}, args...)...)
 }
 
+func (c *container) dockerExecShTest(args ...string) test.Test {
+	args = append([]string{"sh", "-c"}, args...)
+	name := fmt.Sprintf("%s  %s", c.name(), strings.Join(args, " "))
+	return test.New(name, func(t *testing.T) {
+		c.dockerExec(t, args...)
+	})
+}
+
+func (c *container) args(args ...any) *container {
+	cc := *c
+	cc.Args = args
+	return &cc
+}
+
 func (c *container) test(run func(t *testing.T), require ...test.Test) test.Test {
-	name := fmt.Sprintf("%s %d", test.CallerName(2), c.id)
+	name := fmt.Sprintf("%d-%s", c.id, test.CallerName(2))
+	if len(c.Args) == 1 {
+		name = fmt.Sprintf("%s%v", name, c.Args[0])
+	} else if len(c.Args) > 1 {
+		name = fmt.Sprintf("%s%v", name, c.Args)
+	}
 	return test.New(name, run, require...)
 }
 
@@ -65,11 +86,20 @@ func (c *container) runContainer() test.Test {
 	)
 }
 
+func (c *container) buildBaseImage() test.Test {
+	image := c.image + "-base"
+	name := fmt.Sprintf("%s %s", test.CallerName(), image)
+	return test.New(name, func(t *testing.T) {
+		execCmdRun(t, "docker", "build", "-t", image+":latest", "-f", "base.dockerfile", ".")
+	})
+}
+
 func (c *container) buildImage() test.Test {
 	name := fmt.Sprintf("%s %s", test.CallerName(), c.image)
 	return test.New(name, func(t *testing.T) {
 		execCmdRun(t, "docker", "build", "-t", c.image+":latest", ".")
 	},
+		c.buildBaseImage(),
 		c.removeImage(),
 	)
 }

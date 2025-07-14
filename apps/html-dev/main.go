@@ -10,6 +10,7 @@ import (
 	"github.com/cryptopunkscc/portal/runner/wails"
 	"github.com/cryptopunkscc/portal/runner/wails/dist"
 	"github.com/cryptopunkscc/portal/runner/wails/pro"
+	"github.com/cryptopunkscc/portal/target/html"
 	"github.com/cryptopunkscc/portal/target/source"
 )
 
@@ -31,6 +32,20 @@ func (a Application) handler() cmd.Handler {
 		},
 		Sub: cmd.Handlers{
 			{Name: "v", Desc: "Print version.", Func: version.Name},
+			{
+				Func: html.RunCreate,
+				Name: "new n",
+				Desc: "Create a new html app.",
+				Params: cmd.Params{
+					{Name: "template t", Type: "string", Desc: "Template to use."},
+					{Type: "string", Desc: "Project destination directory."},
+				},
+			},
+			{
+				Func: html.ListTemplates,
+				Name: "templates t",
+				Desc: "List available templates.",
+			},
 		},
 	}
 }

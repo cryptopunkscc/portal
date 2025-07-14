@@ -3,6 +3,7 @@ package: portal.dev.html
 title: Portal HTML
 description: Portal HTML development runner
 hidden: true
+schema: go
 build:
   default:
     out: main
