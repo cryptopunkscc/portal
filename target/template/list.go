@@ -8,19 +8,6 @@ import (
 	"github.com/pterm/pterm"
 )
 
-func Map() (templates map[string]target.Template) {
-	templates = map[string]target.Template{}
-	for _, t := range List() {
-		templates[t.Name()] = t
-	}
-	return
-}
-
-func List() Templates {
-	src := source.Embed(TemplatesFs)
-	return Resolve.List(src)
-}
-
 func ListFrom(fs embed.FS) Templates {
 	src := source.Embed(fs)
 	return Resolve.List(src)
