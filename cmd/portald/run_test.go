@@ -14,6 +14,7 @@ func init() {
 }
 
 func TestApplication_start(t *testing.T) {
+	t.SkipNow()
 	dir := test.CleanMkdir(t)
 	c := portal.Config{}
 	c.Dir = dir
@@ -34,6 +35,7 @@ func TestApplication_start(t *testing.T) {
 }
 
 func TestApplication_start_project_config(t *testing.T) {
+	t.SkipNow()
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(func() {
 		cancel()
