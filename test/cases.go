@@ -2,6 +2,7 @@ package test
 
 import (
 	"github.com/cryptopunkscc/portal/pkg/test"
+	"path/filepath"
 	"testing"
 	"time"
 )
@@ -124,5 +125,16 @@ func (c *container) buildProject(opts projectOpts) test.Test {
 		c.execRun(t, "portal", "build", opts.template)
 	},
 		c.newProject(opts),
+	)
+}
+
+func (c *container) publishProject(opts projectOpts) test.Test {
+	return c.args(opts).test(func(t *testing.T) {
+		b, err := c.exec("sh", "-c", "ls build | grep "+opts.template).Output()
+		test.AssertErr(t, err)
+		p := filepath.Join("./build", string(b))
+		c.execRun(t, "portal", "app", "publish", p)
+	},
+		c.buildProject(opts),
 	)
 }

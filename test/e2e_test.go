@@ -51,6 +51,14 @@ func TestE2E_2(t *testing.T) {
 			Test: c[0].newProject(jsProject),
 		},
 		{
+			Name: "pack js project",
+			Test: c[0].buildProject(jsProject),
+		},
+		{
+			Name: "publish js project",
+			Test: c[0].publishProject(jsProject),
+		},
+		{
 			Name: "create js-rollup project",
 			Test: c[0].newProject(jsRollupProject),
 		},
