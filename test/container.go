@@ -6,6 +6,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/stretchr/testify/assert"
 	"io"
+	"os/exec"
 	"slices"
 	"strings"
 	"testing"
@@ -39,19 +40,23 @@ func (c *container) name() string {
 	return fmt.Sprintf("%s-%d", c.image, c.id)
 }
 
-func (c *container) dockerExec(t *testing.T, args ...string) {
+func (c *container) exec(args ...string) *exec.Cmd {
+	return execCmd("docker", append([]string{"exec", "-it", c.name()}, args...)...)
+}
+
+func (c *container) execRun(t *testing.T, args ...string) {
 	execCmdRun(t, "docker", append([]string{"exec", "-it", c.name()}, args...)...)
 }
 
-func (c *container) dockerExecSh(t *testing.T, args ...string) {
-	c.dockerExec(t, append([]string{"sh", "-c"}, args...)...)
+func (c *container) execRunSh(t *testing.T, args ...string) {
+	c.execRun(t, append([]string{"sh", "-c"}, args...)...)
 }
 
-func (c *container) dockerExecShTest(args ...string) test.Test {
+func (c *container) execRunShTest(args ...string) test.Test {
 	args = append([]string{"sh", "-c"}, args...)
 	name := fmt.Sprintf("%s  %s", c.name(), strings.Join(args, " "))
 	return test.New(name, func(t *testing.T) {
-		c.dockerExec(t, args...)
+		c.execRun(t, args...)
 	})
 }
 

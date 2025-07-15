@@ -119,7 +119,7 @@ const (
 )
 
 func (t *Task) require() []Test {
-	return append(t.Require, t.Test.Require...)
+	return append(t.Test.Require, t.Require...)
 }
 
 func (t *Task) run(tt *testing.T, wg *sync.WaitGroup) {
