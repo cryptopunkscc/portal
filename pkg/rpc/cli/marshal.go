@@ -29,9 +29,9 @@ func Marshal(a any) (result []byte, err error) {
 	case stream.Failure:
 		var es plog.ErrStack
 		if ok := errors.As(t.Error, &es); ok {
-			result = fmt.Appendf(nil, "API: %s\n\n%s", es.Error(), es.Stack())
+			result = fmt.Appendf(nil, "ERROR: %s\n\n%s", es.Error(), es.Stack())
 		} else {
-			result = fmt.Appendf(nil, "API: %s", t.Error)
+			result = fmt.Appendf(nil, "ERROR: %s", t.Error)
 		}
 	default:
 		result, err = yaml.Marshal(a)

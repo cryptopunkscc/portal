@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
-	"os"
 	"strings"
 )
 
@@ -20,7 +19,7 @@ func (a *Application) portaldCli(ctx context.Context, cmd ...string) (err error)
 
 	ctx, cancel := context.WithCancel(ctx)
 	go func() {
-		_, _ = io.Copy(os.Stdout, conn)
+		_, _ = io.Copy(a, conn)
 		cancel()
 	}()
 	cmd = fixCmd(cmd)

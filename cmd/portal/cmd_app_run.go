@@ -20,7 +20,7 @@ func (a *Application) runApp(ctx context.Context, opt *portald.OpenOpt, cmd []st
 
 	ctx, cancel := context.WithCancel(ctx)
 	go func() {
-		_, _ = io.Copy(os.Stdout, conn)
+		_, _ = io.Copy(a, conn)
 		cancel()
 	}()
 	go func() {
