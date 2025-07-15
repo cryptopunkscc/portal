@@ -59,6 +59,14 @@ func TestE2E_2(t *testing.T) {
 			Test: c[0].publishProject(jsProject),
 		},
 		{
+			Name: "list available apps",
+			Test: c[1].listAvailableApps(jsProject),
+			Require: test.Tests{
+				c[0].userClaim(c[1]),
+				c[0].publishProject(jsProject),
+			},
+		},
+		{
 			Name: "create js-rollup project",
 			Test: c[0].newProject(jsRollupProject),
 		},

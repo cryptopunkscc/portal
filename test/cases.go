@@ -138,3 +138,11 @@ func (c *container) publishProject(opts projectOpts) test.Test {
 		c.buildProject(opts),
 	)
 }
+
+func (c *container) listAvailableApps(opts projectOpts) test.Test {
+	return c.args(opts).test(func(t *testing.T) {
+		c.execRunSh(t, "portal app available")
+	},
+		c.buildProject(opts),
+	)
+}
