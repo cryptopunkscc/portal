@@ -111,9 +111,13 @@ type projectOpts struct {
 	template string
 }
 
+func (o projectOpts) name() string {
+	return o.template + "-app"
+}
+
 func (c *container) newProject(opts projectOpts) test.Test {
 	return c.args(opts).test(func(t *testing.T) {
-		c.execRun(t, "portal", opts.runner, "new", "-t", opts.template, opts.template)
+		c.execRun(t, "portal", opts.runner, "new", "-t", opts.template, opts.name())
 	},
 		c.portalStart(),
 	)
@@ -122,7 +126,7 @@ func (c *container) newProject(opts projectOpts) test.Test {
 func (c *container) buildProject(opts projectOpts) test.Test {
 	return c.args(opts).test(func(t *testing.T) {
 		c.execRunSh(t, "ls -lah")
-		c.execRun(t, "portal", "build", opts.template)
+		c.execRun(t, "portal", "build", opts.name())
 	},
 		c.newProject(opts),
 	)
@@ -130,7 +134,7 @@ func (c *container) buildProject(opts projectOpts) test.Test {
 
 func (c *container) publishProject(opts projectOpts) test.Test {
 	return c.args(opts).test(func(t *testing.T) {
-		b, err := c.exec("sh", "-c", "ls build | grep "+opts.template).Output()
+		b, err := c.exec("sh", "-c", "ls build | grep "+opts.name()).Output()
 		test.AssertErr(t, err)
 		p := filepath.Join("./build", string(b))
 		c.execRun(t, "portal", "app", "publish", p)
@@ -142,6 +146,14 @@ func (c *container) publishProject(opts projectOpts) test.Test {
 func (c *container) listAvailableApps(opts projectOpts) test.Test {
 	return c.args(opts).test(func(t *testing.T) {
 		c.execRunSh(t, "portal app available")
+	},
+		c.buildProject(opts),
+	)
+}
+
+func (c *container) installAvailableApp(opts projectOpts) test.Test {
+	return c.args(opts).test(func(t *testing.T) {
+		c.execRunSh(t, "portal app install my.app."+opts.name())
 	},
 		c.buildProject(opts),
 	)

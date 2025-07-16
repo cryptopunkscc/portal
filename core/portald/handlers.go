@@ -99,11 +99,11 @@ func (s *Service) publicHandlers() cmd.Handlers {
 			Desc: "Manage applications.",
 			Sub: cmd.Handlers{
 				{
-					Func: s.Installer().Dispatcher().Run,
+					Func: s.InstallApp,
 					Name: "install i",
 					Desc: "Install app.",
 					Params: cmd.Params{
-						{Type: "string", Desc: "Path to containing directory"},
+						{Type: "string", Desc: "App name, package name, or path to the directory containing app bundle."},
 					},
 				},
 				{

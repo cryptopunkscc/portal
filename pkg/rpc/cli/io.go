@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc/stream"
 	"io"
 	"os"
@@ -9,6 +10,7 @@ import (
 
 func cliConnection() stream.Serializer {
 	args := strings.Join(os.Args[1:], " ")
+	plog.D().Println(args)
 	return stream.Serializer{
 		Reader: io.MultiReader(
 			strings.NewReader(args+"\n"),

@@ -128,6 +128,11 @@ func TestService_Integrations(t *testing.T) {
 				it.s2.addEndpoint(&it.s1),
 			},
 		},
+		{
+			Name:    "should install apps by package name",
+			Test:    it.s2.installAppsByPackage(&it.s1),
+			Require: test.Tests{it.s2.availableApps()},
+		},
 
 		{Test: it.s1.setupToken("test.basic.js"), Require: test.Tests{it.s1.start()}},
 		{Test: it.s2.start(), Require: test.Tests{it.s2.configure()}},

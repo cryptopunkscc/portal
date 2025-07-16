@@ -88,6 +88,10 @@ func (s *Service) Installer() app.Installer {
 	return app.Installer{
 		Dir:     s.Config.Apps,
 		Prepare: s.PrepareApp,
+		Repositories: Repositories{
+			source.Repository,
+			s.Bundles(),
+		},
 	}
 }
 
@@ -103,4 +107,8 @@ func (s *Service) Tokens() *token.Repository {
 
 func (s *Service) apps() Source {
 	return source.Dir(s.Config.Apps)
+}
+
+func (s *Service) Bundles() bundle.Repository {
+	return bundle.Repository{Apphost: &s.Apphost}
 }

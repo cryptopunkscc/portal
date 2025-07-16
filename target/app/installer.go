@@ -12,8 +12,9 @@ import (
 )
 
 type Installer struct {
-	Dir     string
-	Prepare func(target.App_) error
+	Dir          string
+	Prepare      func(target.App_) error
+	Repositories target.Repositories
 }
 
 var _ target.Run[target.App_] = Installer{}.Run
@@ -27,7 +28,7 @@ func (i Installer) Dispatcher() target.Dispatcher {
 
 func (i Installer) RunnableProvider() target.Provider[target.Runnable] {
 	return target.Provider[target.Runnable]{
-		Repository: source.Repository,
+		Repository: i.Repositories,
 		Resolve:    target.Any[target.Runnable](i.Runner().Try),
 	}
 }

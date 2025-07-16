@@ -9,4 +9,5 @@ type Info struct {
 	Manifest manifest.App
 	Release
 	ReleaseID *astral.ObjectID
+	Host      *astral.Identity
 }

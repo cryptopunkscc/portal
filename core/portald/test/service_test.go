@@ -36,7 +36,7 @@ type testService struct {
 	config portal.Config
 	*portald.Service
 	apps      []target.Portal_
-	published map[astral.ObjectID]bundle.Release
+	published map[astral.ObjectID]bundle.Info
 }
 
 func testServiceContext(t *testing.T) context.Context {
@@ -180,6 +180,21 @@ func (s *testService) installApps() test.Test {
 	})
 }
 
+func (s *testService) installAppsByPackage(s2 *testService) test.Test {
+	return s.test(func(t *testing.T) {
+		ctx := context.Background()
+		d := s.Installer().Dispatcher()
+		count := 0
+		for _, info := range s2.published {
+			err := d.Run(ctx, info.Manifest.Package)
+			assert.NoError(t, err)
+			count++
+			break
+		}
+		assert.NotEmpty(t, count)
+	})
+}
+
 func (s *testService) uninstallApp() test.Test {
 	return s.test(func(t *testing.T) {
 		if len(s.apps) == 0 {
@@ -194,13 +209,13 @@ func (s *testService) uninstallApp() test.Test {
 func (s *testService) publishAppBundles() test.Test {
 	return s.test(func(t *testing.T) {
 		b := source.Embed(apps.Builds)
-		s.published = map[astral.ObjectID]bundle.Release{}
+		s.published = map[astral.ObjectID]bundle.Info{}
 
 		l, err := s.PublishAppsFS(b)
 		test.AssertErr(t, err)
 		count := 0
 		for _, app := range l {
-			s.published[*app.ReleaseID] = app.Release
+			s.published[*app.ReleaseID] = app
 			count++
 		}
 		assert.NotZero(t, count)
@@ -343,15 +358,15 @@ func (s *testService) searchObjects(query string, s2 ...*testService) test.Test 
 
 func (s *testService) fetchReleases() test.Test {
 	return s.test(func(t *testing.T) {
-		for id, release := range s.published {
+		for id, info := range s.published {
 			c := objects.Op(s.Apphost.Rpc())
 			r := &bundle.Release{}
 			err := c.Fetch(objects.ReadArgs{ID: id}, r)
 			test.AssertErr(t, err)
-			assert.Equal(t, *release.BundleID, *r.BundleID)
-			assert.Equal(t, *release.ManifestID, *r.ManifestID)
-			assert.Equal(t, release.Release, r.Release)
-			assert.Equal(t, release.Target, r.Target)
+			assert.Equal(t, *info.Release.BundleID, *r.BundleID)
+			assert.Equal(t, *info.Release.ManifestID, *r.ManifestID)
+			assert.Equal(t, info.Release.Release, r.Release)
+			assert.Equal(t, info.Release.Target, r.Target)
 		}
 	})
 }
@@ -369,10 +384,7 @@ func (s *testService) signAppContract(pkg string) test.Test {
 func (s *testService) fetchAppBundleExecs() test.Test {
 	return s.test(func(t *testing.T) {
 		for _, r := range s.published {
-			c := objects.Op(s.Apphost.Rpc())
-			o := &bundle.Object[any]{}
-			o.Resolve = target.Any[target.AppBundle[any]](bundle.Resolve_.Try)
-			err := c.Fetch(objects.ReadArgs{ID: *r.BundleID}, o)
+			_, err := s.Bundles().GetByObjectID(*r.Release.BundleID)
 			test.AssertErr(t, err)
 		}
 	})
