@@ -25,7 +25,7 @@ func Create(opts CreateOpts) (err error) {
 		opts.Path = opts.Name
 	}
 	if opts.Name == "" {
-		opts.Name = opts.Path
+		opts.Name = filepath.Base(opts.Path)
 	}
 	if err = SetDefaults(&opts.Dist); err != nil {
 		return

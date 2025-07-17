@@ -163,8 +163,8 @@ func (c *container) startLogging() {
 	println(fmt.Sprintf(">>> STOP LOGGING %d", c.id))
 }
 
-func (c *container) printLog() test.Test {
-	return c.test(func(t *testing.T) {
+func (c *container) printLog(args ...any) test.Test {
+	return c.args(args...).test(func(t *testing.T) {
 		println(fmt.Sprintf(">>> BEGIN PRINT LOG %d", c.id))
 		err := execCmd("docker", "exec", c.name(), "sh", "-c", "cat "+c.logfile).Run()
 		println(fmt.Sprintf(">>> END PRINT LOG %d", c.id))

@@ -1,1 +1,2 @@
-portal.log("Hello portal JS!!!")
+portal.log("Hello JS!!!")
+portal.exit(0)

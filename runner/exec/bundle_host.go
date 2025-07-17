@@ -35,7 +35,7 @@ func (r *BundleHostRunner) Run(ctx context.Context, src target.Portal_, args ...
 	hostId := src.Manifest().Runtime
 	opt := portald.OpenOpt{}
 	if opt.Load(ctx); len(opt.Schema) > 0 {
-		hostId = hostId + "." + opt.Schema
+		hostId = opt.Schema + "." + hostId
 	}
 
 	log.Println("running:", hostId, src.Manifest().Package, args)

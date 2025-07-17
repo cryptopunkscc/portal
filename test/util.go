@@ -10,15 +10,15 @@ import (
 
 func execCmdRun(t *testing.T, cmd string, args ...string) {
 	cc := execCmd(cmd, args...)
-	cc.Stdout = os.Stdout
-	cc.Stderr = os.Stderr
-	cc.Stdin = os.Stdin
 	err := cc.Run()
 	assert.NoError(t, err)
 }
 
 func execCmd(cmd string, args ...string) *exec.Cmd {
 	cc := exec.Command(cmd, args...)
+	cc.Stdout = os.Stdout
+	cc.Stderr = os.Stderr
+	cc.Stdin = os.Stdin
 	cc.Env = append(os.Environ())
 	cc.Dir = "."
 	return cc

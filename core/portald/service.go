@@ -75,13 +75,20 @@ func (s *Service) PrepareApp(app App_) (err error) {
 	if err != nil {
 		return
 	}
-	if s.User != nil {
+	if s.user() != nil {
 		err = s.signAppContract(t.Identity.String())
 		if err != nil {
 			return
 		}
 	}
 	return
+}
+
+func (s *Service) user() *user.Info {
+	if s.User == nil {
+		s.User, _ = s.UserInfo()
+	}
+	return s.User
 }
 
 func (s *Service) Installer() app.Installer {

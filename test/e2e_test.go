@@ -75,12 +75,34 @@ func TestE2E_2(t *testing.T) {
 			},
 		},
 		{
+			Name:    "run js app",
+			Test:    c[1].runApp(jsProject),
+			Require: test.Tests{c[1].installAvailableApp(jsProject)},
+		},
+		{
 			Name: "create js-rollup project",
 			Test: c[0].newProject(jsRollupProject),
 		},
 		{
 			Name: "build js-rollup project",
 			Test: c[0].buildProject(jsRollupProject),
+		},
+		{
+			Name: "publish js-rollup app",
+			Test: c[0].publishProject(jsRollupProject),
+		},
+		{
+			Name: "install js-rollup app by name",
+			Test: c[1].installAvailableApp(jsRollupProject),
+			Require: test.Tests{
+				c[0].userClaim(c[1]),
+				c[0].publishProject(jsRollupProject),
+			},
+		},
+		{
+			Name:    "run js-rollup app",
+			Test:    c[1].runApp(jsRollupProject),
+			Require: test.Tests{c[1].installAvailableApp(jsRollupProject)},
 		},
 		// ====== dev.html ======
 		{
@@ -137,6 +159,7 @@ func TestE2E_2(t *testing.T) {
 var jsProject = projectOpts{
 	runner:   "dev.js",
 	template: "js",
+	name:     "js-raw",
 }
 
 var jsRollupProject = projectOpts{

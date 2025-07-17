@@ -32,5 +32,8 @@ func (s *Service) PublishAppsFS(src target.Source) (out []bundle.Info, err error
 		}
 		out = append(out, aa)
 	}
+	if len(l) == 0 {
+		err = target.ErrNotFound
+	}
 	return
 }

@@ -90,7 +90,7 @@ func (c *container) userInfo() test.Test {
 }
 
 func (c *container) userClaim(c2 *container) test.Test {
-	return c.test(func(t *testing.T) {
+	return c.args(c2.name()).test(func(t *testing.T) {
 		c.execRun(t, "portal", "user", "claim", c2.identity)
 	},
 		c.portalStart(),
@@ -109,15 +109,19 @@ func (c *container) listTemplates(runner string) test.Test {
 type projectOpts struct {
 	runner   string
 	template string
+	name     string
 }
 
-func (o projectOpts) name() string {
-	return o.template + "-app"
+func (o projectOpts) Name() string {
+	if o.name != "" {
+		return o.name
+	}
+	return o.template
 }
 
 func (c *container) newProject(opts projectOpts) test.Test {
 	return c.args(opts).test(func(t *testing.T) {
-		c.execRun(t, "portal", opts.runner, "new", "-t", opts.template, opts.name())
+		c.execRun(t, "portal", opts.runner, "new", "-t", opts.template, opts.Name())
 	},
 		c.portalStart(),
 	)
@@ -126,7 +130,10 @@ func (c *container) newProject(opts projectOpts) test.Test {
 func (c *container) buildProject(opts projectOpts) test.Test {
 	return c.args(opts).test(func(t *testing.T) {
 		c.execRunSh(t, "ls -lah")
-		c.execRun(t, "portal", "build", opts.name())
+		c.execRun(t, "portal", "build", opts.Name(), "pack", ".")
+		c.execRunSh(t, "ls -lah")
+		c.execRunSh(t, "ls -lah ./build")
+		time.Sleep(1 * time.Second)
 	},
 		c.newProject(opts),
 	)
@@ -134,9 +141,12 @@ func (c *container) buildProject(opts projectOpts) test.Test {
 
 func (c *container) publishProject(opts projectOpts) test.Test {
 	return c.args(opts).test(func(t *testing.T) {
-		b, err := c.exec("sh", "-c", "ls build | grep "+opts.name()).Output()
+		e := c.exec("sh", "-c", "ls ./build | grep "+opts.Name())
+		e.Stdout = nil
+		b, err := e.Output()
 		test.AssertErr(t, err)
 		p := filepath.Join("./build", string(b))
+		t.Log("publishing:", p)
 		c.execRun(t, "portal", "app", "publish", p)
 	},
 		c.buildProject(opts),
@@ -153,8 +163,12 @@ func (c *container) listAvailableApps(opts projectOpts) test.Test {
 
 func (c *container) installAvailableApp(opts projectOpts) test.Test {
 	return c.args(opts).test(func(t *testing.T) {
-		c.execRunSh(t, "portal app install my.app."+opts.name())
-	},
-		c.buildProject(opts),
-	)
+		c.execRunSh(t, "portal app install my.app."+opts.Name())
+	})
+}
+
+func (c *container) runApp(opts projectOpts) test.Test {
+	return c.args(opts).test(func(t *testing.T) {
+		c.execRunSh(t, "portal "+opts.Name())
+	})
 }
