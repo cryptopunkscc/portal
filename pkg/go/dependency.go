@@ -5,6 +5,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
 )
@@ -64,6 +65,20 @@ func (d *Dependency) Build(pkg, out string) (err error) {
 	}
 	c := exec.Command("go", "build", "-v", "-o", out, pkg)
 	c.Dir = p
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	return c.Run()
+}
+
+func (d *Dependency) Install(pkg string) (err error) {
+	defer plog.TraceErr(&err)
+	p := path.Join(d.Name, pkg) + "@" + d.Version
+
+	if d.Replace != "" {
+		p = filepath.Join(d.Project.Dir, d.Replace, pkg)
+	}
+	println("Installing:", p)
+	c := exec.Command("go", "install", "-v", p)
 	c.Stdout = os.Stdout
 	c.Stderr = os.Stderr
 	return c.Run()

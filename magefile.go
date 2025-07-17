@@ -4,7 +4,6 @@ package main
 
 import (
 	"errors"
-	"github.com/cryptopunkscc/portal/api"
 	"github.com/cryptopunkscc/portal/api/version"
 	"github.com/cryptopunkscc/portal/apps"
 	"github.com/cryptopunkscc/portal/core/js"
@@ -48,8 +47,12 @@ func Clean() { clean = true }
 
 type Install mg.Namespace
 
-func (Install) Astrald() error {
-	return sh.RunV("go", "install", "github.com/cryptopunkscc/astrald/cmd/astrald@"+api.AstralVersion)
+func (Install) Astrald() (err error) {
+	d, err := golang.ProjectDependency("astrald")
+	if err != nil {
+		return
+	}
+	return d.Install("cmd/astrald")
 }
 
 func (Install) Portald() error {
