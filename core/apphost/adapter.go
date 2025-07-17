@@ -43,7 +43,7 @@ func (a *Adapter) Resolve(name string) (i *astral.Identity, err error) {
 	if ok {
 		return
 	}
-	if i, err = a.Lib.ResolveIdentity(name); err != nil {
+	if i, err = a.Lib.LocalNode().ResolveIdentity(name); err != nil {
 		return
 	}
 	a.identities.Set(name, i)
@@ -54,7 +54,8 @@ func (a *Adapter) DisplayName(identity *astral.Identity) string {
 	if err := a.Connect(); err != nil {
 		return ""
 	}
-	return a.Lib.DisplayName(identity)
+	alias, _ := a.Lib.LocalNode().GetAlias(identity)
+	return alias
 }
 
 func (a *Adapter) Query(target string, method string, args any) (conn api.Conn, err error) {
