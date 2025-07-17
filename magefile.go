@@ -110,7 +110,7 @@ func (Build) Installer() error {
 	if len(out) > 0 {
 		o = out
 	}
-	return sh.RunV("go", "build", "-o", o, "./cmd/portal-installer/")
+	return sh.RunV("go", "build", "-o", o, "./cmd/install-portal-to-astral/")
 }
 
 func (Build) Apps() (err error) {
@@ -126,13 +126,13 @@ func (Build) Apps() (err error) {
 }
 
 func (Build) Cli() error {
-	return sh.RunV("go", "build", "-o", "./cmd/portal-installer/bin/", "./cmd/portal")
+	return sh.RunV("go", "build", "-o", "./cmd/install-portal-to-astral/bin/", "./cmd/portal")
 }
 
 func (Build) Astrald() error {
 	n := "cryptopunkscc/astrald"
 	c := "./cmd/astrald"
-	o := "cmd/portal-installer/bin/"
+	o := "cmd/install-portal-to-astral/bin/"
 	d, err := golang.ProjectDependency(n)
 	if err != nil {
 		return err
@@ -142,7 +142,7 @@ func (Build) Astrald() error {
 }
 
 func (Build) Portald() error {
-	return sh.RunV("go", "build", "-o", "./cmd/portal-installer/bin/", "./cmd/portald")
+	return sh.RunV("go", "build", "-o", "./cmd/install-portal-to-astral/bin/", "./cmd/portald")
 }
 
 func (Build) JsLib() error {
@@ -185,7 +185,7 @@ func clearVersion() {
 }
 
 func cleanInstallerBin() {
-	path := "./cmd/portal-installer/bin"
+	path := "./cmd/install-portal-to-astral/bin"
 	_ = os.RemoveAll(path)
 	err := os.Mkdir(path, 0755)
 	if err != nil && !errors.Is(err, fs.ErrExist) {
@@ -196,7 +196,7 @@ func cleanInstallerBin() {
 func gpgSignPortalInstallers() {
 	_ = filepath.WalkDir("./bin", func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() ||
-			!strings.HasPrefix(d.Name(), "portal-installer") ||
+			!strings.HasPrefix(d.Name(), "install-portal-to-astral") ||
 			strings.HasSuffix(d.Name(), ".sig") {
 			return nil
 		}

@@ -2,7 +2,7 @@ FROM e2e-test-base:latest
 
 WORKDIR /portal
 
-COPY ./portal-installer ./
+COPY ./install-portal-to-astral ./
 COPY ./.portal.env.yml ./
 
 ENV PLOG=100

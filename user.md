@@ -4,12 +4,12 @@ This user guide explains how to install **Portal** with **Astral Apps**, and run
 
 ## Installing Portal
 
-To install **Portal Environment** obtain a [copy](https://github.com/cryptopunkscc/portal/releases) of `portal-installer`, and execute it from the command line:
+To install **Portal Environment** obtain a [copy](https://github.com/cryptopunkscc/portal/releases) of `install-portal-to-astral`, and execute it from the command line:
 
 #### Linux
 
 ```
-./portal-installer
+./install-portal-to-astral
 ```
 
 Make sure you have the following line in your `$PATH`:
@@ -21,7 +21,7 @@ $HOME/.local/bin
 #### Windows
 
 ```
-portal-installer.exe
+install-portal-to-astral.exe
 ```
 
 If you are installing portal the fist time, add the following line to the user's environment variable `%PATH%`:

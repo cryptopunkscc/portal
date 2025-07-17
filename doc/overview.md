@@ -7,7 +7,7 @@ Each component is a standalone **Astral app**.
 ### Astral daemon
 
 Portal requires `astrald` to be running on the user space.
-For convenience `portal-installer` includes compatible version of `astrald` and installs it along with other dependencies.
+For convenience `install-portal-to-astral` includes compatible version of `astrald` and installs it along with other dependencies.
 
 Portal itself is capable to start `astrald` as subprocess if needed.
 In general, you can start `astrald` as separate process before starting `portal`,
@@ -30,7 +30,7 @@ Complete portal environment consists of the following executable components:
 
 * `astrald` - A default implementation of Astral network that runs connectivity node on the local machine providing
   apphost communication interface on tcp or unix sockets. It's a core dependency for portal.
-* `portal-installer` - A bundle containing required executables and capable to install them in the user's environment.
+* `install-portal-to-astral` - A bundle containing required executables and capable to install them in the user's environment.
 * `portal` - A default commandline interface for starting and communicating with `portal-app`.
 * `portal-app` - A core service responsible for managing application runners.
 * `portal-app-wails` - A HTML webkit runner for desktops driven by wails project.

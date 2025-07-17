@@ -9,7 +9,7 @@ import (
 
 func installApps() (err error) {
 	defer plog.TraceErr(&err)
-	dir := filepath.Join(os.TempDir(), "portal-installer", "apps")
+	dir := filepath.Join(os.TempDir(), "install-portal-to-astral", "apps")
 	if err = os.MkdirAll(dir, 0755); err != nil {
 		return
 	}
