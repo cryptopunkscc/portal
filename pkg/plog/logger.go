@@ -3,7 +3,6 @@ package plog
 import (
 	"context"
 	"fmt"
-	"github.com/cryptopunkscc/portal/api"
 	"os"
 	"reflect"
 	"slices"
@@ -27,6 +26,8 @@ func (l logger) Copy() Logger {
 
 var Default = New()
 
+var Module string
+
 func P() Logger                               { return Default.P() }
 func D() Logger                               { return Default.D() }
 func Type(a any) Logger                       { return Default.Type(a) }
@@ -37,7 +38,7 @@ func Printf(format string, args ...any)       { Default.Printf(format, args...) 
 func New() Logger {
 	return logger{
 		out:    DefaultOutput,
-		module: api.Module,
+		module: Module,
 		Log: Log{
 			Pid:   os.Getpid(),
 			Level: Info,
