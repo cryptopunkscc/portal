@@ -17,7 +17,7 @@ func (c *container) printInstallHelp() test.Test {
 
 func (c *container) installFirstPortal() test.Test {
 	return c.test(func(t *testing.T) {
-		c.execRunSh(t, "./install-portal-to-astral first test_user")
+		c.execRunSh(t, "./install-portal-to-astral test_user")
 	},
 		c.runContainer(),
 	)
@@ -25,7 +25,7 @@ func (c *container) installFirstPortal() test.Test {
 
 func (c *container) installNextPortal() test.Test {
 	return c.test(func(t *testing.T) {
-		c.execRunSh(t, "./install-portal-to-astral next")
+		c.execRunSh(t, "./install-portal-to-astral")
 	},
 		c.runContainer(),
 	)

@@ -10,23 +10,20 @@ func main() {
 }
 
 var handler = cmd.Handler{
+	Name: "install-portal-to-astral",
 	Desc: "Astrald & portal environment installer.",
-	Sub: cmd.Handlers{
+	Func: run,
+	Params: cmd.Params{
 		{
-			Func: firstInstallation,
-			Name: "first",
-			Desc: "First installation. Choose if you are installing for the first time. It will install complete environment with default apps and generate your identity.",
-			Params: cmd.Params{
-				{
-					Type: "string",
-					Desc: "Your user name that will be associated with generated identity.",
-				},
-			},
-		},
-		{
-			Func: nextInstallation,
-			Name: "next",
-			Desc: "Next installation. Choose if you already have your identity generated but want to claim another device. It will install base environment ready to claim from another device.",
+			Type: "string",
+			Desc: "Optional user name. When specified, the installed node will be assigned to a new user identity associated with the name. Otherwise, the installed node will be ready to claim by existing user.",
 		},
 	},
+}
+
+func run(username string) (err error) {
+	if username != "" {
+		return firstInstallation(username)
+	}
+	return nextInstallation()
 }
