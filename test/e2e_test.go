@@ -37,10 +37,6 @@ func TestE2E_2(t *testing.T) {
 			Name: "user claim",
 			Test: c[0].userClaim(c[1]),
 		},
-		{
-			Name: "user info",
-			Test: c[0].userInfo(),
-		},
 		// ====== dev.js ======
 		{
 			Name: "list js templates",

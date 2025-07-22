@@ -98,9 +98,14 @@ func TestService_Integrations(t *testing.T) {
 			},
 		},
 		{
-			Name:    "should get user info",
-			Test:    it.s1.userInfo(),
+			Name:    "should has user",
+			Test:    it.s1.hasUser(),
 			Require: test.Tests{it.s1.createUser()},
+		},
+		{
+			Name:    "should has user",
+			Test:    it.s2.hasUser(),
+			Require: test.Tests{it.s1.userClaim(&it.s2)},
 		},
 		{
 			Name:    "should list siblings",

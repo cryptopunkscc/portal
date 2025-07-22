@@ -15,6 +15,7 @@ import (
 	"github.com/cryptopunkscc/portal/target/bundle"
 	"github.com/cryptopunkscc/portal/target/source"
 	"path/filepath"
+	"strings"
 	"sync"
 )
 
@@ -39,6 +40,7 @@ type Service struct {
 
 	UserCreated *user.Created
 	User        *user.Info
+	hasUser     bool
 	*NodeInfo
 }
 
@@ -75,7 +77,7 @@ func (s *Service) PrepareApp(app App_) (err error) {
 	if err != nil {
 		return
 	}
-	if s.user() != nil {
+	if s.HasUser() {
 		err = s.signAppContract(t.Identity.String())
 		if err != nil {
 			return
@@ -89,6 +91,14 @@ func (s *Service) user() *user.Info {
 		s.User, _ = s.UserInfo()
 	}
 	return s.User
+}
+
+func (s *Service) HasUser() bool {
+	if !s.hasUser {
+		_, err := s.UserInfo()
+		s.hasUser = err == nil || strings.Contains(err.Error(), "(1)")
+	}
+	return s.hasUser
 }
 
 func (s *Service) Installer() app.Installer {

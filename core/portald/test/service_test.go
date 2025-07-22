@@ -140,6 +140,13 @@ func (s *testService) userInfo() test.Test {
 	})
 }
 
+func (s *testService) hasUser() test.Test {
+	return s.test(func(t *testing.T) {
+		b := s.HasUser()
+		assert.True(t, b)
+	})
+}
+
 func (s *testService) userClaim(s2 *testService) test.Test {
 	return s.test(func(t *testing.T) {
 		err := s.Claim(s2.Apphost.HostID.String())

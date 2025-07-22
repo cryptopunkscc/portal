@@ -29,7 +29,7 @@ func (s *Service) Start(ctx context.Context) (err error) {
 	}
 	s.createTokens(log)
 	s.NodeInfo, _ = s.nodeInfo()
-	s.User, _ = s.UserInfo()
+	s.hasUser = s.HasUser()
 	return
 }
 
