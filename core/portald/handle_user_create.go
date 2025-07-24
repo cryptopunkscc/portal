@@ -1,6 +1,5 @@
 package portald
 
-import "C"
 import (
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/user"
