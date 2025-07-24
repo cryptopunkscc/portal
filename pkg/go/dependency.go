@@ -1,6 +1,7 @@
 package golang
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"
@@ -35,6 +36,10 @@ func (p *Project) Dependency(name string) (dep Dependency, err error) {
 
 func ParseDependency(goMod string, name string) (dep Dependency, err error) {
 	for _, l := range strings.Split(goMod, "\n") {
+		if strings.HasPrefix(l, `//`) {
+			continue
+		}
+
 		if !strings.Contains(l, name) {
 			continue
 		}
@@ -57,12 +62,22 @@ func ParseDependency(goMod string, name string) (dep Dependency, err error) {
 	return
 }
 
+func (d *Dependency) Get() (err error) {
+	p := fmt.Sprintf("%s@%s", d.Name, d.Version)
+	c := exec.Command("go", "get", p)
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	plog.Println("go get", p)
+	return c.Run()
+}
+
 func (d *Dependency) Build(pkg, out string) (err error) {
 	defer plog.TraceErr(&err)
 	p, err := d.Path()
 	if err != nil {
 		return
 	}
+	plog.Println("go", "build", "-v", "-o", out, filepath.Join(p, pkg))
 	c := exec.Command("go", "build", "-v", "-o", out, pkg)
 	c.Dir = p
 	c.Stdout = os.Stdout
@@ -89,12 +104,12 @@ func (d *Dependency) Path() (path string, err error) {
 		return d.Replace, nil
 	}
 	defer plog.TraceErr(&err)
-	home, err := os.UserHomeDir()
+	dir, err := exec.Command("go", "env", "GOMODCACHE").Output()
 	if err != nil {
-		err = fmt.Errorf("cannot resolve home dir: %v", err)
 		return
 	}
-	path = fmt.Sprintf("%s@%s", d.Name, d.Version)
-	path = filepath.Join(home, "go/pkg/mod", path)
+	dir = bytes.TrimSpace(dir)
+	path = filepath.Join(string(dir), d.Name)
+	path = fmt.Sprintf("%s@%s", path, d.Version)
 	return
 }
