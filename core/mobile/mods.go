@@ -19,7 +19,6 @@ import (
 	_ "github.com/cryptopunkscc/astrald/mod/objects/src"
 	_ "github.com/cryptopunkscc/astrald/mod/profile/src"
 	_ "github.com/cryptopunkscc/astrald/mod/shell/src"
-	_ "github.com/cryptopunkscc/astrald/mod/status/src"
 	_ "github.com/cryptopunkscc/astrald/mod/tcp/src"
 	_ "github.com/cryptopunkscc/astrald/mod/tor/src"
 	_ "github.com/cryptopunkscc/astrald/mod/user/src"
