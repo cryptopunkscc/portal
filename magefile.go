@@ -106,7 +106,7 @@ func (Build) Installer() error {
 		Build.Cli,
 		Build.Apps,
 	)
-	o := "./bin"
+	o := "./bin/"
 	if len(out) > 0 {
 		o = out
 	}
