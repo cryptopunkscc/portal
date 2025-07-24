@@ -137,6 +137,11 @@ func (Build) Astrald() error {
 	if err != nil {
 		return err
 	}
+	if d.Replace == "" {
+		if err = d.Get(); err != nil {
+			return err
+		}
+	}
 	o = filepath.Join(d.Dir, o)
 	return d.Build(c, o)
 }
