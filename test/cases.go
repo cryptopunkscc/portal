@@ -9,7 +9,7 @@ import (
 
 func (c *container) printInstallHelp() test.Test {
 	return c.test(func(t *testing.T) {
-		c.execRunSh(t, "./install-portal-to-astral h")
+		c.execRunSh(t, "/portal/bin/install-portal-to-astral h")
 	},
 		c.runContainer(),
 	)
@@ -17,7 +17,7 @@ func (c *container) printInstallHelp() test.Test {
 
 func (c *container) installFirstPortal() test.Test {
 	return c.test(func(t *testing.T) {
-		c.execRunSh(t, "./install-portal-to-astral test_user")
+		c.execRunSh(t, "/portal/bin/install-portal-to-astral test_user")
 	},
 		c.runContainer(),
 	)
@@ -25,7 +25,7 @@ func (c *container) installFirstPortal() test.Test {
 
 func (c *container) installNextPortal() test.Test {
 	return c.test(func(t *testing.T) {
-		c.execRunSh(t, "./install-portal-to-astral")
+		c.execRunSh(t, "/portal/bin/install-portal-to-astral")
 	},
 		c.runContainer(),
 	)

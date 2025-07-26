@@ -3,10 +3,14 @@ package test
 import (
 	"bufio"
 	"fmt"
+	golang "github.com/cryptopunkscc/portal/pkg/go"
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/stretchr/testify/assert"
+	"go/build"
 	"io"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"slices"
 	"strings"
 	"testing"
@@ -82,9 +86,9 @@ func (c *container) runContainer() test.Test {
 			"--rm", // remove container immediately after run
 			"--name", c.name(),
 			"--network", c.network,
+			"-v", "/home/jan/projects/cryptopunks/portal/bin:/portal/bin",
 			c.image)
 	},
-		buildInstaller(),
 		c.teardown(),
 		c.buildImage(),
 		c.createNetwork(),
@@ -100,12 +104,70 @@ func (c *container) buildBaseImage() test.Test {
 }
 
 func (c *container) buildImage() test.Test {
+	//return c.buildImageLocal()
+	return c.buildImageFast()
+	//return c.buildImageClean()
+}
+
+func (c *container) buildImageLocal() test.Test {
 	name := fmt.Sprintf("%s %s", test.CallerName(), c.image)
 	return test.New(name, func(t *testing.T) {
-		execCmdRun(t, "docker", "build", "-t", c.image+":latest", ".")
+		execCmdRun(t, "docker", "build",
+			"--force-rm", "--squash",
+			"-f", "local.dockerfile",
+			"-t", c.image+":latest", ".")
 	},
 		c.buildBaseImage(),
 		c.removeImage(),
+		buildInstaller(),
+	)
+}
+
+func (c *container) buildImageFast() test.Test {
+	name := fmt.Sprintf("%s %s", test.CallerName(), c.image)
+	return test.New(name, func(t *testing.T) {
+		cacheDir, err := os.UserCacheDir()
+		assert.NoError(t, err)
+
+		projectDir, err := golang.FindProjectRoot()
+		assert.NoError(t, err)
+
+		execCmdRun(t, "docker", "build",
+			"--force-rm", "--squash",
+			"-v", build.Default.GOPATH+":/go",
+			"-v", cacheDir+":/root/.cache",
+			"-v", projectDir+":/portal",
+			"-f", "fast.dockerfile",
+			"-t", c.image+":latest", ".")
+	},
+		c.buildBaseImage(),
+		c.removeImage(),
+	)
+}
+
+func (c *container) buildImageClean() test.Test {
+	name := fmt.Sprintf("%s %s", test.CallerName(), c.image)
+	return test.New(name, func(t *testing.T) {
+		cacheDir, err := os.UserCacheDir()
+		assert.NoError(t, err)
+
+		projectDir, err := golang.FindProjectRoot()
+		assert.NoError(t, err)
+
+		binDir := filepath.Join(projectDir, "bin")
+		_ = os.MkdirAll(binDir, 0755)
+
+		execCmdRun(t, "docker", "build",
+			"--force-rm", "--squash",
+			"-v", build.Default.GOPATH+":/go",
+			"-v", cacheDir+":/root/.cache",
+			"-v", binDir+":/portal/bin",
+			"-f", "clean.dockerfile",
+			"-t", c.image+":latest", ".")
+	},
+		c.buildBaseImage(),
+		c.removeImage(),
+		packProject(),
 	)
 }
 

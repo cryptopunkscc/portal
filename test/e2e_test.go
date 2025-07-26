@@ -18,6 +18,10 @@ func TestE2E_2(t *testing.T) {
 	tests := []test.Task{
 		// ====== base ======
 		{
+			Name: "build",
+			Test: c[0].buildImage(),
+		},
+		{
 			Name: "print install help",
 			Test: c[0].printInstallHelp(),
 		},

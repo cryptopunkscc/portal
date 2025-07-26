@@ -26,9 +26,18 @@ func execCmd(cmd string, args ...string) *exec.Cmd {
 
 func buildInstaller() test.Test {
 	return test.New(test.CallerName(), func(t *testing.T) {
-		cc := execCmd("./mage", "build:out", "./test", "build:installer")
+		cc := execCmd("./mage", "build:installer")
 		cc.Dir = "../"
 		err := cc.Run()
+		assert.NoError(t, err)
+	})
+}
+
+func packProject() test.Test {
+	return test.New(test.CallerName(), func(t *testing.T) {
+		c := execCmd("sh", "-c", "git ls-files -co --exclude-standard -z | tar -cf ./test/sources.tar --exclude=./test/sources.tar --null -T -")
+		c.Dir = "../"
+		err := c.Run()
 		assert.NoError(t, err)
 	})
 }
