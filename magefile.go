@@ -132,7 +132,7 @@ func (Build) Cli() error {
 func (Build) Astrald() error {
 	n := "cryptopunkscc/astrald"
 	c := "./cmd/astrald"
-	o := "cmd/install-portal-to-astral/bin/"
+	o := "/cmd/install-portal-to-astral/bin/"
 	d, err := golang.ProjectDependency(n)
 	if err != nil {
 		return err
@@ -142,7 +142,7 @@ func (Build) Astrald() error {
 			return err
 		}
 	}
-	o = filepath.Join(d.Dir, o)
+	o = d.Dir + o
 	return d.Build(c, o)
 }
 
