@@ -27,7 +27,7 @@ func Start(
 	var err error
 	defer plog.PrintTrace(&err)
 
-	if c.conn, err = apphost.Default.Rpc().Conn("portal", "dev.portal.broadcast"); err != nil {
+	if c.conn, err = apphost.Default.Rpc().Conn("portald", "dev.portal.broadcast"); err != nil {
 		return
 	}
 	if err = c.conn.Encode(portal.Manifest().Package); err != nil {
