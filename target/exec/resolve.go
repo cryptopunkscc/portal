@@ -57,6 +57,11 @@ func ResolveProjectExec(source target.Source) (out target.Exec, err error) {
 		return
 	}
 
+	if p.Build().Get().Exec == "" {
+		err = target.ErrNotTarget
+		return
+	}
+
 	out = Source{executable: p}
 	return
 }
