@@ -2,7 +2,7 @@
   import {apphost, log, platform, rpc} from 'portal';
   import {onDestroy, onMount} from "svelte";
 
-  const service = rpc.bind({"example.project.js": ["link", "*ticker"]})
+  const service = rpc.target("example.project.js").bind("link", "*ticker")
 
   const max = 10
 
