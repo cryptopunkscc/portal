@@ -1,4 +1,8 @@
-export function runTests(port, log, rpc, sleep) {
+export function runTests(port, portal) {
+  const log = portal.log
+  const rpc = portal.rpc
+  const sleep = portal.sleep
+
   rpc.serve({
     inject: {
       state: {
@@ -47,8 +51,6 @@ export function runTests(port, log, rpc, sleep) {
     "func6",
     "func7",
   ]
-  const routes = {}
-  routes[port] = methods
 
   test().catch(log)
 
@@ -57,10 +59,10 @@ export function runTests(port, log, rpc, sleep) {
 
     // const conn = await rpc.conn(port)
     // const client = conn.bind(...methods)
-    const client = rpc.bind(routes)
+    const client = rpc.target(port).bind(...methods)
 
-    log("\n\n\n")
-    log("====================== TEST BEGIN ======================\n")
+    await log("\n\n\n")
+    await log("====================== TEST BEGIN ======================\n")
     await test0()
     await test1()
     await test2()
@@ -68,7 +70,7 @@ export function runTests(port, log, rpc, sleep) {
     await test4()
     await test5()
     await test6()
-    log("====================== TEST END ======================\n\n\n")
+    await log("====================== TEST END ======================\n\n\n")
     await rpc.interrupt()
 
     async function test0() {

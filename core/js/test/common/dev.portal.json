@@ -1,7 +1,7 @@
 {
   "name": "common-test",
   "package": "portal.js.test.common",
-  "version": "0.0.0",
+  "version": 0,
   "title": "Portal JS common test",
   "author": "yang",
   "email": "cryptopunkyang@pm.me",

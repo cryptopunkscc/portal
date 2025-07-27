@@ -1,4 +1,4 @@
-import {log, rpc, sleep} from "../../wails.js";
+import * as portal from "../../wails.js";
 import {runTests} from "../test.js";
 
-runTests("portal.js.test.wails", log, rpc, sleep)
+runTests("portal.js.test.wails", portal)
