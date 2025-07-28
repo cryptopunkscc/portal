@@ -67,7 +67,7 @@ func (r *Runner) initTask(t *Task) {
 }
 
 func (r *Runner) run(t *testing.T, task *Task) {
-	t.Run(task.Test.name, func(t *testing.T) {
+	run := func(t *testing.T) {
 		r.done[task.Group].Add(1)
 		defer r.done[task.Group].Done()
 
@@ -81,7 +81,12 @@ func (r *Runner) run(t *testing.T, task *Task) {
 			r.done[i].Wait()
 		}
 		task.run(t, &r.done[task.Group])
-	})
+	}
+	if task.Test.name == "" {
+		run(t)
+	} else {
+		t.Run(task.Test.name, run)
+	}
 }
 
 type Test struct {
