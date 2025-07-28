@@ -52,9 +52,8 @@ export function runTests(port, portal) {
     "func7",
   ]
 
-  test().catch(log)
-
   async function test() {
+    let failed = 0
     await sleep(200)
 
     // const conn = await rpc.conn(port)
@@ -147,9 +146,14 @@ export function runTests(port, portal) {
       actual = JSON.stringify(actual)
       let result = `[PASSED] ${test}\n`
       if (expected !== actual) {
+        failed++
         result = `[FAILED] ${test}\nactual:\t\t${actual}\nexpected:\t${expected}\n`
       }
       await log(result)
     }
+
+    return failed
   }
+
+  return test().catch(log)
 }

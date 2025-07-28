@@ -29,6 +29,15 @@ func TestService_Integrations(t *testing.T) {
 			Require: test.Tests{it.s1.setupToken("test.basic.js")},
 		},
 		{
+			Name: "should test core js lib",
+			Require: test.Tests{
+				buildCoreJsTestCommon(),
+				it.s1.start(),
+				it.s1.installApps("/core/js/test/common"),
+				it.s1.openApp("portal.js.test.common"),
+			},
+		},
+		{
 			Name:    "should get alias",
 			Test:    it.s1.nodeAlias(),
 			Require: test.Tests{it.s1.start()},
@@ -55,13 +64,13 @@ func TestService_Integrations(t *testing.T) {
 		//},
 		{
 			Name:    "should install apps",
-			Test:    it.s1.installApps(),
+			Test:    it.s1.installDefaultApps(),
 			Require: test.Tests{it.s1.start()},
 		},
 		{
 			Name:    "should uninstall app",
 			Test:    it.s1.uninstallApp(),
-			Require: test.Tests{it.s1.installApps()},
+			Require: test.Tests{it.s1.installDefaultApps()},
 		},
 		{
 			Name:    "should publish app bundles",

@@ -17,12 +17,15 @@ import (
 	"github.com/cryptopunkscc/portal/core/astrald/debug"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/core/portald"
+	golang "github.com/cryptopunkscc/portal/pkg/go"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/runner/goja"
 	"github.com/cryptopunkscc/portal/target/bundle"
+	"github.com/cryptopunkscc/portal/target/npm"
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/stretchr/testify/assert"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
@@ -173,7 +176,24 @@ func (s *testService) buildApps() test.Test {
 	})
 }
 
-func (s *testService) installApps() test.Test {
+func (s *testService) installApps(path string) test.Test {
+	return s.test(func(t *testing.T) {
+		r, err := golang.FindProjectRoot()
+		assert.NoError(t, err)
+		l, err := source.File(filepath.Join(r, path))
+		assert.NoError(t, err)
+		ctx := context.Background()
+		for _, r := range s.Installer().Dispatcher().List(l) {
+			err := r.Run(ctx)
+			test.AssertErr(t, err)
+			s.apps = append(s.apps, r)
+			break
+		}
+		assert.NotEmpty(t, s.apps)
+	})
+}
+
+func (s *testService) installDefaultApps() test.Test {
 	return s.test(func(t *testing.T) {
 		l := source.Embed(apps.Builds)
 		ctx := context.Background()
@@ -423,5 +443,15 @@ func (s *testService) listSiblings() test.Test {
 			plog.Println(sibling.String())
 		}
 		assert.Equal(t, 1, count)
+	})
+}
+
+func buildCoreJsTestCommon() test.Test {
+	return test.New(test.CallerName(), func(t *testing.T) {
+		root, err := golang.FindProjectRoot()
+		assert.NoError(t, err)
+		d := source.Dir(root, "core", "js", "test", "common")
+		err = npm.BuildRunner().Run(context.TODO(), d)
+		assert.NoError(t, err)
 	})
 }
