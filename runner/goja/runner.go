@@ -2,6 +2,7 @@ package goja
 
 import (
 	"context"
+	"fmt"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -45,5 +46,8 @@ func (r *runner) Run(ctx context.Context, app target.AppJs, args ...string) (err
 		return
 	}
 	<-ctx.Done()
+	if core.Code() > 0 {
+		err = fmt.Errorf("exit %d", core.Code())
+	}
 	return
 }

@@ -10,4 +10,5 @@ type Process interface {
 	Log(arg string)
 	Sleep(duration int64)
 	Exit(code int)
+	Code() int
 }
