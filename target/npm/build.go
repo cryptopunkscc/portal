@@ -43,6 +43,20 @@ func (r *buildRunner) Run(ctx context.Context, projectNpm target.ProjectNpm_, ar
 	if err = r.setup(); err != nil {
 		return
 	}
+
+	defer func() {
+		if target.Op(&args, "pack") {
+			d := projectNpm.Dist_()
+			abs := projectNpm.Abs()
+			if len(args) > 0 {
+				abs = args[0]
+			}
+			if err = dist.Pack(d, abs); err != nil {
+				return
+			}
+		}
+	}()
+
 	if r.skip(projectNpm, args...) {
 		return
 	}
@@ -54,21 +68,10 @@ func (r *buildRunner) Run(ctx context.Context, projectNpm target.ProjectNpm_, ar
 	}
 
 	t := manifest.Target{}
-
 	if err = project.Dist(ctx, projectNpm, t); err != nil {
 		return
 	}
 
-	if target.Op(&args, "pack") {
-		d := projectNpm.Dist_()
-		abs := projectNpm.Abs()
-		if len(args) > 0 {
-			abs = args[0]
-		}
-		if err = dist.Pack(d, abs); err != nil {
-			return
-		}
-	}
 	return
 }
 

@@ -130,7 +130,7 @@ func (c *container) newProject(opts projectOpts) test.Test {
 func (c *container) buildProject(opts projectOpts) test.Test {
 	return c.args(opts).test(func(t *testing.T) {
 		c.execRunSh(t, "ls -lah")
-		c.execRun(t, "portal", "build", opts.Name(), "pack", ".")
+		c.execRun(t, "portal", "build", "-p", "-o", ".", opts.Name())
 		c.execRunSh(t, "ls -lah")
 		c.execRunSh(t, "ls -lah ./build")
 		time.Sleep(1 * time.Second)
