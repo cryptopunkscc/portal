@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc/caller/param"
 	"reflect"
 	"strings"
@@ -34,6 +35,7 @@ func parseFields(data []byte) (fields []string) {
 }
 
 func set(p *param.Values, offset int, fields []string) (err error) {
+	defer plog.TraceErr(&err)
 	if offset == len(fields) {
 		return
 	}
