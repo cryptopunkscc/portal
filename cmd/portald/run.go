@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"errors"
+	"github.com/cryptopunkscc/portal/pkg/config"
 	"github.com/cryptopunkscc/portal/runner/exec"
 )
 
@@ -17,7 +19,7 @@ func (a *Application) run(ctx context.Context, args RunArgs) (err error) {
 }
 
 func (a *Application) start(ctx context.Context, args RunArgs) (err error) {
-	if err = a.loadConfig(args); err != nil {
+	if err = a.loadConfig(args); err != nil && !errors.Is(err, config.ErrNotFound) {
 		return
 	}
 	if err = a.Configure(); err != nil {
