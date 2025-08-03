@@ -32,9 +32,10 @@ func (a *Application) start(ctx context.Context, args RunArgs) (err error) {
 }
 
 func (a *Application) loadConfig(args RunArgs) (err error) {
-	err = a.Config.Load(args.ConfigPath)
-	if len(args.ConfigPath) == 0 {
-		err = nil
+	var path []string
+	if len(args.ConfigPath) > 0 {
+		path = append(path, args.ConfigPath)
 	}
+	err = a.Config.Load(path...)
 	return
 }

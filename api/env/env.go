@@ -10,13 +10,14 @@ import (
 type Key string
 
 const (
-	AstraldHome   Key = "ASTRALD_HOME"
-	AstraldDb     Key = "ASTRALD_DB_DIR"
-	ApphostAddr   Key = "APPHOST_ADDR"
-	PortaldHome   Key = "PORTALD_HOME"
-	PortaldTokens Key = "PORTALD_TOKENS_DIR"
-	PortaldApps   Key = "PORTALD_APPS_DIR"
-	PortaldBin    Key = "PORTALD_BIN_DIR"
+	AstraldHome       Key = "ASTRALD_HOME"
+	AstraldDb         Key = "ASTRALD_DB_DIR"
+	ApphostAddr       Key = "APPHOST_ADDR"
+	PortaldHome       Key = "PORTALD_HOME"
+	PortaldTokens     Key = "PORTALD_TOKENS_DIR"
+	PortaldApps       Key = "PORTALD_APPS_DIR"
+	PortaldBin        Key = "PORTALD_BIN_DIR"
+	PortaldConfigPath Key = "PORTALD_CONFIG_PATH"
 )
 
 func (k Key) Default(get func() string) {

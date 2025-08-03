@@ -74,6 +74,9 @@ func (l *Loader[T]) abs(path ...string) (p string, err error) {
 func isDir(path string) (bool, error) {
 	info, err := os.Stat(path)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
 		return false, plog.Err(err)
 	}
 	return info.IsDir(), nil

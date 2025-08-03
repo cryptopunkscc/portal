@@ -4,7 +4,10 @@ CURRENT_DIR=$(pwd)
 SCRIPT_DIR=$(dirname "$0")
 
 cd "$SCRIPT_DIR" || exit
-ENABLE_PORTAL_APPHOST_LOG=true PLOG=100 go run -tags project ./cmd/portal "$@"
+ENABLE_PORTAL_APPHOST_LOG=true \
+PLOG=100 \
+PORTALD_CONFIG_PATH=./debug.portal.env.yml \
+go run ./cmd/portal "$@"
 CODE=$?
 cd "$CURRENT_DIR" || exit $CODE
 exit $CODE

@@ -5,6 +5,8 @@ SCRIPT_DIR=$(dirname "$0")
 
 cd "$SCRIPT_DIR" || exit
 unset ASTRALD_APPHOST_TOKEN
-#PLOG=100 go run ./cmd/portald "$@"
-ENABLE_PORTAL_APPHOST_LOG=true PORTALD_HOME=$(pwd) go run -tags debug ./cmd/portald "$@"
+ENABLE_PORTAL_APPHOST_LOG=true \
+PORTALD_HOME=$(pwd) \
+PORTALD_CONFIG_PATH=./debug.portal.env.yml \
+go run -tags debug ./cmd/portald "$@"
 cd "$CURRENT_DIR" || exit

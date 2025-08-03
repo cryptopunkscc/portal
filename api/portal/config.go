@@ -13,6 +13,7 @@ import (
 )
 
 type Config struct {
+	File           string `yaml:"file,omitempty"`
 	Dir            string `yaml:",omitempty"`
 	Dirs           `yaml:",omitempty"`
 	astrald.Config `yaml:",inline"`
@@ -129,12 +130,18 @@ func (c *Config) Load(path ...string) (err error) {
 		Config:    c,
 		File:      DefaultConfigFile,
 	}
+	if len(path) == 0 {
+		if p := env.PortaldConfigPath.Get(); len(p) > 0 {
+			path = append(path, p)
+		}
+	}
 	if err = l.Load(path...); err != nil {
 		return
 	}
 	if filepath.IsLocal(c.Dir) {
 		c.Dir = filepath.Join(l.Dir, c.Dir)
 	}
+	c.File = l.File
 	return
 }
 func (c *Config) fixApphostAddress() {
