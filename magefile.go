@@ -152,7 +152,7 @@ func (Build) Portald() error {
 
 func (Build) JsLib() error {
 	if !clean {
-		if changed, err := target.Path(
+		if changed, err := target.Dir(
 			"./core/js/embed/",
 			"./core/js/src/",
 			"./core/js/all.js",
