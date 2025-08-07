@@ -1,52 +1,39 @@
-# How it works
+# Overview
 
-Basically, **Portal** works as a tiny service, capable for running **Astral Apps** as subprocesses.
-In addition, Portal consist of a bunch of base general-purpose components.
-Each component is a standalone **Astral app**.
+A runtime and management environment for decentralized multiplatform apps.
+It provides authentication, identity, and connectivity via [Astral](https://github.com/cryptopunkscc/astrald/blob/master/README.md).
+Its mission is to lay the groundwork for building a decentralized network of multiplatform applications.
 
-### Astral daemon
+## Core Design
 
-Portal requires `astrald` to be running on the user space.
-For convenience `install-portal-to-astral` includes compatible version of `astrald` and installs it along with other dependencies.
+In basics, it is a tiny daemon that provides compatibility layer between user, device, applications, and Astral.
 
-Portal itself is capable to start `astrald` as subprocess if needed.
-In general, you can start `astrald` as separate process before starting `portal`,
-or let `portal` to start `astrald` as a subprocess.
+## Features
 
-### Application runner
+* Creates new user.
+* Assigns devices to the user.
+* Manages applications (installs, authenticates, runs, lists).
+* Provides application development tools (building, bundling, publishing).
+* Exposes management API.
 
-Is a special type of executable component, capable to run application written in a dynamically interpreted language on the integrated VM.
-The goal is to provide runtime and development environment capable to execute application written in popular language on any possible platform.
+## Components
 
-By default, **Portal** provide a first class support for **HTML/JS** based apps. 
-Supporting dynamically interpreted language seems to be the best way to achieve this goal.
+Complete portal environment consists of the following core components:
 
-**Portal** provides also limited support for running native executables and developing golang apps. List of supported
-languages and available runners may change in the future.
+* **[astrald](https://github.com/cryptopunkscc/astrald/tree/master/cmd/astrald)** - A daemon that provides all the networking features like: identity, authentication, connectivity, encryption, and many more.
+* **[portald](../cmd/portald)** - A daemon that implements core features for app management. It configures and starts astrald process, and serves management API for the CLI or GUI clients.
+* **[portal](../cmd/portal)** - A reference CLI client for portald management API.
+* **[installer](../cmd/install-portal-to-astral)** - A platform specific bundle that unpacks mentioned components, installs embedded apps, and initiates user identity.
 
-## What is included
+## Embedded Applications
 
-Complete portal environment consists of the following executable components:
+In addition to the core components, portal delegates the rest of its features to the embedded apps and services:
 
-* `astrald` - A default implementation of Astral network that runs connectivity node on the local machine providing
-  apphost communication interface on tcp or unix sockets. It's a core dependency for portal.
-* `install-portal-to-astral` - A bundle containing required executables and capable to install them in the user's environment.
-* `portal` - A default commandline interface for starting and communicating with `portal-app`.
-* `portal-app` - A core service responsible for managing application runners.
-* `portal-app-wails` - A HTML webkit runner for desktops driven by wails project.
-* `portal-app-goja` - A JS runner driven by `goja` - ES 5.1(+) implementation written in pure go.
-* `portal-tray` - Displays tray indicator.
-* `portal-dev` - A core service for generating projects, managing development runners, and creating app bundles.
-* `portal-dev-wails` - Hot-reloading runner for developing HTML apps driven by wails.
-* `portal-dev-goja` - Hot-reloading runner for js apps driven by goja.
-* `portal-dev-go` - Hot-reloading runner for golang projects. Depends on `portal-dev-exec`
-* `portal-dev-exec` - Hot-reloading runner for executables.
-* `anc` - Tool inspired by `netcat`/`nc`. Allows to access apphost interface through command line
-
-Depending on your usecase, you may not need all of them. For example.
-
-* If you are not interested in developing apps you can skip all components prefixed by `portal-dev`.
-* If you are running Portal on a headless environment you don't need following UI components:
-    * `portal-app-wails`
-    * `portal-dev-wails`
-    * `portal-tray`
+* **[portal.js](../apps/js)** - A runner for ES5/6 services. Multiplatform, go.
+* **[portal.html](../apps/html)** - A runner for HTML5 apps. Implementation may vary depending on platform.
+* **[portal.dev.js](../apps/js)** - A runner for creating and developing ES5/6 services. Only for desktop. Requires npm installed on host machine.
+* **[portal.dev.html](../apps/html-dev)** - A runner for creating and developing HTML5 apps. Only for desktop. Requires npm installed on host machine.
+* **[portal.dev.go](../apps/go-dev)** - A runner for creating and developing go apps. Only for desktop. Requires go installed on host machine.
+* **[portal.dev.exec](../apps/exec-dev)** - A proxy runner for developing executable apps. Only for desktop.
+* **[portal.launcher](../apps/launcher)** - A launcher for application. Multiplatform, HTML5.
+* **[portal.tray](../apps/tray)** - Portal tray icon. Only for desktop.
