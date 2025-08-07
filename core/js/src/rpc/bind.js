@@ -1,3 +1,10 @@
+/**
+ * Returns a copy of caller with each route bound as a method.
+ *
+ * @param {RpcClient|RpcConn} caller
+ * @param {Array<string|object>} routes
+ * @returns {(function&RpcClient)|(function&RpcConn)}
+ */
 export function bind(caller, routes) {
   const r = prepare(routes)
   const copy = caller.copy()

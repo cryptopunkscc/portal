@@ -5,7 +5,7 @@ import {bindings} from "../bindings";
 export class ApphostClient {
   async register() {
     await bindings.astral_service_register()
-    return new AppHostListener()
+    return new ApphostListener()
   }
 
   async query(target, query) {
@@ -26,7 +26,7 @@ export class ApphostClient {
   }
 }
 
-export class AppHostListener {
+export class ApphostListener {
   constructor() {
   }
 
@@ -42,7 +42,6 @@ export class AppHostListener {
 
 export class ApphostConn {
   constructor(data) {
-    bindings.log("new apphost conn with data: " + JSON.stringify(data))
     this.id = data.id
     this.query = data.query
     this.remoteId = data.remoteId

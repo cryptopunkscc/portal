@@ -4,10 +4,43 @@ import {call} from "./call";
 import {hasParams} from "./query";
 import {formatQueryParams} from "./params";
 
+/**
+ * Adds RPC implementation to {@link ApphostConn}. Compatible with astral query.
+ *
+ * @extends {ApphostConn}
+ */
 export class RpcConn extends ApphostConn {
 
   constructor(data) {
     super(data);
+  }
+
+  /**
+   * Returns a copy of the object with each route bound as a method.
+   *
+   * @param {...string|object} routes
+   * @return {RpcConn&object}
+   *
+   * @example
+   * const conn = rpc.target(id).conn()
+   * const api = conn.bind("foo", "bar")
+   * await api.foo()
+   * await api.bar("baz", 1, true)
+   */
+  bind(...routes) {
+    return bind(this, routes);
+  }
+
+  /**@override*/
+  copy() {
+    return this;
+  }
+
+  /**@override*/
+  call(port, ...params) {
+    const c = call(this, this.#sub(port), ...params);
+    c.inner.single = false
+    return c
   }
 
   #sub(port) {
@@ -15,30 +48,30 @@ export class RpcConn extends ApphostConn {
     return port
   }
 
-  bind(...routes) {
-    return bind(this, routes);
-  }
-
-  copy() {
-    return this;
-  }
-
-  call(port, ...params) {
-    const c = call(this, this.#sub(port), ...params);
-    c.inner.single = false
-    return c
-  }
-
+  /**
+   * Adds response mapper to this connection.
+   *
+   * @param {(any) => any} f - mapping function
+   * @returns RpcConn - new instance
+   */
   map(f) {
     if (this.mapper) {
       const map = this.mapper
       this.mapper = arg => f(map(arg))
-    } else {
-      this.mapper = f
+      return this
     }
+    this.mapper = f
     return this
   }
 
+  /**
+   * Writes given method with params to this connection.
+   *
+   * @async
+   * @param {string} method
+   * @param {...any} params
+   * @returns {Promise<RpcConn>}
+   */
   async conn(method, ...params) {
     let cmd = method ? method : ""
     if (params.length > 0) {
@@ -49,12 +82,27 @@ export class RpcConn extends ApphostConn {
     return this
   }
 
+  /**
+   * Encodes data into JSON string and writes as line.
+   *
+   * @async
+   * @param {any} data
+   * @returns {Promise<undefined>}
+   * @throws {string} - IO error message
+   */
   async encode(data) {
     let json = JSON.stringify(data)
     if (json === undefined) json = '{}'
     return await super.writeLn(json)
   }
 
+  /**
+   * Reads line and parses it into object.
+   *
+   * @async
+   * @returns {Promise<object>} - parsed JSON object
+   * @throws {string} - parsed error message
+   */
   async decode() {
     const resp = await this.readLn()
     const parsed = JSON.parse(resp)
@@ -63,7 +111,13 @@ export class RpcConn extends ApphostConn {
     return parsed
   }
 
-  async request(...params) {
+  /**
+   * Returns first successfully decoded value or null.
+   *
+   * @async
+   * @returns {Promise<any|null>}
+   */
+  async request() {
     const map = this.mapper
     this.result = null
     for (; ;) {
@@ -80,12 +134,11 @@ export class RpcConn extends ApphostConn {
   }
 
   /**
-   * Collects all decoded values mapped as not null until decodes null or maps into undefined.
+   * Collects all decoded values until first null occurrence.
    *
-   * @param {...any} params
-   * @returns {Promise<any[]>}
+   * @returns {Promise<any[]>} - collected values
    */
-  async collect(...params) {
+  async collect() {
     const map = this.mapper ? this.mapper : null
     let push
     if (!map) push = next => this.result.push(next)

@@ -1,3 +1,6 @@
+/**
+ * Outdated
+ */
 namespace Rpc {
 
     interface Client extends Binder<Client>, Caller {
