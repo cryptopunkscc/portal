@@ -21,6 +21,7 @@ type Container struct {
 	network string
 	logfile string
 	Args    []any
+	root    string
 	io.Writer
 	Astrald
 }
@@ -45,6 +46,11 @@ func (c *Container) Name() string {
 
 func (c *Container) Command(args ...string) *Cmd {
 	return Command("docker", "exec", "-it", c.Name(), "sh", "-c", strings.Join(args, " "))
+}
+
+func (c *Container) GetBundleName(t *testing.T, dir string, pkg string) string {
+	b := c.Command("ls", dir, "| grep", pkg).OutputT(t)
+	return strings.TrimSpace(string(b))
 }
 
 func (c *Container) Arg(args ...any) *Container {
@@ -77,6 +83,14 @@ func (c *Container) RunContainer() test.Test {
 		c.BuildImage(),
 		c.CreateNetwork(),
 	)
+}
+
+func (c *Container) StartPortal(t *testing.T) {
+	Command("docker", "exec", "-d", c.Name(), "sh", "-c", "portal >> "+c.logfile+" 2>&1").RunT(t)
+}
+
+func (c *Container) CreateLogFile(t *testing.T) {
+	c.Command("touch", c.logfile).RunT(t)
 }
 
 func (c *Container) BuildBaseImage() test.Test {

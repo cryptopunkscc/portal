@@ -12,9 +12,23 @@ type Cmd struct {
 	*exec.Cmd
 }
 
-func (c Cmd) RunT(t *testing.T) {
+func (c *Cmd) OutputT(t *testing.T) []byte {
+	c.Stdout = nil
+	output, err := c.Cmd.Output()
+	assert.NoError(t, err)
+	return output
+}
+
+func (c *Cmd) RunT(t *testing.T) {
 	err := c.Run()
 	assert.NoError(t, err)
+}
+
+func (c *Cmd) NoStd() *Cmd {
+	c.Stdin = nil
+	c.Stdout = nil
+	c.Stderr = nil
+	return c
 }
 
 func Command(cmd string, args ...string) *Cmd {

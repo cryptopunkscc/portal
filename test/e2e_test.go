@@ -12,6 +12,7 @@ func TestE2E_2(t *testing.T) {
 		image:   "e2e-test",
 		network: "e2e-test-net",
 		logfile: "portald.log",
+		root:    "/",
 	})
 
 	runner := test.Runner{}
