@@ -3,6 +3,7 @@ package test
 import (
 	"bufio"
 	"github.com/cryptopunkscc/portal/pkg/test"
+	"github.com/cryptopunkscc/portal/test/util"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"path/filepath"
@@ -16,12 +17,12 @@ type Device interface {
 	Root() string
 	Test() test.Test
 	Start() test.Test
-	Command(...string) *Cmd
+	Command(...string) *util.Cmd
 
 	CreateLogFile(t *testing.T)
 	StartLogging()
 	StartPortal(t *testing.T)
-	FollowLogFile() *Cmd
+	FollowLogFile() *util.Cmd
 	GetBundleName(t *testing.T, dir string, pkg string) string
 }
 
@@ -31,7 +32,7 @@ type Cases struct {
 	Astrald
 }
 
-func (c *Cases) installPortalToAstral(args ...string) *Cmd {
+func (c *Cases) installPortalToAstral(args ...string) *util.Cmd {
 	args = slices.Insert(args, 0, filepath.Join(c.Root(), "portal", "bin", "install-portal-to-astral"))
 	return c.Command(args...)
 }

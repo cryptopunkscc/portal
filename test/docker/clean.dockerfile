@@ -5,4 +5,4 @@ ADD sources.tar .
 RUN ./mage -v build:installer
 
 WORKDIR /root
-COPY .portal.env.yml ./
+COPY ../.portal.env.yml ./
