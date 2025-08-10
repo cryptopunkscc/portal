@@ -3,24 +3,32 @@ package test
 import (
 	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/test"
+	"github.com/cryptopunkscc/portal/test/docker"
 	"testing"
 	"time"
 )
 
 func TestE2E_2(t *testing.T) {
-	c := Create(2, Container{
-		image:   "e2e-test",
-		network: "e2e-test-net",
-		logfile: "portald.log",
-		root:    "/",
+	cc := docker.Create(2, docker.Container{
+		Image:   "e2e-test",
+		Network: "e2e-test-net",
+		Logfile: "portald.log",
+		RootDir: "/",
 	})
+	var c []*Cases
+	for _, container := range cc {
+		c = append(c, &Cases{
+			id:     container.Id,
+			Device: container,
+		})
+	}
 
 	runner := test.Runner{}
 	tests := []test.Task{
 		// ====== base ======
 		{
 			Name: "build",
-			Test: c[0].BuildImage(),
+			Test: cc[0].BuildImage(),
 		},
 		{
 			Name: "print install help",
@@ -139,12 +147,12 @@ func TestE2E_2(t *testing.T) {
 		{
 			Name:  "print logs",
 			Group: 2,
-			Test:  c[0].PrintLog(),
+			Test:  cc[0].PrintLog(),
 		},
 		{
 			Name:  "print logs",
 			Group: 3,
-			Test:  c[1].PrintLog(),
+			Test:  cc[1].PrintLog(),
 		},
 	}
 	for i, tt := range tests {
@@ -153,7 +161,7 @@ func TestE2E_2(t *testing.T) {
 
 	t.Cleanup(func() {
 		time.Sleep(1 * time.Second) // await logs
-		ForceStopContainers(c...)
+		docker.ForceStopContainers(cc...)
 	})
 }
 

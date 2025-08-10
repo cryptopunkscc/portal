@@ -1,60 +1,83 @@
 package test
 
 import (
+	"bufio"
 	"github.com/cryptopunkscc/portal/pkg/test"
+	"github.com/stretchr/testify/assert"
+	"io"
 	"path/filepath"
 	"slices"
 	"testing"
 	"time"
 )
 
-func (c *Container) installPortalToAstral(args ...string) *Cmd {
-	args = slices.Insert(args, 0, filepath.Join(c.root, "portal", "bin", "install-portal-to-astral"))
+type Device interface {
+	Name() string
+	Root() string
+	Test() test.Test
+	Start() test.Test
+	Command(...string) *Cmd
+
+	CreateLogFile(t *testing.T)
+	StartLogging()
+	StartPortal(t *testing.T)
+	FollowLogFile() *Cmd
+	GetBundleName(t *testing.T, dir string, pkg string) string
+}
+
+type Cases struct {
+	id int
+	Device
+	Astrald
+}
+
+func (c *Cases) installPortalToAstral(args ...string) *Cmd {
+	args = slices.Insert(args, 0, filepath.Join(c.Root(), "portal", "bin", "install-portal-to-astral"))
 	return c.Command(args...)
 }
 
-func (c *Container) PrintInstallHelp() test.Test {
-	return c.Test(func(t *testing.T) {
+func (c *Cases) PrintInstallHelp() test.Test {
+	return c.Test().Func(func(t *testing.T) {
 		c.installPortalToAstral("h").RunT(t)
 	},
-		c.RunContainer(),
+		c.Start(),
 	)
 }
 
-func (c *Container) InstallFirstPortal() test.Test {
-	return c.Test(func(t *testing.T) {
+func (c *Cases) InstallFirstPortal() test.Test {
+	return c.Test().Func(func(t *testing.T) {
 		c.installPortalToAstral("test_user").RunT(t)
-	},
-		c.RunContainer(),
+	}).Requires(
+		c.Start(),
 	)
 }
 
-func (c *Container) InstallNextPortal() test.Test {
-	return c.Test(func(t *testing.T) {
+func (c *Cases) InstallNextPortal() test.Test {
+	return c.Test().Func(func(t *testing.T) {
 		c.installPortalToAstral().RunT(t)
-	},
-		c.RunContainer(),
+	}).Requires(
+		c.Start(),
 	)
 }
 
-func (c *Container) PortalStart() test.Test {
+func (c *Cases) PortalStart() test.Test {
 	installPortal := c.InstallFirstPortal()
 	if c.id > 0 {
 		installPortal = c.InstallNextPortal()
 	}
-	return c.Test(func(t *testing.T) {
+	return c.Test().Func(func(t *testing.T) {
 		c.CreateLogFile(t)
 		go c.StartLogging()
 
-		c.StartPortal(t)
+		c.Device.StartPortal(t)
 		time.Sleep(1 * time.Second)
 	},
 		installPortal,
 	)
 }
 
-func (c *Container) PortalStartAwait() test.Test {
-	return c.Test(func(t *testing.T) {},
+func (c *Cases) PortalStartAwait() test.Test {
+	return c.Test().Requires(
 		c.PortalStart(),
 		c.ParseLogfile(
 			c.ParseNodeInfo,
@@ -62,8 +85,39 @@ func (c *Container) PortalStartAwait() test.Test {
 	)
 }
 
-func (c *Container) PortalClose() test.Test {
-	return c.Test(func(t *testing.T) {
+func (c *Cases) ParseLogfile(parsers ...func(log string) bool) test.Test {
+	return c.Test().Func(func(t *testing.T) {
+		pr, pw := io.Pipe()
+		cmd := c.FollowLogFile()
+		cmd.Stdout = pw
+		cmd.Stderr = pw
+		if err := cmd.Start(); !assert.NoError(t, err) {
+			return
+		}
+
+		s := bufio.NewScanner(pr)
+		defer func() {
+			_ = cmd.Process.Kill()
+			_ = pr.Close()
+			_ = pw.Close()
+		}()
+		for s.Scan() {
+			l := s.Text()
+			for i, parser := range parsers {
+				if parser(l) {
+					parsers = slices.Delete(parsers, i, i+1)
+					break
+				}
+			}
+			if len(parsers) == 0 {
+				break
+			}
+		}
+	})
+}
+
+func (c *Cases) PortalClose() test.Test {
+	return c.Test().Func(func(t *testing.T) {
 		time.Sleep(1000 * time.Millisecond)
 		c.Command("portal close").RunT(t)
 	},
@@ -71,32 +125,32 @@ func (c *Container) PortalClose() test.Test {
 	)
 }
 
-func (c *Container) PortalHelp() test.Test {
-	return c.Test(func(t *testing.T) {
+func (c *Cases) PortalHelp() test.Test {
+	return c.Test().Func(func(t *testing.T) {
 		c.Command("portal h").RunT(t)
 	},
 		c.PortalStart(),
 	)
 }
 
-func (c *Container) CreateUser() test.Test {
-	return c.Test(func(t *testing.T) {
+func (c *Cases) CreateUser() test.Test {
+	return c.Test().Func(func(t *testing.T) {
 		c.Command("portal user create test_user").RunT(t)
 	},
 		c.PortalStart(),
 	)
 }
 
-func (c *Container) UserInfo() test.Test {
-	return c.Test(func(t *testing.T) {
+func (c *Cases) UserInfo() test.Test {
+	return c.Test().Func(func(t *testing.T) {
 		c.Command("portal user info").RunT(t)
 	},
 		c.PortalStart(),
 	)
 }
 
-func (c *Container) UserClaim(c2 *Container) test.Test {
-	return c.Arg(c2.Name()).Test(func(t *testing.T) {
+func (c *Cases) UserClaim(c2 *Cases) test.Test {
+	return c.Test().Args(c2.Name()).Func(func(t *testing.T) {
 		c.Command("portal", "user", "claim", c2.identity).RunT(t)
 	},
 		c.PortalStart(),
@@ -104,8 +158,8 @@ func (c *Container) UserClaim(c2 *Container) test.Test {
 	)
 }
 
-func (c *Container) ListTemplates(runner string) test.Test {
-	return c.Arg(runner).Test(func(t *testing.T) {
+func (c *Cases) ListTemplates(runner string) test.Test {
+	return c.Test().Args(runner).Func(func(t *testing.T) {
 		c.Command("portal", runner, "templates").RunT(t)
 	},
 		c.PortalStart(),
@@ -125,16 +179,16 @@ func (o ProjectOpts) Name() string {
 	return o.template
 }
 
-func (c *Container) NewProject(opts ProjectOpts) test.Test {
-	return c.Arg(opts).Test(func(t *testing.T) {
+func (c *Cases) NewProject(opts ProjectOpts) test.Test {
+	return c.Test().Args(opts).Func(func(t *testing.T) {
 		c.Command("portal", opts.runner, "new", "-t", opts.template, opts.Name()).RunT(t)
 	},
 		c.PortalStart(),
 	)
 }
 
-func (c *Container) BuildProject(opts ProjectOpts) test.Test {
-	return c.Arg(opts).Test(func(t *testing.T) {
+func (c *Cases) BuildProject(opts ProjectOpts) test.Test {
+	return c.Test().Args(opts).Func(func(t *testing.T) {
 		c.Command("portal", "build", "-p", "-o", ".", opts.Name()).RunT(t)
 		time.Sleep(1 * time.Second)
 	},
@@ -142,8 +196,8 @@ func (c *Container) BuildProject(opts ProjectOpts) test.Test {
 	)
 }
 
-func (c *Container) PublishProject(opts ProjectOpts) test.Test {
-	return c.Arg(opts).Test(func(t *testing.T) {
+func (c *Cases) PublishProject(opts ProjectOpts) test.Test {
+	return c.Test().Args(opts).Func(func(t *testing.T) {
 		name := c.GetBundleName(t, "build", opts.Name())
 		path := filepath.Join("build", name)
 		t.Log("publishing:", path)
@@ -153,22 +207,22 @@ func (c *Container) PublishProject(opts ProjectOpts) test.Test {
 	)
 }
 
-func (c *Container) ListAvailableApps(opts ProjectOpts) test.Test {
-	return c.Arg(opts).Test(func(t *testing.T) {
+func (c *Cases) ListAvailableApps(opts ProjectOpts) test.Test {
+	return c.Test().Args(opts).Func(func(t *testing.T) {
 		c.Command("portal app available").RunT(t)
 	},
 		c.BuildProject(opts),
 	)
 }
 
-func (c *Container) InstallAvailableApp(opts ProjectOpts) test.Test {
-	return c.Arg(opts).Test(func(t *testing.T) {
+func (c *Cases) InstallAvailableApp(opts ProjectOpts) test.Test {
+	return c.Test().Args(opts).Func(func(t *testing.T) {
 		c.Command("portal app install my.app." + opts.Name()).RunT(t)
 	})
 }
 
-func (c *Container) RunApp(opts ProjectOpts) test.Test {
-	return c.Arg(opts).Test(func(t *testing.T) {
+func (c *Cases) RunApp(opts ProjectOpts) test.Test {
+	return c.Test().Args(opts).Func(func(t *testing.T) {
 		c.Command("portal " + opts.Name()).RunT(t)
 	})
 }

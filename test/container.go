@@ -1,7 +1,6 @@
 package test
 
 import (
-	"bufio"
 	"fmt"
 	golang "github.com/cryptopunkscc/portal/pkg/go"
 	"github.com/cryptopunkscc/portal/pkg/test"
@@ -10,7 +9,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"slices"
 	"strings"
 	"testing"
 )
@@ -24,6 +22,10 @@ type Container struct {
 	root    string
 	io.Writer
 	Astrald
+}
+
+func (c *Container) Root() string {
+	return c.root
 }
 
 func Create(amount int, base Container) (cs []*Container) {
@@ -53,24 +55,13 @@ func (c *Container) GetBundleName(t *testing.T, dir string, pkg string) string {
 	return strings.TrimSpace(string(b))
 }
 
-func (c *Container) Arg(args ...any) *Container {
-	cc := *c
-	cc.Args = args
-	return &cc
-}
-
-func (c *Container) Test(run func(t *testing.T), require ...test.Test) test.Test {
+func (c *Container) Test() test.Test {
 	name := fmt.Sprintf("%d-%s", c.id, test.CallerName(2))
-	if len(c.Args) == 1 {
-		name = fmt.Sprintf("%s%v", name, c.Args[0])
-	} else if len(c.Args) > 1 {
-		name = fmt.Sprintf("%s%v", name, c.Args)
-	}
-	return test.New(name, run, require...)
+	return test.New(name, func(t *testing.T) {})
 }
 
-func (c *Container) RunContainer() test.Test {
-	return c.Test(func(t *testing.T) {
+func (c *Container) Start() test.Test {
+	return c.Test().Func(func(t *testing.T) {
 		Command("docker", "run", "-dit",
 			"--rm", // remove Container immediately after run
 			"--name", c.Name(),
@@ -102,9 +93,9 @@ func (c *Container) BuildBaseImage() test.Test {
 }
 
 func (c *Container) BuildImage() test.Test {
-	//return c.buildImageLocal()
+	//return c.BuildImageLocal()
 	return c.BuildImageFast()
-	//return c.buildImageClean()
+	//return c.BuildImageClean()
 }
 
 func (c *Container) BuildImageLocal() test.Test {
@@ -196,14 +187,14 @@ func (c *Container) RemoveImage() test.Test {
 }
 
 func (c *Container) Teardown() test.Test {
-	return c.Test(func(t *testing.T) {},
+	return c.Test().Func(func(t *testing.T) {},
 		c.StopContainer(),
 		c.RemoveContainer(),
 	)
 }
 
 func (c *Container) StopContainer() test.Test {
-	return c.Test(func(t *testing.T) {
+	return c.Test().Func(func(t *testing.T) {
 		ForceStopContainers(c)
 	})
 }
@@ -215,7 +206,7 @@ func ForceStopContainers(c ...*Container) {
 }
 
 func (c *Container) RemoveContainer() test.Test {
-	return c.Test(func(t *testing.T) {
+	return c.Test().Func(func(t *testing.T) {
 		_ = Command("docker", "rm", c.Name()).Run()
 	})
 }
@@ -226,42 +217,15 @@ func (c *Container) StartLogging() {
 	println(fmt.Sprintf(">>> STOP LOGGING %d", c.id))
 }
 
+func (c *Container) FollowLogFile() *Cmd {
+	return Command("docker", "exec", c.Name(), "sh", "-c", "tail -n +1 -f "+c.logfile)
+}
+
 func (c *Container) PrintLog(args ...any) test.Test {
-	return c.Arg(args...).Test(func(t *testing.T) {
+	return c.Test().Args(args...).Func(func(t *testing.T) {
 		println(fmt.Sprintf(">>> BEGIN PRINT LOG %d", c.id))
 		err := Command("docker", "exec", c.Name(), "sh", "-c", "cat "+c.logfile).Run()
 		println(fmt.Sprintf(">>> END PRINT LOG %d", c.id))
 		assert.NoError(t, err)
-	})
-}
-
-func (c *Container) ParseLogfile(parsers ...func(log string) bool) test.Test {
-	return c.Test(func(t *testing.T) {
-		pr, pw := io.Pipe()
-		cmd := Command("docker", "exec", c.Name(), "sh", "-c", "tail -n +1 -f "+c.logfile)
-		cmd.Stdout = pw
-		cmd.Stderr = pw
-		if err := cmd.Start(); !assert.NoError(t, err) {
-			return
-		}
-
-		s := bufio.NewScanner(pr)
-		defer func() {
-			_ = cmd.Process.Kill()
-			_ = pr.Close()
-			_ = pw.Close()
-		}()
-		for s.Scan() {
-			l := s.Text()
-			for i, parser := range parsers {
-				if parser(l) {
-					parsers = slices.Delete(parsers, i, i+1)
-					break
-				}
-			}
-			if len(parsers) == 0 {
-				break
-			}
-		}
 	})
 }
