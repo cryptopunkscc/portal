@@ -8,7 +8,7 @@ import (
 )
 
 func TestE2E_2(t *testing.T) {
-	c := create(2, container{
+	c := Create(2, Container{
 		image:   "e2e-test",
 		network: "e2e-test-net",
 		logfile: "portald.log",
@@ -19,131 +19,131 @@ func TestE2E_2(t *testing.T) {
 		// ====== base ======
 		{
 			Name: "build",
-			Test: c[0].buildImage(),
+			Test: c[0].BuildImage(),
 		},
 		{
 			Name: "print install help",
-			Test: c[0].printInstallHelp(),
+			Test: c[0].PrintInstallHelp(),
 		},
 		{
 			Name: "start portald via portal",
-			Test: c[0].portalStart(),
+			Test: c[0].PortalStart(),
 		},
 		{
 			Name: "start portald via portal",
-			Test: c[1].portalStartAwait(),
+			Test: c[1].PortalStartAwait(),
 		},
 		{
 			Name: "portal help",
-			Test: c[0].portalHelp(),
+			Test: c[0].PortalHelp(),
 		},
 		{
 			Name: "user claim",
-			Test: c[0].userClaim(c[1]),
+			Test: c[0].UserClaim(c[1]),
 		},
 		// ====== dev.js ======
 		{
 			Name: "list js templates",
-			Test: c[0].listTemplates("dev.js"),
+			Test: c[0].ListTemplates("dev.js"),
 		},
 		{
 			Name: "create js project",
-			Test: c[0].newProject(jsProject),
+			Test: c[0].NewProject(jsProject),
 		},
 		{
 			Name: "pack js project",
-			Test: c[0].buildProject(jsProject),
+			Test: c[0].BuildProject(jsProject),
 		},
 		{
 			Name: "publish js project",
-			Test: c[0].publishProject(jsProject),
+			Test: c[0].PublishProject(jsProject),
 		},
 		{
 			Name: "list available apps",
-			Test: c[1].listAvailableApps(jsProject),
+			Test: c[1].ListAvailableApps(jsProject),
 			Require: test.Tests{
-				c[0].userClaim(c[1]),
-				c[0].publishProject(jsProject),
+				c[0].UserClaim(c[1]),
+				c[0].PublishProject(jsProject),
 			},
 		},
 		{
 			Name: "install available app by name",
-			Test: c[1].installAvailableApp(jsProject),
+			Test: c[1].InstallAvailableApp(jsProject),
 			Require: test.Tests{
-				c[0].userClaim(c[1]),
-				c[0].publishProject(jsProject),
+				c[0].UserClaim(c[1]),
+				c[0].PublishProject(jsProject),
 			},
 		},
 		{
 			Name:    "run js app",
-			Test:    c[1].runApp(jsProject),
-			Require: test.Tests{c[1].installAvailableApp(jsProject)},
+			Test:    c[1].RunApp(jsProject),
+			Require: test.Tests{c[1].InstallAvailableApp(jsProject)},
 		},
 		{
 			Name: "create js-rollup project",
-			Test: c[0].newProject(jsRollupProject),
+			Test: c[0].NewProject(jsRollupProject),
 		},
 		{
 			Name: "build js-rollup project",
-			Test: c[0].buildProject(jsRollupProject),
+			Test: c[0].BuildProject(jsRollupProject),
 		},
 		{
 			Name: "publish js-rollup app",
-			Test: c[0].publishProject(jsRollupProject),
+			Test: c[0].PublishProject(jsRollupProject),
 		},
 		{
 			Name: "install js-rollup app by name",
-			Test: c[1].installAvailableApp(jsRollupProject),
+			Test: c[1].InstallAvailableApp(jsRollupProject),
 			Require: test.Tests{
-				c[0].userClaim(c[1]),
-				c[0].publishProject(jsRollupProject),
+				c[0].UserClaim(c[1]),
+				c[0].PublishProject(jsRollupProject),
 			},
 		},
 		{
 			Name:    "run js-rollup app",
-			Test:    c[1].runApp(jsRollupProject),
-			Require: test.Tests{c[1].installAvailableApp(jsRollupProject)},
+			Test:    c[1].RunApp(jsRollupProject),
+			Require: test.Tests{c[1].InstallAvailableApp(jsRollupProject)},
 		},
 		// ====== dev.html ======
 		{
 			Name: "list html templates",
-			Test: c[0].listTemplates("dev.html"),
+			Test: c[0].ListTemplates("dev.html"),
 		},
 		{
 			Name: "create html project",
-			Test: c[0].newProject(htmlProject),
+			Test: c[0].NewProject(htmlProject),
 		},
 		{
 			Name: "create svelte project",
-			Test: c[0].newProject(svelteProject),
+			Test: c[0].NewProject(svelteProject),
 		},
 		{
 			Name: "build svelte project",
-			Test: c[0].buildProject(svelteProject),
+			Test: c[0].BuildProject(svelteProject),
 		},
 		{
 			Name: "create react project",
-			Test: c[0].newProject(reactProject),
+			Test: c[0].NewProject(reactProject),
 		},
 		{
 			Name: "build react project",
-			Test: c[0].buildProject(reactProject),
+			Test: c[0].BuildProject(reactProject),
 		},
 		// ====== tear down ======
 		{
 			Name:  "portal close",
-			Test:  c[0].portalClose(),
+			Test:  c[0].PortalClose(),
 			Group: 1,
 		},
 		{
 			Name:  "print logs",
 			Group: 2,
-			Test:  c[0].printLog(),
+			Test:  c[0].PrintLog(),
 		},
 		{
 			Name:  "print logs",
 			Group: 3,
-			Test:  c[1].printLog(),
+			Test:  c[1].PrintLog(),
 		},
 	}
 	for i, tt := range tests {
@@ -152,32 +152,32 @@ func TestE2E_2(t *testing.T) {
 
 	t.Cleanup(func() {
 		time.Sleep(1 * time.Second) // await logs
-		forceStopContainers(c...)
+		ForceStopContainers(c...)
 	})
 }
 
-var jsProject = projectOpts{
+var jsProject = ProjectOpts{
 	runner:   "dev.js",
 	template: "js",
 	name:     "js-raw",
 }
 
-var jsRollupProject = projectOpts{
+var jsRollupProject = ProjectOpts{
 	runner:   "dev.js",
 	template: "js-rollup",
 }
 
-var htmlProject = projectOpts{
+var htmlProject = ProjectOpts{
 	runner:   "dev.html",
 	template: "html",
 }
 
-var svelteProject = projectOpts{
+var svelteProject = ProjectOpts{
 	runner:   "dev.html",
 	template: "svelte",
 }
 
-var reactProject = projectOpts{
+var reactProject = ProjectOpts{
 	runner:   "dev.html",
 	template: "react",
 }

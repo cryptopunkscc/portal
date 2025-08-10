@@ -5,12 +5,12 @@ import (
 	"strings"
 )
 
-type astrald struct {
+type Astrald struct {
 	identity string
 	alias    string
 }
 
-func (a *astrald) parseNodeInfo(logLine string) bool {
+func (a *Astrald) ParseNodeInfo(logLine string) bool {
 	c := strings.Split(logLine, ": NodeInfo: ")
 	if len(c) < 2 {
 		return false

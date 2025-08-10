@@ -16,61 +16,49 @@ import (
 	"testing"
 )
 
-type container struct {
+type Container struct {
 	id      int
 	image   string
 	network string
 	logfile string
 	Args    []any
 	io.Writer
-	astrald
+	Astrald
 }
 
-func create(amount int, base container) (cs []*container) {
-	cs = make([]*container, amount)
+func Create(amount int, base Container) (cs []*Container) {
+	cs = make([]*Container, amount)
 	for i := 0; i < amount; i++ {
 		cs[i] = base.new()
 	}
 	return
 }
 
-func (c *container) new() *container {
+func (c *Container) new() *Container {
 	cc := *c
 	c.id++
 	return &cc
 }
 
-func (c *container) name() string {
+func (c *Container) Name() string {
 	return fmt.Sprintf("%s-%d", c.image, c.id)
 }
 
-func (c *container) exec(args ...string) *exec.Cmd {
-	return execCmd("docker", append([]string{"exec", "-it", c.name()}, args...)...)
+func (c *Container) Exec(args ...string) *exec.Cmd {
+	return ExecCmd("docker", "exec", "-it", c.Name(), "sh", "-c", strings.Join(args, " "))
 }
 
-func (c *container) execRun(t *testing.T, args ...string) {
-	execCmdRun(t, "docker", append([]string{"exec", "-it", c.name()}, args...)...)
+func (c *Container) ExecRun(t *testing.T, args ...string) {
+	ExecCmdRun(t, "docker", "exec", "-it", c.Name(), "sh", "-c", strings.Join(args, " "))
 }
 
-func (c *container) execRunSh(t *testing.T, args ...string) {
-	c.execRun(t, append([]string{"sh", "-c"}, args...)...)
-}
-
-func (c *container) execRunShTest(args ...string) test.Test {
-	args = append([]string{"sh", "-c"}, args...)
-	name := fmt.Sprintf("%s  %s", c.name(), strings.Join(args, " "))
-	return test.New(name, func(t *testing.T) {
-		c.execRun(t, args...)
-	})
-}
-
-func (c *container) args(args ...any) *container {
+func (c *Container) Arg(args ...any) *Container {
 	cc := *c
 	cc.Args = args
 	return &cc
 }
 
-func (c *container) test(run func(t *testing.T), require ...test.Test) test.Test {
+func (c *Container) Test(run func(t *testing.T), require ...test.Test) test.Test {
 	name := fmt.Sprintf("%d-%s", c.id, test.CallerName(2))
 	if len(c.Args) == 1 {
 		name = fmt.Sprintf("%s%v", name, c.Args[0])
@@ -80,50 +68,50 @@ func (c *container) test(run func(t *testing.T), require ...test.Test) test.Test
 	return test.New(name, run, require...)
 }
 
-func (c *container) runContainer() test.Test {
-	return c.test(func(t *testing.T) {
-		execCmdRun(t, "docker", "run", "-dit",
-			"--rm", // remove container immediately after run
-			"--name", c.name(),
+func (c *Container) RunContainer() test.Test {
+	return c.Test(func(t *testing.T) {
+		ExecCmdRun(t, "docker", "run", "-dit",
+			"--rm", // remove Container immediately after run
+			"--name", c.Name(),
 			"--network", c.network,
 			"-v", "/home/jan/projects/cryptopunks/portal/bin:/portal/bin",
 			c.image)
 	},
-		c.teardown(),
-		c.buildImage(),
-		c.createNetwork(),
+		c.Teardown(),
+		c.BuildImage(),
+		c.CreateNetwork(),
 	)
 }
 
-func (c *container) buildBaseImage() test.Test {
+func (c *Container) BuildBaseImage() test.Test {
 	image := c.image + "-base"
 	name := fmt.Sprintf("%s %s", test.CallerName(), image)
 	return test.New(name, func(t *testing.T) {
-		execCmdRun(t, "docker", "build", "-t", image+":latest", "-f", "base.dockerfile", ".")
+		ExecCmdRun(t, "docker", "build", "-t", image+":latest", "-f", "base.dockerfile", ".")
 	})
 }
 
-func (c *container) buildImage() test.Test {
+func (c *Container) BuildImage() test.Test {
 	//return c.buildImageLocal()
-	return c.buildImageFast()
+	return c.BuildImageFast()
 	//return c.buildImageClean()
 }
 
-func (c *container) buildImageLocal() test.Test {
+func (c *Container) BuildImageLocal() test.Test {
 	name := fmt.Sprintf("%s %s", test.CallerName(), c.image)
 	return test.New(name, func(t *testing.T) {
-		execCmdRun(t, "docker", "build",
+		ExecCmdRun(t, "docker", "build",
 			"--force-rm", "--squash",
 			"-f", "local.dockerfile",
 			"-t", c.image+":latest", ".")
 	},
-		c.buildBaseImage(),
-		c.removeImage(),
-		buildInstaller(),
+		c.BuildBaseImage(),
+		c.RemoveImage(),
+		BuildInstaller(),
 	)
 }
 
-func (c *container) buildImageFast() test.Test {
+func (c *Container) BuildImageFast() test.Test {
 	name := fmt.Sprintf("%s %s", test.CallerName(), c.image)
 	return test.New(name, func(t *testing.T) {
 		cacheDir, err := os.UserCacheDir()
@@ -132,7 +120,7 @@ func (c *container) buildImageFast() test.Test {
 		projectDir, err := golang.FindProjectRoot()
 		assert.NoError(t, err)
 
-		execCmdRun(t, "docker", "build",
+		ExecCmdRun(t, "docker", "build",
 			"--force-rm", "--squash",
 			"-v", build.Default.GOPATH+":/go",
 			"-v", cacheDir+":/root/.cache",
@@ -140,12 +128,12 @@ func (c *container) buildImageFast() test.Test {
 			"-f", "fast.dockerfile",
 			"-t", c.image+":latest", ".")
 	},
-		c.buildBaseImage(),
-		c.removeImage(),
+		c.BuildBaseImage(),
+		c.RemoveImage(),
 	)
 }
 
-func (c *container) buildImageClean() test.Test {
+func (c *Container) BuildImageClean() test.Test {
 	name := fmt.Sprintf("%s %s", test.CallerName(), c.image)
 	return test.New(name, func(t *testing.T) {
 		cacheDir, err := os.UserCacheDir()
@@ -157,7 +145,7 @@ func (c *container) buildImageClean() test.Test {
 		binDir := filepath.Join(projectDir, "bin")
 		_ = os.MkdirAll(binDir, 0755)
 
-		execCmdRun(t, "docker", "build",
+		ExecCmdRun(t, "docker", "build",
 			"--force-rm", "--squash",
 			"-v", build.Default.GOPATH+":/go",
 			"-v", cacheDir+":/root/.cache",
@@ -165,79 +153,79 @@ func (c *container) buildImageClean() test.Test {
 			"-f", "clean.dockerfile",
 			"-t", c.image+":latest", ".")
 	},
-		c.buildBaseImage(),
-		c.removeImage(),
-		packProject(),
+		c.BuildBaseImage(),
+		c.RemoveImage(),
+		PackProject(),
 	)
 }
 
-func (c *container) createNetwork() test.Test {
+func (c *Container) CreateNetwork() test.Test {
 	name := fmt.Sprintf("%s %s", test.CallerName(), c.network)
 	return test.New(name, func(t *testing.T) {
-		execCmdRun(t, "docker", "network", "create", c.network)
+		ExecCmdRun(t, "docker", "network", "create", c.network)
 	},
-		c.removeNetwork(),
+		c.RemoveNetwork(),
 	)
 }
 
-func (c *container) removeNetwork() test.Test {
+func (c *Container) RemoveNetwork() test.Test {
 	name := fmt.Sprintf("%s %s", test.CallerName(), c.network)
 	return test.New(name, func(t *testing.T) {
-		_ = execCmd("docker", "network", "rm", "-f", c.network).Run()
+		_ = ExecCmd("docker", "network", "rm", "-f", c.network).Run()
 	})
 }
 
-func (c *container) removeImage() test.Test {
+func (c *Container) RemoveImage() test.Test {
 	name := fmt.Sprintf("%s %s", test.CallerName(), c.image)
 	return test.New(name, func(t *testing.T) {
-		_ = execCmd("docker", "rmi", c.image).Run()
+		_ = ExecCmd("docker", "rmi", c.image).Run()
 	})
 }
 
-func (c *container) teardown() test.Test {
-	return c.test(func(t *testing.T) {},
-		c.stopContainer(),
-		c.removeContainer(),
+func (c *Container) Teardown() test.Test {
+	return c.Test(func(t *testing.T) {},
+		c.StopContainer(),
+		c.RemoveContainer(),
 	)
 }
 
-func (c *container) stopContainer() test.Test {
-	return c.test(func(t *testing.T) {
-		forceStopContainers(c)
+func (c *Container) StopContainer() test.Test {
+	return c.Test(func(t *testing.T) {
+		ForceStopContainers(c)
 	})
 }
 
-func forceStopContainers(c ...*container) {
+func ForceStopContainers(c ...*Container) {
 	for _, cc := range c {
-		_ = execCmd("docker", "stop", "-t", "0", cc.name()).Run()
+		_ = ExecCmd("docker", "stop", "-t", "0", cc.Name()).Run()
 	}
 }
 
-func (c *container) removeContainer() test.Test {
-	return c.test(func(t *testing.T) {
-		_ = execCmd("docker", "rm", c.name()).Run()
+func (c *Container) RemoveContainer() test.Test {
+	return c.Test(func(t *testing.T) {
+		_ = ExecCmd("docker", "rm", c.Name()).Run()
 	})
 }
 
-func (c *container) startLogging() {
+func (c *Container) StartLogging() {
 	println(fmt.Sprintf(">>> START LOGGING %d", c.id))
-	_ = execCmd("docker", "exec", c.name(), "sh", "-c", "tail -f "+c.logfile).Run()
+	_ = ExecCmd("docker", "exec", c.Name(), "sh", "-c", "tail -f "+c.logfile).Run()
 	println(fmt.Sprintf(">>> STOP LOGGING %d", c.id))
 }
 
-func (c *container) printLog(args ...any) test.Test {
-	return c.args(args...).test(func(t *testing.T) {
+func (c *Container) PrintLog(args ...any) test.Test {
+	return c.Arg(args...).Test(func(t *testing.T) {
 		println(fmt.Sprintf(">>> BEGIN PRINT LOG %d", c.id))
-		err := execCmd("docker", "exec", c.name(), "sh", "-c", "cat "+c.logfile).Run()
+		err := ExecCmd("docker", "exec", c.Name(), "sh", "-c", "cat "+c.logfile).Run()
 		println(fmt.Sprintf(">>> END PRINT LOG %d", c.id))
 		assert.NoError(t, err)
 	})
 }
 
-func (c *container) parseLogfile(parsers ...func(log string) bool) test.Test {
-	return c.test(func(t *testing.T) {
+func (c *Container) ParseLogfile(parsers ...func(log string) bool) test.Test {
+	return c.Test(func(t *testing.T) {
 		pr, pw := io.Pipe()
-		cmd := execCmd("docker", "exec", c.name(), "sh", "-c", "tail -n +1 -f "+c.logfile)
+		cmd := ExecCmd("docker", "exec", c.Name(), "sh", "-c", "tail -n +1 -f "+c.logfile)
 		cmd.Stdout = pw
 		cmd.Stderr = pw
 		if err := cmd.Start(); !assert.NoError(t, err) {

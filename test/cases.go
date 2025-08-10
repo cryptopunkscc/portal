@@ -7,168 +7,168 @@ import (
 	"time"
 )
 
-func (c *container) printInstallHelp() test.Test {
-	return c.test(func(t *testing.T) {
-		c.execRunSh(t, "/portal/bin/install-portal-to-astral h")
+func (c *Container) PrintInstallHelp() test.Test {
+	return c.Test(func(t *testing.T) {
+		c.ExecRun(t, "/portal/bin/install-portal-to-astral h")
 	},
-		c.runContainer(),
+		c.RunContainer(),
 	)
 }
 
-func (c *container) installFirstPortal() test.Test {
-	return c.test(func(t *testing.T) {
-		c.execRunSh(t, "/portal/bin/install-portal-to-astral test_user")
+func (c *Container) InstallFirstPortal() test.Test {
+	return c.Test(func(t *testing.T) {
+		c.ExecRun(t, "/portal/bin/install-portal-to-astral test_user")
 	},
-		c.runContainer(),
+		c.RunContainer(),
 	)
 }
 
-func (c *container) installNextPortal() test.Test {
-	return c.test(func(t *testing.T) {
-		c.execRunSh(t, "/portal/bin/install-portal-to-astral")
+func (c *Container) InstallNextPortal() test.Test {
+	return c.Test(func(t *testing.T) {
+		c.ExecRun(t, "/portal/bin/install-portal-to-astral")
 	},
-		c.runContainer(),
+		c.RunContainer(),
 	)
 }
 
-func (c *container) portalStart() test.Test {
-	installPortal := c.installFirstPortal()
+func (c *Container) PortalStart() test.Test {
+	installPortal := c.InstallFirstPortal()
 	if c.id > 0 {
-		installPortal = c.installNextPortal()
+		installPortal = c.InstallNextPortal()
 	}
-	return c.test(func(t *testing.T) {
-		c.execRunSh(t, "touch "+c.logfile)
-		go c.startLogging()
+	return c.Test(func(t *testing.T) {
+		c.ExecRun(t, "touch "+c.logfile)
+		go c.StartLogging()
 
-		execCmdRun(t, "docker", "exec", "-d", c.name(), "sh", "-c", "portal >> "+c.logfile+" 2>&1")
+		ExecCmdRun(t, "docker", "exec", "-d", c.Name(), "sh", "-c", "portal >> "+c.logfile+" 2>&1")
 		time.Sleep(1 * time.Second)
 	},
 		installPortal,
 	)
 }
 
-func (c *container) portalStartAwait() test.Test {
-	return c.test(func(t *testing.T) {},
-		c.portalStart(),
-		c.parseLogfile(
-			c.parseNodeInfo,
+func (c *Container) PortalStartAwait() test.Test {
+	return c.Test(func(t *testing.T) {},
+		c.PortalStart(),
+		c.ParseLogfile(
+			c.ParseNodeInfo,
 		),
 	)
 }
 
-func (c *container) portalClose() test.Test {
-	return c.test(func(t *testing.T) {
+func (c *Container) PortalClose() test.Test {
+	return c.Test(func(t *testing.T) {
 		time.Sleep(1000 * time.Millisecond)
-		c.execRunSh(t, "portal close")
+		c.ExecRun(t, "portal close")
 	},
-		c.portalStart(),
+		c.PortalStart(),
 	)
 }
 
-func (c *container) portalHelp() test.Test {
-	return c.test(func(t *testing.T) {
-		c.execRunSh(t, "portal h")
+func (c *Container) PortalHelp() test.Test {
+	return c.Test(func(t *testing.T) {
+		c.ExecRun(t, "portal h")
 	},
-		c.portalStart(),
+		c.PortalStart(),
 	)
 }
 
-func (c *container) createUser() test.Test {
-	return c.test(func(t *testing.T) {
-		c.execRunSh(t, "portal user create test_user")
+func (c *Container) CreateUser() test.Test {
+	return c.Test(func(t *testing.T) {
+		c.ExecRun(t, "portal user create test_user")
 	},
-		c.portalStart(),
+		c.PortalStart(),
 	)
 }
 
-func (c *container) userInfo() test.Test {
-	return c.test(func(t *testing.T) {
-		c.execRunSh(t, "portal user info")
+func (c *Container) UserInfo() test.Test {
+	return c.Test(func(t *testing.T) {
+		c.ExecRun(t, "portal user info")
 	},
-		c.portalStart(),
+		c.PortalStart(),
 	)
 }
 
-func (c *container) userClaim(c2 *container) test.Test {
-	return c.args(c2.name()).test(func(t *testing.T) {
-		c.execRun(t, "portal", "user", "claim", c2.identity)
+func (c *Container) UserClaim(c2 *Container) test.Test {
+	return c.Arg(c2.Name()).Test(func(t *testing.T) {
+		c.ExecRun(t, "portal", "user", "claim", c2.identity)
 	},
-		c.portalStart(),
-		c2.portalStartAwait(),
+		c.PortalStart(),
+		c2.PortalStartAwait(),
 	)
 }
 
-func (c *container) listTemplates(runner string) test.Test {
-	return c.args(runner).test(func(t *testing.T) {
-		c.execRun(t, "portal", runner, "templates")
+func (c *Container) ListTemplates(runner string) test.Test {
+	return c.Arg(runner).Test(func(t *testing.T) {
+		c.ExecRun(t, "portal", runner, "templates")
 	},
-		c.portalStart(),
+		c.PortalStart(),
 	)
 }
 
-type projectOpts struct {
+type ProjectOpts struct {
 	runner   string
 	template string
 	name     string
 }
 
-func (o projectOpts) Name() string {
+func (o ProjectOpts) Name() string {
 	if o.name != "" {
 		return o.name
 	}
 	return o.template
 }
 
-func (c *container) newProject(opts projectOpts) test.Test {
-	return c.args(opts).test(func(t *testing.T) {
-		c.execRun(t, "portal", opts.runner, "new", "-t", opts.template, opts.Name())
+func (c *Container) NewProject(opts ProjectOpts) test.Test {
+	return c.Arg(opts).Test(func(t *testing.T) {
+		c.ExecRun(t, "portal", opts.runner, "new", "-t", opts.template, opts.Name())
 	},
-		c.portalStart(),
+		c.PortalStart(),
 	)
 }
 
-func (c *container) buildProject(opts projectOpts) test.Test {
-	return c.args(opts).test(func(t *testing.T) {
-		c.execRunSh(t, "ls -lah")
-		c.execRun(t, "portal", "build", "-p", "-o", ".", opts.Name())
-		c.execRunSh(t, "ls -lah")
-		c.execRunSh(t, "ls -lah ./build")
+func (c *Container) BuildProject(opts ProjectOpts) test.Test {
+	return c.Arg(opts).Test(func(t *testing.T) {
+		c.ExecRun(t, "ls -lah")
+		c.ExecRun(t, "portal", "build", "-p", "-o", ".", opts.Name())
+		c.ExecRun(t, "ls -lah")
+		c.ExecRun(t, "ls -lah ./build")
 		time.Sleep(1 * time.Second)
 	},
-		c.newProject(opts),
+		c.NewProject(opts),
 	)
 }
 
-func (c *container) publishProject(opts projectOpts) test.Test {
-	return c.args(opts).test(func(t *testing.T) {
-		e := c.exec("sh", "-c", "ls ./build | grep "+opts.Name())
+func (c *Container) PublishProject(opts ProjectOpts) test.Test {
+	return c.Arg(opts).Test(func(t *testing.T) {
+		e := c.Exec("ls ./build | grep " + opts.Name())
 		e.Stdout = nil
 		b, err := e.Output()
 		test.AssertErr(t, err)
 		p := filepath.Join("./build", string(b))
 		t.Log("publishing:", p)
-		c.execRun(t, "portal", "app", "publish", p)
+		c.ExecRun(t, "portal", "app", "publish", p)
 	},
-		c.buildProject(opts),
+		c.BuildProject(opts),
 	)
 }
 
-func (c *container) listAvailableApps(opts projectOpts) test.Test {
-	return c.args(opts).test(func(t *testing.T) {
-		c.execRunSh(t, "portal app available")
+func (c *Container) ListAvailableApps(opts ProjectOpts) test.Test {
+	return c.Arg(opts).Test(func(t *testing.T) {
+		c.ExecRun(t, "portal app available")
 	},
-		c.buildProject(opts),
+		c.BuildProject(opts),
 	)
 }
 
-func (c *container) installAvailableApp(opts projectOpts) test.Test {
-	return c.args(opts).test(func(t *testing.T) {
-		c.execRunSh(t, "portal app install my.app."+opts.Name())
+func (c *Container) InstallAvailableApp(opts ProjectOpts) test.Test {
+	return c.Arg(opts).Test(func(t *testing.T) {
+		c.ExecRun(t, "portal app install my.app."+opts.Name())
 	})
 }
 
-func (c *container) runApp(opts projectOpts) test.Test {
-	return c.args(opts).test(func(t *testing.T) {
-		c.execRunSh(t, "portal "+opts.Name())
+func (c *Container) RunApp(opts ProjectOpts) test.Test {
+	return c.Arg(opts).Test(func(t *testing.T) {
+		c.ExecRun(t, "portal "+opts.Name())
 	})
 }

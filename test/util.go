@@ -8,13 +8,13 @@ import (
 	"testing"
 )
 
-func execCmdRun(t *testing.T, cmd string, args ...string) {
-	cc := execCmd(cmd, args...)
+func ExecCmdRun(t *testing.T, cmd string, args ...string) {
+	cc := ExecCmd(cmd, args...)
 	err := cc.Run()
 	assert.NoError(t, err)
 }
 
-func execCmd(cmd string, args ...string) *exec.Cmd {
+func ExecCmd(cmd string, args ...string) *exec.Cmd {
 	cc := exec.Command(cmd, args...)
 	cc.Stdout = os.Stdout
 	cc.Stderr = os.Stderr
@@ -24,18 +24,18 @@ func execCmd(cmd string, args ...string) *exec.Cmd {
 	return cc
 }
 
-func buildInstaller() test.Test {
+func BuildInstaller() test.Test {
 	return test.New(test.CallerName(), func(t *testing.T) {
-		cc := execCmd("./mage", "build:installer")
+		cc := ExecCmd("./mage", "build:installer")
 		cc.Dir = "../"
 		err := cc.Run()
 		assert.NoError(t, err)
 	})
 }
 
-func packProject() test.Test {
+func PackProject() test.Test {
 	return test.New(test.CallerName(), func(t *testing.T) {
-		c := execCmd("sh", "-c", "git ls-files -co --exclude-standard -z | tar -cf ./test/sources.tar --exclude=./test/sources.tar --null -T -")
+		c := ExecCmd("sh", "-c", "git ls-files -co --exclude-standard -z | tar -cf ./test/sources.tar --exclude=./test/sources.tar --null -T -")
 		c.Dir = "../"
 		err := c.Run()
 		assert.NoError(t, err)
