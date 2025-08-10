@@ -1,7 +1,9 @@
 package test
 
 import (
+	"fmt"
 	"github.com/cryptopunkscc/astrald/sig"
+	"reflect"
 	"runtime"
 	"strings"
 	"sync"
@@ -93,9 +95,34 @@ func (r *Runner) run(t *testing.T, task *Task) {
 }
 
 type Test struct {
-	name    string
-	run     func(t *testing.T)
-	Require Tests
+	name     string
+	run      func(t *testing.T)
+	requires Tests
+}
+
+func (test Test) Args(args ...any) Test {
+	if len(args) == 1 {
+		switch reflect.ValueOf(args[0]).Kind() {
+		case reflect.Slice, reflect.Map, reflect.Struct:
+			test.name = fmt.Sprintf("%s%v", test.name, args[0])
+		default:
+			test.name = fmt.Sprintf("%s(%v)", test.name, args[0])
+		}
+	} else if len(args) > 1 {
+		test.name = fmt.Sprintf("%s%v", test.name, args)
+	}
+	return test
+}
+
+func (test Test) Requires(requires ...Test) Test {
+	test.requires = append(test.requires, requires...)
+	return test
+}
+
+func (test Test) Func(run func(t *testing.T), requires ...Test) Test {
+	test.run = run
+	test.requires = append(test.requires, requires...)
+	return test
 }
 
 func (test Test) Run(t *testing.T) {
@@ -127,7 +154,7 @@ const (
 )
 
 func (t *Task) require() []Test {
-	return append(t.Test.Require, t.Require...)
+	return append(t.Test.requires, t.Require...)
 }
 
 func (t *Task) run(tt *testing.T, wg *sync.WaitGroup) {
