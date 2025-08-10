@@ -9,7 +9,7 @@ import (
 
 func (c *Container) PrintInstallHelp() test.Test {
 	return c.Test(func(t *testing.T) {
-		c.ExecRun(t, "/portal/bin/install-portal-to-astral h")
+		c.Command("/portal/bin/install-portal-to-astral h").RunT(t)
 	},
 		c.RunContainer(),
 	)
@@ -17,7 +17,7 @@ func (c *Container) PrintInstallHelp() test.Test {
 
 func (c *Container) InstallFirstPortal() test.Test {
 	return c.Test(func(t *testing.T) {
-		c.ExecRun(t, "/portal/bin/install-portal-to-astral test_user")
+		c.Command("/portal/bin/install-portal-to-astral test_user").RunT(t)
 	},
 		c.RunContainer(),
 	)
@@ -25,7 +25,7 @@ func (c *Container) InstallFirstPortal() test.Test {
 
 func (c *Container) InstallNextPortal() test.Test {
 	return c.Test(func(t *testing.T) {
-		c.ExecRun(t, "/portal/bin/install-portal-to-astral")
+		c.Command("/portal/bin/install-portal-to-astral").RunT(t)
 	},
 		c.RunContainer(),
 	)
@@ -37,10 +37,10 @@ func (c *Container) PortalStart() test.Test {
 		installPortal = c.InstallNextPortal()
 	}
 	return c.Test(func(t *testing.T) {
-		c.ExecRun(t, "touch "+c.logfile)
+		c.Command("touch " + c.logfile).RunT(t)
 		go c.StartLogging()
 
-		ExecCmdRun(t, "docker", "exec", "-d", c.Name(), "sh", "-c", "portal >> "+c.logfile+" 2>&1")
+		Command("docker", "exec", "-d", c.Name(), "sh", "-c", "portal >> "+c.logfile+" 2>&1").RunT(t)
 		time.Sleep(1 * time.Second)
 	},
 		installPortal,
@@ -59,7 +59,7 @@ func (c *Container) PortalStartAwait() test.Test {
 func (c *Container) PortalClose() test.Test {
 	return c.Test(func(t *testing.T) {
 		time.Sleep(1000 * time.Millisecond)
-		c.ExecRun(t, "portal close")
+		c.Command("portal close").RunT(t)
 	},
 		c.PortalStart(),
 	)
@@ -67,7 +67,7 @@ func (c *Container) PortalClose() test.Test {
 
 func (c *Container) PortalHelp() test.Test {
 	return c.Test(func(t *testing.T) {
-		c.ExecRun(t, "portal h")
+		c.Command("portal h").RunT(t)
 	},
 		c.PortalStart(),
 	)
@@ -75,7 +75,7 @@ func (c *Container) PortalHelp() test.Test {
 
 func (c *Container) CreateUser() test.Test {
 	return c.Test(func(t *testing.T) {
-		c.ExecRun(t, "portal user create test_user")
+		c.Command("portal user create test_user").RunT(t)
 	},
 		c.PortalStart(),
 	)
@@ -83,7 +83,7 @@ func (c *Container) CreateUser() test.Test {
 
 func (c *Container) UserInfo() test.Test {
 	return c.Test(func(t *testing.T) {
-		c.ExecRun(t, "portal user info")
+		c.Command("portal user info").RunT(t)
 	},
 		c.PortalStart(),
 	)
@@ -91,7 +91,7 @@ func (c *Container) UserInfo() test.Test {
 
 func (c *Container) UserClaim(c2 *Container) test.Test {
 	return c.Arg(c2.Name()).Test(func(t *testing.T) {
-		c.ExecRun(t, "portal", "user", "claim", c2.identity)
+		c.Command("portal", "user", "claim", c2.identity).RunT(t)
 	},
 		c.PortalStart(),
 		c2.PortalStartAwait(),
@@ -100,7 +100,7 @@ func (c *Container) UserClaim(c2 *Container) test.Test {
 
 func (c *Container) ListTemplates(runner string) test.Test {
 	return c.Arg(runner).Test(func(t *testing.T) {
-		c.ExecRun(t, "portal", runner, "templates")
+		c.Command("portal", runner, "templates").RunT(t)
 	},
 		c.PortalStart(),
 	)
@@ -121,7 +121,7 @@ func (o ProjectOpts) Name() string {
 
 func (c *Container) NewProject(opts ProjectOpts) test.Test {
 	return c.Arg(opts).Test(func(t *testing.T) {
-		c.ExecRun(t, "portal", opts.runner, "new", "-t", opts.template, opts.Name())
+		c.Command("portal", opts.runner, "new", "-t", opts.template, opts.Name()).RunT(t)
 	},
 		c.PortalStart(),
 	)
@@ -129,10 +129,10 @@ func (c *Container) NewProject(opts ProjectOpts) test.Test {
 
 func (c *Container) BuildProject(opts ProjectOpts) test.Test {
 	return c.Arg(opts).Test(func(t *testing.T) {
-		c.ExecRun(t, "ls -lah")
-		c.ExecRun(t, "portal", "build", "-p", "-o", ".", opts.Name())
-		c.ExecRun(t, "ls -lah")
-		c.ExecRun(t, "ls -lah ./build")
+		c.Command("ls -lah").RunT(t)
+		c.Command("portal", "build", "-p", "-o", ".", opts.Name()).RunT(t)
+		c.Command("ls -lah").RunT(t)
+		c.Command("ls -lah ./build").RunT(t)
 		time.Sleep(1 * time.Second)
 	},
 		c.NewProject(opts),
@@ -141,13 +141,13 @@ func (c *Container) BuildProject(opts ProjectOpts) test.Test {
 
 func (c *Container) PublishProject(opts ProjectOpts) test.Test {
 	return c.Arg(opts).Test(func(t *testing.T) {
-		e := c.Exec("ls ./build | grep " + opts.Name())
+		e := c.Command("ls ./build | grep " + opts.Name())
 		e.Stdout = nil
 		b, err := e.Output()
 		test.AssertErr(t, err)
 		p := filepath.Join("./build", string(b))
 		t.Log("publishing:", p)
-		c.ExecRun(t, "portal", "app", "publish", p)
+		c.Command("portal", "app", "publish", p).RunT(t)
 	},
 		c.BuildProject(opts),
 	)
@@ -155,7 +155,7 @@ func (c *Container) PublishProject(opts ProjectOpts) test.Test {
 
 func (c *Container) ListAvailableApps(opts ProjectOpts) test.Test {
 	return c.Arg(opts).Test(func(t *testing.T) {
-		c.ExecRun(t, "portal app available")
+		c.Command("portal app available").RunT(t)
 	},
 		c.BuildProject(opts),
 	)
@@ -163,12 +163,12 @@ func (c *Container) ListAvailableApps(opts ProjectOpts) test.Test {
 
 func (c *Container) InstallAvailableApp(opts ProjectOpts) test.Test {
 	return c.Arg(opts).Test(func(t *testing.T) {
-		c.ExecRun(t, "portal app install my.app."+opts.Name())
+		c.Command("portal app install my.app." + opts.Name()).RunT(t)
 	})
 }
 
 func (c *Container) RunApp(opts ProjectOpts) test.Test {
 	return c.Arg(opts).Test(func(t *testing.T) {
-		c.ExecRun(t, "portal "+opts.Name())
+		c.Command("portal " + opts.Name()).RunT(t)
 	})
 }
