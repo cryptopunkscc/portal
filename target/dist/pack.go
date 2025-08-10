@@ -19,6 +19,8 @@ var PackRun target.Run[target.Dist_] = packRun
 func packRun(_ context.Context, src target.Dist_, args ...string) (err error) {
 	target.Op(&args, "clean")
 	target.Op(&args, "pack")
+	target.Op(&args, "goos=")
+	target.Op(&args, "goarch=")
 	return Pack(src, args...)
 }
 

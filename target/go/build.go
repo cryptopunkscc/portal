@@ -60,6 +60,17 @@ func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args .
 	if len(platforms) == 0 {
 		platforms = [][]string{{}}
 	}
+	print(fmt.Sprintln(args))
+	goos := target.OpVal(&args, "goos=")
+	goarch := target.OpVal(&args, "goarch=")
+	if goos != "" {
+		p := []string{goos}
+		if goarch != "" {
+			p = append(p, goarch)
+		}
+		platforms = [][]string{p}
+	}
+	print(fmt.Sprintln("platforms: ", platforms, "|", goos, goarch))
 
 	var cmd exec.Cmd
 	for _, platform := range platforms {
@@ -75,6 +86,7 @@ func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args .
 				return fmt.Errorf("run golang build %s: %s", projectGo.Abs(), err)
 			}
 
+			print(fmt.Sprintln("target: ", b.Target, projectGo.Abs()))
 			if err = project.Dist(ctx, projectGo, b.Target); err != nil {
 				return
 			}

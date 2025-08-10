@@ -13,7 +13,7 @@ import (
 
 type Dependency struct {
 	Project
-
+	Env     []string
 	Name    string
 	Version string
 	Replace string
@@ -80,6 +80,9 @@ func (d *Dependency) Build(pkg, out string) (err error) {
 	plog.Println("go", "build", "-v", "-o", out, filepath.Join(p, pkg))
 	c := exec.Command("go", "build", "-v", "-o", out, pkg)
 	c.Dir = p
+	if d.Env != nil {
+		c.Env = d.Env
+	}
 	c.Stdout = os.Stdout
 	c.Stderr = os.Stderr
 	return c.Run()

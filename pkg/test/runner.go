@@ -28,6 +28,7 @@ func (r *Runner) Run(tasks []Task, task Task) func(t *testing.T) {
 	}
 }
 
+// Initializes Runner to prepare it for Runner.run.
 func (r *Runner) init() {
 	if r.Len() > 0 {
 		return
@@ -41,7 +42,7 @@ func (r *Runner) init() {
 		}
 	}
 	for _, t := range r.Map.Values() {
-		r.initTask(t)
+		r.initMissingTasks(t)
 	}
 	r.done = make([]sync.WaitGroup, groups+1)
 	for _, t := range r.Map.Values() {
@@ -55,10 +56,11 @@ func (r *Runner) init() {
 	}
 }
 
-func (r *Runner) initTask(t *Task) {
+// Converts missing Test into Task and sets them to Runner.Map.
+func (r *Runner) initMissingTasks(t *Task) {
 	for _, test := range t.require() {
 		tt := &Task{Test: test}
-		r.initTask(tt)
+		r.initMissingTasks(tt)
 	}
 	if _, ok := r.Map.Get(t.Test.name); !ok {
 		t.mu = &sync.Mutex{}
@@ -66,6 +68,7 @@ func (r *Runner) initTask(t *Task) {
 	}
 }
 
+// Runs given Task and Task.Require recursively.
 func (r *Runner) run(t *testing.T, task *Task) {
 	run := func(t *testing.T) {
 		r.done[task.Group].Add(1)

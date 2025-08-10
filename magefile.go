@@ -15,6 +15,7 @@ import (
 	"github.com/magefile/mage/target"
 	"io/fs"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -37,7 +38,15 @@ var goos = []string{runtime.GOOS}
 
 func Goos(str string) {
 	if len(goos) > 0 {
-		goos = strings.Split(str, " ")
+		goos = strings.Split(str, ",")
+	}
+}
+
+var goarch = []string{runtime.GOARCH}
+
+func Goarch(str string) {
+	if len(goarch) > 0 {
+		goarch = strings.Split(str, ",")
 	}
 }
 
@@ -110,7 +119,11 @@ func (Build) Installer() error {
 	if len(out) > 0 {
 		o = out
 	}
-	return sh.RunV("go", "build", "-o", o, "./cmd/install-portal-to-astral/")
+	c := exec.Command("go", "build", "-o", o, "./cmd/install-portal-to-astral/")
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	c.Env = append(os.Environ(), "GOOS="+goos[0], "GOARCH="+goarch[0])
+	return c.Run()
 }
 
 func (Build) Apps() (err error) {
@@ -122,11 +135,16 @@ func (Build) Apps() (err error) {
 	if clean {
 		args = append(args, "clean")
 	}
+	args = append(args, "goos="+goos[0], "goarch="+goarch[0])
 	return apps.Build(args...)
 }
 
 func (Build) Cli() error {
-	return sh.RunV("go", "build", "-o", "./cmd/install-portal-to-astral/bin/", "./cmd/portal")
+	c := exec.Command("go", "build", "-o", "./cmd/install-portal-to-astral/bin/", "./cmd/portal")
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	c.Env = append(os.Environ(), "GOOS="+goos[0], "GOARCH="+goarch[0])
+	return c.Run()
 }
 
 func (Build) Astrald() error {
@@ -134,6 +152,8 @@ func (Build) Astrald() error {
 	c := "./cmd/astrald"
 	o := "/cmd/install-portal-to-astral/bin/"
 	d, err := golang.ProjectDependency(n)
+	d.Env = []string{"GOOS=" + goos[0], "GOARCH=" + goarch[0]}
+	d.Env = append(os.Environ(), "GOOS="+goos[0], "GOARCH="+goarch[0])
 	if err != nil {
 		return err
 	}
@@ -147,7 +167,11 @@ func (Build) Astrald() error {
 }
 
 func (Build) Portald() error {
-	return sh.RunV("go", "build", "-o", "./cmd/install-portal-to-astral/bin/", "./cmd/portald")
+	c := exec.Command("go", "build", "-o", "./cmd/install-portal-to-astral/bin/", "./cmd/portald")
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	c.Env = append(os.Environ(), "GOOS="+goos[0], "GOARCH="+goarch[0])
+	return c.Run()
 }
 
 func (Build) JsLib() error {

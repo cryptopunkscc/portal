@@ -34,6 +34,8 @@ func (r *buildRunner) Run(ctx context.Context, projectNpm target.ProjectNpm_, ar
 	defer plog.TraceErr(&err)
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 
+	target.Op(&args, "goos=")
+	target.Op(&args, "goarch=")
 	if target.Op(&args, "clean") {
 		if err = os.RemoveAll(filepath.Join(projectNpm.Abs(), "dist")); err != nil {
 			log.W().Println(err)

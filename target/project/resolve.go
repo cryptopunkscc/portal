@@ -21,6 +21,7 @@ func Resolver[T any](resolve target.Resolve[T]) target.Resolve[target.Project[T]
 		}
 		s := &Source[T]{}
 		if err = s.manifest.LoadFrom(source.FS()); err != nil {
+			err = plog.Err(err, source.Abs())
 			return
 		}
 		s.resolveDist = dist.Resolver(resolve)

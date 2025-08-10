@@ -9,3 +9,4 @@ build:
     cmd: go build -o $OUT
   windows:
     out: main.exe
+    cmd: go build -o $OUT.exe

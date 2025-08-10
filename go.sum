@@ -28,7 +28,6 @@ github.com/chzyer/test v0.0.0-20210722231415-061457976a23/go.mod h1:Q3SI9o4m/ZMn
 github.com/containerd/console v1.0.3 h1:lIr7SlA5PxZyMV30bDW0MGbiOPXwc63yRuCP0ARubLw=
 github.com/containerd/console v1.0.3/go.mod h1:7LqA/THxQ86k76b8c/EMSiaJ3h1eZkMkXar0TQ1gf3U=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
-github.com/cryptopunkscc/astrald v0.0.0-20250622223542-4aaebe2ab4cd/go.mod h1:IQB9hgwm56yH254jyRYpRNObikLtuKFgPKTfs0Ia+zk=
 github.com/cryptopunkscc/astrald v0.0.0-20250722161916-640545663a9f h1:qzpzB5bCYArsQJusRxnskGaGCkX1sFiT4uYtzgqePEQ=
 github.com/cryptopunkscc/astrald v0.0.0-20250722161916-640545663a9f/go.mod h1:IQB9hgwm56yH254jyRYpRNObikLtuKFgPKTfs0Ia+zk=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
