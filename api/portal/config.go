@@ -42,6 +42,13 @@ var baseConfig = Config{
 	Config: astrald.DefaultConfig,
 }
 
+func (c *Config) GetDirs() (out []string) {
+	for _, s := range c.dirs() {
+		out = append(out, *s)
+	}
+	return
+}
+
 func (c *Config) dirs() []*string {
 	return []*string{
 		&c.Portald,

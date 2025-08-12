@@ -47,3 +47,29 @@ func installBinaries() (err error) {
 	})
 	return
 }
+
+func removeBinaries() (err error) {
+	println(fmt.Sprintf("removing binaries..."))
+	defer plog.TraceErr(&err)
+	bin := binariesDir()
+	if err = os.MkdirAll(bin, 0755); err != nil {
+		return
+	}
+	err = fs.WalkDir(binFs, "bin", func(srcPath string, d fs.DirEntry, err error) error {
+		if d.IsDir() {
+			return nil
+		}
+		dstPath := filepath.Join(bin, d.Name())
+		print(fmt.Sprintf("* removing %s", dstPath))
+
+		err = os.Remove(dstPath)
+		if err != nil {
+			println()
+			return err
+		}
+
+		print(" [DONE]\n")
+		return nil
+	})
+	return
+}

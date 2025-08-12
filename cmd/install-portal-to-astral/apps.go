@@ -1,7 +1,12 @@
 package main
 
 import (
+	"errors"
+	"fmt"
+	_ "github.com/cryptopunkscc/portal/api/env/desktop"
+	"github.com/cryptopunkscc/portal/api/portal"
 	"github.com/cryptopunkscc/portal/apps"
+	"github.com/cryptopunkscc/portal/pkg/config"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"
 	"path/filepath"
@@ -19,6 +24,31 @@ func installApps() (err error) {
 	}
 	if err = portalRun("app", "install", dir); err != nil {
 		return
+	}
+	return
+}
+
+func removeDirs() (err error) {
+	println(fmt.Sprintf("removing configs..."))
+	defer plog.TraceErr(&err)
+	c := portal.Config{}
+	if err = c.Load(); err != nil {
+		if !errors.Is(err, config.ErrNotFound) {
+			return // abort when config exist but cannot be loaded for some reason
+		}
+	}
+	if err = c.Build(); err != nil {
+		return
+	}
+	plog.D().Scope("config").Printf("\n%s", c.Yaml())
+	for _, s := range c.GetDirs() {
+		print(fmt.Sprintf("* removing %s", s))
+		err := os.RemoveAll(s)
+		if err != nil {
+			plog.Println(&err)
+		} else {
+			print(" [DONE]\n")
+		}
 	}
 	return
 }
