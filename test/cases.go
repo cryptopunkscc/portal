@@ -14,9 +14,11 @@ import (
 
 type Device interface {
 	Name() string
-	Root() string
+	Installer() string
 	Test() test.Test
 	Start() test.Test
+	PrintLogs() test.Test
+	Stop()
 	Command(...string) *util.Cmd
 
 	CreateLogFile(t *testing.T)
@@ -33,7 +35,7 @@ type Cases struct {
 }
 
 func (c *Cases) installPortalToAstral(args ...string) *util.Cmd {
-	args = slices.Insert(args, 0, filepath.Join(c.Root(), "portal", "bin", "install-portal-to-astral"))
+	args = slices.Insert(args, 0, c.Installer())
 	return c.Command(args...)
 }
 

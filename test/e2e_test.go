@@ -9,18 +9,15 @@ import (
 )
 
 func TestE2E_2(t *testing.T) {
-	cc := docker.Create(2, docker.Container{
-		Image:   "e2e-test",
-		Network: "e2e-test-net",
-		Logfile: "portald.log",
-		RootDir: "/",
-	})
-	var c []*Cases
-	for _, container := range cc {
-		c = append(c, &Cases{
-			id:     container.Id,
-			Device: container,
-		})
+	dc := docker.Container{
+		Image:         "e2e-test",
+		Network:       "e2e-test-net",
+		Logfile:       "portald.log",
+		InstallerPath: "/portal/bin/install-portal-to-astral",
+	}
+	var c = []*Cases{
+		{id: 0, Device: dc.New(0)},
+		{id: 1, Device: dc.New(1)},
 	}
 
 	runner := test.Runner{}
@@ -28,7 +25,7 @@ func TestE2E_2(t *testing.T) {
 		// ====== base ======
 		{
 			Name: "build",
-			Test: cc[0].BuildImage(),
+			Test: dc.BuildImage(),
 		},
 		{
 			Name: "print install help",
@@ -147,12 +144,12 @@ func TestE2E_2(t *testing.T) {
 		{
 			Name:  "print logs",
 			Group: 2,
-			Test:  cc[0].PrintLog(),
+			Test:  c[0].PrintLogs(),
 		},
 		{
 			Name:  "print logs",
 			Group: 3,
-			Test:  cc[1].PrintLog(),
+			Test:  c[1].PrintLogs(),
 		},
 	}
 	for i, tt := range tests {
@@ -161,7 +158,9 @@ func TestE2E_2(t *testing.T) {
 
 	t.Cleanup(func() {
 		time.Sleep(1 * time.Second) // await logs
-		docker.ForceStopContainers(cc...)
+		for _, ccc := range c {
+			ccc.Stop()
+		}
 	})
 }
 

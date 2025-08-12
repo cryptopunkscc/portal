@@ -15,25 +15,23 @@ import (
 )
 
 type Container struct {
-	Id      int
-	Image   string
-	Network string
-	Logfile string
-	Args    []any
-	RootDir string
+	Id            int
+	Image         string
+	Network       string
+	Logfile       string
+	Args          []any
+	InstallerPath string
 	io.Writer
 }
 
-func Create(amount int, base Container) (cs []*Container) {
-	cs = make([]*Container, amount)
-	for i := 0; i < amount; i++ {
-		cs[i] = base.new()
-	}
-	return
+func (c *Container) New(id int) *Container {
+	cc := *c
+	cc.Id = id
+	return &cc
 }
 
-func (c *Container) Root() string {
-	return c.RootDir
+func (c *Container) Installer() string {
+	return c.InstallerPath
 }
 
 func (c *Container) new() *Container {
@@ -221,6 +219,10 @@ func (c *Container) StopContainer() test.Test {
 	})
 }
 
+func (c *Container) Stop() {
+	_ = util.Command("docker", "stop", "-t", "0", c.Name()).Run()
+}
+
 func ForceStopContainers(c ...*Container) {
 	for _, cc := range c {
 		_ = util.Command("docker", "stop", "-t", "0", cc.Name()).Run()
@@ -243,8 +245,8 @@ func (c *Container) FollowLogFile() *util.Cmd {
 	return util.Command("docker", "exec", c.Name(), "sh", "-c", "tail -n +1 -f "+c.Logfile)
 }
 
-func (c *Container) PrintLog(args ...any) test.Test {
-	return c.Test().Args(args...).Func(func(t *testing.T) {
+func (c *Container) PrintLogs() test.Test {
+	return c.Test().Func(func(t *testing.T) {
 		println(fmt.Sprintf(">>> BEGIN PRINT LOG %d", c.Id))
 		err := util.Command("docker", "exec", c.Name(), "sh", "-c", "cat "+c.Logfile).Run()
 		println(fmt.Sprintf(">>> END PRINT LOG %d", c.Id))
