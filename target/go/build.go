@@ -12,6 +12,7 @@ import (
 	"github.com/cryptopunkscc/portal/target/project"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 )
 
@@ -27,6 +28,9 @@ func BuildProject(platforms ...string) target.Run[target.ProjectGo] {
 	for i, platform := range platforms {
 		p[i] = strings.SplitN(platform, "/", 2)
 	}
+	if len(p) == 0 {
+		p = [][]string{{runtime.GOOS, runtime.GOARCH}}
+	}
 	return buildRunner{p}.Run
 }
 
@@ -41,48 +45,20 @@ func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args .
 	clean := target.Op(&args, "clean")
 	pack := target.Op(&args, "pack")
 
-	changed := projectGo.Changed()
-	build := clean || changed
-
-	if !build && !pack {
-		return
-	}
-
 	log.Printf("go build %T %s %v", projectGo, projectGo.Abs(), g.platforms)
 
-	if build {
-		if err = os.RemoveAll(filepath.Join(projectGo.Abs(), "dist")); err != nil {
-			log.W().Println(err)
-		}
-	}
-
-	platforms := g.platforms
-	if len(platforms) == 0 {
-		platforms = [][]string{{}}
-	}
-	print(fmt.Sprintln(args))
-	goos := target.OpVal(&args, "goos=")
-	goarch := target.OpVal(&args, "goarch=")
-	if goos != "" {
-		p := []string{goos}
-		if goarch != "" {
-			p = append(p, goarch)
-		}
-		platforms = [][]string{p}
-	}
-	print(fmt.Sprintln("platforms: ", platforms, "|", goos, goarch))
-
-	var cmd exec.Cmd
-	for _, platform := range platforms {
+	for _, platform := range g.getPlatforms(&args) {
 		b := projectGo.Build().Get(platform...)
+		p := project.DistPath(b.Target)
 
-		if build {
-			cmd, err = goBuildCmd(b, projectGo.Abs())
-			if err != nil {
-				return
+		if clean || Changed(projectGo, platform...) {
+
+			distPath := append([]string{projectGo.Abs(), "dist"}, p...)
+			if err = os.RemoveAll(filepath.Join(distPath...)); err != nil {
+				log.W().Println(err)
 			}
 
-			if err = cmd.Build().Run(); err != nil {
+			if err = goBuild(b, projectGo.Abs()); err != nil {
 				return fmt.Errorf("run golang build %s: %s", projectGo.Abs(), err)
 			}
 
@@ -93,7 +69,6 @@ func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args .
 		}
 
 		if pack {
-			p := project.DistPath(b.Target)
 			d := projectGo.Dist_(p...)
 			abs := projectGo.Abs()
 			if len(args) > 0 {
@@ -107,11 +82,24 @@ func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args .
 	return
 }
 
-func goBuildCmd(build manifest.Build, abs string) (cmd exec.Cmd, err error) {
+func (g buildRunner) getPlatforms(args *[]string) (platforms [][]string) {
+	goos := target.OpVal(args, "goos=")
+	goarch := target.OpVal(args, "goarch=")
+	if goos != "" {
+		if goarch == "" {
+			goarch = runtime.GOARCH
+		}
+		return [][]string{{goos, goarch}}
+	}
+
+	return g.platforms
+}
+
+func goBuild(build manifest.Build, abs string) (err error) {
 	defer plog.TraceErr(&err)
 	t := build.Target
 	o := filepath.Join("dist", t.OS, t.Arch, "main")
-	cmd = exec.Cmd{
+	cmd := exec.Cmd{
 		Cmd:  "go",
 		Args: []string{"build", "-o", o},
 		Dir:  abs,

@@ -45,7 +45,7 @@ type Project_ interface {
 	Portal_
 	Build() *manifest.Builds
 	Dist_(platform ...string) Dist_
-	Changed(skip ...string) bool
+	Changed() bool
 }
 
 type Project[T any] interface {

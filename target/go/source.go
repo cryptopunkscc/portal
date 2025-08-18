@@ -8,5 +8,5 @@ type Source struct {
 	target.Project[target.Exec]
 }
 
-func (p *Source) IsGo()                       {}
-func (p *Source) Changed(skip ...string) bool { return Changed(p, skip...) }
+func (p *Source) IsGo()         {}
+func (p *Source) Changed() bool { return Changed(p) }

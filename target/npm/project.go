@@ -10,7 +10,6 @@ type Project[T any] struct {
 }
 
 func (p *Project[T]) PkgJson() *target.PackageJson { return p.nodeModule.PkgJson() }
-func (p *Project[T]) Changed(skip ...string) bool {
-	skip = append(skip, "node_modules")
-	return target.Changed(p, skip...)
+func (p *Project[T]) Changed() bool {
+	return target.Changed(p, "node_modules")
 }

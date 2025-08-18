@@ -19,7 +19,7 @@ func (s *Source[T]) Api() *manifest.Api                        { return &s.manif
 func (s *Source[T]) Build() *manifest.Builds                   { return &s.manifest.Builds }
 func (s *Source[T]) Config() *manifest.Config                  { return &s.manifest.Config }
 func (s *Source[T]) Manifest() *manifest.App                   { return &s.manifest.App }
-func (s *Source[T]) Changed(skip ...string) bool               { return target.Changed(s, skip...) }
+func (s *Source[T]) Changed() bool                             { return target.Changed(s) }
 func (s *Source[T]) MarshalJSON() ([]byte, error)              { return json2.Marshal(s.Manifest()) }
 func (s *Source[T]) Dist_(platform ...string) (t target.Dist_) { return s.Dist(platform...) }
 func (s *Source[T]) Dist(platform ...string) (t target.Dist[T]) {

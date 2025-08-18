@@ -9,8 +9,9 @@ import (
 	"slices"
 )
 
-func Changed(p target.Project_, skip ...string) (changed bool) {
-	dist_, err := p.Sub("dist")
+func Changed(p target.Project_, path ...string) (changed bool) {
+	path = append([]string{"dist"}, path...)
+	dist_, err := p.Sub(path...)
 	if err != nil {
 		return true
 	}
@@ -20,7 +21,7 @@ func Changed(p target.Project_, skip ...string) (changed bool) {
 		panic(err)
 	}
 	abs := p.Abs()
-	skip = append(skip, "build", "dist")
+	skip := []string{"build", "dist"}
 	names := map[string]any{}
 	for _, entry := range dir {
 		if name := entry.Name(); !slices.Contains(skip, name) {
