@@ -30,11 +30,6 @@ func (f File_) CopyTo(path ...string) (err error) {
 	}
 	defer srcFile.Close()
 
-	srcInfo, err := srcFile.Stat()
-	if err != nil {
-		return
-	}
-
 	destPath := filepath.Join(path...)
 	destDir := filepath.Dir(destPath)
 	if err = os.MkdirAll(destDir, 0755); err != nil {
@@ -50,7 +45,17 @@ func (f File_) CopyTo(path ...string) (err error) {
 	if _, err = io.Copy(destFile, srcFile); err != nil {
 		return
 	}
-	if err = os.Chmod(destPath, srcInfo.Mode()); err != nil {
+
+	srcInfo, err := srcFile.Stat()
+	if err != nil {
+		return
+	}
+	mode := srcInfo.Mode()
+	if mode == 0444 { // Fix go:embed inconvenience
+		mode = 0644
+	}
+
+	if err = os.Chmod(destPath, mode); err != nil {
 		return
 	}
 	return

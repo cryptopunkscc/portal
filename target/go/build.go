@@ -99,6 +99,8 @@ func goBuild(build manifest.Build, abs string) (err error) {
 	defer plog.TraceErr(&err)
 	t := build.Target
 	o := filepath.Join("dist", t.OS, t.Arch, "main")
+	o = filepath.ToSlash(o)
+	abs = filepath.ToSlash(abs)
 	cmd := exec.Cmd{
 		Cmd:  "go",
 		Args: []string{"build", "-o", o},
@@ -110,9 +112,11 @@ func goBuild(build manifest.Build, abs string) (err error) {
 		return
 	}
 	cmd = cmd.AddEnv(build.Env...).AddEnv("GOOS="+t.OS, "GOARCH="+t.Arch)
+	plog.Println("starting build:", cmd.Cmd, cmd.Args)
 	if err = cmd.Build().Run(); err != nil {
 		err = fmt.Errorf("run golang build %s: %s", abs, err)
 		return
 	}
+	plog.Println("done build:", cmd.Cmd, cmd.Args)
 	return
 }

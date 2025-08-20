@@ -5,26 +5,41 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/test/docker"
 	"github.com/cryptopunkscc/portal/test/host"
+	"github.com/cryptopunkscc/portal/test/kvm/win10"
 	"testing"
 	"time"
 )
 
-func TestE2E_2(t *testing.T) {
-	dc := docker.Container{
-		Build: docker.BuildImageLocal,
-		Bin:   "docker",
-		//Bin:           "podman",
-		Image:         "e2e-test",
-		Network:       "e2e-test-net",
-		Logfile:       "portald.log",
-		InstallerPath: "/portal/bin/install-portal-to-astral",
-	}
-	var c = []*Cases{
-		//{id: 0, Device: host.Linux()},
+var configuration = [][]*Cases{
+	{ // 0
 		{id: 0, Device: dc.New(0)},
+		{id: 1, Device: dc.New(1)},
+	},
+	{ // 1
+		{id: 0, Device: host.Linux()},
+		{id: 1, Device: dc.New(1)},
+	},
+	{ // 2
+		{id: 0, Device: dc.New(1)},
 		{id: 1, Device: host.Linux()},
-		//{id: 1, Device: dc.New(1)},
-	}
+	},
+	/*
+		Windows e2e testing is not fully functional yet. Unsolved issues:
+		* At some point SSH connections used for triggering commands hang.
+		* Redirecting std IO from apps doesn't work when run on e2e tests.
+	*/
+	{ // 3
+		{id: 0, Device: win10.NewVirtualMachine()},
+		{id: 1, Device: host.Linux()},
+	},
+	{ // 4
+		{id: 0, Device: host.Linux()},
+		{id: 1, Device: win10.NewVirtualMachine()},
+	},
+}
+
+func TestE2E_2(t *testing.T) {
+	c := configuration[1]
 
 	runner := test.Runner{}
 	tests := []test.Task{
@@ -32,6 +47,10 @@ func TestE2E_2(t *testing.T) {
 		{
 			Name: "print install help",
 			Test: c[0].PrintInstallHelp(),
+		},
+		{
+			Name: "install portal",
+			Test: c[0].InstallFirstPortal(),
 		},
 		{
 			Name: "start portald via portal",
@@ -164,6 +183,16 @@ func TestE2E_2(t *testing.T) {
 			ccc.Stop()
 		}
 	})
+}
+
+var dc = docker.Container{
+	Build: docker.BuildImageLocal,
+	Bin:   "docker",
+	//Bin:     "podman",
+	Image:         "e2e-test",
+	Network:       "e2e-test-net",
+	Logfile:       "portald.log",
+	InstallerPath: "/portal/bin/install-portal-to-astral",
 }
 
 var jsProject = ProjectOpts{
