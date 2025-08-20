@@ -5,6 +5,7 @@ import (
 	"github.com/cryptopunkscc/portal/api/astrald"
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	"os"
+	"path/filepath"
 )
 
 type Astrald struct {
@@ -18,9 +19,10 @@ var _ astrald.Runner = &Astrald{}
 func (a *Astrald) Start(ctx context.Context) (err error) {
 	cmd := []string{"astrald"}
 	if len(a.NodeRoot) > 0 {
+		nodeRoot := filepath.ToSlash(a.NodeRoot)
 		cmd = append(cmd,
-			"-root", a.NodeRoot,
-			"-dbroot", a.NodeRoot,
+			"-root", nodeRoot,
+			"-dbroot", nodeRoot,
 		)
 	}
 	a.Cmd.Stdout = os.Stdout

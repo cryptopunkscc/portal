@@ -5,6 +5,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
 )
 
@@ -29,7 +30,7 @@ func (d Dir_) Sub(src ...string) (source target.Source, err error) {
 		return
 	}
 
-	p := d.join(src...)
+	p := path.Join(src...)
 
 	s, err := fs.Stat(d.fs, p)
 	if err != nil {

@@ -9,5 +9,6 @@ dist
 !target/dist
 !runner/build
 !apps/build
+!api/bin
 
 apps/build/*.portal

@@ -50,6 +50,7 @@ func (c *Cases) PrintInstallHelp() test.Test {
 func (c *Cases) InstallFirstPortal() test.Test {
 	return c.Test().Func(func(t *testing.T) {
 		c.installPortalToAstral("test_user").RunT(t)
+		//time.Sleep(200 * time.Millisecond) // windows experimental
 	}).Requires(
 		c.Start(),
 	)
@@ -130,6 +131,7 @@ func (c *Cases) PortalClose() test.Test {
 
 func (c *Cases) PortalHelp() test.Test {
 	return c.Test().Func(func(t *testing.T) {
+		//time.Sleep(1 * time.Second) // windows experimental
 		c.Command("portal", "h").RunT(t)
 	},
 		c.PortalStart(),
@@ -154,6 +156,7 @@ func (c *Cases) UserInfo() test.Test {
 
 func (c *Cases) UserClaim(c2 *Cases) test.Test {
 	return c.Test().Args(c2.Name()).Func(func(t *testing.T) {
+		//time.Sleep(3 * time.Second) // windows experimental
 		c.Command("portal", "user", "claim", c2.identity).RunT(t)
 	},
 		c.PortalStart(),
@@ -220,6 +223,7 @@ func (c *Cases) ListAvailableApps(opts ProjectOpts) test.Test {
 
 func (c *Cases) InstallAvailableApp(opts ProjectOpts) test.Test {
 	return c.Test().Args(opts).Func(func(t *testing.T) {
+		//time.Sleep(1 * time.Second) // windows experimental
 		c.Command("portal", "app", "install", "my.app."+opts.Name()).RunT(t)
 	})
 }

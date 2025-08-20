@@ -7,7 +7,9 @@ schema: schema
 build:
   out: out
   cmd: cmd
-  exec: exec
   linux:
+    exec: exec
     deps: [ dep ]
     env: [ DEP=1 ]
+  windows:
+    exec: exec.cmd

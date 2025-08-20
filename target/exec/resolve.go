@@ -9,6 +9,9 @@ import (
 	"github.com/cryptopunkscc/portal/target/portal"
 	"github.com/cryptopunkscc/portal/target/project"
 	"io/fs"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 var ResolveDist = dist.Resolver[target.Exec](ResolveExec)
@@ -30,11 +33,7 @@ func ResolveExec(source target.Source) (exec target.Exec, err error) {
 	}
 	s.target = t.Target
 	file := s.target.Exec
-	stat, err := fs.Stat(p.FS(), file)
-	if err != nil {
-		return
-	}
-	if stat.Mode().Perm()&0111 == 0 {
+	if !isAnyExecutable(p.FS(), file) {
 		err = plog.Errorf("not executable %s", file)
 		return
 	}
@@ -64,4 +63,27 @@ func ResolveProjectExec(source target.Source) (out target.Exec, err error) {
 
 	out = Source{executable: p}
 	return
+}
+
+func isAnyExecutable(files fs.FS, file string) bool {
+	return IsUnixExecutable(files, file) || IsWindowsExecutable(file)
+}
+
+func IsUnixExecutable(files fs.FS, file string) bool {
+	if stat, err := fs.Stat(files, file); err != nil {
+		return false
+	} else {
+		return stat.Mode().Perm()&0111 != 0
+	}
+}
+
+func IsWindowsExecutable(file string) bool {
+	ext := strings.ToLower(filepath.Ext(file))
+	pathext := strings.Split(os.Getenv("PATHEXT"), ";")
+	for _, e := range pathext {
+		if strings.ToLower(e) == ext {
+			return true
+		}
+	}
+	return false
 }

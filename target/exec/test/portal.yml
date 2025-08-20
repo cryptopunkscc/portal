@@ -1,8 +1,0 @@
-name: name
-package: package
-title: title
-description: description
-version: 1
-schema: schema
-target:
-  exec: exec

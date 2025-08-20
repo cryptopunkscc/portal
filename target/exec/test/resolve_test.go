@@ -10,6 +10,7 @@ import (
 	"github.com/cryptopunkscc/portal/target/exec"
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/stretchr/testify/assert"
+	"runtime"
 	"testing"
 )
 
@@ -70,7 +71,12 @@ func TestResolveBundle(t *testing.T) {
 func ExpectedDist(t *testing.T) (expected manifest.Dist) {
 	err := expected.UnmarshalFrom(PortalYaml)
 	test.AssertErr(t, err)
-	expected.Target.Exec = "exec"
+	switch runtime.GOOS {
+	case "windows":
+		expected.Target.Exec = "exec.cmd"
+	default:
+		expected.Target.Exec = "exec"
+	}
 	return
 }
 

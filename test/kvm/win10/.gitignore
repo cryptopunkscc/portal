@@ -1,0 +1,5 @@
+iso/static/
+iso/gen/
+win*.qcow2
+iso/config/cidata/user-data
+iso/config/cidata/sshkey.pub
