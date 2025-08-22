@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/api/portal"
+	"github.com/cryptopunkscc/portal/pkg/config"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/stretchr/testify/assert"
@@ -21,6 +22,7 @@ func TestApplication_loadConfig_custom(t *testing.T) {
 	c.Dir = dir
 	c.Node.Log.Level = 100
 	c.Apphost.Listen = []string{"tcp:127.0.0.1:8638"}
+	c.File = portal.DefaultConfigFile
 	err := writeConfig(t, c, dir, portal.DefaultConfigFile)
 	test.AssertErr(t, err)
 
@@ -34,7 +36,7 @@ func TestApplication_loadConfig_custom(t *testing.T) {
 func TestApplication_loadConfig_platformDefault(t *testing.T) {
 	a := testApplication()
 	err := a.loadConfig(RunArgs{})
-	test.AssertErr(t, err)
+	assert.ErrorIs(t, err, config.ErrNotFound)
 
 	err = a.Configure()
 	test.AssertErr(t, err)
