@@ -17,6 +17,7 @@ import (
 type Container struct {
 	Id            int
 	Bin           string
+	Build         func(*Container) test.Test
 	Image         string
 	Network       string
 	Logfile       string
@@ -46,7 +47,7 @@ func (c *Container) Name() string {
 }
 
 func (c *Container) Command(args ...string) *util.Cmd {
-	return util.Command(c.Bin, "exec", "-it", c.Name(), "sh", "-c", strings.Join(args, " "))
+	return util.Command(c.Bin, "exec", "-t", c.Name(), "sh", "-c", strings.Join(args, " "))
 }
 
 func (c *Container) GetBundleName(t *testing.T, dir string, pkg string) string {
@@ -62,7 +63,7 @@ func (c *Container) Test() test.Test {
 func (c *Container) Start() test.Test {
 	return c.Test().Func(func(t *testing.T) {
 		util.Command(c.Bin, "run", "-dit",
-			"--rm", // remove Container immediately after run
+			//"--rm", // remove Container immediately after run
 			"--name", c.Name(),
 			"--network", c.Network,
 			"-v", "/home/jan/projects/cryptopunks/portal/bin:/portal/bin",
@@ -94,15 +95,18 @@ func (c *Container) BuildBaseImage() test.Test {
 }
 
 func (c *Container) BuildImage() test.Test {
-	//return c.BuildImageLocal()
-	return c.BuildImageFast()
-	//return c.BuildImageClean()
+	if c.Build == nil {
+		return BuildImageLocal(c)
+	}
+	return c.Build(c)
 }
 
-func (c *Container) BuildImageLocal() test.Test {
+func BuildImageLocal(c *Container) test.Test {
 	name := fmt.Sprintf("%s %s", test.CallerName(), c.Image)
 	return test.New(name, func(t *testing.T) {
-		util.Command(c.Bin, "build",
+		util.Command(c.Bin,
+			"buildx",
+			"build",
 			"--force-rm", "--squash",
 			"-f", "docker/local.dockerfile",
 			"-t", c.Image+":latest", ".",
@@ -123,7 +127,7 @@ func BuildInstaller() test.Test {
 	})
 }
 
-func (c *Container) BuildImageFast() test.Test {
+func BuildImageFast(c *Container) test.Test {
 	name := fmt.Sprintf("%s %s", test.CallerName(), c.Image)
 	return test.New(name, func(t *testing.T) {
 		cacheDir, err := os.UserCacheDir()
@@ -132,7 +136,9 @@ func (c *Container) BuildImageFast() test.Test {
 		projectDir, err := golang.FindProjectRoot()
 		assert.NoError(t, err)
 
-		util.Command(c.Bin, "build",
+		util.Command(c.Bin,
+			"buildx",
+			"build",
 			"--force-rm", "--squash",
 			"-v", build.Default.GOPATH+":/go",
 			"-v", cacheDir+":/root/.cache",
@@ -146,7 +152,7 @@ func (c *Container) BuildImageFast() test.Test {
 	)
 }
 
-func (c *Container) BuildImageClean() test.Test {
+func BuildImageClean(c *Container) test.Test {
 	name := fmt.Sprintf("%s %s", test.CallerName(), c.Image)
 	return test.New(name, func(t *testing.T) {
 		cacheDir, err := os.UserCacheDir()
@@ -158,7 +164,9 @@ func (c *Container) BuildImageClean() test.Test {
 		binDir := filepath.Join(projectDir, "bin")
 		_ = os.MkdirAll(binDir, 0755)
 
-		util.Command(c.Bin, "build",
+		util.Command(c.Bin,
+			"buildx",
+			"build",
 			"--force-rm", "--squash",
 			"-v", build.Default.GOPATH+":/go",
 			"-v", cacheDir+":/root/.cache",
@@ -216,18 +224,12 @@ func (c *Container) Teardown() test.Test {
 
 func (c *Container) StopContainer() test.Test {
 	return c.Test().Func(func(t *testing.T) {
-		ForceStopContainers(c)
+		c.Stop()
 	})
 }
 
 func (c *Container) Stop() {
 	_ = util.Command(c.Bin, "stop", "-t", "0", c.Name()).Run()
-}
-
-func ForceStopContainers(c ...*Container) {
-	for _, cc := range c {
-		_ = util.Command(cc.Bin, "stop", "-t", "0", cc.Name()).Run()
-	}
 }
 
 func (c *Container) RemoveContainer() test.Test {

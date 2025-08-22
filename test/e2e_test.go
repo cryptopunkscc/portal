@@ -10,7 +10,9 @@ import (
 
 func TestE2E_2(t *testing.T) {
 	dc := docker.Container{
-		Bin:           "podman",
+		Build: docker.BuildImageLocal,
+		Bin:   "docker",
+		//Bin:           "podman",
 		Image:         "e2e-test",
 		Network:       "e2e-test-net",
 		Logfile:       "portald.log",
@@ -24,10 +26,6 @@ func TestE2E_2(t *testing.T) {
 	runner := test.Runner{}
 	tests := []test.Task{
 		// ====== base ======
-		{
-			Name: "build",
-			Test: dc.BuildImage(),
-		},
 		{
 			Name: "print install help",
 			Test: c[0].PrintInstallHelp(),
