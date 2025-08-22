@@ -122,7 +122,7 @@ func (c *Cases) ParseLogfile(parsers ...func(log string) bool) test.Test {
 func (c *Cases) PortalClose() test.Test {
 	return c.Test().Func(func(t *testing.T) {
 		time.Sleep(1000 * time.Millisecond)
-		c.Command("portal close").RunT(t)
+		c.Command("portal", "close").RunT(t)
 	},
 		c.PortalStart(),
 	)
@@ -130,7 +130,7 @@ func (c *Cases) PortalClose() test.Test {
 
 func (c *Cases) PortalHelp() test.Test {
 	return c.Test().Func(func(t *testing.T) {
-		c.Command("portal h").RunT(t)
+		c.Command("portal", "h").RunT(t)
 	},
 		c.PortalStart(),
 	)
@@ -138,7 +138,7 @@ func (c *Cases) PortalHelp() test.Test {
 
 func (c *Cases) CreateUser() test.Test {
 	return c.Test().Func(func(t *testing.T) {
-		c.Command("portal user create test_user").RunT(t)
+		c.Command("portal", "user", "create", "test_user").RunT(t)
 	},
 		c.PortalStart(),
 	)
@@ -146,7 +146,7 @@ func (c *Cases) CreateUser() test.Test {
 
 func (c *Cases) UserInfo() test.Test {
 	return c.Test().Func(func(t *testing.T) {
-		c.Command("portal user info").RunT(t)
+		c.Command("portal", "user", "info").RunT(t)
 	},
 		c.PortalStart(),
 	)
@@ -212,7 +212,7 @@ func (c *Cases) PublishProject(opts ProjectOpts) test.Test {
 
 func (c *Cases) ListAvailableApps(opts ProjectOpts) test.Test {
 	return c.Test().Args(opts).Func(func(t *testing.T) {
-		c.Command("portal app available").RunT(t)
+		c.Command("portal", "app", "available").RunT(t)
 	},
 		c.BuildProject(opts),
 	)
@@ -220,12 +220,12 @@ func (c *Cases) ListAvailableApps(opts ProjectOpts) test.Test {
 
 func (c *Cases) InstallAvailableApp(opts ProjectOpts) test.Test {
 	return c.Test().Args(opts).Func(func(t *testing.T) {
-		c.Command("portal app install my.app." + opts.Name()).RunT(t)
+		c.Command("portal", "app", "install", "my.app."+opts.Name()).RunT(t)
 	})
 }
 
 func (c *Cases) RunApp(opts ProjectOpts) test.Test {
 	return c.Test().Args(opts).Func(func(t *testing.T) {
-		c.Command("portal " + opts.Name()).RunT(t)
+		c.Command("portal", opts.Name()).RunT(t)
 	})
 }
