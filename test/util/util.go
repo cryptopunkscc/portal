@@ -1,6 +1,7 @@
 package util
 
 import (
+	"context"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"os/exec"
@@ -23,6 +24,15 @@ func (c *Cmd) RunT(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func (c *Cmd) Defaults() *Cmd {
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	c.Stdin = os.Stdin
+	c.Env = os.Environ()
+	c.Dir = "."
+	return c
+}
+
 func (c *Cmd) NoStd() *Cmd {
 	c.Stdin = nil
 	c.Stdout = nil
@@ -30,12 +40,12 @@ func (c *Cmd) NoStd() *Cmd {
 	return c
 }
 
+func CommandContext(ctx context.Context, cmd string, args ...string) *Cmd {
+	c := &Cmd{exec.CommandContext(ctx, cmd, args...)}
+	return c.Defaults()
+}
+
 func Command(cmd string, args ...string) *Cmd {
-	cc := exec.Command(cmd, args...)
-	cc.Stdout = os.Stdout
-	cc.Stderr = os.Stderr
-	cc.Stdin = os.Stdin
-	cc.Env = append(os.Environ())
-	cc.Dir = "."
-	return &Cmd{cc}
+	c := &Cmd{exec.Command(cmd, args...)}
+	return c.Defaults()
 }
