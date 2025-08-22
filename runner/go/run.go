@@ -52,7 +52,7 @@ func (r *ReRunner) Run(ctx context.Context, project target.ProjectGo, args ...st
 	r.args = args
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Println("Running project Go")
-	if err = deps.RequireBinary("go"); err != nil {
+	if err = deps.Check("go", "version"); err != nil {
 		return
 	}
 	r.ctx = ctx

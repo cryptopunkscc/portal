@@ -25,9 +25,9 @@ func AptInstallMissing(deps []string) (err error) {
 	return
 }
 
-func RequireBinary(name string) (err error) {
-	if err = exec.Call(".", "which", name); err != nil {
-		err = fmt.Errorf("%s is required but not installed", name)
+func Check(cmd ...string) (err error) {
+	if err = exec.Call(".", cmd...); err != nil {
+		err = fmt.Errorf("%s is required but not installed", cmd[0])
 	}
 	return
 }

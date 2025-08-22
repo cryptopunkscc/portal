@@ -41,7 +41,7 @@ func (r *reRunner) Run(ctx context.Context, projectHtml target.ProjectHtml, args
 	log.Println("start", projectHtml.Manifest().Package, projectHtml.Abs())
 	defer log.Println("exit", projectHtml.Manifest().Package, projectHtml.Abs())
 
-	if err = deps.RequireBinary("npm"); err != nil {
+	if err = deps.Check("npm", "-v"); err != nil {
 		return
 	}
 

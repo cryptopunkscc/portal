@@ -118,7 +118,7 @@ func (r *buildRunner) build(ctx context.Context, project target.ProjectNpm_) (er
 
 func BuildModule(_ context.Context, m target.NodeModule) (err error) {
 	defer plog.TraceErr(&err)
-	if err = deps.RequireBinary("npm"); err != nil {
+	if err = deps.Check("npm", "-v"); err != nil {
 		return
 	}
 	if !m.PkgJson().CanBuild() {

@@ -38,7 +38,7 @@ type buildRunner struct{ platforms [][]string }
 
 func (g buildRunner) Run(ctx context.Context, projectGo target.ProjectGo, args ...string) (err error) {
 	log := plog.Get(ctx).Type(g).Set(&ctx)
-	if err = deps.RequireBinary("go"); err != nil {
+	if err = deps.Check("go", "version"); err != nil {
 		return
 	}
 

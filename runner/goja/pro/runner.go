@@ -35,7 +35,7 @@ func (r *ReRunner) Run(ctx context.Context, projectJs target.ProjectJs, args ...
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Println("start", projectJs.Manifest().Package, projectJs.Abs())
 	defer log.Println("exit", projectJs.Manifest().Package, projectJs.Abs())
-	if err = deps.RequireBinary("npm"); err != nil {
+	if err = deps.Check("npm", "-v"); err != nil {
 		return
 	}
 

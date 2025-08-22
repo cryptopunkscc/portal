@@ -11,7 +11,7 @@ import (
 )
 
 func TestBuild(t *testing.T) {
-	if err := deps.RequireBinary("npm"); err != nil {
+	if err := deps.Check("npm", "-v"); err != nil {
 		t.SkipNow()
 	}
 

@@ -9,7 +9,7 @@ import (
 )
 
 func Install(_ context.Context, m target.NodeModule) (err error) {
-	if err = deps.RequireBinary("npm"); err != nil {
+	if err = deps.Check("npm", "-v"); err != nil {
 		return
 	}
 	if err = exec.Run(m.Abs(), "npm", "install"); err != nil {

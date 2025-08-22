@@ -9,7 +9,7 @@ import (
 )
 
 func Watch(ctx context.Context, src target.ProjectNpm_) (err error) {
-	if err = deps.RequireBinary("npm"); err != nil {
+	if err = deps.Check("npm", "-v"); err != nil {
 		return
 	}
 	return npmRunWatch(ctx, src.Abs()).Start()
