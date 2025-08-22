@@ -1,6 +1,6 @@
 //go:build unix
 
-package main
+package bin
 
 import (
 	"github.com/cryptopunkscc/portal/pkg/fs2"
@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 )
 
-func binariesDir() string {
+func Dir() string {
 	if fs2.CanWriteToDir("/bin") {
 		return "/bin"
 	}

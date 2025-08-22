@@ -1,13 +1,13 @@
 //go:build windows
 
-package main
+package bin
 
 import (
 	"os"
 	"path/filepath"
 )
 
-func binariesDir() string {
+func Dir() string {
 	cache, err := os.UserCacheDir()
 	if err != nil {
 		panic(err)

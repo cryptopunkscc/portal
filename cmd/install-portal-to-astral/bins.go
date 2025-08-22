@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"fmt"
+	"github.com/cryptopunkscc/portal/api/bin"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 	"io/fs"
@@ -15,15 +16,15 @@ var binFs embed.FS
 
 func installBinaries() (err error) {
 	defer plog.TraceErr(&err)
-	bin := binariesDir()
-	if err = os.MkdirAll(bin, 0755); err != nil {
+	dir := bin.Dir()
+	if err = os.MkdirAll(dir, 0755); err != nil {
 		return
 	}
 	err = fs.WalkDir(binFs, "bin", func(srcPath string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
 			return nil
 		}
-		dstPath := filepath.Join(bin, d.Name())
+		dstPath := filepath.Join(dir, d.Name())
 		print(fmt.Sprintf("* coping %s to %s", d.Name(), dstPath))
 
 		dst, err := os.OpenFile(dstPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0744)
@@ -51,15 +52,15 @@ func installBinaries() (err error) {
 func removeBinaries() (err error) {
 	println(fmt.Sprintf("removing binaries..."))
 	defer plog.TraceErr(&err)
-	bin := binariesDir()
-	if err = os.MkdirAll(bin, 0755); err != nil {
+	dir := bin.Dir()
+	if err = os.MkdirAll(dir, 0755); err != nil {
 		return
 	}
 	err = fs.WalkDir(binFs, "bin", func(srcPath string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
 			return nil
 		}
-		dstPath := filepath.Join(bin, d.Name())
+		dstPath := filepath.Join(dir, d.Name())
 		print(fmt.Sprintf("* removing %s", dstPath))
 
 		err = os.Remove(dstPath)
