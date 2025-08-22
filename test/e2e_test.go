@@ -10,6 +10,7 @@ import (
 
 func TestE2E_2(t *testing.T) {
 	dc := docker.Container{
+		Bin:           "podman",
 		Image:         "e2e-test",
 		Network:       "e2e-test-net",
 		Logfile:       "portald.log",
