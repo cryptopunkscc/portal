@@ -52,6 +52,7 @@ func (d AppRunner) run(ctx context.Context, token string, path string, args ...s
 }
 
 func setStd(cmd *exec.Cmd, ctx context.Context) (err error) {
+	defer plog.TraceErr(&err)
 	log := plog.Get(ctx)
 	std, ok := ctx.Value(stdKey).(*Std)
 	log.Printf("redirecting std %v ", ok)
@@ -64,7 +65,6 @@ func setStd(cmd *exec.Cmd, ctx context.Context) (err error) {
 	cmd.Stderr = std.Err
 	stdIn, err := cmd.StdinPipe()
 	if err != nil {
-		err = plog.Err(err)
 		return
 	}
 	go func() {

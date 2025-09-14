@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/test/docker"
+	"github.com/cryptopunkscc/portal/test/host"
 	"testing"
 	"time"
 )
@@ -19,8 +20,10 @@ func TestE2E_2(t *testing.T) {
 		InstallerPath: "/portal/bin/install-portal-to-astral",
 	}
 	var c = []*Cases{
+		//{id: 0, Device: host.Linux()},
 		{id: 0, Device: dc.New(0)},
-		{id: 1, Device: dc.New(1)},
+		{id: 1, Device: host.Linux()},
+		//{id: 1, Device: dc.New(1)},
 	}
 
 	runner := test.Runner{}
