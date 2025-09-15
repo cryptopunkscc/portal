@@ -13,6 +13,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/resources"
 	"github.com/cryptopunkscc/portal/target/app"
 	"github.com/cryptopunkscc/portal/target/bundle"
+	"github.com/cryptopunkscc/portal/target/exec"
 	"github.com/cryptopunkscc/portal/target/source"
 	"path/filepath"
 	"strings"
@@ -108,6 +109,10 @@ func (s *Service) Installer() app.Installer {
 		Repositories: Repositories{
 			source.Repository,
 			s.Bundles(),
+		},
+		Resolvers: []Resolve[Source]{
+			exec.ResolveDist.Try,
+			exec.ResolveBundle.Try,
 		},
 	}
 }

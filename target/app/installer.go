@@ -15,6 +15,7 @@ type Installer struct {
 	Dir          string
 	Prepare      func(target.App_) error
 	Repositories target.Repositories
+	Resolvers    []target.Resolve[target.Source]
 }
 
 var _ target.Run[target.App_] = Installer{}.Run
@@ -22,43 +23,30 @@ var _ target.Run[target.App_] = Installer{}.Run
 func (i Installer) Dispatcher() target.Dispatcher {
 	return target.Dispatcher{
 		Runner:   target.RunSeq,
-		Provider: i.RunnableProvider(),
+		Provider: i.runnableProvider(),
 	}
 }
 
-func (i Installer) RunnableProvider() target.Provider[target.Runnable] {
+func (i Installer) runnableProvider() target.Provider[target.Runnable] {
 	return target.Provider[target.Runnable]{
 		Repository: i.Repositories,
-		Resolve:    target.Any[target.Runnable](i.Runner().Try),
+		Resolve:    target.Any[target.Runnable](i.runner().Try),
+		Filter:     canRun,
 	}
 }
 
-func (i Installer) Runner() *target.SourceRunner[target.App_] {
+func (i Installer) runner() *target.SourceRunner[target.App_] {
 	return &target.SourceRunner[target.App_]{
 		Runner: i,
 		Resolve: func(src target.Source) (out target.App_, err error) {
-			out, err = Resolve_(src)
-			if err != nil {
-				return
-			}
-			if !canRun(out) {
-				err = target.ErrNotTarget
-			}
-			return
+			resolvers := append(i.Resolvers, Resolve_.Try)
+			return target.Any[target.App_](resolvers...).Resolve(src)
 		},
 	}
 }
 
-func (i Installer) AppProvider() target.Provider[target.App_] {
-	return target.Provider[target.App_]{
-		Filter:     canRun,
-		Repository: source.Repository,
-		Resolve:    target.Any[target.App_](target.Try(Resolve_)),
-	}
-}
-
-func canRun(app target.App_) bool {
-	if e, ok := app.(target.AppExec); ok {
+func canRun(app target.Runnable) bool {
+	if e, ok := app.Source().(target.AppExec); ok {
 		return e.Runtime().Target().Match()
 	}
 	return true
@@ -70,7 +58,7 @@ func (i Installer) Run(_ context.Context, src target.App_, _ ...string) (err err
 
 func (i Installer) Install(src target.App_) (err error) {
 	defer plog.TraceErr(&err)
-	plog.Println("installing", src.Manifest().Package)
+	plog.Println("installing", src.Manifest().Package, src.Manifest().Runtime)
 	if err = i.prepare(src); err != nil {
 		return
 	}
