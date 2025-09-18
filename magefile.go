@@ -54,6 +54,10 @@ var clean = false
 
 func Clean() { clean = true }
 
+var sign = false
+
+func Sign() { sign = true }
+
 type Install mg.Namespace
 
 func (Install) Astrald() (err error) {
@@ -106,7 +110,9 @@ func (Build) Out(dir string) { out = dir }
 
 func (Build) Installer() error {
 	defer clearVersion()
-	defer gpgSignPortalInstallers()
+	if sign {
+		defer gpgSignPortalInstallers()
+	}
 	cleanInstallerBin()
 	resolveVersion()
 	mg.Deps(
