@@ -22,11 +22,11 @@ func TraceErr(errPtr *error) {
 	}
 }
 
-func PrintTrace(errPtr *error) {
+func PrintTrace(errPtr *error, message ...any) {
 	if errPtr != nil && *errPtr != nil {
 		err := *errPtr
 		err = wrapErrStack(err)
-		Println(err)
+		Println(append(message, err)...)
 	}
 }
 

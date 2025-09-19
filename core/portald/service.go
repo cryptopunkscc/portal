@@ -68,12 +68,6 @@ func (s *Service) Wait() (err error) {
 	return
 }
 
-// Deprecated
-func (s *Service) SetupToken(app App_) (err error) {
-	_, err = s.Tokens().Resolve(app.Manifest().Package)
-	return
-}
-
 func (s *Service) user() *user.Info {
 	if s.User == nil {
 		s.User, _ = s.UserInfo()

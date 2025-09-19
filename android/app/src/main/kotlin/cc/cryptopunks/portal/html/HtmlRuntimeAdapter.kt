@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.util.UUID
 
@@ -68,7 +69,7 @@ internal class HtmlRuntimeAdapter(
                 val message = e.message
                 "window._reject(\"$id\", \"$message\")"
             }
-            launch(Dispatchers.Main) {
+            withContext(Dispatchers.Main) {
                 webView.evaluateJavascript(fn) {
                     Log.d(Tag, "done: $fn, $it")
                 }

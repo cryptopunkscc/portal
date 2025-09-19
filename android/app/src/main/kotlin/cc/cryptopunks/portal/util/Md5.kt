@@ -8,16 +8,13 @@ fun File.md5(): String = inputStream().md5()
 
 fun String.md5(): String = byteInputStream().md5()
 
-fun InputStream.md5(): String {
-    val md = MessageDigest.getInstance("MD5")
-    return use { fis ->
+fun InputStream.md5(): String = use { inputStream ->
+    MessageDigest.getInstance("MD5").apply {
         val buffer = ByteArray(8192)
-        generateSequence {
-            when (val bytesRead = fis.read(buffer)) {
-                -1 -> null
-                else -> bytesRead
-            }
-        }.forEach { bytesRead -> md.update(buffer, 0, bytesRead) }
-        md.digest().toHexString(separator = "")
-    }
+        while (true) {
+            val len = inputStream.read(buffer)
+            if (len == -1) break
+            update(buffer, 0, len)
+        }
+    }.digest().toHexString(separator = "")
 }

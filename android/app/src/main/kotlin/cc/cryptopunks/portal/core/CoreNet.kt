@@ -1,4 +1,4 @@
-package cc.cryptopunks.portal.agent
+package cc.cryptopunks.portal.core
 
 import cc.cryptopunks.portal.core.mobile.Net
 import cc.cryptopunks.portal.core.mobile.NetInterface
@@ -6,7 +6,7 @@ import cc.cryptopunks.portal.core.mobile.NetInterfaceIterator
 import cc.cryptopunks.portal.util.CIDRs
 import java.net.NetworkInterface
 
-class AgentNet : Net {
+class CoreNet : Net {
 
     override fun addresses(): String {
         return NetworkInterface.getNetworkInterfaces().toList()

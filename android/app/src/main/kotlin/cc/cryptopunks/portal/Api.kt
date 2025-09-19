@@ -1,14 +1,15 @@
 package cc.cryptopunks.portal
 
 import android.app.Activity
-import cc.cryptopunks.portal.core.mobile.Event
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
-const val LAUNCHER = "launcher"
+const val LAUNCHER = "portal.launcher"
 
 fun interface StartHtmlApp : (String) -> Unit
 
-interface CoreEvents : StateFlow<Event>
+interface Status : StateFlow<Int>
+
+interface Errors : Flow<String>
 
 interface Activities : List<Activity>

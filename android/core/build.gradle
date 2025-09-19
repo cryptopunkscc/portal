@@ -1,47 +1,65 @@
 plugins {
-    id 'java-library'
+    id 'com.android.library'
+    id 'maven-publish'
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
+android {
+    compileSdk = 34
+    namespace = "cc.cryptopunks.portal"
 
-task environment(type: Exec) {
-    commandLine 'env'
-}
-
-task javaVersion(type: Exec) {
-    group 'test'
-    commandLine "java", '-version'
+    defaultConfig {
+        minSdk = 24
+    }
 }
 
 task updateGoMobile(type: Exec) {
     group 'build'
-    commandLine "go", 'get', "golang.org/x/mobile/bind"
+    commandLine "sh", "-c", "go get golang.org/x/mobile/bind"
 }
 
 task buildGoMobile(type: Exec) {
     group 'build'
     dependsOn updateGoMobile
-    inputs.files files("go.mod", 'go.sum'), fileTree("../../") { include "**/*.go" }
+    inputs.files files("go.mod", 'go.sum'), fileTree("../../") {
+        include "**/*.go"
+        exclude 'android'
+    }
     outputs.upToDateWhen {
-        file('./build/portal.aar').exists()
+        file("$buildDir/outputs/aar/core.aar").exists()
     }
     doFirst {
-        mkdir buildDir
+        mkdir "$buildDir/outputs/aar/"
     }
-    environment("GOTOOLCHAIN", "go1.23.7")
+    environment("GOTOOLCHAIN", "go1.24.7")
 //    environment("GOARCH", "x86_64")
 //    environment("GOOS", "android")
-    commandLine("gomobile", "bind", "-v", "-o", "./build/portal.aar",
-            "-tags", "sqlite_native",
-            "-target=android", "-androidapi=24",
-            "-javapkg=cc.cryptopunks.portal.core",
-            "github.com/cryptopunkscc/portal/api/bind",
-            "github.com/cryptopunkscc/portal/api/mobile",
-            "github.com/cryptopunkscc/portal/core/mobile",
+
+    commandLine("sh", "-c", "gomobile bind"
+            + " -v -o $buildDir/outputs/aar/core.aar"
+            + " -tags sqlite_native"
+            + " -target=android -androidapi=24"
+            + " -javapkg=cc.cryptopunks.portal.core"
+            + " github.com/cryptopunkscc/portal/api/bind"
+            + " github.com/cryptopunkscc/portal/api/mobile"
+            + " github.com/cryptopunkscc/portal/core/mobile"
     )
 }
 
-compileJava.dependsOn buildGoMobile
+configurations { aar }
+
+artifacts.add('aar', file("$buildDir/outputs/aar/core.aar")) {
+    builtBy tasks.named('buildGoMobile')
+}
+
+//group = "cc.cryptopunks.portal"
+//version = "1.0.0"
+//publishing {
+//    publications {
+//        aar(MavenPublication) {
+//            groupId = project.group.toString()
+//            artifactId = 'core'
+//            version = project.version.toString()
+//            artifact("$buildDir/outputs/aar/core.aar") { builtBy buildGoMobile }
+//        }
+//    }
+//}

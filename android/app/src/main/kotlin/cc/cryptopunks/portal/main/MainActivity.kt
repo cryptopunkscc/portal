@@ -7,54 +7,39 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.TextStyle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import cc.cryptopunks.portal.Status
 import cc.cryptopunks.portal.LAUNCHER
 import cc.cryptopunks.portal.StartHtmlApp
+import cc.cryptopunks.portal.compose.AstralTheme
 import cc.cryptopunks.portal.compose.inject
-import cc.cryptopunks.portal.core.mobile.Event
 import cc.cryptopunks.portal.core.mobile.Mobile
-import cc.cryptopunks.portal.exception.ExceptionsState
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filter
+import cc.cryptopunks.portal.onboarding.OnBoardingScreen
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.compose.koinInject
 
 class MainActivity : ComponentActivity() {
     private val mainPermissions: MainPermissions by viewModel()
     private val startHtmlApp: StartHtmlApp by inject()
-    private val events: MainEvents by inject()
+//    private val events: MainEvents by inject()
+    private val status: Status by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycleScope.launch {
-            events.first { it.msg == Mobile.STARTED }
+            status.first { it == Mobile.STARTED }
             startHtmlApp(LAUNCHER)
             finish()
         }
         setContent {
-            inject.Errors()
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
-                val event by events.collectAsStateWithLifecycle()
-                Text(
-                    text = when (event.msg) {
-                        Mobile.STARTING -> "Portal starting..."
-                        Mobile.STARTED -> "Portal started."
-                        Mobile.STOPPED -> "Portal stopped."
-                        else -> "Invalid status"
-                    },
-                    style = MaterialTheme.typography.h2
-                )
-            }
+            MainScreen()
         }
     }
 
@@ -63,5 +48,27 @@ class MainActivity : ComponentActivity() {
         if (!mainPermissions.ask(this)) {
             startAstralService()
         }
+    }
+}
+
+@Composable
+fun MainScreen() = AstralTheme {
+    inject.Errors()
+    val status by koinInject<Status>().collectAsStateWithLifecycle()
+    if (status == Mobile.FRESH) OnBoardingScreen()
+    else Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            text = when (status) {
+                Mobile.STARTING -> "Portal starting..."
+                Mobile.STARTED -> "Portal started."
+                Mobile.STOPPED -> "Portal stopped."
+//                        Mobile.FRESH -> "Not configured."
+                else -> "Unknown status"
+            },
+            style = MaterialTheme.typography.h2
+        )
     }
 }

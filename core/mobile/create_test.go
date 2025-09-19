@@ -34,10 +34,9 @@ func (t testApi) DbDir() string {
 	return t.testDir
 }
 
-func (t testApi) Event(event *mobile.Event) {
-	//TODO implement me
-	panic("implement me")
-}
+func (t testApi) Status(id int32) { panic("implement me") }
+
+func (t testApi) Error(message string) { panic("implement me") }
 
 func (t testApi) StartHtml(pkg string, args string) error {
 	//TODO implement me

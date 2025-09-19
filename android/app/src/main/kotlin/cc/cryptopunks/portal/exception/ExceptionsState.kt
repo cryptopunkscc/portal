@@ -14,5 +14,5 @@ class ExceptionsState : (Throwable) -> Unit {
 
     operator fun plusAssign(e: Throwable) = errors.update { it + e }
 
-    fun pop() = errors.update { it.dropLast(1) }
+    fun drop() = errors.update { it.dropLast(1) }
 }

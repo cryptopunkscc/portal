@@ -44,12 +44,8 @@ fun ErrorsScreen(
 ) {
     val error by errors.current.collectAsStateWithLifecycle(null)
     error?.let { err ->
-        val drop: () -> Unit = {
-            errors.pop()
-        }
-        var stacktrace by remember(err) {
-            mutableStateOf(false)
-        }
+        val drop: () -> Unit = { errors.drop() }
+        var stacktrace by remember(err) { mutableStateOf(false) }
         val clipboard = LocalClipboardManager.current
         Dialog(drop) {
             Surface(

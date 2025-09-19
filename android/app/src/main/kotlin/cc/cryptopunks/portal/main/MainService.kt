@@ -5,8 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
-import cc.cryptopunks.portal.CoreEvents
-import cc.cryptopunks.portal.core.mobile.Event
+import cc.cryptopunks.portal.Errors
+import cc.cryptopunks.portal.Status
 import cc.cryptopunks.portal.core.mobile.Mobile
 import cc.cryptopunks.portal.core.mobile.Core
 import cc.cryptopunks.portal.exception.ExceptionsState
@@ -14,17 +14,21 @@ import cc.cryptopunks.portal.util.acquireMulticastWakeLock
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.timeout
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import kotlin.time.Duration.Companion.seconds
 
 class MainService : Service() {
 
     private val scope = CoroutineScope(Dispatchers.IO)
     private val tag = javaClass.simpleName
     private val runtime: Core by inject()
-    private val events: CoreEvents by inject()
+    private val status: Status by inject()
+    private val errors: Errors by inject()
     private val wakeLock by lazy { acquireMulticastWakeLock("astral") }
     private val exceptions: ExceptionsState by inject()
 
@@ -33,13 +37,17 @@ class MainService : Service() {
         startForegroundNotification()
         wakeLock.acquire()
         scope.launch {
-            events.collect { event -> Log.d(tag, "event: ${event.msg}", event.err) }
+            status.collect { Log.d(tag, "status: $it") }
         }
         scope.launch {
-            events.mapNotNull(Event::getErr).collect(exceptions)
+            errors.map(::Exception).collect(exceptions)
         }
         scope.launch {
-            events.first { event -> event.msg == Mobile.STOPPED }
+            runCatching {
+                status.filter { it == Mobile.STARTING }.timeout(3.seconds).first()
+            }.onSuccess {
+                status.first { it == Mobile.STOPPED }
+            }
             stopSelf()
         }
         scope.launch {

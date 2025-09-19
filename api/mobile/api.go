@@ -2,7 +2,8 @@ package mobile
 
 type Api interface {
 	Config
-	Event(event *Event)
+	Status(id int32)
+	Error(message string)
 	StartHtml(pkg string, args string) error
 	Net() Net
 }
@@ -29,13 +30,10 @@ type NetInterface struct {
 	Addresses    string
 }
 
-type Event struct {
-	Msg int
-	Err error
-}
-
+// Status ID
 const (
-	STARTING = iota
+	STOPPED = int32(iota)
+	STARTING
 	STARTED
-	STOPPED
+	FRESH
 )

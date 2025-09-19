@@ -1,4 +1,4 @@
-package cc.cryptopunks.portal.app
+package cc.cryptopunks.portal.activity
 
 import android.app.Activity
 import android.app.Application

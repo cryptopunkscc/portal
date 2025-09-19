@@ -2,18 +2,6 @@
 
 [astrald](https://github.com/cryptopunkscc/astrald) agent for Android OS
 
-## Features
-
-* Foreground service for keeping astrald alive
-* Ongoing notification
-* Embedded goja runner for js app backend
-* WebView runner for js app frontend
-* Apphost support via js adapter
-* Installing js app from zip bundle
-* Node log screen
-* Node config editor
-* Admin panel console
-
 ## Dev dependencies
 
 * GO 1.21
@@ -46,8 +34,7 @@ adb install ./app/build/outputs/apk/debug/app-debug.apk
 adb shell am start -n cc.cryptopunks.portal/cc.cryptopunks.portal.MainActivity
 ```
 
-## How to create JS app
+## Android Studio
 
-To create a JS app compatible with the android agent, please refer to the
-following [manual](https://github.com/cryptopunkscc/js-apphost-adapter/blob/master/example/react.md#create-bundle-with-frontend--backend)
-and example [react-basic](https://github.com/cryptopunkscc/js-apphost-adapter/tree/master/example/react-basic) app.
+Compiling the project via Android Studio might not work by default because of different env and $PATH.
+This problem might be solved by running AS from the terminal.

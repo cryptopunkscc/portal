@@ -2,18 +2,30 @@ package core
 
 import (
 	. "github.com/cryptopunkscc/portal/api/mobile"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 func (m *service) Start() {
-	m.mobile.Event(&Event{Msg: STARTING})
+	m.set(STARTING)
+
 	if err := m.Service.Start(m.ctx); err != nil {
-		m.mobile.Event(&Event{Msg: STOPPED, Err: err})
+		plog.Println(err)
+		m.err(err)
+		m.set(STOPPED)
 		return
 	}
-	m.mobile.Event(&Event{Msg: STARTED})
+
+	if !m.HasUser() {
+		m.set(FRESH)
+	} else {
+		m.set(STARTED)
+	}
+
 	go func() {
 		err := m.Wait()
-		m.mobile.Event(&Event{Msg: STOPPED, Err: err})
+		plog.Println(err)
+		m.err(err)
+		m.set(STOPPED)
 	}()
 	return
 }
