@@ -39,7 +39,6 @@
         <activity
             android:name="cc.cryptopunks.portal.main.MainActivity"
             android:exported="true"
-            android:launchMode="singleInstance"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -73,63 +72,83 @@
 
         <activity
             android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot0"
+            android:launchMode="singleTask"
             android:taskAffinity=".html.HtmlAppActivity0" />
         <activity
             android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot1"
+            android:launchMode="singleTask"
             android:taskAffinity=".html.HtmlAppActivity1" />
         <activity
             android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot2"
+            android:launchMode="singleTask"
             android:taskAffinity=".html.HtmlAppActivity2" />
         <activity
             android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot3"
+            android:launchMode="singleTask"
             android:taskAffinity=".html.HtmlAppActivity3" />
         <activity
             android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot4"
+            android:launchMode="singleTask"
             android:taskAffinity=".html.HtmlAppActivity4" />
         <activity
             android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot5"
+            android:launchMode="singleTask"
             android:taskAffinity=".html.HtmlAppActivity5" />
         <activity
             android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot6"
+            android:launchMode="singleTask"
             android:taskAffinity=".html.HtmlAppActivity6" />
         <activity
             android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot7"
+            android:launchMode="singleTask"
             android:taskAffinity=".html.HtmlAppActivity7" />
         <activity
             android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot8"
+            android:launchMode="singleTask"
             android:taskAffinity=".html.HtmlAppActivity8" />
         <activity
             android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot9"
+            android:launchMode="singleTask"
             android:taskAffinity=".html.HtmlAppActivity9" />
         <activity
             android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot10"
+            android:launchMode="singleTask"
             android:taskAffinity=".html.HtmlAppActivity10" />
         <activity
             android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot11"
+            android:launchMode="singleTask"
             android:taskAffinity=".html.HtmlAppActivity11" />
         <activity
             android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot12"
+            android:launchMode="singleTask"
             android:taskAffinity=".html.HtmlAppActivity12" />
         <activity
             android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot13"
+            android:launchMode="singleTask"
             android:taskAffinity=".html.HtmlAppActivity13" />
         <activity
             android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot14"
+            android:launchMode="singleTask"
             android:taskAffinity=".html.HtmlAppActivity14" />
         <activity
             android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot15"
+            android:launchMode="singleTask"
             android:taskAffinity=".html.HtmlAppActivity15" />
         <activity
             android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot16"
+            android:launchMode="singleTask"
             android:taskAffinity=".html.HtmlAppActivity16" />
         <activity
             android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot17"
+            android:launchMode="singleTask"
             android:taskAffinity=".html.HtmlAppActivity17" />
         <activity
             android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot18"
+            android:launchMode="singleTask"
             android:taskAffinity=".html.HtmlAppActivity18" />
         <activity
             android:name="cc.cryptopunks.portal.html.HtmlAppActivity$Slot19"
+            android:launchMode="singleTask"
             android:taskAffinity=".html.HtmlAppActivity19" />
     </application>
 

@@ -12,9 +12,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import cc.cryptopunks.portal.Status
 import cc.cryptopunks.portal.LAUNCHER
 import cc.cryptopunks.portal.StartHtmlApp
+import cc.cryptopunks.portal.Status
 import cc.cryptopunks.portal.compose.AstralTheme
 import cc.cryptopunks.portal.compose.inject
 import cc.cryptopunks.portal.core.mobile.Mobile
@@ -28,7 +28,6 @@ import org.koin.compose.koinInject
 class MainActivity : ComponentActivity() {
     private val mainPermissions: MainPermissions by viewModel()
     private val startHtmlApp: StartHtmlApp by inject()
-//    private val events: MainEvents by inject()
     private val status: Status by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +35,7 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             status.first { it == Mobile.STARTED }
             startHtmlApp(LAUNCHER)
-            finish()
+            finishAndRemoveTask()
         }
         setContent {
             MainScreen()
@@ -55,20 +54,23 @@ class MainActivity : ComponentActivity() {
 fun MainScreen() = AstralTheme {
     inject.Errors()
     val status by koinInject<Status>().collectAsStateWithLifecycle()
-    if (status == Mobile.FRESH) OnBoardingScreen()
-    else Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Text(
-            text = when (status) {
-                Mobile.STARTING -> "Portal starting..."
-                Mobile.STARTED -> "Portal started."
-                Mobile.STOPPED -> "Portal stopped."
-//                        Mobile.FRESH -> "Not configured."
-                else -> "Unknown status"
-            },
-            style = MaterialTheme.typography.h2
-        )
+    when (status) {
+        Mobile.FRESH -> OnBoardingScreen()
+//        Mobile.STARTED -> HtmlAppScreen(src = LAUNCHER)
+        else -> Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Text(
+                text = when (status) {
+                    Mobile.STARTING -> "Portal starting..."
+                    Mobile.STARTED -> "Portal started."
+                    Mobile.STOPPED -> "Portal stopped."
+//                    Mobile.FRESH -> "Not configured."
+                    else -> "Unknown status"
+                },
+                style = MaterialTheme.typography.h2
+            )
+        }
     }
 }

@@ -8,6 +8,5 @@ import org.koin.dsl.module
 val htmlAppModule = module {
     singleOf(::HtmlAppRepository) binds arrayOf(
         StartHtmlApp::class,
-        HtmlAppRegistry::class
     )
 }

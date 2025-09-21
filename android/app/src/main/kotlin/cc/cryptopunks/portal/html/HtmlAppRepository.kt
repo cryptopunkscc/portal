@@ -5,31 +5,23 @@ import android.content.Context
 import android.content.Intent
 import cc.cryptopunks.portal.Activities
 import cc.cryptopunks.portal.StartHtmlApp
-import java.lang.ref.WeakReference
 
 class HtmlAppRepository(
     private val activities: Activities,
-) : HtmlAppRegistry, StartHtmlApp {
+) : StartHtmlApp {
 
-    private val appActivities = mutableListOf<HtmlAppActivity>()
-
+    private val appActivities get() = activities.filterIsInstance<HtmlAppActivity>()
     private val usedSlots get() = appActivities.map(HtmlAppActivity::slot).toSet()
     private val freeSlots get() = HtmlAppActivity.slots - usedSlots
     private val nextSlot get() = freeSlots.first()
 
-    override var current: HtmlAppActivity? = appActivities.lastOrNull()
-
-    override fun onCreate(activity: HtmlAppActivity) {
-        appActivities.add(activity)
-    }
-
-    override fun onDestroy(activity: HtmlAppActivity) {
-        appActivities.remove(activity)
-    }
-
     override fun invoke(src: String) {
-        activities.last().startHtmlAppActivity(src, nextSlot)
+        activities.lastOrNull()?.startHtmlAppActivity(src, slot(src))
     }
+
+    operator fun contains(activity: HtmlAppActivity) = appActivities.any { activity.src == it.src && it != activity }
+
+    private fun slot(src: String) = appActivities.firstOrNull { src == it.src }?.slot ?: nextSlot
 }
 
 private fun Context.startHtmlAppActivity(src: String, slot: Int) =

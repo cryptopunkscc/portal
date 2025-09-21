@@ -1,96 +1,40 @@
 package cc.cryptopunks.portal.html
 
-import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.webkit.WebChromeClient
-import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
-import cc.cryptopunks.portal.core.mobile.App
-import cc.cryptopunks.portal.core.mobile.Core
 import org.koin.android.ext.android.inject
-import java.io.File
 
 sealed class HtmlAppActivity(val slot: Int) : ComponentActivity() {
 
-    private val webView: WebView by lazy { WebView(this) }
-    private val portal: Core by inject()
-    private val registry: HtmlAppRegistry by inject()
-    private var app: App? = null
+    private val webView: HtmlAppView by lazy { HtmlAppView(this) }
+    private val repository: HtmlAppRepository by inject()
+    val src by lazy { intent.getStringExtra("src")!! }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        registry.onCreate(this)
+        prepare() || return
         setContentView(webView)
-        setupWebView()
+        webView.loadApp(src)
         setupOnBackPressedCallback()
     }
 
-    private fun reloadApp(intent: Intent = getIntent()): App {
-        val src = intent.getStringExtra("src")
-        app?.run { core().close() }
-        Log.d("HtmlAppActivity", "portal.app")
-        return portal.app(src).also { app ->
-            Log.d("HtmlAppActivity", "portal.app success")
-            this.app = app
-            title = app.manifest().title
-        }
-    }
-
-    private fun setupWebView(app: App = reloadApp()) = webView.apply {
-        val assets = app.assets()
-        webViewClient = PortalWebViewClient(assets)
-        webChromeClient = WebChromeClient()
-        settings.apply {
-            @SuppressLint("SetJavaScriptEnabled")
-            javaScriptEnabled = true
-            domStorageEnabled = true
-            useWideViewPort = true
-            allowFileAccess = true
-//            allowFileAccessFromFileURLs = true
-//            allowUniversalAccessFromFileURLs = true
-            allowContentAccess = true
-            domStorageEnabled = true
-            databaseEnabled = true
-            javaScriptCanOpenWindowsAutomatically = true
-        }
-        addJavascriptInterface(
-            HtmlRuntimeAdapter(webView, app.core()),
-            "_app_host"
-        )
-        assets.get("index.html").run {
-            Log.d("HtmlAppActivity", "mime: ${mime()}, encoding: ${encoding()}")
-//            val index = "file://" + dataDir.resolve("apps/portal.launcher/index.html")
-//            loadUrl(index)
-            loadUrl("file://index.html")
-//            val data = data().readAll().decodeToString()
-//            loadData(
-//                data,
-//                mime(),
-//                encoding(),
-//            )
-        }
+    private fun prepare(): Boolean = when {
+        runCatching { src }.isFailure -> false
+        this in repository -> false.also { repository(src) }
+        else -> true
     }
 
     private fun setupOnBackPressedCallback() {
         onBackPressedDispatcher.addCallback(this) {
-            if (webView.canGoBack()) {
-                webView.goBack()
-            } else {
-                isEnabled = false
-                onBackPressedDispatcher.onBackPressed()
-                isEnabled = true
-            }
+            if (webView.canGoBack()) webView.goBack()
+            else finishAndRemoveTask()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        registry.onDestroy(this)
         webView.destroy()
-        app?.run { core().close() }
     }
 
     companion object {
