@@ -1,0 +1,6 @@
+name: launcher
+title: Launcher
+description: Portal applications launcher.
+package: portal.launcher
+schema: html
+icon: ./src/assets/images/logo.svg

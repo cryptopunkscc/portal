@@ -14,7 +14,7 @@ func (m *service) Install() (err error) {
 	var errs []error
 	i := m.Installer()
 	for _, b := range bundle.Resolve_.List(
-		source.Embed(apps.LauncherSvelteFS),
+		source.Embed(apps.LauncherFS),
 		source.Embed(apps.ProfileFS),
 	) {
 		if err = m.SetupToken(b); err != nil {

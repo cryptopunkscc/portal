@@ -1,8 +1,0 @@
-{
-  "name": "launcher",
-  "package": "portal.launcher",
-  "title": "Portal Launcher",
-  "description": "Portal applications launcher.",
-  "icon": "./src/assets/images/logo.svg",
-  "schema": "html"
-}

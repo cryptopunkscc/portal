@@ -8,7 +8,7 @@ import (
 var Builds embed.FS
 
 //go:embed launcher
-var LauncherSvelteFS embed.FS
+var LauncherFS embed.FS
 
 //go:embed profile
 var ProfileFS embed.FS
