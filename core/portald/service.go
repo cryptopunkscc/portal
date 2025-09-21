@@ -68,22 +68,9 @@ func (s *Service) Wait() (err error) {
 	return
 }
 
+// Deprecated
 func (s *Service) SetupToken(app App_) (err error) {
 	_, err = s.Tokens().Resolve(app.Manifest().Package)
-	return
-}
-
-func (s *Service) PrepareApp(app App_) (err error) {
-	t, err := s.Tokens().Resolve(app.Manifest().Package)
-	if err != nil {
-		return
-	}
-	if s.HasUser() {
-		err = s.signAppContract(t.Identity.String())
-		if err != nil {
-			return
-		}
-	}
 	return
 }
 
@@ -104,8 +91,7 @@ func (s *Service) HasUser() bool {
 
 func (s *Service) Installer() app.Installer {
 	return app.Installer{
-		Dir:     s.Config.Apps,
-		Prepare: s.PrepareApp,
+		Dir: s.Config.Apps,
 		Repositories: Repositories{
 			source.Repository,
 			s.Bundles(),
@@ -114,6 +100,7 @@ func (s *Service) Installer() app.Installer {
 			exec.ResolveDist.Try,
 			exec.ResolveBundle.Try,
 		},
+		Prepare: s.ClaimApp,
 	}
 }
 

@@ -107,6 +107,14 @@ func (s *Service) publicHandlers() cmd.Handlers {
 					},
 				},
 				{
+					Func: s.ClaimPackage,
+					Name: "claim c",
+					Desc: "Claim the app by package name.",
+					Params: cmd.Params{
+						{Type: "string", Desc: "App package name"},
+					},
+				},
+				{
 					Func: s.Installer().Uninstall,
 					Name: "uninstall d",
 					Desc: "Uninstall app.",

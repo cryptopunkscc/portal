@@ -8,6 +8,7 @@ import (
 	"github.com/cryptopunkscc/portal/target/source"
 )
 
+// Deprecated
 func (m *service) Install() (err error) {
 	defer plog.TraceErr(&err)
 	var errs []error
