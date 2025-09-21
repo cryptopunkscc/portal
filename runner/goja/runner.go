@@ -46,6 +46,7 @@ func (r *runner) Run(ctx context.Context, app target.AppJs, args ...string) (err
 		return
 	}
 	<-ctx.Done()
+	r.backend.Interrupt()
 	if core.Code() > 0 {
 		err = fmt.Errorf("exit %d", core.Code())
 	}

@@ -24,6 +24,14 @@ func NewBackend(core bind.Core) *Backend {
 	}
 }
 
+func (b *Backend) Interrupt() {
+	if b.vm != nil {
+		b.vm.ClearInterrupt()
+		b.core.Interrupt()
+		b.vm = nil
+	}
+}
+
 func (b *Backend) RunFs(files fs.FS, args ...string) (err error) {
 	var src []byte
 	if src, err = fs.ReadFile(files, "main.js"); err != nil {
@@ -33,10 +41,7 @@ func (b *Backend) RunFs(files fs.FS, args ...string) (err error) {
 }
 
 func (b *Backend) RunSource(app string, args ...string) (err error) {
-	if b.vm != nil {
-		b.vm.ClearInterrupt()
-		b.core.Interrupt()
-	}
+	b.Interrupt()
 	b.vm = goja.New()
 
 	if err = Bind(b.vm, b.core); err != nil {

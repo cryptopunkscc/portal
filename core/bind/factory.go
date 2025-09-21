@@ -29,7 +29,7 @@ func (f CoreFactory) api(newApphost newApphost) NewCore {
 			bind.Process
 		}{}
 		m.Process, ctx = Process(ctx)
-		m.Apphost = newApphost(ctx, portal)
+		m.Apphost, ctx = newApphost(ctx, portal)
 		return m, ctx
 	}
 }
@@ -46,23 +46,23 @@ func (f CoreFactory) cachedInvoker(ctx context.Context, portal target.Portal_) a
 	return core.Cached(i)
 }
 
-type newApphost func(ctx context.Context, portal target.Portal_) Apphost
+type newApphost func(ctx context.Context, portal target.Portal_) (Apphost, context.Context)
 
 func (f CoreFactory) frontendApphost(
 	create func(ctx context.Context, portal target.Portal_) apphost.Cached,
 ) newApphost {
-	return func(ctx context.Context, portal target.Portal_) Apphost {
-		return Adapter(ctx, create(ctx, portal), portal.Manifest().Package)
+	return func(ctx context.Context, portal target.Portal_) (Apphost, context.Context) {
+		return Adapter(ctx, create(ctx, portal), portal.Manifest().Package), ctx
 	}
 }
 
 func (f CoreFactory) backendApphost(
 	create func(ctx context.Context, portal target.Portal_) apphost.Cached,
 ) newApphost {
-	return func(ctx context.Context, portal target.Portal_) Apphost {
+	return func(ctx context.Context, portal target.Portal_) (Apphost, context.Context) {
 		cached := create(ctx, portal)
 		core.ConnectionsThreshold = 0
-		core.Timeout(ctx, cached, portal)
-		return Adapter(ctx, cached, portal.Manifest().Package)
+		ctx = core.Timeout(ctx, cached, portal)
+		return Adapter(ctx, cached, portal.Manifest().Package), ctx
 	}
 }

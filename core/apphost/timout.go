@@ -5,28 +5,26 @@ import (
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	sig2 "github.com/cryptopunkscc/portal/pkg/sig"
 	"time"
 )
 
 var ConnectionsThreshold = -1
 
-func Timeout(ctx context.Context, apphost apphost.Cache, portal target.Portal_) {
+func Timeout(ctx context.Context, apphost apphost.Cache, portal target.Portal_) context.Context {
 	if ConnectionsThreshold < 0 {
-		return
+		return ctx
 	}
 	timeout := portal.Config().Timeout
 	if timeout < 0 {
-		return
+		return ctx
 	}
+	ctx, cancel := context.WithCancel(ctx)
 	go func() {
 		duration := 5 * time.Second
 		if timeout > 0 {
 			duration = time.Duration(timeout) * time.Millisecond
 		}
-		t := newTimout(duration, func() {
-			_ = sig2.Interrupt()
-		})
+		t := newTimout(duration, cancel)
 		log := plog.Get(ctx).D().Type(t).Set(&ctx)
 		t.log = log
 		t.Enable(true)
@@ -35,6 +33,7 @@ func Timeout(ctx context.Context, apphost apphost.Cache, portal target.Portal_) 
 			t.Enable(apphost.Connections().Size() <= ConnectionsThreshold)
 		}
 	}()
+	return ctx
 }
 
 type timout struct {
