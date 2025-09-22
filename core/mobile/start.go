@@ -19,6 +19,7 @@ func (m *service) Start() {
 		m.set(FRESH)
 	} else {
 		m.set(STARTED)
+		_ = m.installApps()
 	}
 
 	go func() {
