@@ -37,6 +37,15 @@ func (s *Service) handlers() cmd.Handlers {
 func (s *Service) publicHandlers() cmd.Handlers {
 	return cmd.Handlers{
 		{
+			Func: s.Setup,
+			Name: "setup",
+			Desc: "Setup portal environment.",
+			Params: cmd.Params{
+				{Name: "user u", Type: "string", Desc: "Optional user alias. When specified, the installed node will be assigned to a new user identity associated with the name. Otherwise, the installed node will be ready to claim by existing user."},
+				{Name: "apps a", Type: "string", Desc: "Path to directory containing application to install."},
+			},
+		},
+		{
 			Name: "user u",
 			Desc: "Manage user.",
 			Sub: cmd.Handlers{
