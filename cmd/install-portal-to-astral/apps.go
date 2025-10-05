@@ -3,26 +3,23 @@ package main
 import (
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+
 	_ "github.com/cryptopunkscc/portal/api/env/desktop"
 	"github.com/cryptopunkscc/portal/api/portal"
 	"github.com/cryptopunkscc/portal/apps"
 	"github.com/cryptopunkscc/portal/pkg/config"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"os"
-	"path/filepath"
 )
 
-func installApps() (err error) {
+func copyApps() (dir string, err error) {
 	defer plog.TraceErr(&err)
-	dir := filepath.Join(os.TempDir(), "install-portal-to-astral", "apps")
+	dir = filepath.Join(os.TempDir(), "install-portal-to-astral", "apps")
 	if err = os.MkdirAll(dir, 0755); err != nil {
 		return
 	}
-	defer os.RemoveAll(dir)
 	if err = os.CopyFS(dir, apps.Builds); err != nil {
-		return
-	}
-	if err = portalRun("app", "install", dir); err != nil {
 		return
 	}
 	return
