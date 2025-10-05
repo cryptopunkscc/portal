@@ -70,6 +70,11 @@ func (s *Service) publicHandlers() cmd.Handlers {
 					Name: "info i",
 					Desc: "Print user info.",
 				},
+				{
+					Func: s.HasUser,
+					Name: "check",
+					Desc: "Check if user exists.",
+				},
 			},
 		},
 		{
