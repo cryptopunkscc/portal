@@ -15,12 +15,8 @@ func (m *service) Start() {
 		return
 	}
 
-	if !m.HasUser() {
-		m.set(FRESH)
-	} else {
-		m.set(STARTED)
-		_ = m.installApps()
-	}
+	_ = m.installApps()
+	m.set(STARTED)
 
 	go func() {
 		err := m.Wait()
