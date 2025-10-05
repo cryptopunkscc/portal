@@ -1,11 +1,13 @@
 package apphost
 
 import (
+	"strings"
+	"sync"
+
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/sig"
 	api "github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"sync"
 )
 
 var Default = &Adapter{}
@@ -44,7 +46,12 @@ func (a *Adapter) Resolve(name string) (i *astral.Identity, err error) {
 		return
 	}
 	if i, err = a.Lib.LocalNode().ResolveIdentity(name); err != nil {
-		return
+		if strings.HasPrefix(name, ".") {
+			return
+		}
+		if i, err = a.Lib.LocalNode().ResolveIdentity("." + name); err != nil {
+			return
+		}
 	}
 	a.identities.Set(name, i)
 	return
