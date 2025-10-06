@@ -6,6 +6,10 @@ import (
 )
 
 func (m *service) Start() {
+	go m.start()
+}
+
+func (m *service) start() {
 	m.set(STARTING)
 
 	if err := m.Service.Start(m.ctx); err != nil {
@@ -18,11 +22,9 @@ func (m *service) Start() {
 	_ = m.installApps()
 	m.set(STARTED)
 
-	go func() {
-		err := m.Wait()
-		plog.Println(err)
-		m.err(err)
-		m.set(STOPPED)
-	}()
+	err := m.Wait()
+	plog.Println(err)
+	m.err(err)
+	m.set(STOPPED)
 	return
 }

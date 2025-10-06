@@ -66,6 +66,8 @@
 
 <style>
     main {
+        margin: -16px -8px;
+        margin-outside: 200px;
         display: flex;
         justify-content: center;
         align-items: center;

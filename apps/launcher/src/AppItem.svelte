@@ -32,6 +32,10 @@
         background-color: #ffffff09;
     }
 
+    .app-item:active {
+        background-color: #0D47A124;
+    }
+
     .app-info {
         flex: 1;
     }
@@ -56,7 +60,6 @@
         font-size: 16px;
         color: #aaa;
         display: flex;
-        /*text-align: center; !* Wyśrodkowanie opisu *!*/
     }
 </style>
 
