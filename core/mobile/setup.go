@@ -16,6 +16,7 @@ func (m *service) installApps() (err error) {
 	for _, b := range app.Resolve_.List(
 		source.Embed(apps.LauncherFS),
 		source.Embed(apps.ProfileFS),
+		source.Embed(apps.ClaimFS),
 	) {
 		if err = i.Install(b); err != nil {
 			errs = append(errs, err)

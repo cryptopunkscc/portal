@@ -1,0 +1,6 @@
+name: claim
+title: Claim
+description: Claim new device
+package: portal.user.claim
+schema: html
+type: gui

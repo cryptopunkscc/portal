@@ -12,3 +12,6 @@ var LauncherFS embed.FS
 
 //go:embed profile
 var ProfileFS embed.FS
+
+//go:embed claim
+var ClaimFS embed.FS
