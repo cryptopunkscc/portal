@@ -2,14 +2,15 @@ package test
 
 import (
 	"bufio"
-	"github.com/cryptopunkscc/portal/pkg/test"
-	"github.com/cryptopunkscc/portal/test/util"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"path/filepath"
 	"slices"
 	"testing"
 	"time"
+
+	"github.com/cryptopunkscc/portal/pkg/test"
+	"github.com/cryptopunkscc/portal/test/util"
+	"github.com/stretchr/testify/assert"
 )
 
 type Device interface {
@@ -157,7 +158,7 @@ func (c *Cases) UserInfo() test.Test {
 func (c *Cases) UserClaim(c2 *Cases) test.Test {
 	return c.Test().Args(c2.Name()).Func(func(t *testing.T) {
 		//time.Sleep(3 * time.Second) // windows experimental
-		c.Command("portal", "user", "claim", c2.identity).RunT(t)
+		c.Command("portal", "user", "claim", c2.alias).RunT(t)
 	},
 		c.PortalStart(),
 		c2.PortalStartAwait(),
