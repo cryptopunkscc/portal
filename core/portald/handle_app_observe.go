@@ -2,6 +2,7 @@ package portald
 
 import (
 	"context"
+
 	"github.com/cryptopunkscc/astrald/sig"
 	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/pkg/fs2"
@@ -33,7 +34,7 @@ func (s *Service) ObserveApps(ctx context.Context, opts ListAppsOpts) (out <-cha
 	// list installed apps
 	go func() {
 		for _, bundle := range resolve.List(s.apps()) {
-			if opts.Hidden || !bundle.Config().Hidden {
+			if opts.includes(bundle) {
 				installed.Set(bundle.Manifest().Package, true)
 				results <- ObservedApp{
 					App:       *bundle.Manifest(),
@@ -53,7 +54,7 @@ func (s *Service) ObserveApps(ctx context.Context, opts ListAppsOpts) (out <-cha
 					log.Println("new installed file:", file.Abs())
 					for _, bundle := range resolve.List(file) {
 						log.Println("new installed app:", *bundle.Manifest())
-						if opts.Hidden || !bundle.Config().Hidden {
+						if opts.includes(bundle) {
 							installed.Set(bundle.Manifest().Package, true)
 							log.Println("new installed app sending:", *bundle.Manifest())
 							results <- ObservedApp{

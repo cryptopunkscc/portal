@@ -6,5 +6,6 @@
   "description": "Simple HTML Chat example.",
   "author": "yang",
   "email": "cryptopunkyang@pm.me",
-  "schema": "html"
+  "schema": "html",
+  "type": "gui"
 }

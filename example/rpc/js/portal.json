@@ -3,5 +3,6 @@
   "package": "example.rpc.js",
   "title": "Example RPC js",
   "version": 0,
-  "schema": "js"
+  "schema": "js",
+  "type": "srv"
 }

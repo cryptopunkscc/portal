@@ -2,11 +2,12 @@ package manifest
 
 import (
 	"encoding/json"
-	"github.com/cryptopunkscc/portal/pkg/dec/all"
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 	"io/fs"
 	"strings"
+
+	"github.com/cryptopunkscc/portal/pkg/dec/all"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 const AppFilename = "portal"
@@ -26,6 +27,8 @@ type App struct {
 	Icon string `json:"icon,omitempty" yaml:"icon,omitempty"`
 	// Runtime of the application [js, html, exec].
 	Runtime string `json:"schema,omitempty" yaml:"schema,omitempty"`
+	// Type of the application [gui, cli, api].
+	Type string `json:"type,omitempty" yaml:"type,omitempty"`
 }
 
 func (a *App) UnmarshalFrom(bytes []byte) error { return all.Unmarshalers.Unmarshal(bytes, a) }

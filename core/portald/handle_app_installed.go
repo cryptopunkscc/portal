@@ -3,18 +3,33 @@ package portald
 import (
 	"bytes"
 	"fmt"
-	"github.com/cryptopunkscc/portal/api/target"
+	"strings"
 	"text/tabwriter"
+
+	"github.com/cryptopunkscc/portal/api/target"
 )
 
 type ListAppsOpts struct {
-	Hidden bool `query:"hidden h" cli:"hidden h"`
+	Hidden bool   `query:"hidden h" cli:"hidden h"`
+	Scope  string `query:"scope s" cli:"scope s"`
+}
+
+func (opts ListAppsOpts) includes(app target.Portal_) bool {
+	if opts.Scope == "" {
+		return opts.Hidden || !app.Config().Hidden
+	} else {
+		appType := app.Manifest().Type
+		if appType == "" {
+			appType = "api"
+		}
+		return strings.Contains(opts.Scope, appType)
+	}
 }
 
 func (s *Service) InstalledApps(opts ListAppsOpts) Apps {
 	a := target.Portals[target.Portal_]{}
 	for _, app := range s.Resolve.List(s.apps()) {
-		if opts.Hidden || !app.Config().Hidden {
+		if opts.includes(app) {
 			a = append(a, app)
 		}
 	}

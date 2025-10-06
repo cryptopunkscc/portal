@@ -3,6 +3,7 @@ package: portal.tray
 title: Portal Tray
 description: Tray icon for Portal.
 schema: go
+type: gui
 build:
   default:
     out: main

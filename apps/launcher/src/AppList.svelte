@@ -22,7 +22,7 @@
       else client.install(app.package)
     }
     apps.set(app)
-  }).collect())
+  }).collect({scope: "gui|srv"}))
   onDestroy(rpc.interrupt)
 </script>
 

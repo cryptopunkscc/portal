@@ -8,5 +8,6 @@
   "schema": "js",
   "env": {
     "timeout": 3000
-  }
+  },
+  "type": "srv"
 }

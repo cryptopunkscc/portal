@@ -8,5 +8,6 @@
   "email": "cryptopunkyang@pm.me",
   "icon": "",
   "url": "",
-  "schema": "html"
+  "schema": "html",
+  "type": "gui"
 }

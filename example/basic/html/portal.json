@@ -3,5 +3,6 @@
   "package": "example.basic.html",
   "title": "Example basic html",
   "version": 0,
-  "schema": "html"
+  "schema": "html",
+  "type": "gui"
 }

@@ -3,5 +3,6 @@
   "package": "example.rpc.html",
   "title": "Example RPC frontend",
   "version": 0,
-  "schema": "html"
+  "schema": "html",
+  "type": "gui"
 }
