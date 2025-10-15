@@ -2,6 +2,10 @@ package portald
 
 import (
 	"context"
+	"path/filepath"
+	"strings"
+	"sync"
+
 	"github.com/cryptopunkscc/astrald/sig"
 	"github.com/cryptopunkscc/portal/api/astrald"
 	"github.com/cryptopunkscc/portal/api/portal"
@@ -15,9 +19,6 @@ import (
 	"github.com/cryptopunkscc/portal/target/bundle"
 	"github.com/cryptopunkscc/portal/target/exec"
 	"github.com/cryptopunkscc/portal/target/source"
-	"path/filepath"
-	"strings"
-	"sync"
 )
 
 type Service struct {
@@ -98,10 +99,9 @@ func (s *Service) Installer() app.Installer {
 	}
 }
 
-func (s *Service) Publisher() bundle.Publisher {
-	return bundle.Publisher{
-		Dir: filepath.Join(s.Config.Astrald, "data"),
-	}
+func (s *Service) Publisher() (p bundle.Publisher) {
+	p.Path = filepath.Join(s.Config.Astrald, "data")
+	return
 }
 
 func (s *Service) Tokens() *token.Repository {
