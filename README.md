@@ -1,10 +1,10 @@
 # Portal
 
-A launcher for decentralized application.
+Framework for decentralized applications.
 
 ## Status
 
-This project is in the **alpha** stage, is ready for testing and developing proof of concept apps but the
+This project is in the **alpha** stage, is ready for testing and developing proof of concept apps, but the
 SDK isn't complete and the API may change before the beta release.
 
 ## Docs
@@ -16,9 +16,9 @@ SDK isn't complete and the API may change before the beta release.
 ## Platforms
 
 * [x] Linux
-    * [x] Debian based distros.
+    * [x] Debian-based distros.
     * [ ] Others - Hopefully should work out of the box.
-* [x] Windows - Outdated (v0.1.1).
-* [ ] Android - In progress.
+* [x] Windows.
+* [x] Android.
 * [ ] macOS - Requires adjustments.
 * [ ] iOS - In roadmap
