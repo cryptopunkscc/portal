@@ -2,6 +2,8 @@ package core
 
 import (
 	"context"
+
+	_ "github.com/cryptopunkscc/astrald/mod"
 	. "github.com/cryptopunkscc/portal/api/mobile"
 	"github.com/cryptopunkscc/portal/core/portald"
 )

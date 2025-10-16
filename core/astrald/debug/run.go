@@ -4,13 +4,15 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/core"
 	"github.com/cryptopunkscc/astrald/debug"
+	_ "github.com/cryptopunkscc/astrald/mod"
 	"github.com/cryptopunkscc/astrald/mod/keys"
 	"github.com/cryptopunkscc/astrald/resources"
-	"os"
-	"time"
 )
 
 const resNodeIdentity = "node_identity"

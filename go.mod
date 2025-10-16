@@ -1,12 +1,12 @@
 module github.com/cryptopunkscc/portal
 
-go 1.24.0
+go 1.24.1
 
 toolchain go1.24.7
 
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
-	github.com/cryptopunkscc/astrald v0.0.0-20250722161916-640545663a9f
+	github.com/cryptopunkscc/astrald v0.0.0-20251016205212-3258ef5ac75a
 	github.com/dop251/goja v0.0.0-20240220182346-e401ed450204
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/getlantern/systray v1.2.2
@@ -39,6 +39,7 @@ require (
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.3.2 // indirect
 	github.com/containerd/console v1.0.5 // indirect
+	github.com/cryptopunkscc/utp v0.0.0-20251010115525-2f03809eff3d // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.3.0 // indirect
 	github.com/dhowden/tag v0.0.0-20240122214204-713ab0e94639 // indirect
@@ -85,11 +86,8 @@ require (
 	github.com/wailsapp/mimetype v1.4.1 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	golang.org/x/crypto v0.42.0 // indirect
-	golang.org/x/mobile v0.0.0-20250911085028-6912353760cf // indirect
 	golang.org/x/net v0.44.0 // indirect
-	golang.org/x/sync v0.17.0 // indirect
 	golang.org/x/term v0.35.0 // indirect
-	golang.org/x/tools v0.37.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/driver/sqlite v1.5.4 // indirect
 	gorm.io/gorm v1.25.4 // indirect
