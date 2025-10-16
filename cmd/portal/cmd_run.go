@@ -2,16 +2,18 @@ package main
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/api/portald"
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/cryptopunkscc/portal/api/portald"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 type Opt struct {
+	Token string `cli:"token t"`
 	Query string `cli:"query q"`
 	Open  bool   `cli:"open o"`
 	Dev   bool   `cli:"dev d"`
@@ -26,6 +28,12 @@ func (a *Application) Run(ctx context.Context, opt Opt, cmd ...string) (err erro
 	}
 	if err = a.Configure(); err != nil {
 		if err = a.handleConfigurationError(ctx, err); err != nil {
+			return
+		}
+	}
+	if len(opt.Token) > 0 {
+		a.Apphost.AuthToken = opt.Token
+		if err = a.Apphost.Reconnect(); err != nil {
 			return
 		}
 	}
