@@ -3,7 +3,9 @@
 package main
 
 import (
+	"github.com/cryptopunkscc/portal/api/astrald"
 	. "github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/core/astrald/debug"
 	"github.com/cryptopunkscc/portal/runner/exec"
 )
 
@@ -16,4 +18,13 @@ func (a *Application) init() {
 		exec.Runner{Config: a.Config}.Project().Try,
 		exec.Runner{Config: a.Config}.ProjectHost().Try,
 	)
+}
+
+func (a *Application) newAstrald() astrald.Runner {
+	return &debug.Astrald{
+		NodeRoot: a.Config.Astrald,
+		DBRoot:   a.Config.AstralDB,
+		Ghost:    false,
+		Version:  false,
+	}
 }

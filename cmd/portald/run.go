@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"errors"
+
 	"github.com/cryptopunkscc/portal/pkg/config"
-	"github.com/cryptopunkscc/portal/runner/exec"
 )
 
 type RunArgs struct {
@@ -26,7 +26,7 @@ func (a *Application) start(ctx context.Context, args RunArgs) (err error) {
 		return
 	}
 	a.init()
-	a.Astrald = &exec.Astrald{NodeRoot: a.Config.Astrald}
+	a.Astrald = a.newAstrald()
 	if err = a.Start(ctx); err != nil {
 		return
 	}
