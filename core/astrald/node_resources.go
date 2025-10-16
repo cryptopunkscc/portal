@@ -1,10 +1,9 @@
 package astrald
 
-import "github.com/cryptopunkscc/portal/pkg/resources"
-
 func (i *Initializer) initNodeResources() (err error) {
-	if i.resources.FileResources == nil {
-		i.resources, err = resources.NewFileResources(i.NodeRoot)
+	if i.resources.Path == "" {
+		i.resources.Path = i.NodeRoot
+		err = i.resources.Init()
 	}
 	return
 }

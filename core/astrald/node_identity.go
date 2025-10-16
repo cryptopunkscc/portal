@@ -17,7 +17,7 @@ func (i *Initializer) readOrGenerateNodeIdentity() (err error) {
 func (i *Initializer) readNodeIdentity() (err error) {
 	defer plog.TraceErr(&err)
 	var pk keys.PrivateKey
-	if err = i.resources.DecodeObject("node_identity", &pk); err != nil {
+	if err = i.resources.ReadObject("node_identity", &pk); err != nil {
 		return
 	}
 	if i.nodeIdentity, err = astral.IdentityFromPrivKeyBytes(pk.Bytes); err != nil {
@@ -32,7 +32,7 @@ func (i *Initializer) generateNodeIdentity() (err error) {
 	if i.nodeIdentity, err = astral.GenerateIdentity(); err != nil {
 		return
 	}
-	if err = i.resources.EncodeObject("node_identity", &keys.PrivateKey{
+	if err = i.resources.WriteObject("node_identity", &keys.PrivateKey{
 		Type:  keys.KeyTypeIdentity,
 		Bytes: i.nodeIdentity.PrivateKey().Serialize(),
 	}); err != nil {

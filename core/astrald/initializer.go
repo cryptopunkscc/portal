@@ -3,6 +3,7 @@ package astrald
 import (
 	"context"
 	"fmt"
+
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/portal/api/astrald"
 	"github.com/cryptopunkscc/portal/core/apphost"
@@ -19,7 +20,7 @@ type Initializer struct {
 	Apphost    *apphost.Adapter
 
 	log            plog.Logger
-	resources      resources.FileResources
+	resources      resources.Dir
 	nodeIdentity   *astral.Identity
 	nodeToken      string
 	restartAstrald bool

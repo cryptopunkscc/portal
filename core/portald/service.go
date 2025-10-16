@@ -34,7 +34,7 @@ type Service struct {
 
 	Apphost   apphost.Adapter
 	Astrald   astrald.Runner
-	Resources resources.FileResources
+	Resources resources.Dir
 
 	Resolve Resolve[Runnable]
 
@@ -50,7 +50,8 @@ func (s *Service) Configure() (err error) {
 	if err = s.Config.Build(); err != nil {
 		return
 	}
-	if s.Resources, err = resources.NewFileResources(s.Config.Portald, true); err != nil {
+	s.Resources.Path = s.Config.Portald
+	if err = s.Resources.Init(); err != nil {
 		return
 	}
 	_ = s.ReadCreatedUser()
