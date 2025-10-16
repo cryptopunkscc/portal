@@ -190,6 +190,32 @@ func (s *Service) publicHandlers() cmd.Handlers {
 			},
 		},
 		{
+			Name: "fs",
+			Desc: "Manage fs module.",
+			Sub: cmd.Handlers{
+				{
+					Name: "config c",
+					Func: s.FsConfigRead,
+					Desc: "Read fs config.",
+				},
+				{
+					Name: "watch w",
+					Desc: "Read only directories.",
+					Sub: cmd.Handlers{
+						{
+							Func: s.FsConfigWatchAdd,
+							Name: "add a",
+							Desc: "Observe given directory.",
+							Params: cmd.Params{
+								{Type: "string", Desc: "Alias."},
+								{Type: "string", Desc: "Path to dir."},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			Func: s.Stop,
 			Name: "close",
 			Desc: "Shutdown portal environment and close all running apps.",
