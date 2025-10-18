@@ -2,8 +2,9 @@ package rpc
 
 import (
 	"errors"
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 var Close = errors.New("close")
@@ -91,8 +92,8 @@ func Subscribe[R any](conn Conn, method string, args ...any) (c <-chan R, err er
 	go func() {
 		defer close(cc)
 		defer conn.Flush()
-		var r R
 		for {
+			var r R
 			if err = conn.Decode(&r); err != nil {
 				return
 			}
