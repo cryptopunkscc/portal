@@ -2,14 +2,15 @@ package exec
 
 import (
 	"context"
+	"io"
+	"os"
+	"os/exec"
+
 	"github.com/cryptopunkscc/astrald/lib/apphost"
 	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/api/portal"
 	"github.com/cryptopunkscc/portal/core/token"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"io"
-	"os"
-	"os/exec"
 )
 
 type RunApp func(ctx context.Context, manifest manifest.App, path string, args ...string) (err error)
@@ -36,12 +37,13 @@ func (d AppRunner) run(ctx context.Context, token string, path string, args ...s
 	log := plog.Get(ctx).Type(d).Set(&ctx)
 	log.Printf("Command run: %s, %v", path, args)
 	cmd := exec.CommandContext(ctx, path, args...)
+	cmd.Cancel = func() error { return cmd.Process.Signal(os.Interrupt) }
 	cmd.Env = append(os.Environ(), apphost.AuthTokenEnv+"="+token)
 	cmd.Env = append(cmd.Env, d.Env()...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
-	if err = setStd(cmd, ctx); err != nil {
+	if err = tryRedirectStd(ctx, cmd); err != nil {
 		return
 	}
 	if err = cmd.Run(); err != nil {
@@ -51,7 +53,7 @@ func (d AppRunner) run(ctx context.Context, token string, path string, args ...s
 	return
 }
 
-func setStd(cmd *exec.Cmd, ctx context.Context) (err error) {
+func tryRedirectStd(ctx context.Context, cmd *exec.Cmd) (err error) {
 	defer plog.TraceErr(&err)
 	log := plog.Get(ctx)
 	std, ok := ctx.Value(stdKey).(*Std)
@@ -59,17 +61,32 @@ func setStd(cmd *exec.Cmd, ctx context.Context) (err error) {
 	if !ok {
 		return
 	}
+	cmd.SysProcAttr = appSysProcArgs()
+
+	cmd.Stdout = nil
+	stdOut, err := cmd.StdoutPipe()
+	if err != nil {
+		return
+	}
+	go io.Copy(std.Out, stdOut)
+
+	cmd.Stderr = nil
+	stdErr, err := cmd.StderrPipe()
+	if err != nil {
+		return
+	}
+	go io.Copy(std.Err, stdErr)
 
 	cmd.Stdin = nil
-	cmd.Stdout = std.Out
-	cmd.Stderr = std.Err
 	stdIn, err := cmd.StdinPipe()
 	if err != nil {
 		return
 	}
 	go func() {
 		_, _ = io.Copy(stdIn, std.In)
+		appKill(cmd)
 		_ = stdIn.Close()
+		log.Println("closed stdIn")
 	}()
 	return
 }

@@ -1,15 +1,16 @@
 package sig
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 func OnShutdown(log plog.Logger, cancel func()) {
 	quitChannel := make(chan os.Signal, 1)
-	signal.Notify(quitChannel, os.Interrupt, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
+	signal.Notify(quitChannel, os.Interrupt, os.Kill, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 	sig := <-quitChannel
 	println()
 	if log != nil {
