@@ -1,0 +1,14 @@
+name: drive
+package: portal.drive
+title: Portal drive
+description: Mounts astral FS into user space.
+schema: go
+type: cli
+build:
+  exec: go run
+  default:
+    out: main
+    cmd: go build -o $OUT
+  windows:
+    out: main.exe
+    cmd: go build -o $OUT.exe
