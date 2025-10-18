@@ -75,20 +75,23 @@ func marshal(from any, to url.Values, tag string) (err error) {
 			if fieldValue.Kind() == reflect.Ptr && fieldValue.IsNil() {
 				continue
 			}
-			// skip zero values
-			if fieldValue.IsZero() {
-				continue
-			}
-
-			// use the "query" tag if available, otherwise fallback to field name
-			fieldTag := field.Tag.Get("query")
-			if fieldTag == "" || fieldTag == "-" {
-				fieldTag = strings.ToLower(field.Name)
-			}
 
 			// Skip unexported fields
 			if !fieldValue.CanInterface() {
 				continue
+			}
+
+			includeEmpty := strings.Contains(field.Tag.Get("include"), "empty")
+
+			// skip zero values
+			if !includeEmpty && fieldValue.IsZero() {
+				continue
+			}
+
+			// use the "query" tag if available, otherwise fallback to the field name
+			fieldTag := field.Tag.Get("query")
+			if fieldTag == "" || fieldTag == "-" {
+				fieldTag = strings.ToLower(field.Name)
 			}
 
 			// handle collections
@@ -101,13 +104,13 @@ func marshal(from any, to url.Values, tag string) (err error) {
 
 			// format single value
 			value := fmt.Sprintf("%v", fieldValue.Interface())
-			if value != "" {
+			if includeEmpty || value != "" {
 				to.Add(fieldTag, value)
 			}
 		}
 
 	default:
-		// for basic types, add value with fallback key
+		// for basic types, add value with a fallback key
 		to.Add(tag, fmt.Sprintf("%v", from))
 	}
 

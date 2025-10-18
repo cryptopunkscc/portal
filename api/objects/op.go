@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"io"
+
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/mod/objects"
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
-	"io"
 )
 
 func Op(rpc rpc.Rpc, target ...string) OpClient {
@@ -66,10 +67,10 @@ func (c OpClient) Fetch(args ReadArgs, obj astral.Object) (err error) {
 }
 
 type SearchArgs struct {
-	Query string `query:"q"`
+	Query string `query:"q" include:"empty"`
 	Zone  astral.Zone
 	Out   string
-	Ext   string
+	Ext   string // not implemented yet
 }
 
 func (c OpClient) Search(args SearchArgs) (out <-chan rpc.Json[objects.SearchResult], err error) {
@@ -101,9 +102,9 @@ type DescribeArgs struct {
 	Zones astral.Zone
 }
 
-func (c OpClient) Describe(args DescribeArgs) (r map[string]any, err error) {
+func (c OpClient) Describe(args DescribeArgs) (r <-chan map[string]any, err error) {
 	args.Out = "json"
-	return rpc.Query[map[string]any](c.Conn, "describe", args)
+	return rpc.Subscribe[map[string]any](c.Conn, "describe", args)
 }
 
 func (c OpClient) Show(id astral.ObjectID) (r string, err error) {
