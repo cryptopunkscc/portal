@@ -37,37 +37,64 @@ func (f *FS) ModTime() time.Time         { return time.Now() }
 func (f *FS) IsDir() bool                { return true }
 func (f *FS) Sys() any                   { return nil }
 
+func (f *FS) Scan(args ScanArgs) (err error) {
+	scan, err := f.op.Scan2(args)
+	if err != nil {
+		return
+	}
+	go func() {
+		for r := range scan {
+			o, err := astral.ParseID(r.Object)
+			if err != nil {
+				plog.Println("scan parse id failed:", err)
+				continue
+			}
+			if err := f.append(*o, nil); err != nil {
+				plog.Println("scan append failed:", err)
+			}
+		}
+	}()
+	return
+}
+
 func (f *FS) Search(args SearchArgs) (err error) {
 	search, err := f.op.Search(args)
 	if err != nil {
 		return
 	}
-
 	go func() {
 		for r := range search {
-			describe, err := f.op.Describe(DescribeArgs{
-				ID:    *r.Object.ObjectID,
-				Out:   "json",
-				Zones: astral.ZoneAll,
-			})
-			if err != nil {
-				plog.Println("cannot describe:", err)
-				continue
+			if err := f.append(*r.Object.ObjectID, r.Payload); err != nil {
+				plog.Println("search append failed:", err)
 			}
-			file := &Object{
-				ObjectID: *r.Object.ObjectID,
-				Payload:  r.Payload,
-				Describe: make(map[string]map[string]any),
-			}
-			for n := range describe {
-				file.Describe[n["Type"].(string)] = n["Object"].(map[string]any)
-			}
-			if len(file.Payload) == 0 {
-				file.Payload, _ = yaml.Marshal(file.Describe)
-			}
-			f.entries[file.Name()] = file
 		}
 	}()
+	return
+}
+
+func (f *FS) append(objectID astral.ObjectID, payload []byte) (err error) {
+	describe, err := f.op.Describe(DescribeArgs{
+		ID:    objectID,
+		Out:   "json",
+		Zones: astral.ZoneAll,
+	})
+	if err != nil {
+		return
+	}
+	file := &Object{
+		ObjectID: objectID,
+		Payload:  payload,
+		Describe: make(map[string]map[string]any),
+	}
+	var d []any
+	for n := range describe {
+		d = append(d, n)
+		file.Describe[n["Type"].(string)] = n["Object"].(map[string]any)
+	}
+	if len(file.Payload) == 0 {
+		file.Payload, _ = yaml.Marshal(d)
+	}
+	f.entries[file.Name()] = file
 	return
 }
 

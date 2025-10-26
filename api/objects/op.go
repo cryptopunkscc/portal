@@ -96,6 +96,11 @@ func (c OpClient) Scan(args ScanArgs) (out <-chan astral.ObjectID, err error) {
 	return
 }
 
+func (c OpClient) Scan2(args ScanArgs) (out <-chan rpc.Json[string], err error) {
+	args.Out = "json"
+	return rpc.Subscribe[rpc.Json[string]](c.Conn, "scan", args)
+}
+
 type DescribeArgs struct {
 	ID    astral.ObjectID
 	Out   string
