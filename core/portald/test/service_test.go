@@ -5,6 +5,12 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"path/filepath"
+	"runtime"
+	"strings"
+	"testing"
+	"time"
+
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/nodes"
@@ -25,11 +31,6 @@ import (
 	"github.com/cryptopunkscc/portal/target/npm"
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/stretchr/testify/assert"
-	"path/filepath"
-	"runtime"
-	"strings"
-	"testing"
-	"time"
 )
 
 type testService struct {
@@ -115,7 +116,9 @@ func (s *testService) start() test.Test {
 	return s.test(func(t *testing.T) {
 		err := s.Start(s.ctx)
 		test.AssertErr(t, err)
-	})
+	}).Requires(
+		s.configure(),
+	)
 }
 
 func (s *testService) nodeAlias() test.Test {
@@ -131,7 +134,9 @@ func (s *testService) createUser() test.Test {
 	return s.test(func(t *testing.T) {
 		err := s.CreateUser("test_user")
 		test.AssertErr(t, err)
-	})
+	}).Requires(
+		s.start(),
+	)
 }
 
 func (s *testService) userInfo() test.Test {
@@ -154,7 +159,10 @@ func (s *testService) userClaim(s2 *testService) test.Test {
 	return s.test(func(t *testing.T) {
 		err := s.Claim(s2.Apphost.HostID.String())
 		test.AssertErr(t, err)
-	})
+	}).Requires(
+		s.createUser(),
+		s.addEndpoint(s2),
+	)
 }
 
 func (s *testService) addEndpoint(s2 *testService) test.Test {
@@ -164,7 +172,10 @@ func (s *testService) addEndpoint(s2 *testService) test.Test {
 		endpoint := fmt.Sprintf("tcp:127.0.0.1:%d", port)
 		err := nodes.Op(&s.Apphost).AddEndpoint(id, endpoint)
 		test.AssertErr(t, err)
-	})
+	}).Requires(
+		s.start(),
+		s2.start(),
+	)
 }
 
 func (s *testService) buildApps() test.Test {
@@ -429,7 +440,9 @@ func (s *testService) setupToken(pkg string) test.Test {
 	return s.arg(pkg).test(func(t *testing.T) {
 		_, err := s.Tokens().Resolve(pkg)
 		test.AssertErr(t, err)
-	})
+	}).Requires(
+		s.start(),
+	)
 }
 
 func (s *testService) listSiblings() test.Test {

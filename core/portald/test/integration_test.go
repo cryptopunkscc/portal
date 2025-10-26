@@ -2,9 +2,10 @@ package portald
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/test"
-	"testing"
 )
 
 func TestService_Integrations(t *testing.T) {
@@ -19,9 +20,8 @@ func TestService_Integrations(t *testing.T) {
 			Test: it.s1.configure(),
 		},
 		{
-			Name:    "should start node",
-			Test:    it.s1.start(),
-			Require: test.Tests{it.s1.configure()},
+			Name: "should start node",
+			Test: it.s1.start(),
 		},
 		{
 			Name:    "should run basic js app",
@@ -43,19 +43,16 @@ func TestService_Integrations(t *testing.T) {
 			Require: test.Tests{it.s1.start()},
 		},
 		{
-			Name:    "should create user",
-			Test:    it.s1.createUser(),
-			Require: test.Tests{it.s1.start()},
+			Name: "should create user",
+			Test: it.s1.createUser(),
 		},
 		{
-			Name:    "should add endpoint",
-			Test:    it.s1.addEndpoint(&it.s2),
-			Require: test.Tests{it.s1.start(), it.s2.start()},
+			Name: "should add endpoint",
+			Test: it.s1.addEndpoint(&it.s2),
 		},
 		{
-			Name:    "should claim",
-			Test:    it.s1.userClaim(&it.s2),
-			Require: test.Tests{it.s1.createUser(), it.s1.addEndpoint(&it.s2)},
+			Name: "should claim",
+			Test: it.s1.userClaim(&it.s2),
 		},
 		//{
 		//	Name:    "should build apps",
@@ -147,11 +144,6 @@ func TestService_Integrations(t *testing.T) {
 			Test:    it.s2.installAppsByPackage(&it.s1),
 			Require: test.Tests{it.s2.availableApps()},
 		},
-
-		{Test: it.s1.setupToken("test.basic.js"), Require: test.Tests{it.s1.start()}},
-		{Test: it.s2.start(), Require: test.Tests{it.s2.configure()}},
-		{Test: it.s2.addEndpoint(&it.s1), Require: test.Tests{it.s1.start(), it.s2.start()}},
-		{Test: it.s2.configure()},
 	}
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("%d  %s", i, tt.Name), runner.Run(tests, tt))
