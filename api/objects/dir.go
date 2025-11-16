@@ -17,7 +17,7 @@ func (p Dir) Write(obj astral.Object) (objectID *astral.ObjectID, err error) {
 	defer plog.TraceErr(&err)
 
 	buf := bytes.NewBuffer(nil)
-	if _, err = astral.WriteCanonical(buf, obj); err != nil {
+	if err = WriteCanonical(buf, obj); err != nil {
 		return
 	}
 	if objectID, err = astral.ResolveObjectID(obj); err != nil {

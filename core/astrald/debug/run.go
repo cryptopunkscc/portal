@@ -13,6 +13,7 @@ import (
 	_ "github.com/cryptopunkscc/astrald/mod"
 	"github.com/cryptopunkscc/astrald/mod/keys"
 	"github.com/cryptopunkscc/astrald/resources"
+	"github.com/cryptopunkscc/portal/api/objects"
 )
 
 const resNodeIdentity = "node_identity"
@@ -84,16 +85,7 @@ func setupNodeIdentity(resources resources.Resources) (*astral.Identity, error) 
 		}
 
 		var pk keys.PrivateKey
-
-		objType, payload, err := astral.OpenCanonical(bytes.NewReader(keyBytes))
-		switch {
-		case err != nil:
-			return nil, err
-		case objType != pk.ObjectType():
-			return nil, fmt.Errorf("invalid object type: %s", objType)
-		}
-
-		_, err = pk.ReadFrom(payload)
+		err = objects.ReadCanonical(bytes.NewReader(keyBytes), &pk)
 		if err != nil {
 			return nil, err
 		}
@@ -113,7 +105,7 @@ func setupNodeIdentity(resources resources.Resources) (*astral.Identity, error) 
 		Bytes: nodeID.PrivateKey().Serialize(),
 	}
 
-	_, err = astral.WriteCanonical(buf, pk)
+	err = objects.WriteCanonical(buf, pk)
 	if err != nil {
 		return nil, err
 	}

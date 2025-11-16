@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/cryptopunkscc/astrald/astral"
+	"github.com/cryptopunkscc/portal/api/objects"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"gopkg.in/yaml.v3"
 )
@@ -81,16 +82,7 @@ func (d Dir) ReadObject(name string, obj astral.Object) (err error) {
 	}
 	defer file.Close()
 
-	objType, payload, err := astral.OpenCanonical(file)
-	switch {
-	case err != nil:
-		return
-	case objType != obj.ObjectType():
-		return fmt.Errorf("invalid object type: %s", objType)
-	}
-
-	_, err = obj.ReadFrom(payload)
-	return
+	return objects.ReadCanonical(file, obj)
 }
 
 func (d Dir) WriteObject(name string, obj astral.Object) (err error) {
@@ -101,6 +93,6 @@ func (d Dir) WriteObject(name string, obj astral.Object) (err error) {
 		return
 	}
 	defer file.Close()
-	_, err = astral.WriteCanonical(file, obj)
-	return
+
+	return objects.WriteCanonical(file, obj)
 }

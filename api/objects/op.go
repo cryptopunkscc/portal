@@ -3,7 +3,6 @@ package objects
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
 	"io"
 
 	"github.com/cryptopunkscc/astrald/astral"
@@ -25,7 +24,7 @@ type OpClient struct{ rpc.Conn }
 func (c OpClient) Push(obj astral.Object) (ok bool, err error) {
 	defer plog.TraceErr(&err)
 	buf := bytes.NewBuffer(nil)
-	if _, err = astral.WriteCanonical(buf, obj); err != nil {
+	if err = WriteCanonical(buf, obj); err != nil {
 		return
 	}
 	conn := c.Copy()
@@ -55,15 +54,7 @@ func (c OpClient) Fetch(args ReadArgs, obj astral.Object) (err error) {
 	if err != nil {
 		return
 	}
-	t, r, err := astral.OpenCanonical(b)
-	if err != nil {
-		return err
-	}
-	if t != obj.ObjectType() {
-		return fmt.Errorf("expected object type %s, got %s", obj.ObjectType(), t)
-	}
-	_, err = obj.ReadFrom(r)
-	return
+	return ReadCanonical(b, obj)
 }
 
 type SearchArgs struct {

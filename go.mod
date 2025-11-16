@@ -6,7 +6,7 @@ toolchain go1.24.7
 
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
-	github.com/cryptopunkscc/astrald v0.0.0-20251016205212-3258ef5ac75a
+	github.com/cryptopunkscc/astrald v0.0.0-20251113104149-ddd926505c3f
 	github.com/dop251/goja v0.0.0-20240220182346-e401ed450204
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/getlantern/systray v1.2.2
@@ -65,6 +65,8 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/jxskiss/base62 v1.1.0 // indirect
+	github.com/klauspost/cpuid/v2 v2.2.10 // indirect
+	github.com/klauspost/reedsolomon v1.12.5 // indirect
 	github.com/labstack/echo/v4 v4.10.2 // indirect
 	github.com/leaanthony/go-ansi-parser v1.6.0 // indirect
 	github.com/leaanthony/u v1.1.0 // indirect
@@ -80,12 +82,14 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
+	github.com/tjfoc/gmsm v1.4.1 // indirect
 	github.com/tkrajina/go-reflector v0.5.6 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/wailsapp/go-webview2 v1.0.10 // indirect
 	github.com/wailsapp/mimetype v1.4.1 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
+	github.com/xtaci/kcp-go/v5 v5.6.24 // indirect
 	golang.org/x/crypto v0.43.0 // indirect
 	golang.org/x/net v0.46.0 // indirect
 	golang.org/x/term v0.36.0 // indirect

@@ -3,26 +3,28 @@ package object
 import (
 	"bytes"
 	"fmt"
+	"io"
+
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"io"
 )
 
 func Unmarshal(b []byte, v any) (err error) {
 	defer plog.TraceErr(&err)
-	var r io.Reader = bytes.NewReader(b)
-	switch t := v.(type) {
+	var reader io.Reader = bytes.NewReader(b)
+	switch obj := v.(type) {
 	case astral.Object:
-		var typ string
-		if typ, r, err = astral.OpenCanonical(r); err != nil {
+		var objType astral.ObjectType
+		objType, _, err = astral.ReadCanonicalType(reader)
+		switch {
+		case err != nil:
 			return
+		case objType.String() != obj.ObjectType():
+			return fmt.Errorf("object type mismatch: got %q, want %q", objType.String(), obj.ObjectType())
 		}
-		if typ != t.ObjectType() {
-			return fmt.Errorf("object type mismatch: got %q, want %q", typ, t.ObjectType())
-		}
-		_, err = t.ReadFrom(r)
+		_, err = obj.ReadFrom(reader)
 	case io.ReaderFrom:
-		_, err = t.ReadFrom(r)
+		_, err = obj.ReadFrom(reader)
 	default:
 		err = fmt.Errorf("%T is not io.ReaderFrom", v)
 	}
