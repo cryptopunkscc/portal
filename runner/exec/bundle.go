@@ -5,12 +5,13 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/target/exec"
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/target/exec"
 )
 
 func (r Runner) Bundle() *target.SourceRunner[target.BundleExec] {

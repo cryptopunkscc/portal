@@ -2,9 +2,10 @@ package target
 
 import (
 	"errors"
-	"github.com/stretchr/testify/assert"
 	"io/fs"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAny(t *testing.T) {

@@ -2,8 +2,9 @@ package win10
 
 import (
 	"fmt"
-	"github.com/cryptopunkscc/portal/pkg/test"
 	"testing"
+
+	"github.com/cryptopunkscc/portal/pkg/test"
 )
 
 func Test_PrepareWindowsVM(t *testing.T) {

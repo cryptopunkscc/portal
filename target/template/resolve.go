@@ -3,8 +3,9 @@ package template
 import (
 	"encoding/json"
 	"errors"
-	"github.com/cryptopunkscc/portal/api/target"
 	"io/fs"
+
+	"github.com/cryptopunkscc/portal/api/target"
 )
 
 var Resolve target.Resolve[target.Template] = resolve

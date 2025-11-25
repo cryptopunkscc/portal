@@ -1,9 +1,10 @@
 package cli
 
 import (
+	"testing"
+
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestUnmarshaler_Unmarshal(t *testing.T) {

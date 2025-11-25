@@ -1,11 +1,12 @@
 package goja
 
 import (
+	"io/fs"
+
 	"github.com/cryptopunkscc/portal/api/bind"
 	"github.com/cryptopunkscc/portal/core/js/embed/common"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/dop251/goja"
-	"io/fs"
 )
 
 type Backend struct {

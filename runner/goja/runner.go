@@ -3,6 +3,7 @@ package goja
 import (
 	"context"
 	"fmt"
+
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/plog"

@@ -1,8 +1,9 @@
 package target
 
 import (
-	"github.com/cryptopunkscc/portal/api/manifest"
 	"io/fs"
+
+	"github.com/cryptopunkscc/portal/api/manifest"
 )
 
 type Source interface {

@@ -1,11 +1,12 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestDist_UnmarshalFrom(t *testing.T) {

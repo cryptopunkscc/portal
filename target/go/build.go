@@ -3,6 +3,11 @@ package golang
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
+	"runtime"
+	"strings"
+
 	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/deps"
@@ -10,10 +15,6 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target/dist"
 	"github.com/cryptopunkscc/portal/target/project"
-	"os"
-	"path/filepath"
-	"runtime"
-	"strings"
 )
 
 func BuildRunner(platforms ...string) *target.SourceRunner[target.ProjectGo] {

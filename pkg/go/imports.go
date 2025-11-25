@@ -3,10 +3,11 @@ package golang
 import (
 	"bufio"
 	"fmt"
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 func filterByModule(imports []string, module string) (filtered []string) {

@@ -1,10 +1,11 @@
 package env
 
 import (
-	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/target/source"
 	"os"
 	"path/filepath"
+
+	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/target/source"
 )
 
 type Key string

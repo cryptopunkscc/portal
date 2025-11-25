@@ -2,8 +2,9 @@ package cmd
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestHandler_Json(t *testing.T) {

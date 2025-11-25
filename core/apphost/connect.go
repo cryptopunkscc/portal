@@ -1,10 +1,11 @@
 package apphost
 
 import (
+	"os"
+
 	"github.com/cryptopunkscc/astrald/lib/apphost"
 	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"os"
 )
 
 func (a *Adapter) Connect() (err error) {

@@ -2,12 +2,13 @@ package js
 
 import (
 	"context"
+	"log"
+
 	"github.com/cryptopunkscc/portal/api/target"
 	golang "github.com/cryptopunkscc/portal/pkg/go"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target/npm"
 	"github.com/cryptopunkscc/portal/target/source"
-	"log"
 )
 
 func BuildPortalLib() (err error) {

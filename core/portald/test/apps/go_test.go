@@ -2,12 +2,13 @@ package apps
 
 import (
 	"context"
+	"testing"
+	"time"
+
 	"github.com/cryptopunkscc/portal/core/portald/test/apps/go_client"
 	"github.com/cryptopunkscc/portal/core/portald/test/apps/go_service"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
-	"testing"
-	"time"
 )
 
 func TestGoRpc(t *testing.T) {

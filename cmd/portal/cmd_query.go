@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 func (a *Application) queryApp(ctx context.Context, query string) (err error) {

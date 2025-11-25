@@ -4,10 +4,11 @@ import (
 	"archive/zip"
 	"bytes"
 	"errors"
+	"io/fs"
+
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target/source"
-	"io/fs"
 )
 
 func Resolve(src target.Source) (t target.Bundle, err error) {

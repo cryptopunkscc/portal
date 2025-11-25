@@ -2,12 +2,13 @@ package html
 
 import (
 	"errors"
+	"io/fs"
+
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target/bundle"
 	"github.com/cryptopunkscc/portal/target/dist"
 	"github.com/cryptopunkscc/portal/target/npm"
-	"io/fs"
 )
 
 var ResolveDist = dist.Resolver[target.Html](ResolveHtml)

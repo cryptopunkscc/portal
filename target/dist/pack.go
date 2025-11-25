@@ -3,10 +3,11 @@ package dist
 import (
 	"context"
 	"fmt"
-	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/pkg/zip"
 	"os"
 	"path/filepath"
+
+	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/pkg/zip"
 )
 
 var PackRunner = target.SourceRunner[target.Dist_]{

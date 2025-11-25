@@ -2,10 +2,11 @@ package version
 
 import (
 	_ "embed"
+	"strings"
+
 	"github.com/cryptopunkscc/portal/api"
 	"github.com/cryptopunkscc/portal/pkg/git"
 	"github.com/cryptopunkscc/portal/pkg/vcs"
-	"strings"
 )
 
 //go:embed name

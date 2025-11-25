@@ -2,11 +2,12 @@ package target
 
 import (
 	"errors"
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io/fs"
 	"log"
 	"path/filepath"
 	"reflect"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 type Resolve[T any] func(src Source) (result T, err error)

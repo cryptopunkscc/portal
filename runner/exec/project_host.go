@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
+	"strings"
+
 	"github.com/cryptopunkscc/portal/api/portald"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/exec"
@@ -12,8 +15,6 @@ import (
 	exec2 "github.com/cryptopunkscc/portal/target/exec"
 	"github.com/cryptopunkscc/portal/target/project"
 	"github.com/cryptopunkscc/portal/target/source"
-	"slices"
-	"strings"
 )
 
 func (r Runner) ProjectHost() *target.SourceRunner[target.Portal_] {

@@ -2,11 +2,12 @@ package main
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/pkg/flow"
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"
 	"os/exec"
 	"time"
+
+	"github.com/cryptopunkscc/portal/pkg/flow"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 func (a *Application) startPortald(ctx context.Context) (err error) {

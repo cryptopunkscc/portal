@@ -1,10 +1,11 @@
 package win10
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/test"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+
+	"github.com/cryptopunkscc/portal/pkg/test"
+	"github.com/stretchr/testify/assert"
 )
 
 type VmFactory struct {

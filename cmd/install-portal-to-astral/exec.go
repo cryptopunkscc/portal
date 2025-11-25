@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"
 	"os/exec"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 func portalRun(cmd ...string) (err error) {

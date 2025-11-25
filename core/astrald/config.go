@@ -1,9 +1,10 @@
 package astrald
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"
 	"path/filepath"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 func (i *Initializer) createConfigs() (err error) {

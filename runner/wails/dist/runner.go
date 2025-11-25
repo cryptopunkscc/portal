@@ -2,6 +2,8 @@ package wails_dist
 
 import (
 	"context"
+	"path/filepath"
+
 	"github.com/cryptopunkscc/portal/api/dev"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/bind"
@@ -10,7 +12,6 @@ import (
 	"github.com/cryptopunkscc/portal/target/dev/reload"
 	"github.com/cryptopunkscc/portal/target/dist"
 	"github.com/cryptopunkscc/portal/target/html"
-	"path/filepath"
 )
 
 func Runner(newCore bind.NewCore) *target.SourceRunner[target.DistHtml] {

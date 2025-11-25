@@ -2,10 +2,11 @@ package npm
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/pkg/deps"
 	"os"
 	"os/exec"
+
+	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/pkg/deps"
 )
 
 func Watch(ctx context.Context, src target.ProjectNpm_) (err error) {

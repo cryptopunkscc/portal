@@ -1,8 +1,9 @@
 package desktop
 
 import (
-	"github.com/cryptopunkscc/portal/api/env"
 	"path/filepath"
+
+	"github.com/cryptopunkscc/portal/api/env"
 )
 
 func init() {

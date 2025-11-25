@@ -1,8 +1,9 @@
 package template
 
 import (
-	"github.com/cryptopunkscc/portal/api/target"
 	"path/filepath"
+
+	"github.com/cryptopunkscc/portal/api/target"
 )
 
 type Source struct {

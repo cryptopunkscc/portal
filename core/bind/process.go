@@ -2,9 +2,10 @@ package bind
 
 import (
 	"context"
+	"time"
+
 	"github.com/cryptopunkscc/portal/api/bind"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"time"
 )
 
 func Process(ctx context.Context) (bind.Process, context.Context) {

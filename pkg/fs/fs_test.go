@@ -1,10 +1,11 @@
 package fs
 
 import (
-	"github.com/samber/lo"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/samber/lo"
 
 	"github.com/matryer/is"
 )

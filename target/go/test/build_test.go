@@ -2,10 +2,11 @@ package test
 
 import (
 	"context"
+	"testing"
+
 	"github.com/cryptopunkscc/portal/pkg/test"
 	golang "github.com/cryptopunkscc/portal/target/go"
 	"github.com/cryptopunkscc/portal/target/source"
-	"testing"
 )
 
 func TestBuildProject(t *testing.T) {

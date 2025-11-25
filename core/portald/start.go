@@ -2,11 +2,12 @@ package portald
 
 import (
 	"context"
+	"os"
+
 	"github.com/cryptopunkscc/portal/core/astrald"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd/help"
-	"os"
 )
 
 func (s *Service) Start(ctx context.Context) (err error) {

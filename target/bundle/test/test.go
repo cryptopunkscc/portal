@@ -1,11 +1,12 @@
 package test
 
 import (
+	"path/filepath"
+	"testing"
+
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/pkg/zip"
 	disttest "github.com/cryptopunkscc/portal/target/dist/test"
-	"path/filepath"
-	"testing"
 )
 
 func CreateBundleM(t *testing.T, manifest []byte, dst ...string) string {

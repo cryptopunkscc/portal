@@ -1,9 +1,10 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/target/source"
-	"testing"
 )
 
 func Test(t *testing.T) {

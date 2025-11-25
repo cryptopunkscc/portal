@@ -2,11 +2,12 @@ package win10
 
 import (
 	"errors"
-	"github.com/cryptopunkscc/portal/pkg/test"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/cryptopunkscc/portal/pkg/test"
+	"github.com/stretchr/testify/assert"
 )
 
 const (

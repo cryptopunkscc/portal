@@ -3,12 +3,13 @@ package zip
 import (
 	"archive/zip"
 	"errors"
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 func Pack(src, dst string) (err error) {

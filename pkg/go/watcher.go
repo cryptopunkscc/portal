@@ -2,9 +2,10 @@ package golang
 
 import (
 	"context"
+	"strings"
+
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/fsnotify/fsnotify"
-	"strings"
 )
 
 type Watcher struct {

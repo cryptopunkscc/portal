@@ -4,9 +4,10 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 	"strings"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 type Serializer struct {

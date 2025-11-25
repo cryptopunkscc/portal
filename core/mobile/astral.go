@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/core"
 	"github.com/cryptopunkscc/astrald/debug"
@@ -13,8 +16,6 @@ import (
 	api "github.com/cryptopunkscc/portal/api/astrald"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"gopkg.in/yaml.v3"
-	"os"
-	"time"
 )
 
 type astrald struct {

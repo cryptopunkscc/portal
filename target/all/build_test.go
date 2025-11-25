@@ -2,12 +2,13 @@ package all
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/pkg/test"
 	"log"
 	"sync"
 	"testing"
+
+	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/test"
 )
 
 func Test_provider(t *testing.T) {

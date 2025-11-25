@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+
 	"github.com/cryptopunkscc/portal/core/portald/test/apps/go_service"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"

@@ -2,10 +2,11 @@ package apphost
 
 import (
 	"bufio"
+	"net"
+
 	lib "github.com/cryptopunkscc/astrald/lib/apphost"
 	api "github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"net"
 )
 
 type listener struct{ i *lib.Listener }

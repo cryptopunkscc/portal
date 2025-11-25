@@ -3,14 +3,15 @@ package test
 import (
 	"embed"
 	_ "embed"
-	"github.com/cryptopunkscc/portal/api/manifest"
-	"github.com/cryptopunkscc/portal/pkg/test"
-	disttest "github.com/cryptopunkscc/portal/target/dist/test"
-	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
+
+	"github.com/cryptopunkscc/portal/api/manifest"
+	"github.com/cryptopunkscc/portal/pkg/test"
+	disttest "github.com/cryptopunkscc/portal/target/dist/test"
+	"gopkg.in/yaml.v3"
 )
 
 //go:embed test_project

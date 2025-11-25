@@ -2,6 +2,7 @@ package json
 
 import (
 	"encoding/json"
+
 	"github.com/cryptopunkscc/portal/pkg/dec"
 )
 

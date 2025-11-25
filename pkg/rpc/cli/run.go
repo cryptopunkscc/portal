@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd/help"

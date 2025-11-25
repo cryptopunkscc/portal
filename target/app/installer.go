@@ -3,12 +3,13 @@ package app
 import (
 	"context"
 	"fmt"
-	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/target/source"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/target/source"
 )
 
 type Installer struct {

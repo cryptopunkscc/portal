@@ -6,11 +6,12 @@ package webview
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/pkg/sig"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/sig"
 )
 
 // legacy main function

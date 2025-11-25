@@ -2,9 +2,10 @@ package portald
 
 import (
 	"context"
+	"io"
+
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"io"
 )
 
 func Op(rpc rpc.Rpc) OpClient { return OpClient{rpc.Request("portald")} }

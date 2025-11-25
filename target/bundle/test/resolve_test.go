@@ -1,6 +1,8 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/target/bundle"
@@ -8,7 +10,6 @@ import (
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v3"
-	"testing"
 )
 
 func TestResolve(t *testing.T) {

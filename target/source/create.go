@@ -2,10 +2,11 @@ package source
 
 import (
 	"fmt"
-	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/leaanthony/gosod"
 	"io/fs"
 	"os"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/leaanthony/gosod"
 )
 
 type CreateOpts struct {

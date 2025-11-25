@@ -3,9 +3,10 @@
 package wails_pro
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os/exec"
 	"syscall"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
 
 	"golang.org/x/sys/unix"
 )

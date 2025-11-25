@@ -5,6 +5,10 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io"
+	"net"
+	"testing"
+
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -13,9 +17,6 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/pkg/rpc/router"
 	"github.com/stretchr/testify/assert"
-	"io"
-	"net"
-	"testing"
 )
 
 func TestRouter_routeQuery(t *testing.T) {

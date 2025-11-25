@@ -1,11 +1,12 @@
 package bundle
 
 import (
+	"io"
+	"testing/fstest"
+
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/target/source"
-	"io"
-	"testing/fstest"
 )
 
 type Object[T any] struct {

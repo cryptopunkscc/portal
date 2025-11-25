@@ -1,8 +1,9 @@
 package main
 
 import (
-	gotest "github.com/cryptopunkscc/portal/target/go/test"
 	"testing"
+
+	gotest "github.com/cryptopunkscc/portal/target/go/test"
 )
 
 func TestResolve(t *testing.T) {

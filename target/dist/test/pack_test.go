@@ -1,13 +1,14 @@
 package test
 
 import (
+	"os"
+	"path/filepath"
+	"testing"
+
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/target/dist"
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/stretchr/testify/assert"
-	"os"
-	"path/filepath"
-	"testing"
 )
 
 func TestPack(t *testing.T) {

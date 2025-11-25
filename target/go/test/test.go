@@ -3,11 +3,12 @@ package test
 import (
 	"context"
 	"embed"
+	"testing"
+
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/test"
 	golang "github.com/cryptopunkscc/portal/target/go"
 	"github.com/cryptopunkscc/portal/target/source"
-	"testing"
 )
 
 //go:embed project

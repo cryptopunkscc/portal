@@ -2,6 +2,9 @@ package reload
 
 import (
 	"context"
+	"strings"
+	"time"
+
 	api "github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/dev"
 	"github.com/cryptopunkscc/portal/api/target"
@@ -9,8 +12,6 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/mem"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
-	"strings"
-	"time"
 )
 
 func Start(

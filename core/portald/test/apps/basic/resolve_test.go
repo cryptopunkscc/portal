@@ -1,10 +1,11 @@
 package basic
 
 import (
+	"testing"
+
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/target/js"
 	"github.com/cryptopunkscc/portal/target/source"
-	"testing"
 )
 
 func TestResolve(t *testing.T) {

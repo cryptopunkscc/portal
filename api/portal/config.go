@@ -2,14 +2,15 @@ package portal
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"slices"
+
 	"github.com/cryptopunkscc/portal/api/astrald"
 	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/pkg/config"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"gopkg.in/yaml.v3"
-	"os"
-	"path/filepath"
-	"slices"
 )
 
 type Config struct {

@@ -2,11 +2,12 @@ package dist
 
 import (
 	"context"
+	"time"
+
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/fs2"
 	"github.com/fsnotify/fsnotify"
-	"time"
 )
 
 func ReRunner[T target.Dist_](reload func(...string) error) target.ReRunner[T] {

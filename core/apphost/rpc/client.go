@@ -1,9 +1,10 @@
 package rpc
 
 import (
+	"io"
+
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"github.com/cryptopunkscc/portal/pkg/rpc/stream"
-	"io"
 )
 
 func (r *Rpc) Conn(target, query string) (c rpc.Conn, err error) {

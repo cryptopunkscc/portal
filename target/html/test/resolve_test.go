@@ -1,13 +1,14 @@
 package test
 
 import (
+	"path/filepath"
+	"testing"
+
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/pkg/zip"
 	"github.com/cryptopunkscc/portal/target/html"
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/stretchr/testify/assert"
-	"path/filepath"
-	"testing"
 )
 
 func TestResolveDist(t *testing.T) {

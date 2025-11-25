@@ -1,9 +1,10 @@
 package gpg
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/exec"
 	"os"
 	"path/filepath"
+
+	"github.com/cryptopunkscc/portal/pkg/exec"
 )
 
 func Sign(path string) {

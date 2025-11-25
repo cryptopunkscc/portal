@@ -5,8 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/acarl005/stripansi"
-	"golang.org/x/mod/semver"
 	"net/url"
 	"os"
 	"os/exec"
@@ -14,6 +12,9 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/acarl005/stripansi"
+	"golang.org/x/mod/semver"
 )
 
 // runViteWatcher will run the `frontend:dev:watcher` command if it was given, ex- `npm run dev`

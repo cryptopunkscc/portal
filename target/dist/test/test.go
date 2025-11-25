@@ -3,10 +3,11 @@ package test
 import (
 	"embed"
 	_ "embed"
-	"github.com/cryptopunkscc/portal/pkg/test"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/cryptopunkscc/portal/pkg/test"
 )
 
 //go:embed test_dist/portal.yml

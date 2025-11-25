@@ -2,16 +2,17 @@ package docker
 
 import (
 	"fmt"
-	golang "github.com/cryptopunkscc/portal/pkg/go"
-	"github.com/cryptopunkscc/portal/pkg/test"
-	"github.com/cryptopunkscc/portal/test/util"
-	"github.com/stretchr/testify/assert"
 	"go/build"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	golang "github.com/cryptopunkscc/portal/pkg/go"
+	"github.com/cryptopunkscc/portal/pkg/test"
+	"github.com/cryptopunkscc/portal/test/util"
+	"github.com/stretchr/testify/assert"
 )
 
 type Container struct {

@@ -2,11 +2,12 @@ package exec
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/google/shlex"
 	"io"
 	"os"
 	"os/exec"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/google/shlex"
 )
 
 type Cmd struct {

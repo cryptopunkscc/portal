@@ -1,10 +1,11 @@
 package registry
 
 import (
-	"github.com/stretchr/testify/assert"
-	"golang.org/x/exp/maps"
 	"slices"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"golang.org/x/exp/maps"
 )
 
 func TestRegistry(t *testing.T) {

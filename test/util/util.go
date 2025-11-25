@@ -2,10 +2,11 @@ package util
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"os/exec"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type Cmd struct {

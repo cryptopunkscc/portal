@@ -3,12 +3,13 @@ package main
 import (
 	"embed"
 	"fmt"
-	"github.com/cryptopunkscc/portal/api/bin"
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
+
+	"github.com/cryptopunkscc/portal/api/bin"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 //go:embed bin

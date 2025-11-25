@@ -1,13 +1,14 @@
 package test
 
 import (
-	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/pkg/test"
-	"github.com/stretchr/testify/assert"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/pkg/test"
+	"github.com/stretchr/testify/assert"
 )
 
 func CreateTestDir(path ...string) string {

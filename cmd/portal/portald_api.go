@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
+	"slices"
+
 	"github.com/cryptopunkscc/portal/api/portald"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd/help"
-	"slices"
 )
 
 func (a *Application) portald() portald.OpClient {

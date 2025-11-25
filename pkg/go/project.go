@@ -1,10 +1,11 @@
 package golang
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 type Project struct {

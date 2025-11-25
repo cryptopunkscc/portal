@@ -2,12 +2,13 @@ package config
 
 import (
 	"fmt"
-	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/stretchr/testify/assert"
-	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/stretchr/testify/assert"
+	"gopkg.in/yaml.v3"
 )
 
 func TestLoader_Load(t *testing.T) {

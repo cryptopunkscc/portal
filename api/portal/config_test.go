@@ -1,10 +1,11 @@
 package portal
 
 import (
+	"testing"
+
 	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/test"
-	"testing"
 )
 
 func init() {

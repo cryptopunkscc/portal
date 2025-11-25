@@ -1,14 +1,15 @@
 package core
 
 import (
-	"github.com/cryptopunkscc/portal/api/mobile"
-	"github.com/cryptopunkscc/portal/core/js/embed/android"
 	"io"
 	"io/fs"
 	"mime"
 	"net/http"
 	"path/filepath"
 	"strings"
+
+	"github.com/cryptopunkscc/portal/api/mobile"
+	"github.com/cryptopunkscc/portal/core/js/embed/android"
 )
 
 type assets struct{ files fs.FS }

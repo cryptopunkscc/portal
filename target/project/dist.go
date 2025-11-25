@@ -3,12 +3,13 @@ package project
 import (
 	"context"
 	"encoding/json"
+	"os"
+	"path/filepath"
+
 	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/fs2"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"os"
-	"path/filepath"
 )
 
 func Dist(ctx context.Context, project target.Project_, target manifest.Target) (err error) {

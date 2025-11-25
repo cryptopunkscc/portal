@@ -1,12 +1,13 @@
 package manifest
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/config"
-	"github.com/cryptopunkscc/portal/pkg/dec/all"
 	"io/fs"
 	"path"
 	"runtime"
 	"slices"
+
+	"github.com/cryptopunkscc/portal/pkg/config"
+	"github.com/cryptopunkscc/portal/pkg/dec/all"
 )
 
 type Builds struct {

@@ -1,9 +1,10 @@
 package main
 
 import (
+	"testing"
+
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestApplication_setupFunctions(t *testing.T) {

@@ -1,9 +1,10 @@
 package golang
 
 import (
+	"testing"
+
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestProject_Resolve(t *testing.T) {

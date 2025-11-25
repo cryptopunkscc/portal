@@ -1,12 +1,13 @@
 package golang
 
 import (
-	"github.com/cryptopunkscc/portal/api/target"
-	golang "github.com/cryptopunkscc/portal/pkg/go"
-	target2 "github.com/magefile/mage/target"
 	"io/fs"
 	"path/filepath"
 	"slices"
+
+	"github.com/cryptopunkscc/portal/api/target"
+	golang "github.com/cryptopunkscc/portal/pkg/go"
+	target2 "github.com/magefile/mage/target"
 )
 
 func Changed(p target.Project_, path ...string) (changed bool) {

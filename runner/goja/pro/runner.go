@@ -2,6 +2,8 @@ package goja_pro
 
 import (
 	"context"
+	"time"
+
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/deps"
@@ -9,7 +11,6 @@ import (
 	"github.com/cryptopunkscc/portal/runner/goja/dist"
 	"github.com/cryptopunkscc/portal/target/js"
 	"github.com/cryptopunkscc/portal/target/npm"
-	"time"
 )
 
 func Runner(newCore bind.NewCore) *target.SourceRunner[target.ProjectJs] {

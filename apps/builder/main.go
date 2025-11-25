@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+
 	"github.com/cryptopunkscc/portal/api/version"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"

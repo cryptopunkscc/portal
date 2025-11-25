@@ -1,6 +1,11 @@
 package exec
 
 import (
+	"io/fs"
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -8,10 +13,6 @@ import (
 	"github.com/cryptopunkscc/portal/target/dist"
 	"github.com/cryptopunkscc/portal/target/portal"
 	"github.com/cryptopunkscc/portal/target/project"
-	"io/fs"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
 var ResolveDist = dist.Resolver[target.Exec](ResolveExec)

@@ -3,13 +3,14 @@ package exec
 import (
 	"context"
 	"errors"
+	"slices"
+
 	"github.com/cryptopunkscc/portal/api/portald"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target/bundle"
 	"github.com/cryptopunkscc/portal/target/exec"
 	"github.com/cryptopunkscc/portal/target/source"
-	"slices"
 )
 
 func (r Runner) BundleHost() *target.SourceRunner[target.Portal_] {

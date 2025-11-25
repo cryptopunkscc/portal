@@ -1,9 +1,10 @@
 package rpc
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 	"strings"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 type Logger struct {

@@ -3,6 +3,10 @@ package npm
 import (
 	"context"
 	"errors"
+	"os"
+	"path/filepath"
+	"slices"
+
 	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/deps"
@@ -10,9 +14,6 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target/dist"
 	"github.com/cryptopunkscc/portal/target/project"
-	"os"
-	"path/filepath"
-	"slices"
 )
 
 func BuildRunner(dependencies ...target.NodeModule) *target.SourceRunner[target.ProjectNpm_] {

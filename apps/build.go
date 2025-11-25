@@ -2,9 +2,10 @@ package apps
 
 import (
 	"context"
+	"path/filepath"
+
 	golang "github.com/cryptopunkscc/portal/pkg/go"
 	"github.com/cryptopunkscc/portal/target/all"
-	"path/filepath"
 )
 
 func Build(args ...string) error {

@@ -1,8 +1,9 @@
 package v8
 
 import (
-	"github.com/cryptopunkscc/portal/api/bind"
 	"log"
+
+	"github.com/cryptopunkscc/portal/api/bind"
 	v8 "rogchap.com/v8go"
 )
 

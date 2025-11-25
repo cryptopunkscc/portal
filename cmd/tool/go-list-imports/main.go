@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	golang "github.com/cryptopunkscc/portal/pkg/go"
 	"os"
 	"strings"
+
+	golang "github.com/cryptopunkscc/portal/pkg/go"
 )
 
 func main() {

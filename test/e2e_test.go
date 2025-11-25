@@ -2,12 +2,13 @@ package test
 
 import (
 	"fmt"
+	"testing"
+	"time"
+
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/test/docker"
 	"github.com/cryptopunkscc/portal/test/host"
 	"github.com/cryptopunkscc/portal/test/kvm/win10"
-	"testing"
-	"time"
 )
 
 var configuration = [][]*Cases{

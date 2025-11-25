@@ -1,12 +1,13 @@
 package rpc
 
 import (
+	"io"
+
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"github.com/cryptopunkscc/portal/pkg/rpc/stream"
-	"io"
 )
 
 func (r *Rpc) Request(target string, query ...string) rpc.Conn {

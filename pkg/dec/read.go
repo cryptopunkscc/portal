@@ -2,8 +2,9 @@ package dec
 
 import (
 	"errors"
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io/fs"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 type Unmarshal func(in []byte, out any) (err error)

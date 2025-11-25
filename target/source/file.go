@@ -1,12 +1,13 @@
 package source
 
 import (
-	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
+
+	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 type File_ struct {

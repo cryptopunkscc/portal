@@ -2,6 +2,8 @@ package resolve
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target/exec"
@@ -11,7 +13,6 @@ import (
 	"github.com/cryptopunkscc/portal/target/portal"
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func init() {

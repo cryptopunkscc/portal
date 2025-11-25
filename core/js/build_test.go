@@ -1,9 +1,10 @@
 package js
 
 import (
+	"testing"
+
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/test"
-	"testing"
 )
 
 func TestBuildPortalLib(t *testing.T) {

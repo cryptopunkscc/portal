@@ -3,12 +3,13 @@ package npm
 import (
 	"context"
 	"fmt"
-	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
+
+	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 type injector struct {

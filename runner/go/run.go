@@ -2,6 +2,8 @@ package golang
 
 import (
 	"context"
+	"time"
+
 	"github.com/cryptopunkscc/portal/api/dev"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/deps"
@@ -11,7 +13,6 @@ import (
 	"github.com/cryptopunkscc/portal/runner/exec"
 	"github.com/cryptopunkscc/portal/target/dev/reload"
 	golang2 "github.com/cryptopunkscc/portal/target/go"
-	"time"
 )
 
 func Runner() *target.SourceRunner[target.ProjectGo] {

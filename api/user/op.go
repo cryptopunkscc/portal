@@ -2,6 +2,8 @@ package user
 
 import (
 	"encoding/json"
+	"io"
+
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/mod/user"
 	"github.com/cryptopunkscc/portal/api/apphost"
@@ -9,7 +11,6 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"gopkg.in/yaml.v3"
-	"io"
 )
 
 func Op(client apphost.Client, target ...string) OpClient {

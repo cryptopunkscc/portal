@@ -1,11 +1,12 @@
 package test
 
 import (
+	"os"
+	"testing"
+
 	"github.com/cryptopunkscc/portal/pkg/assets"
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/target/project"
-	"os"
-	"testing"
 )
 
 func TestCreateProject(t *testing.T) {

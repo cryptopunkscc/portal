@@ -1,11 +1,12 @@
 package cli
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/pkg/rpc/stream"
 	"io"
 	"os"
 	"strings"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/rpc/stream"
 )
 
 func cliConnection() stream.Serializer {

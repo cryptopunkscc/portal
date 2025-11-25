@@ -3,12 +3,13 @@ package main
 import (
 	"context"
 	"errors"
+	"time"
+
 	"github.com/cryptopunkscc/astrald/mod/apphost"
 	"github.com/cryptopunkscc/portal/core/token"
 	"github.com/cryptopunkscc/portal/pkg/config"
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"time"
 )
 
 func (a *Application) Configure() (err error) {

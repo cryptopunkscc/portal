@@ -1,11 +1,12 @@
 package test
 
 import (
+	"path/filepath"
+	"testing"
+
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/pkg/zip"
 	sourceTest "github.com/cryptopunkscc/portal/target/source/test"
-	"path/filepath"
-	"testing"
 )
 
 func CreateTestZip(t *testing.T, name string, src ...string) string {

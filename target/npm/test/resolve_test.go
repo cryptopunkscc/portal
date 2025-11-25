@@ -1,11 +1,12 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/target/npm"
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestResolveModule(t *testing.T) {

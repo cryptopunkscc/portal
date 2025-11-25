@@ -1,8 +1,9 @@
 package apps
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/test"
 	"testing"
+
+	"github.com/cryptopunkscc/portal/pkg/test"
 )
 
 func TestAppsBuild_Run(t *testing.T) {

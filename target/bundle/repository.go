@@ -2,6 +2,9 @@ package bundle
 
 import (
 	"context"
+	"log"
+	"sync"
+
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/manifest"
@@ -11,8 +14,6 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
-	"log"
-	"sync"
 )
 
 type Repository struct {

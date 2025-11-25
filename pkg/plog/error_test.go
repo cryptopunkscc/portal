@@ -3,10 +3,11 @@ package plog
 import (
 	"errors"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"runtime/debug"
 	"slices"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {

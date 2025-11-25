@@ -2,6 +2,9 @@ package go_client
 
 import (
 	"errors"
+	"log"
+	"testing"
+
 	apphost2 "github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/core/apphost"
 	rpc2 "github.com/cryptopunkscc/portal/core/portald/test/apps/go_service"
@@ -9,8 +12,6 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"github.com/cryptopunkscc/portal/pkg/rpc/stream/query"
 	"github.com/stretchr/testify/assert"
-	"log"
-	"testing"
 )
 
 type TestClient struct {

@@ -3,9 +3,10 @@
 package bin
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/fs2"
 	"os"
 	"path/filepath"
+
+	"github.com/cryptopunkscc/portal/pkg/fs2"
 )
 
 func Dir() string {

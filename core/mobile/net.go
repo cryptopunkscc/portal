@@ -1,10 +1,11 @@
 package core
 
 import (
-	ether "github.com/cryptopunkscc/astrald/mod/ether/src"
-	"github.com/cryptopunkscc/portal/api/mobile"
 	"net"
 	"strings"
+
+	ether "github.com/cryptopunkscc/astrald/mod/ether/src"
+	"github.com/cryptopunkscc/portal/api/mobile"
 )
 
 func interfaceAddrsFunc(api mobile.Api) func() ([]net.Addr, error) {

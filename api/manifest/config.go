@@ -1,8 +1,9 @@
 package manifest
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/dec/all"
 	"io/fs"
+
+	"github.com/cryptopunkscc/portal/pkg/dec/all"
 )
 
 type Config struct {

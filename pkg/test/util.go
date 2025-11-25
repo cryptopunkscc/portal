@@ -1,10 +1,11 @@
 package test
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 func init() {

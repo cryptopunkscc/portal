@@ -3,6 +3,7 @@ package dist
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/api/target"
 )

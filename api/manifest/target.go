@@ -1,8 +1,9 @@
 package manifest
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/dec/all"
 	"runtime"
+
+	"github.com/cryptopunkscc/portal/pkg/dec/all"
 )
 
 type Target struct {

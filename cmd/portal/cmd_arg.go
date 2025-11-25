@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"errors"
-	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
 	"log"
+
+	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
 )
 
 func (a *Application) Arg(ctx context.Context, runner *cli.Runner, arg string, cmd ...string) (err error) {

@@ -3,6 +3,9 @@ package test
 import (
 	"bytes"
 	_ "embed"
+	"runtime"
+	"testing"
+
 	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/test"
@@ -10,8 +13,6 @@ import (
 	"github.com/cryptopunkscc/portal/target/exec"
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/stretchr/testify/assert"
-	"runtime"
-	"testing"
 )
 
 func TestResolveManifest(t *testing.T) {

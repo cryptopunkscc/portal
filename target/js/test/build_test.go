@@ -2,12 +2,13 @@ package test
 
 import (
 	"context"
+	"testing"
+
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/target/js"
 	"github.com/cryptopunkscc/portal/target/npm"
 	"github.com/cryptopunkscc/portal/target/source"
-	"testing"
 )
 
 func TestBuild(t *testing.T) {

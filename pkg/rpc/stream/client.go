@@ -2,6 +2,7 @@ package stream
 
 import (
 	"bytes"
+
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 )
 

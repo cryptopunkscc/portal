@@ -2,10 +2,11 @@ package apphost
 
 import (
 	"context"
+	"time"
+
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"time"
 )
 
 var ConnectionsThreshold = -1

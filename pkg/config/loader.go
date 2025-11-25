@@ -2,9 +2,10 @@ package config
 
 import (
 	"errors"
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"
 	"path/filepath"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 type Loader[T any] struct {

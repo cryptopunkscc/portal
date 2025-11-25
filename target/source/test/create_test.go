@@ -2,12 +2,13 @@ package test
 
 import (
 	"embed"
-	"github.com/cryptopunkscc/portal/pkg/test"
-	"github.com/cryptopunkscc/portal/target/source"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/cryptopunkscc/portal/pkg/test"
+	"github.com/cryptopunkscc/portal/target/source"
+	"github.com/stretchr/testify/assert"
 )
 
 //go:embed template

@@ -1,12 +1,13 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/pkg/test"
 	golang "github.com/cryptopunkscc/portal/target/go"
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestResolve(t *testing.T) {

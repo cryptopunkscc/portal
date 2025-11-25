@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/cryptopunkscc/portal/core/portald/test/apps/go_client"
 	"log"
 	"testing"
 	"time"
+
+	"github.com/cryptopunkscc/portal/core/portald/test/apps/go_client"
 )
 
 func Test(t *testing.T) {

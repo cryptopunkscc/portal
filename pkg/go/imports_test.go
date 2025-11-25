@@ -1,9 +1,10 @@
 package golang
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"path/filepath"
 	"testing"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 func Test_ListImports(t *testing.T) {

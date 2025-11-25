@@ -1,13 +1,14 @@
 package router
 
 import (
+	"reflect"
+	"testing"
+
 	"github.com/cryptopunkscc/portal/pkg/rpc/caller"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/pkg/rpc/registry"
 	"github.com/cryptopunkscc/portal/pkg/rpc/stream"
 	"github.com/stretchr/testify/assert"
-	"reflect"
-	"testing"
 )
 
 func TestRouter_Query(t *testing.T) {

@@ -4,6 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/deps"
@@ -14,9 +18,6 @@ import (
 	"github.com/cryptopunkscc/portal/target/npm"
 	"github.com/wailsapp/wails/v2/pkg/application"
 	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 func Runner(newCore bind.NewCore) *target.SourceRunner[target.ProjectHtml] {

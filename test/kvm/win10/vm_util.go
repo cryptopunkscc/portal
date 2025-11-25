@@ -1,10 +1,11 @@
 package win10
 
 import (
-	"github.com/stretchr/testify/assert"
 	"os"
 	"os/exec"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func execCmdRun(t *testing.T, cmd string, args ...string) {

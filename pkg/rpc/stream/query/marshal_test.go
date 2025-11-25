@@ -1,8 +1,9 @@
 package query
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"testing"
+
+	"github.com/cryptopunkscc/portal/pkg/rpc"
 )
 
 func TestMarshal(t *testing.T) {

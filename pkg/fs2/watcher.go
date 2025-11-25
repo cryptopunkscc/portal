@@ -2,6 +2,7 @@ package fs2
 
 import (
 	"context"
+
 	"github.com/fsnotify/fsnotify"
 )
 

@@ -1,12 +1,13 @@
 package main
 
 import (
+	"os"
+
 	_ "github.com/cryptopunkscc/portal/api/env/desktop"
 	"github.com/cryptopunkscc/portal/api/portal"
 	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
-	"os"
 )
 
 func init() {

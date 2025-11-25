@@ -1,10 +1,11 @@
 package golang
 
 import (
+	"io/fs"
+
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target/exec"
-	"io/fs"
 )
 
 var ResolveProject target.Resolve[target.ProjectGo] = resolveProject

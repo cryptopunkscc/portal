@@ -3,12 +3,13 @@ package golang
 import (
 	"bytes"
 	"fmt"
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 type Dependency struct {

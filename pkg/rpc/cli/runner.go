@@ -2,11 +2,12 @@ package cli
 
 import (
 	"context"
+	"io"
+
 	"github.com/cryptopunkscc/portal/pkg/rpc/caller/cli"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/pkg/rpc/router"
 	"github.com/cryptopunkscc/portal/pkg/rpc/stream"
-	"io"
 )
 
 type Runner struct {

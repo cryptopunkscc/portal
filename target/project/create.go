@@ -1,13 +1,14 @@
 package project
 
 import (
-	"github.com/cryptopunkscc/portal/api/manifest"
-	"github.com/cryptopunkscc/portal/target/dist"
-	"github.com/cryptopunkscc/portal/target/source"
 	"io/fs"
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/cryptopunkscc/portal/api/manifest"
+	"github.com/cryptopunkscc/portal/target/dist"
+	"github.com/cryptopunkscc/portal/target/source"
 )
 
 type CreateOpts struct {

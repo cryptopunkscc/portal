@@ -2,12 +2,13 @@ package test
 
 import (
 	"fmt"
-	"github.com/cryptopunkscc/astrald/sig"
 	"reflect"
 	"runtime"
 	"strings"
 	"sync"
 	"testing"
+
+	"github.com/cryptopunkscc/astrald/sig"
 )
 
 type Runner struct {

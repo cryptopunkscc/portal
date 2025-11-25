@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/api/portald"
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 	"os"
+
+	"github.com/cryptopunkscc/portal/api/portald"
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 func (a *Application) runApp(ctx context.Context, opt *portald.OpenOpt, cmd []string) (err error) {

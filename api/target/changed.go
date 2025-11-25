@@ -1,10 +1,11 @@
 package target
 
 import (
-	target2 "github.com/magefile/mage/target"
 	"io/fs"
 	"path/filepath"
 	"slices"
+
+	target2 "github.com/magefile/mage/target"
 )
 
 func Changed(p Project_, skip ...string) (changed bool) {

@@ -1,12 +1,13 @@
 package astrald
 
 import (
+	"reflect"
+	"strings"
+
 	"github.com/cryptopunkscc/astrald/core"
 	apphost "github.com/cryptopunkscc/astrald/mod/apphost/src"
 	ether "github.com/cryptopunkscc/astrald/mod/ether/src"
 	tcp "github.com/cryptopunkscc/astrald/mod/tcp/src"
-	"reflect"
-	"strings"
 )
 
 type Config struct {

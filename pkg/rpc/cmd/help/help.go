@@ -3,11 +3,12 @@ package help
 import (
 	"bytes"
 	"fmt"
-	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"slices"
 	"strconv"
 	"strings"
 	"text/tabwriter"
+
+	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 )
 
 // Check if given helper contains help printer.

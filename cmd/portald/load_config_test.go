@@ -1,6 +1,10 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
+	"testing"
+
 	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/api/portal"
 	"github.com/cryptopunkscc/portal/pkg/config"
@@ -8,9 +12,6 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v3"
-	"os"
-	"path/filepath"
-	"testing"
 )
 
 func TestApplication_loadConfig_custom(t *testing.T) {

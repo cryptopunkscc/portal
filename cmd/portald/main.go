@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+
 	_ "github.com/cryptopunkscc/portal/api/env/desktop"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cli"

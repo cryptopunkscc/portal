@@ -1,10 +1,11 @@
 package apphost
 
 import (
-	"github.com/cryptopunkscc/astrald/astral"
-	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"io"
 	"net"
+
+	"github.com/cryptopunkscc/astrald/astral"
+	"github.com/cryptopunkscc/portal/pkg/rpc"
 )
 
 type Client interface {

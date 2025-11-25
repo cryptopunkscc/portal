@@ -3,17 +3,18 @@ package host
 import (
 	"context"
 	"fmt"
-	golang "github.com/cryptopunkscc/portal/pkg/go"
-	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/pkg/test"
-	"github.com/cryptopunkscc/portal/test/util"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 	"time"
+
+	golang "github.com/cryptopunkscc/portal/pkg/go"
+	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/test"
+	"github.com/cryptopunkscc/portal/test/util"
+	"github.com/stretchr/testify/assert"
 )
 
 func Linux() (os *OS) {

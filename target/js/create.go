@@ -4,10 +4,11 @@ import (
 	"context"
 	"embed"
 	_ "embed"
+	"io/fs"
+
 	"github.com/cryptopunkscc/portal/target/npm"
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/cryptopunkscc/portal/target/template"
-	"io/fs"
 )
 
 //go:embed tmpl

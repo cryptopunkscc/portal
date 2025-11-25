@@ -2,10 +2,11 @@ package exec
 
 import (
 	"context"
+	"strings"
+
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/exec"
 	exec2 "github.com/cryptopunkscc/portal/target/exec"
-	"strings"
 )
 
 func (r Runner) Project() *target.SourceRunner[target.ProjectExec] {

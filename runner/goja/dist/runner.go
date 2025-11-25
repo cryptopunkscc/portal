@@ -2,6 +2,9 @@ package goja_dist
 
 import (
 	"context"
+	"path/filepath"
+	"time"
+
 	"github.com/cryptopunkscc/portal/api/dev"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/bind"
@@ -10,8 +13,6 @@ import (
 	"github.com/cryptopunkscc/portal/target/dev/reload"
 	"github.com/cryptopunkscc/portal/target/dist"
 	"github.com/cryptopunkscc/portal/target/js"
-	"path/filepath"
-	"time"
 )
 
 func Runner(newCore bind.NewCore) *target.SourceRunner[target.DistJs] {

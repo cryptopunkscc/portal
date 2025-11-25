@@ -1,11 +1,12 @@
 package source
 
 import (
-	"github.com/cryptopunkscc/portal/api/target"
 	"io/fs"
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/cryptopunkscc/portal/api/target"
 )
 
 var File target.File = file

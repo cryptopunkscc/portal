@@ -1,10 +1,11 @@
 package mobile
 
 import (
-	"github.com/stretchr/testify/assert"
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_callbackReader_Read(t *testing.T) {

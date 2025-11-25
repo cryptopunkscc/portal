@@ -2,11 +2,12 @@ package main
 
 import (
 	"context"
+	"testing"
+	"time"
+
 	"github.com/cryptopunkscc/portal/api/portal"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/test"
-	"testing"
-	"time"
 )
 
 func init() {

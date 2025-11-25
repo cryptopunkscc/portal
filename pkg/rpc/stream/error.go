@@ -3,6 +3,7 @@ package stream
 import (
 	"encoding/json"
 	"errors"
+
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 

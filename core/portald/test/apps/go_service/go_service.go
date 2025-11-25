@@ -2,6 +2,7 @@ package go_service
 
 import (
 	"errors"
+
 	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"

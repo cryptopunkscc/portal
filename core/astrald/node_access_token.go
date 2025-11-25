@@ -1,10 +1,11 @@
 package astrald
 
 import (
+	"strings"
+
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/labstack/gommon/random"
-	"strings"
 )
 
 const temporaryTokenPrefix = "temporary_token_"

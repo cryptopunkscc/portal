@@ -2,8 +2,9 @@ package deps
 
 import (
 	"fmt"
-	"github.com/cryptopunkscc/portal/pkg/exec"
 	"log"
+
+	"github.com/cryptopunkscc/portal/pkg/exec"
 )
 
 func AptInstallMissing(deps []string) (err error) {

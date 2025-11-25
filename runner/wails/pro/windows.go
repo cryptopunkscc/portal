@@ -4,9 +4,10 @@ package wails_pro
 
 import (
 	"bytes"
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"os/exec"
 	"strconv"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 func setParentGID(_ *exec.Cmd) {}

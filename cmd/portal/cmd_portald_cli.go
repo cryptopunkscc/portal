@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"io"
 	"strings"
+
+	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
 func (a *Application) portaldCli(ctx context.Context, cmd ...string) (err error) {

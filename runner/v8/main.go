@@ -4,9 +4,10 @@ package v8
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/pkg/sig"
 	"log"
 	"os"
+
+	"github.com/cryptopunkscc/portal/pkg/sig"
 )
 
 // legacy main function

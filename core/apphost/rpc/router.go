@@ -3,14 +3,15 @@ package rpc
 import (
 	"context"
 	"errors"
+	"math"
+	"strings"
+
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"github.com/cryptopunkscc/portal/pkg/rpc/caller/query"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/pkg/rpc/router"
-	"math"
-	"strings"
 )
 
 func (r *Rpc) Router(handler cmd.Handler) rpc.Router {

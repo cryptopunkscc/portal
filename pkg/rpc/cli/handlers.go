@@ -2,12 +2,13 @@ package cli
 
 import (
 	"encoding/json"
+	"log"
+
 	"github.com/cryptopunkscc/portal/pkg/rpc/caller/cli"
 	"github.com/cryptopunkscc/portal/pkg/rpc/caller/query"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/pkg/rpc/router"
 	"github.com/cryptopunkscc/portal/pkg/rpc/stream"
-	"log"
 )
 
 var Handler = cmd.Handler{

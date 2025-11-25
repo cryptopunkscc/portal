@@ -1,4 +1,4 @@
-import {rpc, log} from 'portal';
+import {log, rpc} from 'portal';
 import {writable} from 'svelte/store';
 
 const method = "user.check"

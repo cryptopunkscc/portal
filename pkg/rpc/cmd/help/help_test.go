@@ -2,10 +2,11 @@ package help
 
 import (
 	"fmt"
-	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
+
+	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_injectHelp(t *testing.T) {

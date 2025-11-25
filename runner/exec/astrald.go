@@ -2,10 +2,11 @@ package exec
 
 import (
 	"context"
-	"github.com/cryptopunkscc/portal/api/astrald"
-	"github.com/cryptopunkscc/portal/pkg/exec"
 	"os"
 	"path/filepath"
+
+	"github.com/cryptopunkscc/portal/api/astrald"
+	"github.com/cryptopunkscc/portal/pkg/exec"
 )
 
 type Astrald struct {
