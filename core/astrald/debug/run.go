@@ -10,7 +10,7 @@ import (
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/core"
 	"github.com/cryptopunkscc/astrald/debug"
-	_ "github.com/cryptopunkscc/astrald/mod"
+	_ "github.com/cryptopunkscc/astrald/mod/all"
 	"github.com/cryptopunkscc/astrald/mod/keys"
 	"github.com/cryptopunkscc/astrald/resources"
 	"github.com/cryptopunkscc/portal/api/objects"

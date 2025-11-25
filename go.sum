@@ -40,6 +40,10 @@ github.com/containerd/console v1.0.5/go.mod h1:YynlIjWYF8myEu6sdkwKIvGQq+cOckRm6
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/cryptopunkscc/astrald v0.0.0-20251113104149-ddd926505c3f h1:jSS/BQoutOkZG8JmwRszuJpzQ7ahGcd2pAFWih22CN4=
 github.com/cryptopunkscc/astrald v0.0.0-20251113104149-ddd926505c3f/go.mod h1:qM82+NKlOo+hv03wTq6cDB1ZKxoeN9j8NQH7odK0ErQ=
+github.com/cryptopunkscc/astrald v0.0.0-20251124163059-7cc64ba829c9 h1:W5PrTUTzQxly3JQY0ypKYPHWn8sWNA/CtmyAoMQ9l3k=
+github.com/cryptopunkscc/astrald v0.0.0-20251124163059-7cc64ba829c9/go.mod h1:hbHjGPCyq74wAafbTZMZU4KyVebBo2Zgro024CVl/qk=
+github.com/cryptopunkscc/astrald v0.0.0-20251125144032-f739d5d6e5cf h1:u+tFCJ87EXOFSgwYclOinaJ5zgZjlOY+aw3CHWXuddE=
+github.com/cryptopunkscc/astrald v0.0.0-20251125144032-f739d5d6e5cf/go.mod h1:hbHjGPCyq74wAafbTZMZU4KyVebBo2Zgro024CVl/qk=
 github.com/cryptopunkscc/utp v0.0.0-20251010115525-2f03809eff3d h1:mj/jUJQzlrDuQaLhsDCxDuXbqBEfEbAfjEHh63I7uOM=
 github.com/cryptopunkscc/utp v0.0.0-20251010115525-2f03809eff3d/go.mod h1:st8C4CbewTFOG1NpSWRet3saNyHaeIt+9OYlDNQvW0U=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
