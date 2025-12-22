@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/cryptopunkscc/portal/api/astrald"
 	"github.com/cryptopunkscc/portal/pkg/exec"
@@ -21,9 +22,11 @@ func (a *Astrald) Start(ctx context.Context) (err error) {
 	cmd := []string{"astrald"}
 	if len(a.NodeRoot) > 0 {
 		nodeRoot := filepath.ToSlash(a.NodeRoot)
+
+		// FIXME: usage of strconv.Quote works fine for now, but whole command should be built more safely.
 		cmd = append(cmd,
-			"-root", nodeRoot,
-			"-dbroot", nodeRoot,
+			"-root", strconv.Quote(nodeRoot),
+			"-dbroot", strconv.Quote(nodeRoot),
 		)
 	}
 	a.Cmd.Stdout = os.Stdout
