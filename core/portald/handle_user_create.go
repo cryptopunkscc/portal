@@ -1,6 +1,7 @@
 package portald
 
 import (
+	user2 "github.com/cryptopunkscc/astrald/mod/user"
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/user"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -21,7 +22,7 @@ func (s *Service) CreateUser(alias string) (err error) {
 	}
 
 	// authenticate as user
-	s.Apphost.AuthToken = s.UserCreated.AccessToken
+	s.Apphost.AuthToken = s.UserCreated.AccessToken.String()
 	if err = s.Apphost.Reconnect(); err != nil {
 		return
 	}
@@ -69,7 +70,7 @@ func (s *Service) authenticate() (err error) {
 	return
 }
 
-func (s *Service) PrintCreatedUser() (info *user.Created, err error) {
+func (s *Service) PrintCreatedUser() (info *user2.CreatedUserInfo, err error) {
 	if s.UserCreated == nil {
 		return nil, plog.Errorf("user not exists")
 	}

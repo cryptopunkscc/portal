@@ -1,15 +1,7 @@
 package apphost
 
-import "github.com/cryptopunkscc/portal/pkg/rpc"
+import "github.com/cryptopunkscc/portal/api/dir"
 
 func (a *Adapter) NodeAlias() (alias string, err error) {
-	p, err := rpc.Query[profile](a.Rpc().Request("localnode"), ".profile")
-	if err == nil {
-		alias = p.Alias
-	}
-	return
-}
-
-type profile struct {
-	Alias string `json:"alias"`
+	return dir.Op(a, "localnode").GetAlias(*a.HostID)
 }

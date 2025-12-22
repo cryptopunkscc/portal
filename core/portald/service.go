@@ -6,11 +6,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/cryptopunkscc/astrald/sig"
+	"github.com/cryptopunkscc/astrald/mod/user"
 	"github.com/cryptopunkscc/portal/api/astrald"
 	"github.com/cryptopunkscc/portal/api/portal"
 	. "github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/api/user"
 	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/core/token"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -24,7 +23,6 @@ import (
 type Service struct {
 	cache     Cache[Portal_]
 	waitGroup sync.WaitGroup
-	processes sig.Map[string, Portal_]
 	shutdown  context.CancelFunc
 
 	Config      portal.Config
@@ -40,7 +38,7 @@ type Service struct {
 
 	Order []int
 
-	UserCreated *user.Created
+	UserCreated *user.CreatedUserInfo
 	User        *user.Info
 	hasUser     bool
 	*NodeInfo

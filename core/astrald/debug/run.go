@@ -93,10 +93,7 @@ func setupNodeIdentity(resources resources.Resources) (*astral.Identity, error) 
 		return astral.IdentityFromPrivKeyBytes(pk.Bytes)
 	}
 
-	nodeID, err := astral.GenerateIdentity()
-	if err != nil {
-		return nil, err
-	}
+	nodeID := astral.GenerateIdentity()
 
 	var buf = &bytes.Buffer{}
 

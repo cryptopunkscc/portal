@@ -32,7 +32,7 @@ func (b *Service) BroadcastMsg(ctx context.Context, conn rpc.Conn) {
 		_ = v.Close()
 	}
 	// append new
-	b.targets.Set(pkg, conn)
+	b.targets.Replace(pkg, conn)
 
 	// read messages
 	var msg dev.Msg

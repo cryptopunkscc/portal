@@ -40,19 +40,17 @@ func (i Created) MarshalCLI() string {
 	return string(b)
 }
 
-func (u OpClient) Create(alias string) (ui *Created, err error) {
-	c, err := u.Query(u.Target, "user.create", "alias="+alias)
+func (u OpClient) Create(alias string) (ui *user.CreatedUserInfo, err error) {
+	r, err := rpc.Query[rpc.Json[*user.CreatedUserInfo]](u.r(), "create", rpc.Opt{"alias": alias, "out": "json"})
 	if err != nil {
-		return
+		return nil, err
 	}
-	if err = json.NewDecoder(c).Decode(&ui); err != nil {
-		return
-	}
+	ui = r.Object
 	return
 }
 
 func (u OpClient) Claim(alias string) (err error) {
-	c, err := u.Query(u.Target, "user.claim", "target="+alias)
+	c, err := u.Query(u.Target, "user.claim", map[string]string{"target": alias, "out": "json"})
 	if err != nil {
 		return
 	}
@@ -91,10 +89,8 @@ func (u OpClient) Siblings() (out flow.Input[astral.Identity], err error) {
 	return
 }
 
-type Info user.Info
-
-func (u OpClient) Info() (info *Info, err error) {
-	r, err := rpc.Query[rpc.Json[*Info]](u.r(), "info", rpc.Opt{"out": "json"})
+func (u OpClient) Info() (info *user.Info, err error) {
+	r, err := rpc.Query[rpc.Json[*user.Info]](u.r(), "info", rpc.Opt{"out": "json"})
 	if err != nil {
 		return nil, err
 	}

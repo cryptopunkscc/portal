@@ -12,7 +12,7 @@ func (s *Service) Claim(alias string) (err error) {
 	a := s.Apphost.Clone()
 
 	if s.UserCreated != nil {
-		a.AuthToken = s.UserCreated.AccessToken
+		a.AuthToken = s.UserCreated.AccessToken.String()
 		if err = a.Reconnect(); err != nil {
 			return
 		}
