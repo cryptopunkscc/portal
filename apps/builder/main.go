@@ -22,7 +22,7 @@ func (a Application) handler() cmd.Handler {
 		Params: cmd.Params{
 			{Name: "clean c", Type: "bool", Desc: "Clean build directory before building."},
 			{Name: "pack p", Type: "bool", Desc: "Pack app bundle after successful build."},
-			{Name: "out o", Type: "string", Desc: "optional Path to output directory."},
+			{Name: "out o", Type: "string", Desc: "optional path to app bundle output directory."},
 			{Type: "string", Desc: "Path to project directory. Takes current directory as default."},
 		},
 		Sub: cmd.Handlers{
