@@ -41,8 +41,12 @@ func (f CoreFactory) cachedInvoker(ctx context.Context, portal target.Portal_) a
 	if f.Adapter != nil {
 		i.Endpoint = f.Adapter.Endpoint
 	}
-	if t, err := f.Repository.Get(portal.Manifest().Package); err == nil {
-		i.AuthToken = string(t.Token)
+
+	// TODO deprecated - remove after fixing auth token injection for mobile
+	if f.Repository.Load() {
+		if t, err := f.Repository.Get(portal.Manifest().Package); err == nil {
+			i.AuthToken = string(t.Token)
+		}
 	}
 	return core.Cached(i)
 }

@@ -28,9 +28,17 @@ func NewRepository(
 	return &Repository{Dir: dir, Adapter: adapter}
 }
 
-func (r *Repository) dir() string {
-	if r.Dir == "" {
+func (r *Repository) Load() bool {
+	if r.Dir == "" && env.PortaldTokens.Exist() {
 		r.Dir = env.PortaldTokens.MkdirAll()
+	}
+	return len(r.Dir) > 0
+}
+
+func (r *Repository) dir() string {
+	r.Load()
+	if len(r.Dir) == 0 {
+		panic("no tokens dir")
 	}
 	return r.Dir
 }
