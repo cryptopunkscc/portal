@@ -84,7 +84,7 @@ func (r *reRunner) Run(ctx context.Context, projectHtml target.ProjectHtml, args
 	opt.LogLevel = 6
 
 	// Setup dev environment
-	_ = os.Setenv("devserver", "localhost:34115")
+	_ = os.Setenv("devserver", "127.0.0.1:34115")
 	_ = os.Setenv("assetdir", path)
 	_ = os.Setenv("frontenddevserverurl", url)
 
