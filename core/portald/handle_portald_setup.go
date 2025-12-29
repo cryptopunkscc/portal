@@ -13,10 +13,10 @@ type SetupOpts struct {
 
 func (s *Service) Setup(ctx context.Context, opts SetupOpts) (err error) {
 	defer plog.PrintTrace(&err)
-	if s.HasUser() {
-		return plog.Errorf("setup already performed")
-	}
 	if len(opts.User) > 0 {
+		if s.HasUser() {
+			return plog.Errorf("setup already performed")
+		}
 		if err = s.CreateUser(opts.User); err != nil {
 			return
 		}
