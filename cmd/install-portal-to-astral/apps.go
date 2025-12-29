@@ -16,6 +16,7 @@ import (
 func copyApps() (dir string, err error) {
 	defer plog.TraceErr(&err)
 	dir = filepath.Join(os.TempDir(), "install-portal-to-astral", "apps")
+	_ = os.RemoveAll(dir)
 	if err = os.MkdirAll(dir, 0755); err != nil {
 		return
 	}
@@ -41,11 +42,11 @@ func removeDirs() (err error) {
 	for _, s := range c.GetDirs() {
 		print(fmt.Sprintf("* removing %s", s))
 		err := os.RemoveAll(s)
+		print(" [DONE]")
 		if err != nil {
-			plog.Println(&err)
-		} else {
-			print(" [DONE]\n")
+			print(fmt.Sprintf(" - %s", err.Error()))
 		}
+		println()
 	}
 	return
 }

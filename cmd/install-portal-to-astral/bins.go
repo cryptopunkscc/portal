@@ -65,12 +65,11 @@ func removeBinaries() (err error) {
 		print(fmt.Sprintf("* removing %s", dstPath))
 
 		err = os.Remove(dstPath)
+		print(" [DONE]")
 		if err != nil {
-			println()
-			return err
+			print(fmt.Sprintf(" - %s", err.Error()))
 		}
-
-		print(" [DONE]\n")
+		println()
 		return nil
 	})
 	return
