@@ -46,21 +46,28 @@ type ListTokensArgs struct {
 	Out string           `query:"format" cli:"format f"`
 }
 
-func (c OpClient) ListTokens(args *ListTokensArgs) (AccessTokens, error) {
+func (c OpClient) ListTokens(args *ListTokensArgs) (at AccessTokens, err error) {
 	if args == nil {
 		args = &ListTokensArgs{}
 	}
 	if args.Out == "" {
 		args.Out = "json"
 	}
-	return rpc.Query[AccessTokens](c.r(), "list_tokens", rpc.Opt{"out": "json"})
+	result, err := rpc.Subscribe[rpc.Json[*mod.AccessToken]](c.r(), "list_tokens", rpc.Opt{"out": "json"})
+	if err != nil {
+		return
+	}
+	for r := range result {
+		at = append(at, *r.Object)
+	}
+	return
 }
 
 type AccessTokens []mod.AccessToken
 
 func (t AccessTokens) MarshalCLI() (s string) {
 	for i, token := range t {
-		s += fmt.Sprintf("%d: %s %s\n", i, token.Token, token.Identity)
+		s += fmt.Sprintf("%d: %s %s\n", i, token.Identity, token.Token)
 	}
 	return
 }
