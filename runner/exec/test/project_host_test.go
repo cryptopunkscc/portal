@@ -15,9 +15,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-//go:embed app
-var AppFS embed.FS
-
 //go:embed apps
 var AppsFS embed.FS
 
@@ -36,8 +33,8 @@ func TestProjectHostRunner_Run(t *testing.T) {
 
 	expectedArgs := []string{
 		"run",
-		expectedManifest.Runtime,
-		"app",
+		expectedManifest.Runtime + "\"",
+		`"apps/test app"`,
 		"foo",
 		"bar",
 	}
@@ -61,19 +58,18 @@ func TestProjectHostRunner_Run(t *testing.T) {
 		RunAppFunc: assertRunApp,
 	}
 
-	ctx := context.Background()
-	s, err := source.Embed(AppFS).Sub("app")
+	apps, err := source.Embed(AppsFS).Sub("apps")
 	test.AssertErr(t, err)
 
-	ss, err := source.Embed(AppsFS).Sub("apps")
+	testApp, err := apps.Sub("test app")
 	test.AssertErr(t, err)
 
 	err = os.RemoveAll(config.Apps)
 	test.AssertErr(t, err)
 
-	err = ss.CopyTo(config.Apps)
+	err = apps.CopyTo(config.Apps)
 	test.AssertErr(t, err)
 
-	err = runner.ProjectHost().Run(ctx, s, "foo", "bar")
+	err = runner.ProjectHost().Run(context.Background(), testApp, "foo", "bar")
 	test.AssertErr(t, err)
 }

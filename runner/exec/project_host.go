@@ -4,17 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"slices"
-	"strings"
+	"strconv"
 
 	"github.com/cryptopunkscc/portal/api/portald"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/pkg/exec"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target/dist"
 	exec2 "github.com/cryptopunkscc/portal/target/exec"
 	"github.com/cryptopunkscc/portal/target/project"
 	"github.com/cryptopunkscc/portal/target/source"
+	"github.com/google/shlex"
 )
 
 func (r Runner) ProjectHost() *target.SourceRunner[target.Portal_] {
@@ -64,12 +63,15 @@ func (r *ProjectHostRunner) Run(ctx context.Context, src target.Portal_, args ..
 		return target.ErrNotFound
 	}
 
-	args = slices.Insert(args, 0, src.Abs())
-
-	c, err := exec.Cmd{}.Parse(b.Exec, hostBundle.Abs(), strings.Join(args, " "))
+	cmd, err := shlex.Split(b.Exec)
 	if err != nil {
 		return
 	}
 
-	return r.RunApp(ctx, *src.Manifest(), c.Cmd, c.Args...)
+	args = append(cmd[1:], append([]string{
+		strconv.Quote(hostBundle.Abs()),
+		strconv.Quote(src.Abs()),
+	}, args...)...)
+
+	return r.RunApp(ctx, *src.Manifest(), cmd[0], args...)
 }

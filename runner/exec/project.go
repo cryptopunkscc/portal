@@ -2,11 +2,11 @@ package exec
 
 import (
 	"context"
-	"strings"
+	"strconv"
 
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/pkg/exec"
 	exec2 "github.com/cryptopunkscc/portal/target/exec"
+	"github.com/google/shlex"
 )
 
 func (r Runner) Project() *target.SourceRunner[target.ProjectExec] {
@@ -19,12 +19,11 @@ func (r Runner) Project() *target.SourceRunner[target.ProjectExec] {
 type ProjectRunner struct{ Runner }
 
 func (r *ProjectRunner) Run(ctx context.Context, src target.ProjectExec, args ...string) (err error) {
-	cmd := src.Build().Get().Exec
-	abs := src.Abs()
-	arg := strings.Join(args, " ")
-	c, err := exec.Cmd{}.Parse(cmd, abs, arg)
+	cmd, err := shlex.Split(src.Build().Get().Exec)
 	if err != nil {
 		return
 	}
-	return r.RunApp(ctx, *src.Manifest(), c.Cmd, c.Args...)
+	abs := strconv.Quote(src.Abs())
+	args = append(cmd[1:], append([]string{abs}, args...)...)
+	return r.RunApp(ctx, *src.Manifest(), cmd[0], args...)
 }

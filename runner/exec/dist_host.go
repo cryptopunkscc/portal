@@ -5,6 +5,7 @@ import (
 	"errors"
 	"path/filepath"
 	"slices"
+	"strconv"
 
 	"github.com/cryptopunkscc/portal/api/portald"
 	"github.com/cryptopunkscc/portal/api/target"
@@ -49,7 +50,8 @@ func (r *DistHostRunner) Run(ctx context.Context, src target.Portal_, args ...st
 
 	execFile := hostDist.Runtime().Target().Exec
 	execFile = filepath.Join(hostDist.Abs(), execFile)
+	execFile = strconv.Quote(execFile)
 
-	args = slices.Insert(args, 0, src.Abs())
+	args = slices.Insert(args, 0, strconv.Quote(src.Abs()))
 	return r.RunApp(ctx, *src.Manifest(), execFile, args...)
 }
