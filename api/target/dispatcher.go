@@ -68,3 +68,12 @@ func (r *AsyncRunner) Run(ctx context.Context, runnables []Runnable, args ...str
 	waitGroup.Wait()
 	return errors.Join(errs...)
 }
+
+var RunFirst Run[[]Runnable] = runFirst
+
+func runFirst(ctx context.Context, src []Runnable, args ...string) (err error) {
+	if len(src) == 0 {
+		return ErrNotFound
+	}
+	return src[0].Run(ctx, args...)
+}
