@@ -8,7 +8,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strconv"
 
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -30,7 +29,7 @@ func (r *BundleRunner) Run(ctx context.Context, bundle target.BundleExec, args .
 		return
 	}
 
-	err = r.RunApp(ctx, *bundle.Manifest(), strconv.Quote(execFile.Name()), args...)
+	err = r.RunApp(ctx, *bundle.Manifest(), execFile.Name(), args...)
 	if err != nil {
 		return
 	}

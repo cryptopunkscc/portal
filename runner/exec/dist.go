@@ -2,7 +2,6 @@ package exec
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/target/exec"
@@ -18,7 +17,6 @@ func (r Runner) Dist() *target.SourceRunner[target.DistExec] {
 type DistRunner struct{ Runner }
 
 func (r *DistRunner) Run(ctx context.Context, src target.DistExec, args ...string) (err error) {
-	abs := src.Runtime().Executable().Abs()
-	abs = strconv.Quote(abs)
-	return r.RunApp(ctx, *src.Manifest(), abs, args...)
+	execPath := src.Runtime().Executable().Abs()
+	return r.RunApp(ctx, *src.Manifest(), execPath, args...)
 }

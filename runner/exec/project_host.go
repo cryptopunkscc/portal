@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
+	"slices"
 
 	"github.com/cryptopunkscc/portal/api/portald"
 	"github.com/cryptopunkscc/portal/api/target"
@@ -68,10 +68,7 @@ func (r *ProjectHostRunner) Run(ctx context.Context, src target.Portal_, args ..
 		return
 	}
 
-	args = append(cmd[1:], append([]string{
-		strconv.Quote(hostBundle.Abs()),
-		strconv.Quote(src.Abs()),
-	}, args...)...)
+	args = slices.Concat(cmd[1:], []string{hostBundle.Abs(), src.Abs()}, args)
 
 	return r.RunApp(ctx, *src.Manifest(), cmd[0], args...)
 }

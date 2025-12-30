@@ -2,7 +2,6 @@ package exec
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/cryptopunkscc/portal/api/target"
 	exec2 "github.com/cryptopunkscc/portal/target/exec"
@@ -23,7 +22,7 @@ func (r *ProjectRunner) Run(ctx context.Context, src target.ProjectExec, args ..
 	if err != nil {
 		return
 	}
-	abs := strconv.Quote(src.Abs())
+	abs := src.Abs()
 	args = append(cmd[1:], append([]string{abs}, args...)...)
 	return r.RunApp(ctx, *src.Manifest(), cmd[0], args...)
 }
