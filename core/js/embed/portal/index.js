@@ -475,6 +475,8 @@ function hasParams(query) {
  */
 class RpcConn extends ApphostConn {
 
+  mapper = arg => arg
+
   constructor(data) {
     super(data);
   }
@@ -519,13 +521,21 @@ class RpcConn extends ApphostConn {
    * @returns RpcConn - new instance
    */
   map(f) {
-    if (this.mapper) {
-      const map = this.mapper;
-      this.mapper = arg => f(map(arg));
-      return this
-    }
-    this.mapper = f;
+    const map = this.mapper;
+    this.mapper = arg => f(map(arg));
     return this
+  }
+
+  /**
+   * Adds response filter.
+   *
+   * @param {(any) => boolean} f - filtering function
+   * @returns RpcCall - new instance
+   */
+  filter(f) {
+    return this.map(arg => {
+      if (f(arg)) return arg
+    })
   }
 
   /**
@@ -592,7 +602,7 @@ class RpcConn extends ApphostConn {
       if (!map) return next
       const last = await map(next);
       if (last === undefined) continue
-      if (last === null) return this.result
+      if (next["Type"] === "eos") return this.result
       return last
     }
   }
@@ -603,19 +613,18 @@ class RpcConn extends ApphostConn {
    * @returns {Promise<any[]>} - collected values
    */
   async collect() {
-    const map = this.mapper ? this.mapper : null;
-    let push;
-    if (!map) push = next => this.result.push(next);
-    else push = async (next) => {
+    const map = this.mapper ?? null;
+    const push = !map ? next => this.result.push(next) : async (next) => {
       next = await map.call(this, next);
       if (next === null) return this.result
-      if (next) this.result.push(next);
+      if (next !== undefined) this.result.push(next);
     };
+
     this.result = [];
     for (; ;) {
       let next = await this.decode();
-      if (next === null) return this.result
-      push(next);
+      if (next["Type"] === "eos") return this.result
+      await push(next);
     }
   }
 }

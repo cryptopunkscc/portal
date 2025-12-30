@@ -23,6 +23,7 @@ export function runTests(port, portal) {
           await conn.encode(state.counter++)
           await sleep(1)
         }
+        return {Type: "eos"}
       },
       func3: (_, msg) => {
         throw msg
@@ -65,6 +66,7 @@ export function runTests(port, portal) {
     await test0()
     await test1()
     await test2()
+    await test2_1()
     await test3()
     await test4()
     await test5()
@@ -94,6 +96,16 @@ export function runTests(port, portal) {
       await log(`test2 start ${client.func2.request}`)
       const actual = await client.func2.filter(next => next === expected).request(initial, max)
       await assert("test2", expected, actual)
+    }
+
+    async function test2_1() {
+      const initial = 1
+      const max = 3
+      const expected = [1, 4, 9]
+
+      await log(`test2_1 start ${client.func2.request}`)
+      const actual = await client.func2.map(next => next * next).collect(initial, max)
+      await assert("test2_1", expected, actual)
     }
 
     async function test3() {
