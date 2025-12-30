@@ -56,14 +56,14 @@ func (r *Repository) op() api.OpClient {
 
 func (r *Repository) Set(pkg string, token *mod.AccessToken) (err error) {
 	if err = pkgOs.WriteJson[*mod.AccessToken](token, r.dir(), pkg); err != nil {
-		err = plog.Err(err)
+		err = plog.Err(err, pkg)
 	}
 	return
 }
 
 func (r *Repository) Get(pkg string) (token *mod.AccessToken, err error) {
 	if token, err = pkgOs.ReadJson[*mod.AccessToken](r.dir(), pkg); err != nil {
-		err = plog.Err(ErrNotCached)
+		err = plog.Err(ErrNotCached, pkg)
 	}
 	return
 }

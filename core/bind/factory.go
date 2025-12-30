@@ -2,7 +2,9 @@ package bind
 
 import (
 	"context"
+	"os"
 
+	apphost2 "github.com/cryptopunkscc/astrald/lib/apphost"
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/bind"
 	"github.com/cryptopunkscc/portal/api/target"
@@ -43,7 +45,7 @@ func (f CoreFactory) cachedInvoker(ctx context.Context, portal target.Portal_) a
 	}
 
 	// TODO deprecated - remove after fixing auth token injection for mobile
-	if f.Repository.Load() {
+	if len(os.Getenv(apphost2.AuthTokenEnv)) == 0 && f.Repository.Load() {
 		if t, err := f.Repository.Get(portal.Manifest().Package); err == nil {
 			i.AuthToken = string(t.Token)
 		}
