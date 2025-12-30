@@ -4,7 +4,6 @@ import (
 	"sync"
 
 	"github.com/cryptopunkscc/astrald/astral"
-	"github.com/cryptopunkscc/astrald/sig"
 	api "github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
@@ -13,9 +12,8 @@ var Default = &Adapter{}
 
 type Adapter struct {
 	Lib
-	mu         sync.Mutex
-	Log        plog.Logger
-	identities sig.Map[string, *astral.Identity]
+	mu  sync.Mutex
+	Log plog.Logger
 }
 
 func (a *Adapter) Clone() (c *Adapter) {
@@ -40,14 +38,9 @@ func (a *Adapter) Resolve(name string) (i *astral.Identity, err error) {
 	if name == "" {
 		return a.Lib.HostID, nil
 	}
-	i, ok := a.identities.Get(name)
-	if ok {
-		return
-	}
 	if i, err = a.Lib.LocalNode().ResolveIdentity(name); err != nil {
 		return
 	}
-	a.identities.Set(name, i)
 	return
 }
 
@@ -64,11 +57,10 @@ func (a *Adapter) Query(target string, method string, args any) (conn api.Conn, 
 	if err = a.Connect(); err != nil {
 		return
 	}
-	id, err := a.Resolve(target)
 	if err != nil {
 		return
 	}
-	return outConn(a.Lib.Query(id.String(), method, args))
+	return outConn(a.Lib.Query(target, method, args))
 }
 
 func (a *Adapter) Session() (s api.Session, err error) {
