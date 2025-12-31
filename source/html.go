@@ -1,100 +1,85 @@
 package source
 
 import (
-	"io/fs"
+	"path"
 
-	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/spf13/afero"
 )
 
 type HtmlProject struct {
-	Project
-	Html        Html
-	PackageJson PackageJson
-
-	Dist HtmlDist
+	NpmProject
+	Html
+	App HtmlApp
 }
 
-func (p *HtmlProject) ReadFs(files afero.Fs) (err error) {
-	return FSReaders{&p.Project, &p.Html, &p.PackageJson}.ReadFs(files)
+func (p HtmlProject) New() (src Source) {
+	return &p
 }
 
-func (p *HtmlProject) WriteFs(dir afero.Fs) (err error) {
-	return FsWriters{&p.Project, &p.Html, &p.PackageJson}.WriteFs(dir)
+func (p *HtmlProject) ReadSrc(src Source) (err error) {
+	return Readers{&p.Html, &p.NpmProject}.ReadSrc(src)
 }
 
-func (p *HtmlProject) WriteOS(dir string) (err error) {
-	return p.WriteFs(afero.NewBasePathFs(afero.NewOsFs(), dir))
+func (p *HtmlProject) WriteRef(ref Ref) (err error) {
+	return Writers{&p.NpmProject, &p.Html}.WriteRef(ref)
 }
 
-type HtmlDist struct {
-	Dist
+type HtmlApp struct {
+	App
 	Html
 }
 
-func (d *HtmlDist) ReadFs(files afero.Fs) (err error) {
-	return FSReaders{&d.Dist, &d.Html}.ReadFs(files)
+func (a HtmlApp) New() (src Source) {
+	return &a
 }
 
-func (d *HtmlDist) WriteFs(dir afero.Fs) (err error) {
-	return FsWriters{&d.Dist, &d.Html}.WriteFs(dir)
+func (a *HtmlApp) ReadSrc(src Source) (err error) {
+	return Readers{&a.App, &a.Html}.ReadSrc(src)
 }
 
-func (d *HtmlDist) WriteOS(dir string) (err error) {
-	return d.WriteFs(afero.NewBasePathFs(afero.NewOsFs(), dir))
+func (a *HtmlApp) WriteRef(ref Ref) (err error) {
+	return Writers{&a.App, &a.Html}.WriteRef(ref)
 }
 
 type HtmlBundle struct {
-	DistBundle
-	Html Html
+	HtmlApp
+	Zip
 }
 
-func (d *HtmlBundle) ReadFs(files afero.Fs) (err error) {
-	defer plog.TraceErr(&err)
-	if err = d.DistBundle.ReadFs(files); err != nil {
-		return
-	}
-	if err = d.Html.ReadFs(d.ZipFs); err != nil {
-		return
-	}
-	return
+func (b HtmlBundle) New() (src Source) {
+	return &b
 }
 
-func (d *HtmlBundle) WriteFs(dir afero.Fs) (err error) {
-	defer plog.TraceErr(&err)
-	if err = d.Html.WriteFs(dir); err != nil {
+func (d *HtmlBundle) ReadSrc(src Source) (err error) {
+	if err = d.Zip.ReadSrc(src); err != nil {
 		return
 	}
-	if err = d.DistBundle.WriteFs(dir); err != nil {
-		return
-	}
-	return
+	return d.HtmlApp.ReadSrc(&Ref{Fs: d.Zip.Unpacked})
 }
 
-func (d *HtmlBundle) WriteOS(dir string) (err error) {
-	return d.WriteFs(afero.NewBasePathFs(afero.NewOsFs(), dir))
+func (d *HtmlBundle) WriteRef(ref Ref) (err error) {
+	if d.Fs == nil {
+		d.Fs = afero.NewMemMapFs()
+	}
+	if err = d.HtmlApp.WriteRef(d.Ref); err != nil {
+		return
+	}
+	ref.Path = path.Join(ref.Path, d.BundleName())
+	d.Zip.Unpacked = d.Fs
+	return d.Zip.WriteRef(ref)
 }
 
 type Html struct {
 	IndexHtml Blob `json:"index,omitempty" yaml:"index,omitempty"`
 }
 
-func (h *Html) ReadFS(files fs.FS) (err error) {
-	return h.ReadFs(afero.FromIOFS{FS: files})
+func (h *Html) ReadSrc(src Source) (err error) {
+	ref := *src.Ref_()
+	ref.Path = path.Join(ref.Path, "index.html")
+	return h.IndexHtml.ReadSrc(&ref)
 }
 
-func (h *Html) ReadFs(files afero.Fs) (err error) {
-	defer plog.TraceErr(&err)
-	if err = h.IndexHtml.ReadFile(files, "index.html"); err != nil {
-		return
-	}
-	return
-}
-
-func (h *Html) WriteFs(dir afero.Fs) (err error) {
-	defer plog.TraceErr(&err)
-	if err = h.IndexHtml.WriteFile(dir, "index.html"); err != nil {
-		return
-	}
-	return
+func (h *Html) WriteRef(ref Ref) (err error) {
+	ref.Path = path.Join(ref.Path, "index.html")
+	return h.IndexHtml.WriteRef(ref)
 }

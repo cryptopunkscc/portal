@@ -1,4 +1,4 @@
 package source
 
-type ExecDist struct{ Dist }
-type ExecBundle struct{ Dist }
+type ExecApp struct{ App }
+type ExecBundle struct{ App }

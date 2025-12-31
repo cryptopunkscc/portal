@@ -1,108 +1,88 @@
 package source
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/plog"
+	"path"
+
 	"github.com/spf13/afero"
 )
 
 type JsProject struct {
 	NpmProject
-	Js   Js
-	Dist JsDist
+	Js  Js
+	App JsApp
 }
 
-func (p *JsProject) ReadSource(source Source) (err error) {
-	p.Source = source
-	return p.ReadFs(source.Fs)
+func (p JsProject) New() (src Source) {
+	return &p
 }
 
-func (p *JsProject) ReadFs(files afero.Fs) (err error) {
-	return FSReaders{&p.NpmProject, &p.Js}.ReadFs(files)
+func (p *JsProject) ReadSrc(src Source) (err error) {
+	return Readers{&p.Js, &p.NpmProject}.ReadSrc(src)
 }
 
-func (p *JsProject) WriteFs(dir afero.Fs) (err error) {
-	return FsWriters{&p.NpmProject, &p.Js}.WriteFs(dir)
+func (p *JsProject) WriteRef(ref Ref) (err error) {
+	return Writers{&p.NpmProject, &p.Js}.WriteRef(ref)
 }
 
-func (p *JsProject) WriteOS(dir string) (err error) {
-	return p.WriteFs(afero.NewBasePathFs(afero.NewOsFs(), dir))
-}
-
-type JsDist struct {
-	Dist
+type JsApp struct {
+	App
 	Js
 }
 
-func (d *JsDist) ReadSource(source Source) (err error) {
-	d.Source = source
-	return d.ReadFs(source.Fs)
+func (a JsApp) New() (src Source) {
+	return &a
 }
 
-func (d *JsDist) ReadFs(dir afero.Fs) (err error) {
-	return FSReaders{&d.Dist, &d.Js}.ReadFs(dir)
+func (a *JsApp) ReadSrc(src Source) (err error) {
+	return Readers{&a.App, &a.Js}.ReadSrc(src)
 }
 
-func (d *JsDist) WriteFs(dir afero.Fs) (err error) {
-	return FsWriters{&d.Dist, &d.Js}.WriteFs(dir)
-}
-
-func (d *JsDist) WriteOS(dir string) (err error) {
-	return d.WriteFs(afero.NewBasePathFs(afero.NewOsFs(), dir))
+func (a *JsApp) WriteRef(ref Ref) (err error) {
+	return Writers{&a.App, &a.Js}.WriteRef(ref)
 }
 
 type JsBundle struct {
-	DistBundle
-	Js Js
+	JsApp
+	Zip
 }
 
-func (d *JsBundle) ReadFs(files afero.Fs) (err error) {
-	defer plog.TraceErr(&err)
-	if err = d.DistBundle.ReadFs(files); err != nil {
+func (b JsBundle) New() (src Source) {
+	return &b
+}
+
+func (b *JsBundle) ReadSrc(src Source) (err error) {
+	if err = b.Zip.ReadSrc(src); err != nil {
 		return
 	}
-	if err = d.Js.ReadFs(d.ZipFs); err != nil {
+	if err = b.JsApp.ReadSrc(&Ref{Fs: b.Zip.Unpacked}); err != nil {
 		return
 	}
 	return
 }
 
-func (d *JsBundle) WriteFs(dir afero.Fs) (err error) {
-	defer plog.TraceErr(&err)
-	mapFs := afero.NewMemMapFs()
-	if err = d.Js.WriteFs(mapFs); err != nil {
+func (b *JsBundle) WriteRef(ref Ref) (err error) {
+	if b.Fs == nil {
+		b.Fs = afero.NewMemMapFs()
+	}
+	if err = b.JsApp.WriteRef(b.Ref); err != nil {
 		return
 	}
-	if err = d.Dist.WriteFs(mapFs); err != nil {
-		return
-	}
-
-	d.DistBundle.Fs = mapFs
-	if err = d.DistBundle.WriteFs(dir); err != nil {
-		return
-	}
-	return
-}
-
-func (d *JsBundle) WriteOS(dir string) (err error) {
-	return d.WriteFs(afero.NewBasePathFs(afero.NewOsFs(), dir))
+	ref.Path = path.Join(ref.Path, b.BundleName())
+	b.Zip.Unpacked = b.Fs
+	return b.Zip.WriteRef(ref)
 }
 
 type Js struct {
 	MainJs Blob `json:"main,omitempty" yaml:"main,omitempty"`
 }
 
-func (j *Js) ReadFs(files afero.Fs) (err error) {
-	defer plog.TraceErr(&err)
-	if err = j.MainJs.ReadFile(files, "main.js"); err != nil {
-		return
-	}
-	return
+func (j *Js) ReadSrc(src Source) (err error) {
+	ref := *src.Ref_()
+	ref.Path = path.Join(ref.Path, "main.js")
+	return j.MainJs.ReadSrc(&ref)
 }
 
-func (j *Js) WriteFs(dir afero.Fs) (err error) {
-	defer plog.TraceErr(&err)
-	if err = j.MainJs.WriteFile(dir, "main.js"); err != nil {
-		return
-	}
-	return
+func (j *Js) WriteRef(ref Ref) (err error) {
+	ref.Path = path.Join(ref.Path, "main.js")
+	return j.MainJs.WriteRef(ref)
 }

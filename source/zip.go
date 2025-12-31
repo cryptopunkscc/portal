@@ -3,53 +3,83 @@ package source
 import (
 	"archive/zip"
 	"bytes"
-	"io/fs"
+	"errors"
+	"io"
+	"path"
 
+	"github.com/cryptopunkscc/astrald/astral"
+	"github.com/cryptopunkscc/astrald/lib/astrald"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/spf13/afero"
 )
 
-type ZipBundle struct {
-	Source
-	ZipFs afero.Fs
+type Zip struct {
+	Unpacked afero.Fs
+	Blob     []byte
+	File     Ref
+	ObjectID *astral.ObjectID
 }
 
-func (b *ZipBundle) ReadSource(source Source) (err error) {
-	b.Source = source
-	return b.ReadFs(source.Fs)
-}
-
-func (b *ZipBundle) ReadFs(files afero.Fs) (err error) {
+func (z *Zip) ReadSrc(src Source) (err error) {
 	defer plog.TraceErr(&err)
-	if err = b.Source.ReadFs(files); err != nil {
+	if err = z.File.ReadSrc(src); err != nil {
 		return
 	}
-	if err = b.SetZipReader(); err != nil {
-		return
-	}
-	return
-}
 
-func (b *ZipBundle) WriteZipFs(out afero.Fs) (err error) {
-	if err = b.Source.WriteZipFs(out); err != nil {
-		return
-	}
-	if err = b.SetZipReader(); err != nil {
-		return
-	}
-	return
-}
-
-func (b *ZipBundle) SetZipReader() (err error) {
-	defer plog.TraceErr(&err)
-	var file []byte
-	if file, err = fs.ReadFile(afero.IOFS{Fs: b.Fs}, b.Name); err != nil {
-		return
-	}
-	reader, err := zip.NewReader(bytes.NewReader(file), int64(len(file)))
+	blob, err := afero.ReadFile(z.File.Fs, z.File.Path)
 	if err != nil {
 		return
 	}
-	b.ZipFs = afero.NewCopyOnWriteFs(afero.FromIOFS{FS: reader}, afero.NewMemMapFs())
+
+	_, err = z.ReadFrom(bytes.NewReader(blob))
+	return
+}
+
+func (z *Zip) ReadFrom(r io.Reader) (n int64, err error) {
+	blob, err := io.ReadAll(r)
+	reader, err := zip.NewReader(bytes.NewReader(blob), int64(len(blob)))
+	if err != nil {
+		return
+	}
+	z.Unpacked = afero.FromIOFS{FS: reader}
+	z.Blob = blob
+	return
+}
+
+func (z *Zip) WriteRef(ref Ref) (err error) {
+	defer plog.TraceErr(&err)
+	if z.Unpacked == nil {
+		return errors.New("zip.WriteRef: Unpacked is nil")
+	}
+
+	buffer := bytes.Buffer{}
+	zipWriter := zip.NewWriter(&buffer)
+	if err = zipWriter.AddFS(afero.NewIOFS(z.Unpacked)); err != nil {
+		return
+	}
+	if err = zipWriter.Close(); err != nil {
+		return
+	}
+
+	if err = ref.Fs.MkdirAll(path.Dir(ref.Path), 0755); err != nil {
+		return
+	}
+	if err = afero.WriteFile(ref.Fs, ref.Path, buffer.Bytes(), 0644); err != nil {
+		return
+	}
+
+	z.File = ref
+	return
+}
+
+func (z Zip) Publish(objects *astrald.ObjectsClient) (err error) {
+	writer, err := objects.Create("", len(z.Blob))
+	if err != nil {
+		return
+	}
+	if _, err = writer.Write(z.Blob); err != nil {
+		return
+	}
+	z.ObjectID, err = writer.Commit()
 	return
 }

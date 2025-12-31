@@ -7,20 +7,18 @@ import (
 
 type Blob []byte
 
-func (m *Blob) ReadFile(files afero.Fs, name string) (err error) {
+func (m *Blob) ReadSrc(src Source) (err error) {
 	defer plog.TraceErr(&err)
-	if *m, err = afero.ReadFile(files, name); err != nil {
+	if *m, err = afero.ReadFile(src.Ref_().Fs, src.Ref_().Path); err != nil {
 		return
 	}
 	return
 }
 
-func (m *Blob) WriteFile(dir afero.Fs, name string) (err error) {
+func (m *Blob) WriteRef(ref Ref) (err error) {
 	defer plog.TraceErr(&err)
-
-	if err = afero.WriteFile(dir, name, *m, 0644); err != nil {
+	if err = afero.WriteFile(ref.Fs, ref.Path, *m, 0644); err != nil {
 		return
 	}
-
 	return
 }

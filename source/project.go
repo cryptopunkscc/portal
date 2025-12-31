@@ -2,65 +2,91 @@ package source
 
 import (
 	"encoding/json"
+	"path"
+	"path/filepath"
 
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/spf13/afero"
+	"go.nhat.io/aferocopy/v2"
 	"gopkg.in/yaml.v3"
 )
 
 type Project struct {
-	Source
-
-	Manifest ProjectMetadata
+	Ref
+	Metadata ProjectMetadata
 }
 
-func (p *Project) ReadFs(files afero.Fs) (err error) {
-	return FSReaders{&p.Source, &p.Manifest}.ReadFs(files)
+func (p Project) Dist() (a App, err error) {
+	err = a.ReadSrc(p.Sub("dist"))
+	return
 }
 
-func (p *Project) WriteFs(dir afero.Fs) (err error) {
-	return FsWriters{&p.Source, &p.Manifest}.WriteFs(dir)
+func (p Project) Pack() (err error) {
+	app, err := p.Dist()
+	if err != nil {
+		return
+	}
+	return app.Bundle().WriteRef(*p.Sub("build"))
 }
 
-func (p *Project) WriteOS(dir string) (err error) {
-	return p.WriteFs(afero.NewBasePathFs(afero.NewOsFs(), dir))
+func (p *Project) ReadSrc(src Source) (err error) {
+	return Readers{&p.Ref, &p.Metadata}.ReadSrc(src)
 }
 
-type ProjectMetadata struct {
-	Manifest `json:",inline" yaml:",inline"`
-	Builds   InnerBuilds `yaml:"build,omitempty" json:"build,omitempty"`
+func (p *Project) WriteRef(ref Ref) (err error) {
+	return Writers{&p.Metadata, &p.Ref}.WriteRef(ref)
 }
 
-func (m *ProjectMetadata) ReadFs(files afero.Fs) (err error) {
-	defer plog.TraceErr(&err)
-
-	bytes, err := afero.ReadFile(files, "dev.portal.json")
-	if err == nil {
-		return json.Unmarshal(bytes, m)
+func (p Project) Build(dstPath string) (err error) {
+	// copy app icon into dist
+	if len(p.Metadata.Icon) > 0 {
+		iconName := "icon" + filepath.Ext(p.Metadata.Icon)
+		if err = aferocopy.Copy(
+			path.Join(p.Path, p.Metadata.Icon),
+			path.Join(p.Path, dstPath, iconName),
+			aferocopy.Options{SrcFs: p.Fs, DestFs: p.Fs},
+		); err != nil {
+			return
+		}
+		p.Metadata.Icon = iconName
 	}
 
-	bytes, err = afero.ReadFile(files, "dev.portal.yaml")
-	if err == nil {
-		return yaml.Unmarshal(bytes, m)
-	}
-
-	bytes, err = afero.ReadFile(files, "dev.portal.yml")
-	if err == nil {
-		return yaml.Unmarshal(bytes, m)
+	// write portal.json into dist
+	if err = p.Metadata.Manifest.WriteRef(*p.Sub(dstPath)); err != nil {
+		return
 	}
 
 	return
 }
 
-func (m *ProjectMetadata) WriteFs(dir afero.Fs) (err error) {
+type ProjectMetadata struct {
+	Metadata `json:",inline" yaml:",inline"`
+	Builds   InnerBuilds `yaml:"build,omitempty" json:"build,omitempty"`
+}
+
+func (m *ProjectMetadata) ReadSrc(src Source) (err error) {
+	defer plog.TraceErr(&err)
+	ref := *src.Ref_()
+	bytes, err := afero.ReadFile(ref.Fs, path.Join(ref.Path, "dev.portal.json"))
+	if err == nil {
+		return json.Unmarshal(bytes, m)
+	}
+	bytes, err = afero.ReadFile(ref.Fs, path.Join(ref.Path, "dev.portal.yaml"))
+	if err == nil {
+		return yaml.Unmarshal(bytes, m)
+	}
+	bytes, err = afero.ReadFile(ref.Fs, path.Join(ref.Path, "dev.portal.yml"))
+	if err == nil {
+		return yaml.Unmarshal(bytes, m)
+	}
+	return
+}
+
+func (m *ProjectMetadata) WriteRef(ref Ref) (err error) {
 	defer plog.TraceErr(&err)
 	bytes, err := json.Marshal(m)
 	if err != nil {
 		return
 	}
-	return afero.WriteFile(dir, "dev.portal.json", bytes, 0644)
-}
-
-func (m *ProjectMetadata) WriteOS(dir string) (err error) {
-	return m.WriteFs(afero.NewBasePathFs(afero.NewOsFs(), dir))
+	return afero.WriteFile(ref.Fs, path.Join(ref.Path, "dev.portal.json"), bytes, 0644)
 }

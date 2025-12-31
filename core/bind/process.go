@@ -4,29 +4,28 @@ import (
 	"context"
 	"time"
 
-	"github.com/cryptopunkscc/portal/api/bind"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
-func Process(ctx context.Context) (bind.Process, context.Context) {
+func NewProcess(ctx context.Context) (*Process, context.Context) {
 	ctx, cancel := context.WithCancel(ctx)
-	return &process{
-		log:    plog.Get(ctx).Type(process{}),
+	return &Process{
+		log:    plog.Get(ctx).Type(Process{}),
 		cancel: cancel,
 		code:   -1,
 	}, ctx
 }
 
-type process struct {
+type Process struct {
 	log    plog.Logger
 	cancel context.CancelFunc
 	code   int
 }
 
-func (s *process) Code() int            { return s.code }
-func (s *process) Log(str string)       { s.log.Scope("Log").Println(str) }
-func (s *process) Sleep(duration int64) { time.Sleep(time.Duration(duration) * time.Millisecond) }
-func (s *process) Exit(code int) {
+func (s *Process) Code() int            { return s.code }
+func (s *Process) Log(str string)       { s.log.Scope("Log").Println(str) }
+func (s *Process) Sleep(duration int64) { time.Sleep(time.Duration(duration) * time.Millisecond) }
+func (s *Process) Exit(code int) {
 	s.code = code
 	s.cancel()
 }

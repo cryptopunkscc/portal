@@ -104,4 +104,4 @@ require (
 	modernc.org/sqlite v1.25.0 // indirect
 )
 
-//replace github.com/cryptopunkscc/astrald => ../astrald
+replace github.com/cryptopunkscc/astrald => ../astrald

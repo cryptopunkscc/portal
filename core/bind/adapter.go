@@ -14,31 +14,31 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
-func Adapter(ctx context.Context, cached apphost.Cached) Apphost {
-	a := &adapter{}
+func NewAdapter(ctx context.Context, cached apphost.Cached) *Adapter {
+	a := &Adapter{}
 	a.Cached = cached
 	a.log = plog.Get(ctx).Type(a)
 	return a
 }
 
-type adapter struct {
+type Adapter struct {
 	apphost.Cached
 	log      plog.Logger
 	listener apphost.Listener
 }
 
-func (a *adapter) Close() error {
+func (a *Adapter) Close() error {
 	_ = a.ServiceClose()
 	a.Cached.Interrupt()
 	return nil
 }
 
-func (a *adapter) ServiceRegister() (err error) {
+func (a *Adapter) ServiceRegister() (err error) {
 	a.listener, err = a.Cached.Register()
 	return
 }
 
-func (a *adapter) ServiceClose() (err error) {
+func (a *Adapter) ServiceClose() (err error) {
 	listener := a.listener
 	if listener == nil {
 		return
@@ -48,7 +48,7 @@ func (a *adapter) ServiceClose() (err error) {
 	return
 }
 
-func (a *adapter) ConnAccept() (data *bind.QueryData, err error) {
+func (a *Adapter) ConnAccept() (data *bind.QueryData, err error) {
 	listener := a.listener
 	if listener == nil {
 		err = fmt.Errorf("[ConnAccept] not listening: %v", listener)
@@ -75,7 +75,7 @@ func (a *adapter) ConnAccept() (data *bind.QueryData, err error) {
 	return
 }
 
-func (a *adapter) ConnClose(id string) (err error) {
+func (a *Adapter) ConnClose(id string) (err error) {
 	a.log.Printf("close <%s>", id)
 	conn, ok := a.Connections().Get(id)
 	if !ok {
@@ -86,7 +86,7 @@ func (a *adapter) ConnClose(id string) (err error) {
 	return
 }
 
-func (a *adapter) ConnWrite(id string, data []byte) (n int, err error) {
+func (a *Adapter) ConnWrite(id string, data []byte) (n int, err error) {
 	a.log.Printf("> [%v]byte <%s>", len(data), id)
 	//api.log.Printf("> [%v]byte <%s>", data, id)
 	conn, ok := a.Connections().Get(id)
@@ -98,7 +98,7 @@ func (a *adapter) ConnWrite(id string, data []byte) (n int, err error) {
 	return
 }
 
-func (a *adapter) ConnRead(id string, n int) (data []byte, err error) {
+func (a *Adapter) ConnRead(id string, n int) (data []byte, err error) {
 	conn, ok := a.Connections().Get(id)
 	if !ok {
 		err = errors.New("[ConnRead] not found connection with id: " + id)
@@ -112,7 +112,7 @@ func (a *adapter) ConnRead(id string, n int) (data []byte, err error) {
 	return
 }
 
-func (a *adapter) ConnWriteLn(id string, data string) (err error) {
+func (a *Adapter) ConnWriteLn(id string, data string) (err error) {
 	a.log.Printf("> %s <%s>", strings.TrimRight(data, "\r\n"), id)
 	conn, ok := a.Connections().Get(id)
 	if !ok {
@@ -126,7 +126,7 @@ func (a *adapter) ConnWriteLn(id string, data string) (err error) {
 	return
 }
 
-func (a *adapter) ConnReadLn(id string) (data string, err error) {
+func (a *Adapter) ConnReadLn(id string) (data string, err error) {
 	conn, ok := a.Connections().Get(id)
 	if !ok {
 		err = errors.New("[ConnReadLn] not found connection with id: " + id)
@@ -138,7 +138,7 @@ func (a *adapter) ConnReadLn(id string) (data string, err error) {
 	return
 }
 
-func (a *adapter) Query(target string, query string) (data *bind.QueryData, err error) {
+func (a *Adapter) Query(target string, query string) (data *bind.QueryData, err error) {
 	a.log.Println("~>", target, query)
 	conn, err := a.Cached.Query(target, query, nil)
 	if err != nil {
@@ -153,7 +153,7 @@ func (a *adapter) Query(target string, query string) (data *bind.QueryData, err 
 	return
 }
 
-func (a *adapter) QueryString(target string, query string) (data string, err error) {
+func (a *Adapter) QueryString(target string, query string) (data string, err error) {
 	queryData, err := a.Query(target, query)
 	if err != nil {
 		return
@@ -166,7 +166,7 @@ func (a *adapter) QueryString(target string, query string) (data string, err err
 	return
 }
 
-func (a *adapter) Resolve(name string) (id string, err error) {
+func (a *Adapter) Resolve(name string) (id string, err error) {
 	identity, err := a.Cached.Resolve(name)
 	if err != nil {
 		return
@@ -175,7 +175,7 @@ func (a *adapter) Resolve(name string) (id string, err error) {
 	return
 }
 
-func (a *adapter) NodeInfo(identity string) (info *bind.NodeInfo, err error) {
+func (a *Adapter) NodeInfo(identity string) (info *bind.NodeInfo, err error) {
 	nid, err := astral.IdentityFromString(identity)
 	if err != nil {
 		return
@@ -188,7 +188,7 @@ func (a *adapter) NodeInfo(identity string) (info *bind.NodeInfo, err error) {
 	return
 }
 
-func (a *adapter) NodeInfoString(identity string) (info string, err error) {
+func (a *Adapter) NodeInfoString(identity string) (info string, err error) {
 	nodeInfo, err := a.NodeInfo(identity)
 	if err != nil {
 		return

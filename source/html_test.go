@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var testJsMetadata = Manifest{
+var testHtmlMetadata = Manifest{
 	Name:        "Name",
 	Title:       "Title",
 	Description: "Description",
@@ -19,20 +19,20 @@ var testJsMetadata = Manifest{
 	Type:        "Type",
 }
 
-var testMainJs = []byte(`portal.log("Hello Astral!!!")`)
+var testIndexHtml = []byte(`portal.log("Hello Astral!!!")`)
 
-func testJsRef(t *testing.T, name string) (ref Ref) {
+func testHtmlRef(t *testing.T, name string) (ref Ref) {
 	ref.Fs = afero.NewMemMapFs()
-	//ref = Ref{Fs: afero.NewOsFs(), Path: test.CleanMkdir(t, name)}
+	//ref = Ref{afero.NewOsFs(), test.CleanMkdir(t, name)}
 	return
 }
 
-func TestJsApp_WriteFs_ReadFS(t *testing.T) {
-	ref := testJsRef(t, ".js_test_app")
-	actual := JsApp{}
-	expected := JsApp{}
-	expected.Metadata = Metadata{Manifest: testJsMetadata}
-	expected.MainJs = testMainJs
+func TestHtmlApp_WriteFs_ReadFS(t *testing.T) {
+	ref := testHtmlRef(t, ".html_test_app")
+	actual := HtmlApp{}
+	expected := HtmlApp{}
+	expected.Metadata = Metadata{Manifest: testHtmlMetadata}
+	expected.IndexHtml = testIndexHtml
 	test.NoError(t, expected.WriteRef(ref))
 	test.NoError(t, actual.ReadSrc(&ref))
 
@@ -42,12 +42,12 @@ func TestJsApp_WriteFs_ReadFS(t *testing.T) {
 	require.Equal(t, expected, actual)
 }
 
-func TestJsProject_WriteFs_ReadFS(t *testing.T) {
-	ref := testJsRef(t, ".js_test_project")
-	actual := JsProject{}
-	expected := JsProject{}
-	expected.Manifest = ProjectMetadata{Manifest: testJsMetadata}
-	expected.Js.MainJs = testMainJs
+func TestHtmlProject_WriteFs_ReadFS(t *testing.T) {
+	ref := testHtmlRef(t, ".html_test_project")
+	actual := HtmlProject{}
+	expected := HtmlProject{}
+	expected.Manifest = ProjectMetadata{Manifest: testHtmlMetadata}
+	expected.Html.IndexHtml = testIndexHtml
 	test.NoError(t, expected.WriteRef(ref))
 	test.NoError(t, actual.ReadSrc(&ref))
 
@@ -57,12 +57,12 @@ func TestJsProject_WriteFs_ReadFS(t *testing.T) {
 	require.Equal(t, expected, actual)
 }
 
-func TestJsBundle_WriteFs_ReadFS(t *testing.T) {
-	ref := testJsRef(t, ".js_test_bundle")
-	actual := JsBundle{}
-	expected := JsBundle{}
-	expected.App.Metadata = Metadata{Manifest: testJsMetadata}
-	expected.Js.MainJs = testMainJs
+func TestHtmlBundle_WriteFs_ReadFS(t *testing.T) {
+	ref := testHtmlRef(t, ".html_test_bundle")
+	actual := HtmlBundle{}
+	expected := HtmlBundle{}
+	expected.App.Metadata = Metadata{Manifest: testHtmlMetadata}
+	expected.Html.IndexHtml = testIndexHtml
 	test.NoError(t, expected.WriteRef(ref))
 
 	ref.Path = expected.Zip.File.Path

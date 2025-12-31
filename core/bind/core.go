@@ -3,7 +3,6 @@ package bind
 import (
 	"context"
 
-	lib "github.com/cryptopunkscc/astrald/lib/apphost"
 	"github.com/cryptopunkscc/portal/api/bind"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/apphost"
@@ -21,30 +20,18 @@ type Core interface {
 	bind.Process
 }
 
-type core struct {
-	Apphost
-	bind.Process
+type Core2 struct {
+	*Adapter
+	*Process
 }
 
 type DefaultCoreFactory struct{}
 
-func (DefaultCoreFactory) Create(ctx context.Context) (Core, context.Context) {
+func (DefaultCoreFactory) Create(ctx context.Context) (Core2, context.Context) {
 	i := &apphost.Invoker{Ctx: ctx}
-	c := core{}
-	c.Process, ctx = Process(ctx)
-	c.Apphost = Adapter(ctx, apphost.NewCached(i))
-	return c, ctx
-}
-
-type LibCoreFactory struct{ Client *lib.Client }
-
-func (f LibCoreFactory) Create(ctx context.Context) (Core, context.Context) {
-	i := &apphost.Invoker{Ctx: ctx}
-	i.Client.Endpoint = f.Client.Endpoint
-	i.Client.AuthToken = f.Client.AuthToken
-	c := core{}
-	c.Process, ctx = Process(ctx)
-	c.Apphost = Adapter(ctx, apphost.NewCached(i))
+	c := Core2{}
+	c.Process, ctx = NewProcess(ctx)
+	c.Adapter = NewAdapter(ctx, apphost.NewCached(i))
 	return c, ctx
 }
 
@@ -53,17 +40,17 @@ type AutoTokenCoreFactory struct {
 	Tokens  *token.Repository
 }
 
-func (f AutoTokenCoreFactory) Create(ctx context.Context) (Core, context.Context) {
+func (f AutoTokenCoreFactory) Create(ctx context.Context) (Core2, context.Context) {
 	i := &apphost.Invoker{Ctx: ctx}
 	i.Client.Endpoint = f.Tokens.Endpoint
 	t, err := f.Tokens.Get(f.PkgName)
 	if err != nil {
-		return nil, nil
+		return Core2{}, nil
 	}
 	i.Client.AuthToken = t.Token.String()
-	c := core{}
-	c.Process, ctx = Process(ctx)
-	c.Apphost = Adapter(ctx, apphost.NewCached(i))
+	c := Core2{}
+	c.Process, ctx = NewProcess(ctx)
+	c.Adapter = NewAdapter(ctx, apphost.NewCached(i))
 	return c, ctx
 }
 
