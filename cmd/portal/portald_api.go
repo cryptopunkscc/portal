@@ -4,13 +4,13 @@ import (
 	"context"
 	"slices"
 
-	"github.com/cryptopunkscc/portal/api/portald"
+	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd/help"
 )
 
-func (a *Application) portald() portald.OpClient {
-	return portald.Op(&a.Apphost)
+func (a *Application) portald() apphost.PortaldClient {
+	return a.Apphost.Portald()
 }
 
 func (a *Application) injectPortaldApi(handler *cmd.Handler) {
@@ -33,9 +33,9 @@ func (a *Application) setupFunctions(handlers cmd.Handlers) {
 				return a.portaldCli(ctx, cmd...)
 			}
 		} else {
-			handlers[i].Func = func(ctx context.Context, opt *portald.OpenOpt, cmd ...string) (err error) {
+			handlers[i].Func = func(ctx context.Context, opt *apphost.OpenOpt, cmd ...string) (err error) {
 				cmd = slices.Insert(cmd, 0, name)
-				return a.runApp(ctx, nil, cmd)
+				return a.runApp(ctx, apphost.OpenOpt{})
 			}
 		}
 	}

@@ -4,7 +4,7 @@ import (
 	"github.com/cryptopunkscc/portal/api/version"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/runner/exec"
+	"github.com/cryptopunkscc/portal/runner/deprecated/exec"
 	"github.com/cryptopunkscc/portal/target/source"
 )
 

@@ -4,52 +4,72 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/target/js"
+	"github.com/cryptopunkscc/portal/source"
+	"github.com/cryptopunkscc/portal/source/js"
 )
 
-func Runner(newCore bind.NewCore) *target.SourceRunner[target.AppJs] {
-	return &target.SourceRunner[target.AppJs]{
-		Resolve: target.Any[target.AppJs](
-			js.ResolveDist.Try,
-			js.ResolveBundle.Try,
-		),
-		Runner: NewRunner(newCore),
+type Runner interface {
+	Run(ctx bind.Context, args ...string) error
+}
+
+type BundleRunner struct {
+	AppRunner
+	Bundle js.Bundle
+}
+
+func (r BundleRunner) New() source.Source {
+	return &r
+}
+
+func (r *BundleRunner) ReadSrc(src source.Source) (err error) {
+	if err = r.Bundle.ReadSrc(src); err == nil {
+		r.App = r.Bundle.App
+		r.Func = r.Run
 	}
+	return
 }
 
-type runner struct {
-	newCore bind.NewCore
+type AppRunner struct {
+	js.App
+	Core    bind.Context
 	backend *Backend
-	app     target.AppJs
-	args    []string
+	Args    []string
 }
 
-func NewRunner(newCore bind.NewCore) target.ReRunner[target.AppJs] {
-	return &runner{newCore: newCore}
+func (r AppRunner) New() source.Source {
+	return &r
 }
 
-func (r *runner) Reload() (err error) {
-	return r.backend.RunFs(r.app.FS(), r.args...)
+func (r *AppRunner) ReadSrc(src source.Source) (err error) {
+	if err = r.App.ReadSrc(src); err != nil {
+		r.Func = r.Run
+	}
+	return
 }
 
-func (r *runner) Run(ctx context.Context, app target.AppJs, args ...string) (err error) {
-	// TODO pass args to js
-	log := plog.Get(ctx).Type(r).Set(&ctx)
-	log.Printf("run %T %s", app, app.Abs())
-	core, ctx := r.newCore(ctx, app)
-	r.app = app
-	r.args = args
-	r.backend = NewBackend(core)
-	if err = r.Reload(); err != nil {
+func (r *AppRunner) Reload(ctx context.Context) (err error) {
+	r.Core.Interrupt()
+	return r.backend.RunFs(r.PathFS(), r.Args...)
+}
+
+func (r *AppRunner) Start(ctx bind.Context, args ...string) (err error) {
+	r.Core = ctx
+	log := plog.Get(ctx).Type(r)
+	log.Printf("run %T %s", r.App.Metadata.Package, r.Path)
+	r.Args = args
+	r.backend = NewBackend(&r.Core)
+	return r.Reload(ctx)
+}
+func (r *AppRunner) Run(ctx bind.Context, args ...string) (err error) {
+	if err = r.Start(ctx, args...); err != nil {
 		return
 	}
 	<-ctx.Done()
 	r.backend.Interrupt()
-	if core.Code() > 0 {
-		err = fmt.Errorf("exit %d", core.Code())
+	if ctx.Code() > 0 {
+		err = fmt.Errorf("exit %d", ctx.Code())
 	}
 	return
 }

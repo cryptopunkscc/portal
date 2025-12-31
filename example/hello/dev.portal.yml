@@ -1,0 +1,5 @@
+name: hello-astral-world
+title: Hello-Astral-World
+description: missing description
+package: my.app.hello-astral-world
+schema: html

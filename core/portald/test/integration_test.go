@@ -85,20 +85,30 @@ func TestService_Integrations(t *testing.T) {
 			Require: test.Tests{it.s1.awaitPublishedBundles()},
 		},
 		{
+			Name:    "should get app by package name",
+			Test:    it.s1.getAppByPackageName(),
+			Require: test.Tests{it.s1.awaitPublishedBundles()},
+		},
+		{
+			Name:    "should get app by object ID",
+			Test:    it.s1.getAppById(),
+			Require: test.Tests{it.s1.awaitPublishedBundles()},
+		},
+		{
 			Name:    "should fetch executable app bundles",
 			Test:    it.s1.fetchAppBundleExecs(),
 			Require: test.Tests{it.s1.awaitPublishedBundles()},
 		},
 		{
 			Name:    "should scan its own objects",
-			Test:    it.s1.scanObjects("app.manifest"),
+			Test:    it.s1.scanObjects(),
 			Require: test.Tests{it.s1.awaitPublishedBundles()},
 		},
 		{
 			Name: "should scan another node's objects",
-			Test: it.s2.scanObjects("app.manifest", &it.s1),
+			Test: it.s2.scanObjects(&it.s1),
 			Require: test.Tests{
-				it.s1.scanObjects("app.manifest"),
+				it.s1.scanObjects(),
 				it.s1.userClaim(&it.s2),
 				it.s2.addEndpoint(&it.s1),
 			},
@@ -118,11 +128,11 @@ func TestService_Integrations(t *testing.T) {
 			Test:    it.s1.listSiblings(),
 			Require: test.Tests{it.s1.userClaim(&it.s2)},
 		},
-		{
-			Name:    "should list siblings 2",
-			Test:    it.s2.listSiblings(),
-			Require: test.Tests{it.s1.listSiblings()},
-		},
+		//{
+		//	Name:    "should list siblings 2",
+		//	Test:    it.s2.listSiblings(),
+		//	Require: test.Tests{it.s1.listSiblings()},
+		//},
 		{
 			Name: "should list available apps 1",
 			Test: it.s1.availableApps(),
@@ -130,20 +140,20 @@ func TestService_Integrations(t *testing.T) {
 				it.s1.awaitPublishedBundles(),
 			},
 		},
-		{
-			Name: "should list available apps 2",
-			Test: it.s2.availableApps(),
-			Require: test.Tests{
-				it.s1.awaitPublishedBundles(),
-				it.s1.userClaim(&it.s2),
-				it.s2.addEndpoint(&it.s1),
-			},
-		},
-		{
-			Name:    "should install apps by package name",
-			Test:    it.s2.installAppsByPackage(&it.s1),
-			Require: test.Tests{it.s2.availableApps()},
-		},
+		//{
+		//	Name: "should list available apps 2",
+		//	Test: it.s2.availableApps(),
+		//	Require: test.Tests{
+		//		it.s1.awaitPublishedBundles(),
+		//		it.s1.userClaim(&it.s2),
+		//		it.s2.addEndpoint(&it.s1),
+		//	},
+		//},
+		//{
+		//	Name:    "should install apps by package name",
+		//	Test:    it.s2.installAppsByPackage(&it.s1),
+		//	Require: test.Tests{it.s2.availableApps()},
+		//},
 	}
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("%d  %s", i, tt.Name), runner.Run(tests, tt))

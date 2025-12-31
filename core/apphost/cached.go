@@ -4,16 +4,16 @@ import (
 	"github.com/cryptopunkscc/portal/api/apphost"
 )
 
-func Cached(client apphost.Client) apphost.Cached {
-	return &cached{Client: client, cache: newCache()}
+func NewCached(client *Adapter) *Cached {
+	return &Cached{Adapter: client, cache: newCache()}
 }
 
-type cached struct {
-	apphost.Client
+type Cached struct {
+	*Adapter
 	*cache
 }
 
-func (a cached) Interrupt() {
+func (a *Cached) Interrupt() {
 	for _, closer := range a.listeners.Release() {
 		_ = closer.Close()
 	}
@@ -22,12 +22,12 @@ func (a cached) Interrupt() {
 	}
 }
 
-func (a cached) Query(target string, method string, args any) (conn apphost.Conn, err error) {
-	return a.setConn(a.Client.Query(target, method, args))
+func (a *Cached) Query(target string, method string, args any) (conn apphost.Conn, err error) {
+	return a.setConn(a.Adapter.Query(target, method, args))
 }
 
-func (a cached) Register() (l apphost.Listener, err error) {
-	ll, err := a.Client.Register()
+func (a *Cached) Register() (l apphost.Listener, err error) {
+	ll, err := a.Adapter.Register()
 	return a.setListener(ll, err)
 }
 

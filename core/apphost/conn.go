@@ -4,51 +4,39 @@ import (
 	"bufio"
 
 	"github.com/cryptopunkscc/astrald/astral"
-	lib "github.com/cryptopunkscc/astrald/lib/apphost"
-	api "github.com/cryptopunkscc/portal/api/apphost"
-	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/google/uuid"
+	"github.com/cryptopunkscc/portal/api/apphost"
 )
 
-var _ api.Conn = &conn{}
-
-func inConn(c *lib.Conn, err error) (*conn, error)  { return newConn(c, err, true) }
-func outConn(c *lib.Conn, err error) (*conn, error) { return newConn(c, err, false) }
-func newConn(c *lib.Conn, err error, in bool) (*conn, error) {
-	defer plog.TraceErr(&err)
-	if err != nil {
-		return nil, err
-	}
-	return &conn{
-		Conn: c,
-		buf:  bufio.NewReader(c),
-		ref:  uuid.New().String(),
-		in:   in,
-	}, nil
+type Conn struct {
+	astral.Conn
+	buf   *bufio.Reader
+	query string
+	ref   string
+	in    bool
 }
 
-func (c *conn) RemoteIdentity() *astral.Identity {
-	return c.Conn.RemoteIdentity()
-}
+var _ apphost.Conn = &Conn{}
 
-func (c *conn) Write(b []byte) (n int, err error) {
+func (c *Conn) Query() string { return c.query }
+
+func (c *Conn) Write(b []byte) (n int, err error) {
 	if n, err = c.Conn.Write(b); err != nil {
 		_ = c.Close()
 	}
 	return
 }
 
-func (c *conn) Read(b []byte) (n int, err error) {
+func (c *Conn) Read(b []byte) (n int, err error) {
 	if n, err = c.buf.Read(b); err != nil {
 		_ = c.Close()
 	}
 	return
 }
-func (c *conn) ReadString(delim byte) (s string, err error) {
+func (c *Conn) ReadString(delim byte) (s string, err error) {
 	if s, err = c.buf.ReadString(delim); err != nil {
 		_ = c.Close()
 	}
 	return
 }
-func (c *conn) Ref() string { return c.ref }
-func (c *conn) In() bool    { return c.in }
+func (c *Conn) Ref() string { return c.ref }
+func (c *Conn) In() bool    { return c.in }

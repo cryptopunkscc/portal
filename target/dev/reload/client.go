@@ -5,18 +5,19 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cryptopunkscc/astrald/astral"
+	"github.com/cryptopunkscc/astrald/astral/channel"
+	"github.com/cryptopunkscc/astrald/lib/query"
 	api "github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/dev"
-	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/mem"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/pkg/rpc"
 )
 
 func Start(
 	ctx context.Context,
-	portal target.Portal_,
+	pkg string,
 	reload Reload,
 	cache api.Cache,
 ) (send dev.SendMsg) {
@@ -28,10 +29,17 @@ func Start(
 	var err error
 	defer plog.PrintTrace(&err)
 
-	if c.conn, err = apphost.Default.Rpc().Conn("portald", "dev.portal.broadcast"); err != nil {
+	ah := apphost.Default
+	portaldId, err := ah.Resolve("portald")
+	if err != nil {
 		return
 	}
-	if err = c.conn.Encode(portal.Manifest().Package); err != nil {
+	c.conn, err = ah.WithTarget(portaldId).QueryChannel(
+		astral.NewContext(ctx),
+		"dev.portal.broadcast",
+		query.Args{"pkg": pkg},
+	)
+	if err != nil {
 		return
 	}
 
@@ -41,17 +49,17 @@ func Start(
 }
 
 type client struct {
-	conn rpc.Conn
+	conn *channel.Channel
 
 	reload  Reload
 	cache   api.Cache
 	changes mem.Cache[time.Time]
 }
 
-type Reload func() error
+type Reload func(ctx context.Context) error
 
-func (s *client) Send(msg dev.Msg) (err error) {
-	if err = s.conn.Encode(msg); err != nil && err.Error() == "EOF" {
+func (s *client) Send(msg *dev.Msg) (err error) {
+	if err = s.conn.Send(msg); err != nil && err.Error() == "EOF" {
 		_ = s.Close()
 		return
 	}
@@ -69,11 +77,12 @@ func (s *client) Handle(ctx context.Context) {
 		<-ctx.Done()
 		_ = s.conn.Close()
 	}()
-	var msg dev.Msg
+	var msg astral.Object
 	var err error
 	log := plog.Get(ctx).Type(s)
 	for {
-		if msg, err = rpc.Decode[dev.Msg](s.conn); err != nil {
+
+		if msg, err = s.conn.Receive(); err != nil {
 			break
 		}
 		log.Println("got message", msg)
@@ -84,8 +93,9 @@ func (s *client) Handle(ctx context.Context) {
 	}
 }
 
-func (s *client) HandleMsg(ctx context.Context, msg dev.Msg) {
+func (s *client) HandleMsg(ctx context.Context, obj astral.Object) {
 	log := plog.Get(ctx).D()
+	msg := obj.(*dev.Msg)
 	log.Println("received broadcast message:", msg)
 	switch msg.Event {
 	case dev.Changed:
@@ -107,7 +117,7 @@ func (s *client) HandleMsg(ctx context.Context, msg dev.Msg) {
 			return
 		}
 		log.Println("reloading")
-		if err := s.reload(); err != nil {
+		if err := s.reload(ctx); err != nil {
 			log.F().Println(err)
 		}
 	}

@@ -8,6 +8,8 @@ type Root Handler
 type Handlers []Handler
 type Params []Param
 
+var DefaultHandlers = Handlers{}
+
 type Handler struct {
 	Func   any       `json:"func,omitempty" yaml:"func,omitempty"`
 	Name   string    `json:"name,omitempty" yaml:"name,omitempty"`
@@ -32,4 +34,9 @@ func (h *Handler) Names() []string {
 
 func (h Handlers) Plus(handlers ...Handler) Handlers {
 	return append(h, handlers...)
+}
+
+func (h *Handlers) Add(handlers ...Handler) Handlers {
+	*h = append(*h, handlers...)
+	return *h
 }

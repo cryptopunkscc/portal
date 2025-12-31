@@ -3,38 +3,56 @@ package wails
 import (
 	"context"
 
-	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/core/js/embed/wails"
 	"github.com/cryptopunkscc/portal/pkg/assets"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/target/html"
+	"github.com/cryptopunkscc/portal/source"
+	"github.com/cryptopunkscc/portal/source/html"
 	"github.com/wailsapp/wails/v2/pkg/application"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-func Runner(newCore bind.NewCore) *target.SourceRunner[target.AppHtml] {
-	return &target.SourceRunner[target.AppHtml]{
-		Runner: &ReRunner{
-			newCore: newCore,
-		},
-		Resolve: target.Any[target.AppHtml](
-			target.Skip("node_modules"),
-			target.Try(html.ResolveDist),
-			target.Try(html.ResolveBundle),
-		),
-	}
+type Runner interface {
+	Run(ctx bind.Core) error
 }
 
-type ReRunner struct {
-	bind.Core
-	newCore  bind.NewCore
+type BundleRunner struct {
+	AppRunner
+	Bundle html.Bundle
+}
+
+func (r BundleRunner) New() source.Source {
+	return &r
+}
+
+func (r *BundleRunner) ReadSrc(src source.Source) (err error) {
+	if err = r.Bundle.ReadSrc(src); err == nil {
+		r.App = r.Bundle.App
+		r.Func = r.Run
+	}
+	return
+}
+
+type AppRunner struct {
+	html.App
 	frontCtx context.Context
 }
 
-func (r *ReRunner) Reload() (err error) {
+func (r AppRunner) New() source.Source {
+	return &r
+}
+
+func (r *AppRunner) ReadSrc(src source.Source) (err error) {
+	if err = r.App.ReadSrc(src); err != nil {
+		r.Func = r.Run
+	}
+	return
+}
+
+func (r *AppRunner) Reload() (err error) {
 	if r.frontCtx == nil {
 		return plog.Errorf("nil context")
 	}
@@ -42,17 +60,14 @@ func (r *ReRunner) Reload() (err error) {
 	return
 }
 
-func (r *ReRunner) Run(ctx context.Context, app target.AppHtml, args ...string) (err error) {
-	// TODO pass args to js
-	log := plog.Get(ctx).Type(r).Set(&ctx)
-	log.Println("start", app.Manifest().Package, app.Abs())
-	defer log.Println("exit", app.Manifest().Package, app.Abs())
-	if r.Core == nil {
-		r.Core, _ = r.newCore(ctx, app)
-	}
-	opt := AppOptions(r.Core)
+func (r *AppRunner) Run(ctx bind.Core) (err error) {
+	log := plog.Get(ctx).Type(r)
+	log.Println("start", r.Metadata.Package, r.Metadata)
+	defer log.Println("exit", r.Metadata.Package, r.Metadata)
+
+	opt := AppOptions(ctx)
 	opt.OnStartup = func(ctx context.Context) { r.frontCtx = ctx }
-	SetupOptions(app, opt)
+	SetupOptions(opt, r.App)
 	if err = application.NewWithOptions(opt).Run(); err != nil {
 		return plog.Err(err)
 	}
@@ -72,29 +87,32 @@ func AppOptions(core bind.Core) *options.App {
 	}
 }
 
-func SetupOptions(src target.Portal_, opt *options.App) {
+func SetupOptions(opt *options.App, app html.App) {
 	// Setup defaults
 	if opt.AssetServer == nil {
 		opt.AssetServer = &assetserver.Options{}
 	}
 
 	// Setup manifest
-	m := src.Manifest()
-	opt.Title = m.Title
+	opt.Title = app.Title
 	if opt.Title == "" {
-		opt.Title = m.Name
+		opt.Title = app.Name
 	}
 
-	apphostJsFs := wails.JsFs
+	apphostJsFS := wails.JsFs
+	assetsFs := app.PathFS()
 
 	// Setup fs assets
-	opt.AssetServer.Assets = assets.ArrayFs{src.FS(), apphostJsFs}
+	opt.AssetServer.Assets = assets.ArrayFs{
+		assetsFs,
+		apphostJsFS,
+	}
 
 	// Setup http assets
 	opt.AssetServer.Handler = assets.StoreHandler{
 		Store: &assets.OverlayStore{Stores: []assets.Store{
-			&assets.FsStore{FS: src.FS()},
-			&assets.FsStore{FS: apphostJsFs}},
+			&assets.FsStore{FS: assetsFs},
+			&assets.FsStore{FS: apphostJsFS}},
 		},
 	}
 }

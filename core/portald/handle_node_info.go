@@ -2,7 +2,6 @@ package portald
 
 import (
 	"github.com/cryptopunkscc/astrald/astral"
-	"github.com/cryptopunkscc/portal/api/dir"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
@@ -16,14 +15,11 @@ func (s *Service) nodeInfo() (ni *NodeInfo, err error) {
 		return s.NodeInfo, nil
 	}
 	ni = new(NodeInfo)
-	ni.Identity, err = s.Apphost.Resolve("localnode")
+	ni.Alias, err = s.Apphost.NodeAlias()
 	if err != nil {
 		return
 	}
-	ni.Alias, err = dir.OpClient{Client: &s.Apphost}.GetAlias(*ni.Identity)
-	if err != nil {
-		return
-	}
+	ni.Identity = s.Apphost.HostID()
 	s.NodeInfo = ni
 	plog.Printf("NodeInfo: %s %s", s.Identity, s.Alias)
 	return

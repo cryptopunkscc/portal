@@ -23,14 +23,13 @@ func (r reRunner[T]) Run(ctx context.Context, src T, args ...string) (err error)
 	r.ctx = ctx
 	r.src = src
 	r.args = args
-	return r.Reload()
+	return r.Reload(ctx)
 }
 
-func (r reRunner[T]) Reload() error {
+func (r reRunner[T]) Reload(ctx context.Context) error {
 	if r.cancel != nil {
 		r.cancel()
 	}
-	var ctx context.Context
 	ctx, r.cancel = context.WithCancel(r.ctx)
 	return r.run(ctx, r.src, r.args...)
 }

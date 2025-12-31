@@ -1,4 +1,4 @@
-# Apps
+# Apps (DEPRECATED)
 
 The following directory contains default apps embedded in the portal environment.
 

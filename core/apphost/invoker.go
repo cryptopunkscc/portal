@@ -7,18 +7,15 @@ import (
 
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/flow"
-	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/pkg/rpc"
 )
 
 type Invoker struct {
-	Adapter
-	Log plog.Logger
+	Cached
 	Ctx context.Context
 }
 
 func (i *Invoker) Query(target string, method string, args any) (conn apphost.Conn, err error) {
-	if conn, err = i.Adapter.Query(target, method, args); err == nil {
+	if conn, err = i.Cached.Query(target, method, args); err == nil {
 		return
 	}
 
@@ -34,7 +31,7 @@ func (i *Invoker) Query(target string, method string, args any) (conn apphost.Co
 	}
 	for in := range await.Chan() {
 		i.Log.Println("retry:", in)
-		if conn, err = i.Adapter.Query(target, method, args); err == nil {
+		if conn, err = i.Cached.Query(target, method, args); err == nil {
 			i.Log.Println("query succeed", conn.Query())
 			return
 		}
@@ -44,12 +41,12 @@ func (i *Invoker) Query(target string, method string, args any) (conn apphost.Co
 
 func (i *Invoker) Open(src string) (err error) {
 	i.Log.Println("starting query", "portald.open", src)
-	request := i.Adapter.Rpc().Request("portald")
-	err = rpc.Command(request, "open", src)
+	query, err := i.Cached.Query("portald", "open", src)
 	if err != nil {
 		i.Log.E().Printf("cannot query %s: %v", src, err)
 		return fmt.Errorf("cannot query %s: %w", src, err)
 	}
+	_ = query.Close()
 	i.Log.Println("started query", "portald.open", src)
 	return
 }

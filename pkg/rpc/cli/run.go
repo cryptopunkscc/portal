@@ -10,6 +10,9 @@ import (
 )
 
 func Run(handler cmd.Handler) {
+	if handler.Sub == nil {
+		handler.Sub = cmd.DefaultHandlers
+	}
 	ctx, cancel := context.WithCancel(context.Background())
 	log := plog.New().D().Scope(handler.Name).Set(&ctx)
 	go sig.OnShutdown(log, cancel)

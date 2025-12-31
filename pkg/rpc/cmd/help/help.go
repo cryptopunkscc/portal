@@ -79,7 +79,7 @@ func (h Handler) MarshalCLI() (help string) {
 				n = "$" + strconv.Itoa(i)
 				i++
 			}
-			fmt.Fprintf(w, "\t%s\t[%s]\t- %s\n", n, p.Type, p.Desc)
+			fmt.Fprintf(w, "\t%s\t%s\t- %s\n", n, p.Type, p.Desc)
 		}
 		fmt.Fprintln(w)
 	}

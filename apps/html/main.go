@@ -9,7 +9,7 @@ import (
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/runner/wails"
+	"github.com/cryptopunkscc/portal/runner/deprecated/wails"
 	"github.com/cryptopunkscc/portal/target/bundle"
 	"github.com/cryptopunkscc/portal/target/source"
 )
@@ -50,8 +50,8 @@ func runner() Dispatcher {
 }
 
 func core(ctx context.Context, portal Portal_) (bind.Core, context.Context) {
-	r, ctx := bind.NewFrontendCore(ctx, portal)
-	return &Adapter{r}, ctx
+	r := bind.DefaultCoreFactory{}.Create(ctx)
+	return &Adapter{r}, r.Context
 }
 
 type Adapter struct{ bind.Core }

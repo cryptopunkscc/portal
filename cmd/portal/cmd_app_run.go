@@ -5,15 +5,15 @@ import (
 	"io"
 	"os"
 
-	"github.com/cryptopunkscc/portal/api/portald"
+	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
-func (a *Application) runApp(ctx context.Context, opt *portald.OpenOpt, cmd []string) (err error) {
-	log := plog.Get(ctx)
-	log.Println("running app", opt, cmd)
+func (a *Application) runApp(ctx context.Context, opt apphost.OpenOpt) (err error) {
+	log := plog.Get(ctx).Type(a)
+	log.Println("running:", opt)
 
-	conn, err := a.portald().Connect(opt, cmd...)
+	conn, err := a.portald().Connect(opt)
 	if err != nil {
 		return
 	}

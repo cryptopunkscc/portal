@@ -28,10 +28,7 @@ func (c *cache) setConn(ac apphost.Conn, err error) (apphost.Conn, error) {
 	if err != nil {
 		return nil, err
 	}
-	ac = &cachedConn{
-		Conn:  ac,
-		cache: c,
-	}
+	ac = &cachedConn{ac, c}
 	c.connections.Set(ac.Ref(), ac)
 	c.events.Push(apphost.Event{Type: apphost.EventConnect, Query: ac.Query(), Ref: ac.Ref()})
 	return ac, nil

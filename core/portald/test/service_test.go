@@ -12,21 +12,19 @@ import (
 	"time"
 
 	"github.com/cryptopunkscc/astrald/astral"
-	"github.com/cryptopunkscc/portal/api/apphost"
-	"github.com/cryptopunkscc/portal/api/nodes"
-	"github.com/cryptopunkscc/portal/api/objects"
 	"github.com/cryptopunkscc/portal/api/portal"
-	portald2 "github.com/cryptopunkscc/portal/api/portald"
 	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/api/user"
 	"github.com/cryptopunkscc/portal/apps"
-	"github.com/cryptopunkscc/portal/core/astrald/debug"
+	portald2 "github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/core/portald"
 	golang "github.com/cryptopunkscc/portal/pkg/go"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/test"
-	"github.com/cryptopunkscc/portal/runner/goja"
+	"github.com/cryptopunkscc/portal/runner/astrald/debug"
+	"github.com/cryptopunkscc/portal/runner/deprecated/goja"
+	source2 "github.com/cryptopunkscc/portal/source"
+	"github.com/cryptopunkscc/portal/source/app"
 	"github.com/cryptopunkscc/portal/target/bundle"
 	"github.com/cryptopunkscc/portal/target/npm"
 	"github.com/cryptopunkscc/portal/target/source"
@@ -39,8 +37,9 @@ type testService struct {
 	ctx    context.Context
 	config portal.Config
 	*portald.Service
-	apps      []target.Portal_
-	published map[astral.ObjectID]bundle.Info
+	apps       []target.Portal_
+	published  map[astral.ObjectID]bundle.Info
+	published2 map[astral.ObjectID]app.ReleaseInfo
 }
 
 func testServiceContext(t *testing.T) context.Context {
@@ -104,11 +103,12 @@ func (s *testService) configure() test.Test {
 		//s.Astrald = &exec.Astrald{NodeRoot: s.Config.Astrald} // Faster testing
 		s.Astrald = &debug.Astrald{NodeRoot: s.Config.Astrald} // Debugging astrald
 
-		f := bind.CoreFactory{Repository: *s.Tokens()}
+		f := bind.AutoTokenCoreFactory{Tokens: s.Tokens()}
 		s.Resolve = target.Any[target.Runnable](
 			target.Skip("node_modules"),
-			goja.Runner(f.NewBackendFunc()).Try,
+			goja.Runner(f.Create2).Try,
 		)
+		//s.Apphost.Log = plog.New().Scope("TEST_APPHOST_" + s.name)
 	})
 }
 
@@ -157,7 +157,7 @@ func (s *testService) hasUser() test.Test {
 
 func (s *testService) userClaim(s2 *testService) test.Test {
 	return s.test(func(t *testing.T) {
-		err := s.Claim(s2.Apphost.HostID.String())
+		err := s.Claim(s2.Apphost.TargetID.String())
 		test.AssertErr(t, err)
 	}).Requires(
 		s.createUser(),
@@ -167,10 +167,10 @@ func (s *testService) userClaim(s2 *testService) test.Test {
 
 func (s *testService) addEndpoint(s2 *testService) test.Test {
 	return s.arg(s2.name).test(func(t *testing.T) {
-		id := s2.Apphost.HostID.String()
+		id := s2.Apphost.TargetID
 		port := s2.Config.TCP.ListenPort
 		endpoint := fmt.Sprintf("tcp:127.0.0.1:%d", port)
-		err := nodes.Op(&s.Apphost).AddEndpoint(id, endpoint)
+		err := s.Apphost.Nodes().AddEndpoint(nil, *id, endpoint)
 		test.AssertErr(t, err)
 	}).Requires(
 		s.start(),
@@ -246,14 +246,13 @@ func (s *testService) uninstallApp() test.Test {
 
 func (s *testService) publishAppBundles() test.Test {
 	return s.test(func(t *testing.T) {
-		b := source.Embed(apps.Builds)
-		s.published = map[astral.ObjectID]bundle.Info{}
-
-		l, err := s.PublishAppsFS(b)
+		s.published2 = map[astral.ObjectID]app.ReleaseInfo{}
+		src := source2.FSRef(apps.Builds)
+		l, err := s.Publisher().PublishBundlesSrc(src)
 		test.AssertErr(t, err)
 		count := 0
 		for _, app := range l {
-			s.published[*app.ReleaseID] = app
+			s.published2[*app.ReleaseID] = app
 			count++
 		}
 		assert.NotZero(t, count)
@@ -262,10 +261,10 @@ func (s *testService) publishAppBundles() test.Test {
 
 func (s *testService) awaitPublishedBundles() test.Test {
 	return s.test(func(t *testing.T) {
-		if len(s.published) == 0 {
+		if len(s.published2) == 0 {
 			t.Fatalf("no published bundles")
 		}
-		for id := range s.published {
+		for id := range s.published2 {
 			s.awaitObject(id).Run(t)
 			break
 		}
@@ -274,11 +273,10 @@ func (s *testService) awaitPublishedBundles() test.Test {
 
 func (s *testService) awaitObject(id astral.ObjectID) test.Test {
 	return s.test(func(t *testing.T) {
-		c := objects.Op(s.Apphost.Rpc())
-		args := objects.ReadArgs{ID: id}
+		c := s.Apphost.Objects()
 		limit := 10
 		for {
-			rc, err := c.Read(args)
+			rc, err := c.Read(nil, &id, 0, 0)
 			if err != nil {
 				if limit > 0 {
 					limit--
@@ -300,8 +298,8 @@ func (s *testService) awaitObject(id astral.ObjectID) test.Test {
 
 func (s *testService) readObject(id astral.ObjectID) test.Test {
 	return s.test(func(t *testing.T) {
-		c := objects.Op(s.Apphost.Rpc())
-		rc, err := c.Read(objects.ReadArgs{ID: id})
+		c := s.Apphost.Objects()
+		rc, err := c.Read(nil, &id, 0, 0)
 		buf := bytes.NewBuffer(nil)
 		_, err = buf.ReadFrom(rc)
 		test.AssertErr(t, err)
@@ -312,7 +310,7 @@ func (s *testService) readObject(id astral.ObjectID) test.Test {
 
 func (s *testService) reconnectAsUser() test.Test {
 	return s.test(func(t *testing.T) {
-		s.Apphost.AuthToken = s.UserCreated.AccessToken.String()
+		s.Apphost.Token = s.UserCreated.AccessToken.String()
 		err := s.Apphost.Reconnect()
 		test.AssertErr(t, err)
 	})
@@ -320,7 +318,7 @@ func (s *testService) reconnectAsUser() test.Test {
 
 func (s *testService) reconnectAsUser2(s2 *testService) test.Test {
 	return s.test(func(t *testing.T) {
-		s.Apphost.AuthToken = s2.UserCreated.AccessToken.String()
+		s.Apphost.Token = s2.UserCreated.AccessToken.String()
 		err := s.Apphost.Reconnect()
 		test.AssertErr(t, err)
 	})
@@ -330,27 +328,23 @@ func (s *testService) reconnectAs(alias string) test.Test {
 	return s.arg(alias).test(func(t *testing.T) {
 		pt, err := s.Tokens().Resolve(alias)
 		test.AssertErr(t, err)
-		s.Apphost.AuthToken = pt.Token.String()
+		s.Apphost.Token = pt.Token.String()
 		err = s.Apphost.Reconnect()
 		test.AssertErr(t, err)
 	})
 }
 
-func (s *testService) scanObjects(typ string, s2 ...*testService) test.Test {
+func (s *testService) scanObjects(s2 ...*testService) test.Test {
 	o := s2
 	if len(o) == 0 {
 		o = append(o, s)
 	}
-	return s.arg(typ).test(func(t *testing.T) {
-		c := objects.Op(s.Apphost.Rpc(), o[0].Apphost.HostID.String())
-		search, err := c.Scan(objects.ScanArgs{
-			Type: typ,
-			Zone: astral.ZoneAll,
-		})
+	return s.test(func(t *testing.T) {
+		scan, err := s.Apphost.Objects().Scan(nil, "", false)
 		test.AssertErr(t, err)
 
 		count := 0
-		for result := range search {
+		for result := range scan {
 			count++
 			plog.Println(result)
 		}
@@ -360,13 +354,10 @@ func (s *testService) scanObjects(typ string, s2 ...*testService) test.Test {
 
 func (s *testService) availableApps() test.Test {
 	return s.test(func(t *testing.T) {
-		aa, err := s.AvailableApps(s.ctx, false)
-		test.AssertErr(t, err)
-
 		count := 0
-		for app := range aa {
+		for info := range s.AvailableApps(s.ctx, false) {
 			count++
-			plog.Println("available app:", app)
+			plog.Println("available app:", info)
 		}
 		assert.NotZero(t, count)
 	})
@@ -378,15 +369,10 @@ func (s *testService) searchObjects(query string, s2 ...*testService) test.Test 
 		o = append(o, s)
 	}
 	return s.arg(query).test(func(t *testing.T) {
-		c := objects.Op(s.Apphost.Rpc(), o[0].Apphost.HostID.String())
-		search, err := c.Search(objects.SearchArgs{
-			Query: query,
-			Zone:  astral.ZoneAll,
-		})
+		results, err := s.Apphost.Objects().Search(nil, query)
 		test.AssertErr(t, err)
-
 		count := 0
-		for result := range search {
+		for result := range results {
 			count++
 			plog.Println(result)
 		}
@@ -396,15 +382,38 @@ func (s *testService) searchObjects(query string, s2 ...*testService) test.Test 
 
 func (s *testService) fetchReleases() test.Test {
 	return s.test(func(t *testing.T) {
-		for id, info := range s.published {
-			c := objects.Op(s.Apphost.Rpc())
-			r := &bundle.Release{}
-			err := c.Fetch(objects.ReadArgs{ID: id}, r)
-			test.AssertErr(t, err)
-			assert.Equal(t, *info.Release.BundleID, *r.BundleID)
-			assert.Equal(t, *info.Release.ManifestID, *r.ManifestID)
-			assert.Equal(t, info.Release.Release, r.Release)
-			assert.Equal(t, info.Release.Target, r.Target)
+		for id, info := range s.published2 {
+			obj, err := s.Apphost.Objects().Get(&id)
+			r := obj.(*app.ReleaseMetadata)
+			test.NoError(t, err)
+			assert.Equal(t, *info.BundleID, *r.BundleID)
+			assert.Equal(t, *info.ManifestID, *r.ManifestID)
+			assert.Equal(t, info.Release, r.Release)
+			assert.Equal(t, info.Target, r.Target)
+		}
+	})
+}
+
+func (s *testService) getAppByPackageName() test.Test {
+	return s.test(func(t *testing.T) {
+		for _, info := range s.published2 {
+			r, err := s.AppObjects().GetAppBundle(info.Manifest.Package)
+			test.NoError(t, err)
+			assert.Equal(t, info.Release, r.Release)
+			assert.Equal(t, info.Target, r.Target)
+			return
+		}
+	})
+}
+
+func (s *testService) getAppById() test.Test {
+	return s.test(func(t *testing.T) {
+		for _, info := range s.published2 {
+			r, err := s.AppObjects().GetAppBundle(info.BundleID.String())
+			test.NoError(t, err)
+			assert.Equal(t, info.Release, r.Release)
+			assert.Equal(t, info.Target, r.Target)
+			return
 		}
 	})
 }
@@ -413,7 +422,7 @@ func (s *testService) signAppContract(pkg string) test.Test {
 	return s.arg(pkg).test(func(t *testing.T) {
 		id, err := s.Apphost.Resolve(pkg)
 		test.AssertErr(t, err)
-		contract, err := apphost.Op(&s.Apphost).SignAppContract(id)
+		contract, err := s.Apphost.SignAppContract(id)
 		test.AssertErr(t, err)
 		plog.Println(contract)
 	})
@@ -422,7 +431,7 @@ func (s *testService) signAppContract(pkg string) test.Test {
 func (s *testService) fetchAppBundleExecs() test.Test {
 	return s.test(func(t *testing.T) {
 		for _, r := range s.published {
-			_, err := s.Bundles().GetByObjectID(*r.Release.BundleID)
+			_, err := s.AppObjects().GetByObjectID(*r.Release.BundleID)
 			test.AssertErr(t, err)
 		}
 	})
@@ -430,7 +439,7 @@ func (s *testService) fetchAppBundleExecs() test.Test {
 
 func (s *testService) openApp(pkg string) test.Test {
 	return s.arg(pkg).test(func(t *testing.T) {
-		o := portald2.OpenOpt{}
+		o := portald2.OpenOptLegacy{}
 		err := s.Open().Run(s.ctx, o, pkg)
 		test.AssertErr(t, err)
 	})
@@ -447,8 +456,7 @@ func (s *testService) setupToken(pkg string) test.Test {
 
 func (s *testService) listSiblings() test.Test {
 	return s.test(func(t *testing.T) {
-		c := user.Op(&s.Apphost)
-		siblings, err := c.Siblings()
+		siblings, err := s.Apphost.User().Siblings(nil)
 		test.AssertErr(t, err)
 		count := 0
 		for sibling := range siblings {

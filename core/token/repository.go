@@ -5,9 +5,7 @@ import (
 	"os"
 
 	mod "github.com/cryptopunkscc/astrald/mod/apphost"
-	api "github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/env"
-	"github.com/cryptopunkscc/portal/api/keys"
 	"github.com/cryptopunkscc/portal/core/apphost"
 	pkgOs "github.com/cryptopunkscc/portal/pkg/os"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -43,15 +41,11 @@ func (r *Repository) dir() string {
 	return r.Dir
 }
 
-func (r *Repository) apphost() api.Client {
+func (r *Repository) apphost() *apphost.Adapter {
 	if r.Adapter == nil {
 		r.Adapter = apphost.Default
 	}
 	return r.Adapter
-}
-
-func (r *Repository) op() api.OpClient {
-	return api.Op(r.apphost())
 }
 
 func (r *Repository) Set(pkg string, token *mod.AccessToken) (err error) {
@@ -70,8 +64,13 @@ func (r *Repository) Get(pkg string) (token *mod.AccessToken, err error) {
 
 var ErrNotCached = errors.New("apphost auth token is not cached or cannot be loaded")
 
-func (r *Repository) List(args *api.ListTokensArgs) (api.AccessTokens, error) {
-	return r.op().ListTokens(args)
+type ListTokensArgs struct {
+	Out string `query:"format" cli:"format f"`
+}
+type AccessTokens []mod.AccessToken
+
+func (r *Repository) List(args ListTokensArgs) (AccessTokens, error) {
+	return r.apphost().ListTokens(args.Out)
 }
 
 func (r *Repository) Resolve(pkg string) (accessToken *mod.AccessToken, err error) {
@@ -84,7 +83,7 @@ func (r *Repository) Resolve(pkg string) (accessToken *mod.AccessToken, err erro
 
 	if id != nil {
 		var tokens []mod.AccessToken
-		if tokens, err = r.op().ListTokens(nil); err != nil {
+		if tokens, err = r.apphost().ListTokens(""); err != nil {
 			return
 		}
 
@@ -95,12 +94,11 @@ func (r *Repository) Resolve(pkg string) (accessToken *mod.AccessToken, err erro
 				return
 			}
 		}
-	} else if id, err = keys.Op(r.apphost()).CreateKey(pkg); err != nil {
+	} else if id, err = r.apphost().Keys().CreateKey(nil, pkg); err != nil {
 		return
 	}
 
-	args := api.CreateTokenArgs{ID: id}
-	if accessToken, err = r.op().CreateToken(args); err != nil {
+	if accessToken, err = r.apphost().CreateToken(id); err != nil {
 		return
 	}
 

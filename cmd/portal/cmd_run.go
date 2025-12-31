@@ -3,12 +3,11 @@ package main
 import (
 	"context"
 	"os"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/cryptopunkscc/portal/api/portald"
+	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
@@ -32,7 +31,7 @@ func (a *Application) Run(ctx context.Context, opt Opt, cmd ...string) (err erro
 		}
 	}
 	if len(opt.Token) > 0 {
-		a.Apphost.AuthToken = opt.Token
+		a.Apphost.Token = opt.Token
 		if err = a.Apphost.Reconnect(); err != nil {
 			return
 		}
@@ -62,25 +61,14 @@ func (a *Application) Run(ctx context.Context, opt Opt, cmd ...string) (err erro
 		go func() {
 			defer wg.Done()
 			cmd = fixCmd(cmd)
-			o := &portald.OpenOpt{}
-			if opt.Dev {
-				o.Schema = "dev"
-				o.Order = []int{2, 1, 0}
-			}
-			if opt.Order != "" {
-				o.Order = nil
-				i := 0
-				for _, s := range strings.Split(opt.Order, ",") {
-					if i, err = strconv.Atoi(s); err != nil {
-						return
-					}
-					o.Order = append(o.Order, i)
-				}
+			o := apphost.OpenOpt{
+				App:  cmd[0],
+				Args: strings.Join(cmd[1:], " "),
 			}
 			if opt.Open {
-				err = a.startApp(ctx, o, cmd)
+				err = a.startApp(ctx, o)
 			} else {
-				err = a.runApp(ctx, o, cmd)
+				err = a.runApp(ctx, o)
 			}
 		}()
 	}

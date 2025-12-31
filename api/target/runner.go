@@ -11,7 +11,7 @@ type Runner[T any] interface {
 }
 
 type Reloader interface {
-	Reload() error
+	Reload(ctx context.Context) error
 }
 
 var _ ReRunner[Source] = &SourceRunner[Portal_]{}

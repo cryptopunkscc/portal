@@ -3,9 +3,6 @@ package env
 import (
 	"os"
 	"path/filepath"
-
-	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/target/source"
 )
 
 type Key string
@@ -13,7 +10,8 @@ type Key string
 const (
 	AstraldHome       Key = "ASTRALD_HOME"
 	AstraldDb         Key = "ASTRALD_DB_DIR"
-	ApphostAddr       Key = "APPHOST_ADDR"
+	ApphostAddr       Key = "ASTRALD_APPHOST_ADDR"
+	ApphostToken      Key = "ASTRALD_APPHOST_TOKEN"
 	PortaldHome       Key = "PORTALD_HOME"
 	PortaldTokens     Key = "PORTALD_TOKENS_DIR"
 	PortaldApps       Key = "PORTALD_APPS_DIR"
@@ -64,8 +62,4 @@ func (k Key) MkdirAll() (dir string) {
 		panic(err)
 	}
 	return abs
-}
-
-func (k Key) Source() target.Source {
-	return source.Dir(k.MkdirAll())
 }

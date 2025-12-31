@@ -4,10 +4,11 @@ import (
 	"context"
 	"os"
 
-	"github.com/cryptopunkscc/portal/core/astrald"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd/help"
+	"github.com/cryptopunkscc/portal/runner/astrald"
+	"github.com/cryptopunkscc/portal/runner/astrald/initializer"
 )
 
 func (s *Service) Start(ctx context.Context) (err error) {
@@ -22,7 +23,7 @@ func (s *Service) Start(ctx context.Context) (err error) {
 			return
 		}
 	}
-	if err = s.startAstrald(ctx); err != nil {
+	if err = s.astrald().Start(ctx); err != nil {
 		return
 	}
 	if err = s.startPortald(ctx); err != nil {
@@ -34,8 +35,8 @@ func (s *Service) Start(ctx context.Context) (err error) {
 	return
 }
 
-func (s *Service) startAstrald(ctx context.Context) (err error) {
-	r := astrald.Initializer{
+func (s *Service) astrald() astrald.Runner {
+	return &initializer.Astrald{
 		AgentAlias: "portald",
 		NodeRoot:   s.Config.Astrald,
 		TokensDir:  s.Config.Tokens,
@@ -43,7 +44,6 @@ func (s *Service) startAstrald(ctx context.Context) (err error) {
 		Runner:     s.Astrald,
 		Apphost:    &s.Apphost,
 	}
-	return r.Start(ctx)
 }
 
 func (s *Service) startPortald(ctx context.Context) error {

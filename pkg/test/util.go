@@ -52,6 +52,10 @@ func Clean(path ...string) {
 	_ = os.RemoveAll(dir)
 }
 
+func NoError(t *testing.T, err error) {
+	AssertErr(t, err)
+}
+
 func AssertErr(t *testing.T, err error) {
 	if err != nil {
 		plog.Println(err)

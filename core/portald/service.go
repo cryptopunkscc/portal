@@ -2,18 +2,19 @@ package portald
 
 import (
 	"context"
-	"path/filepath"
 	"strings"
 	"sync"
 
 	"github.com/cryptopunkscc/astrald/mod/user"
-	"github.com/cryptopunkscc/portal/api/astrald"
 	"github.com/cryptopunkscc/portal/api/portal"
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/core/token"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/resources"
+	"github.com/cryptopunkscc/portal/runner/astrald"
+	source2 "github.com/cryptopunkscc/portal/source"
+	app2 "github.com/cryptopunkscc/portal/source/app"
 	"github.com/cryptopunkscc/portal/target/app"
 	"github.com/cryptopunkscc/portal/target/bundle"
 	"github.com/cryptopunkscc/portal/target/exec"
@@ -98,9 +99,8 @@ func (s *Service) Installer() app.Installer {
 	}
 }
 
-func (s *Service) Publisher() (p bundle.Publisher) {
-	p.Path = filepath.Join(s.Config.Astrald, "data")
-	return
+func (s *Service) Publisher() app2.Publisher {
+	return app2.Publisher{ObjectsClient: &s.Apphost.Objects().ObjectsClient}
 }
 
 func (s *Service) Tokens() *token.Repository {
@@ -111,6 +111,14 @@ func (s *Service) apps() Source {
 	return source.Dir(s.Config.Apps)
 }
 
-func (s *Service) Bundles() bundle.Repository {
-	return bundle.Repository{Apphost: &s.Apphost}
+func (s *Service) appsRef() *source2.Ref {
+	return source2.OSRef(s.Config.Apps)
+}
+
+func (s *Service) Bundles() *bundle.Repository {
+	return &bundle.Repository{Apphost: &s.Apphost}
+}
+
+func (s *Service) AppObjects() *app2.Objects {
+	return &app2.Objects{Adapter: &s.Apphost}
 }

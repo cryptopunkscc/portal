@@ -15,18 +15,6 @@ func (a *Adapter) Rpc() rpc.Rpc {
 
 var _ rpc.Rpc = &Adapter{}
 
-func (a *Adapter) Format(name string) rpc.Rpc {
-	return a.Rpc().Format(name)
-}
-
-func (a *Adapter) Conn(target, query string) (rpc.Conn, error) {
-	return a.Rpc().Conn(target, query)
-}
-
-func (a *Adapter) Request(target string, query ...string) rpc.Conn {
-	return a.Rpc().Request(target, query...)
-}
-
 func (a *Adapter) Router(handler cmd.Handler) rpc.Router {
 	return a.Rpc().Router(handler)
 }

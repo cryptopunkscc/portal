@@ -5,9 +5,9 @@ import (
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/runner/goja"
-	"github.com/cryptopunkscc/portal/runner/goja/dist"
-	"github.com/cryptopunkscc/portal/runner/goja/pro"
+	"github.com/cryptopunkscc/portal/runner/deprecated/goja"
+	"github.com/cryptopunkscc/portal/runner/deprecated/goja/dist"
+	"github.com/cryptopunkscc/portal/runner/deprecated/goja/pro"
 	"github.com/cryptopunkscc/portal/target/js"
 	"github.com/cryptopunkscc/portal/target/source"
 )
@@ -19,9 +19,9 @@ type Application struct{}
 func (a Application) handler() cmd.Handler {
 	return cmd.Handler{
 		Func: source.File.NewRun(
-			goja_pro.Runner(bind.NewBackendCore).Try,
-			goja_dist.Runner(bind.NewBackendCore).Try,
-			goja.Runner(bind.NewBackendCore).Try,
+			goja_pro.Runner(bind.CreateCore).Try,
+			goja_dist.Runner(bind.CreateCore).Try,
+			goja.Runner(bind.CreateCore).Try,
 		),
 		Name: "dev-js",
 		Desc: "Start portal js app development in goja runner.",

@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 	"slices"
 
-	"github.com/cryptopunkscc/portal/api/astrald"
 	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/pkg/config"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/runner/astrald"
 	"gopkg.in/yaml.v3"
 )
 

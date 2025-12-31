@@ -3,12 +3,12 @@ package main
 import (
 	"context"
 
-	"github.com/cryptopunkscc/portal/api/portald"
+	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
-func (a *Application) startApp(ctx context.Context, opt *portald.OpenOpt, cmd []string) (err error) {
+func (a *Application) startApp(ctx context.Context, opt apphost.OpenOpt) (err error) {
 	log := plog.Get(ctx)
-	log.Println("starting app", cmd)
-	return a.portald().Open(opt, cmd...)
+	log.Println("starting app", opt.App)
+	return a.portald().Open(opt)
 }

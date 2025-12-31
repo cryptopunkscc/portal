@@ -2,9 +2,9 @@ package rpc
 
 import (
 	"io"
+	"strings"
 
 	"github.com/cryptopunkscc/astrald/astral"
-	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
 	"github.com/cryptopunkscc/portal/pkg/rpc/stream"
@@ -48,11 +48,12 @@ func (r *rpcRequest) Flush() {
 func (r *rpcRequest) Call(method string, value any) (err error) {
 	defer plog.TraceErr(&err)
 	// build base query
-	p := apphost.NewPort(r.query...)
+	query := r.query
 	if method != "" {
-		p = p.Add(method)
+		query = append(query, method)
 	}
-	q := p.String()
+
+	q := strings.Join(r.query, ".")
 
 	// marshal args
 	if value != nil {

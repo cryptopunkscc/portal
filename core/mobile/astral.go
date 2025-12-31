@@ -13,8 +13,8 @@ import (
 	apphost "github.com/cryptopunkscc/astrald/mod/apphost/src"
 	"github.com/cryptopunkscc/astrald/mod/keys"
 	"github.com/cryptopunkscc/astrald/resources"
-	api "github.com/cryptopunkscc/portal/api/astrald"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	api "github.com/cryptopunkscc/portal/runner/astrald"
 	"gopkg.in/yaml.v3"
 )
 

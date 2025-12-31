@@ -1,9 +1,10 @@
 package apphost
 
 import (
-	"os"
+	"reflect"
 
 	"github.com/cryptopunkscc/astrald/lib/apphost"
+	"github.com/cryptopunkscc/astrald/lib/astrald"
 	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
@@ -18,10 +19,7 @@ func (a *Adapter) Connect() (err error) {
 }
 
 func (a *Adapter) IsConnected() bool {
-	return a.HostID != nil &&
-		a.GuestID != nil &&
-		a.AuthToken != "" &&
-		a.Endpoint != ""
+	return a.Client != nil
 }
 
 func (a *Adapter) Reconnect() (err error) {
@@ -32,18 +30,26 @@ func (a *Adapter) Reconnect() (err error) {
 
 func (a *Adapter) connect() (err error) {
 	defer plog.TraceErr(&err)
-	if len(a.Endpoint) == 0 {
-		a.Endpoint = env.ApphostAddr.Get()
-		if len(a.Endpoint) == 0 {
-			a.Endpoint = apphost.DefaultEndpoint
+	a.Endpoint = FirstNotZero(a.Endpoint, env.ApphostAddr.Get(), apphost.DefaultEndpoint)
+	a.Token = FirstNotZero(a.Token, env.ApphostToken.Get())
+	host, err := apphost.Connect(a.Endpoint)
+	if err != nil {
+		return
+	}
+	if err = host.AuthToken(a.Token); err != nil {
+		return
+	}
+	defer host.Close()
+	a.TargetID = host.HostID()
+	a.Client = astrald.NewClient(apphost.NewRouter(a.Endpoint, a.Token))
+	return
+}
+
+func FirstNotZero[T any](anyOf ...T) (zero T) {
+	for _, next := range anyOf {
+		if val := reflect.ValueOf(next); !val.IsZero() {
+			return next
 		}
-	}
-	if len(a.AuthToken) == 0 {
-		a.AuthToken = os.Getenv(apphost.AuthTokenEnv)
-	}
-	client, err := apphost.NewClient(a.Endpoint, a.AuthToken)
-	if err == nil {
-		a.Lib.Client = *client
 	}
 	return
 }
