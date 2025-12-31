@@ -3,7 +3,7 @@ package core
 import (
 	"context"
 
-	_ "github.com/cryptopunkscc/astrald/mod"
+	_ "github.com/cryptopunkscc/astrald/mod/all"
 	. "github.com/cryptopunkscc/portal/api/mobile"
 	"github.com/cryptopunkscc/portal/core/portald"
 )
