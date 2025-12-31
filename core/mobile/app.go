@@ -16,18 +16,22 @@ func (m *service) App(path string) mobile.App {
 		plog.Get(m.ctx).Type(m).E().Println(target.ErrNotFound)
 		return nil
 	}
+
 	if source, ok := apps[0].Source().(target.App_); ok {
 		return &app_{
 			ctx:     m.ctx,
 			source:  source,
-			newCore: m.cores().NewFrontendFunc(),
+			newCore: m.newCore,
 		}
 	}
 	return nil
 }
 
-func (m *service) cores() CoreFactory {
-	return CoreFactory{Repository: *m.Tokens()}
+func (m *service) newCore(ctx context.Context, portal target.Portal_) (Core, context.Context) {
+	return AutoTokenCoreFactory{
+		PkgName: portal.Manifest().Package,
+		Tokens:  m.Tokens(),
+	}.Create(ctx)
 }
 
 type app_ struct {

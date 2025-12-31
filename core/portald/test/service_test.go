@@ -104,10 +104,10 @@ func (s *testService) configure() test.Test {
 		//s.Astrald = &exec.Astrald{NodeRoot: s.Config.Astrald} // Faster testing
 		s.Astrald = &debug.Astrald{NodeRoot: s.Config.Astrald} // Debugging astrald
 
-		f := bind.CoreFactory{Repository: *s.Tokens()}
+		f := bind.AutoTokenCoreFactory{Tokens: s.Tokens()}
 		s.Resolve = target.Any[target.Runnable](
 			target.Skip("node_modules"),
-			goja.Runner(f.NewBackendFunc()).Try,
+			goja.Runner(f.Create2).Try,
 		)
 	})
 }

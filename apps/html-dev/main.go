@@ -52,7 +52,7 @@ func (a Application) handler() cmd.Handler {
 }
 
 func (a Application) core(ctx context.Context, portal Portal_) (bind.Core, context.Context) {
-	r, ctx := bind.NewFrontendCore(ctx, portal)
+	r, ctx := bind.DefaultCoreFactory{}.Create(ctx)
 	return &Adapter{r}, ctx
 }
 

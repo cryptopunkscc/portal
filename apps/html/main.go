@@ -50,7 +50,7 @@ func runner() Dispatcher {
 }
 
 func core(ctx context.Context, portal Portal_) (bind.Core, context.Context) {
-	r, ctx := bind.NewFrontendCore(ctx, portal)
+	r, ctx := bind.DefaultCoreFactory{}.Create(ctx)
 	return &Adapter{r}, ctx
 }
 

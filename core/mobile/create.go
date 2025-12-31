@@ -37,7 +37,7 @@ func Create(api mobile.Api) mobile.Core {
 	}
 	m.Resolve = Any[Runnable](
 		Skip("node_modules"),
-		goja.Runner(m.cores().NewBackendFunc()).Try,
+		goja.Runner(m.newCore).Try,
 		m.htmlRunner().Try,
 		exec2.Runner{Config: m.Config}.Dist().Try,
 		exec2.Runner{Config: m.Config}.Bundle().Try,

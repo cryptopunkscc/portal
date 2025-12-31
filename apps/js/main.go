@@ -41,7 +41,7 @@ func runner() Dispatcher {
 				bundle.Repository{Apphost: apphost.Default},
 			},
 			Resolve: Any[Runnable](
-				goja.Runner(bind.NewBackendCore).Try,
+				goja.Runner(bind.CreateCore).Try,
 			),
 		},
 	}
