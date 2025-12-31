@@ -59,7 +59,7 @@ func (f CoreFactory) frontendApphost(
 	create func(ctx context.Context, portal target.Portal_) apphost.Cached,
 ) newApphost {
 	return func(ctx context.Context, portal target.Portal_) (Apphost, context.Context) {
-		return Adapter(ctx, create(ctx, portal), portal.Manifest().Package), ctx
+		return Adapter(ctx, create(ctx, portal)), ctx
 	}
 }
 
@@ -70,6 +70,6 @@ func (f CoreFactory) backendApphost(
 		cached := create(ctx, portal)
 		core.ConnectionsThreshold = 0
 		ctx = core.Timeout(ctx, cached, portal)
-		return Adapter(ctx, cached, portal.Manifest().Package), ctx
+		return Adapter(ctx, cached), ctx
 	}
 }

@@ -14,13 +14,9 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
-func Adapter(ctx context.Context, cached apphost.Cached, pkg string) Apphost {
-	if pkg == "" {
-		panic("package is empty")
-	}
+func Adapter(ctx context.Context, cached apphost.Cached) Apphost {
 	a := &adapter{}
 	a.Cached = cached
-	a.pkg = pkg
 	a.log = plog.Get(ctx).Type(a)
 	return a
 }
@@ -28,7 +24,6 @@ func Adapter(ctx context.Context, cached apphost.Cached, pkg string) Apphost {
 type adapter struct {
 	apphost.Cached
 	log      plog.Logger
-	pkg      string
 	listener apphost.Listener
 }
 
