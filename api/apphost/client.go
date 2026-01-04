@@ -12,23 +12,8 @@ type Client interface {
 	Query(target string, method string, args any) (Conn, error)
 	Resolve(name string) (*astral.Identity, error)
 	Register() (Listener, error)
-	Protocol() string
 	DisplayName(identity *astral.Identity) string
-	Session() (Session, error)
 	Rpc() rpc.Rpc
-}
-
-type Session interface {
-	Token(token string) (res TokenResponse, err error)
-	Query(callerID *astral.Identity, targetID *astral.Identity, query string) (conn Conn, err error)
-	Register(identity *astral.Identity, target string) (token string, err error)
-	Close() error
-}
-
-type TokenResponse interface {
-	Code() uint8
-	GuestID() *astral.Identity
-	HostID() *astral.Identity
 }
 
 type Conn interface {
@@ -48,8 +33,6 @@ type Listener interface {
 	Close() error
 	Addr() net.Addr
 	String() string
-	Token() string
-	SetToken(token string)
 	Done() <-chan struct{}
 }
 

@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/cryptopunkscc/astrald/astral"
+	"github.com/cryptopunkscc/astrald/lib/astrald"
 	api "github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
@@ -11,23 +12,17 @@ import (
 var Default = &Adapter{}
 
 type Adapter struct {
-	Lib
-	mu  sync.Mutex
-	Log plog.Logger
+	*astrald.Client
+	astrald.Config
+	HostID *astral.Identity
+	mu     sync.Mutex
+	Log    plog.Logger
 }
 
 func (a *Adapter) Clone() (c *Adapter) {
 	c = &Adapter{}
 	c.Log = a.Log
-	c.Lib = a.Lib
 	return
-}
-
-func (a *Adapter) Protocol() string {
-	if a.Connect() != nil {
-		return ""
-	}
-	return a.Lib.Protocol()
 }
 
 func (a *Adapter) Resolve(name string) (i *astral.Identity, err error) {
@@ -36,19 +31,16 @@ func (a *Adapter) Resolve(name string) (i *astral.Identity, err error) {
 		return
 	}
 	if name == "" {
-		return a.Lib.HostID, nil
+		name = "localnode"
 	}
-	if i, err = a.Lib.LocalNode().ResolveIdentity(name); err != nil {
-		return
-	}
-	return
+	return astrald.NewDirClient(a.Client).ResolveIdentity(name)
 }
 
 func (a *Adapter) DisplayName(identity *astral.Identity) string {
 	if err := a.Connect(); err != nil {
 		return ""
 	}
-	alias, _ := a.Lib.LocalNode().GetAlias(identity)
+	alias, _ := astrald.NewDirClient(a.Client).GetAlias(identity)
 	return alias
 }
 
@@ -60,19 +52,7 @@ func (a *Adapter) Query(target string, method string, args any) (conn api.Conn, 
 	if err != nil {
 		return
 	}
-	return outConn(a.Lib.Query(target, method, args))
-}
-
-func (a *Adapter) Session() (s api.Session, err error) {
-	defer plog.TraceErr(&err)
-	if err = a.Connect(); err != nil {
-		return
-	}
-	ss, err := a.Lib.Session()
-	if err != nil {
-		return
-	}
-	return session{ss}, nil
+	return outConn(a.Client.Query(target, method, args))
 }
 
 func (a *Adapter) Register() (l api.Listener, err error) {
@@ -80,7 +60,7 @@ func (a *Adapter) Register() (l api.Listener, err error) {
 	if err = a.Connect(); err != nil {
 		return
 	}
-	ll, err := a.Lib.Listen()
+	ll, err := a.Client.Listen()
 	if err != nil {
 		return
 	}

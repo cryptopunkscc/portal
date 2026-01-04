@@ -22,7 +22,7 @@ func (s *Service) CreateUser(alias string) (err error) {
 	}
 
 	// authenticate as user
-	s.Apphost.AuthToken = s.UserCreated.AccessToken.String()
+	s.Apphost.Token = s.UserCreated.AccessToken.String()
 	if err = s.Apphost.Reconnect(); err != nil {
 		return
 	}
@@ -63,7 +63,7 @@ func (s *Service) authenticate() (err error) {
 	if err != nil {
 		return
 	}
-	s.Apphost.AuthToken = uat.Token.String()
+	s.Apphost.Token = uat.Token.String()
 	if err = s.Apphost.Reconnect(); err != nil {
 		return
 	}

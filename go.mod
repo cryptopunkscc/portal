@@ -20,9 +20,11 @@ require (
 	github.com/matryer/is v1.4.1
 	github.com/pterm/pterm v0.12.81
 	github.com/samber/lo v1.39.0
+	github.com/spf13/afero v1.15.0
 	github.com/stretchr/testify v1.10.0
 	github.com/wailsapp/wails/v2 v2.9.0
 	github.com/webview/webview v0.0.0-20230415172654-8387ff8945fc
+	go.nhat.io/aferocopy/v2 v2.0.3
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 	golang.org/x/mod v0.29.0
 	golang.org/x/sys v0.37.0
@@ -37,8 +39,14 @@ require (
 	atomicgo.dev/schedule v0.1.0 // indirect
 	bitbucket.org/creachadair/shell v0.0.7 // indirect
 	github.com/akutz/memconn v0.1.0 // indirect
+	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.3.2 // indirect
+	github.com/charmbracelet/colorprofile v0.2.3-0.20250311203215-f60798e515dc // indirect
+	github.com/charmbracelet/lipgloss v1.1.0 // indirect
+	github.com/charmbracelet/x/ansi v0.8.0 // indirect
+	github.com/charmbracelet/x/cellbuf v0.0.13-0.20250311204145-2c3ea96c31dd // indirect
+	github.com/charmbracelet/x/term v0.2.1 // indirect
 	github.com/containerd/console v1.0.5 // indirect
 	github.com/cryptopunkscc/utp v0.0.0-20251010115525-2f03809eff3d // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -71,10 +79,12 @@ require (
 	github.com/leaanthony/go-ansi-parser v1.6.0 // indirect
 	github.com/leaanthony/u v1.1.0 // indirect
 	github.com/lithammer/fuzzysearch v1.1.8 // indirect
+	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/mattn/go-sqlite3 v1.14.17 // indirect
+	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -82,7 +92,6 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
-	github.com/spf13/afero v1.15.0 // indirect
 	github.com/tjfoc/gmsm v1.4.1 // indirect
 	github.com/tkrajina/go-reflector v0.5.6 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
@@ -91,7 +100,6 @@ require (
 	github.com/wailsapp/mimetype v1.4.1 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/xtaci/kcp-go/v5 v5.6.24 // indirect
-	go.nhat.io/aferocopy/v2 v2.0.3 // indirect
 	golang.org/x/crypto v0.43.0 // indirect
 	golang.org/x/net v0.46.0 // indirect
 	golang.org/x/term v0.36.0 // indirect

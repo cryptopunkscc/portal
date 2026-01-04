@@ -42,12 +42,12 @@ type AutoTokenCoreFactory struct {
 
 func (f AutoTokenCoreFactory) Create(ctx context.Context) (Core2, context.Context) {
 	i := &apphost.Invoker{Ctx: ctx}
-	i.Client.Endpoint = f.Tokens.Endpoint
+	i.Endpoint = f.Tokens.Endpoint
 	t, err := f.Tokens.Get(f.PkgName)
 	if err != nil {
 		return Core2{}, nil
 	}
-	i.Client.AuthToken = t.Token.String()
+	i.Token = t.Token.String()
 	c := Core2{}
 	c.Process, ctx = NewProcess(ctx)
 	c.Adapter = NewAdapter(ctx, apphost.NewCached(i))

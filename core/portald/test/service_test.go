@@ -312,7 +312,7 @@ func (s *testService) readObject(id astral.ObjectID) test.Test {
 
 func (s *testService) reconnectAsUser() test.Test {
 	return s.test(func(t *testing.T) {
-		s.Apphost.AuthToken = s.UserCreated.AccessToken.String()
+		s.Apphost.Token = s.UserCreated.AccessToken.String()
 		err := s.Apphost.Reconnect()
 		test.AssertErr(t, err)
 	})
@@ -320,7 +320,7 @@ func (s *testService) reconnectAsUser() test.Test {
 
 func (s *testService) reconnectAsUser2(s2 *testService) test.Test {
 	return s.test(func(t *testing.T) {
-		s.Apphost.AuthToken = s2.UserCreated.AccessToken.String()
+		s.Apphost.Token = s2.UserCreated.AccessToken.String()
 		err := s.Apphost.Reconnect()
 		test.AssertErr(t, err)
 	})
@@ -330,7 +330,7 @@ func (s *testService) reconnectAs(alias string) test.Test {
 	return s.arg(alias).test(func(t *testing.T) {
 		pt, err := s.Tokens().Resolve(alias)
 		test.AssertErr(t, err)
-		s.Apphost.AuthToken = pt.Token.String()
+		s.Apphost.Token = pt.Token.String()
 		err = s.Apphost.Reconnect()
 		test.AssertErr(t, err)
 	})

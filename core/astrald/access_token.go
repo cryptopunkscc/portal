@@ -9,7 +9,7 @@ func (i *Initializer) fetchAuthToken(pkg string) (err error) {
 	if err != nil {
 		return
 	}
-	i.Apphost.AuthToken = string(t.Token)
+	i.Apphost.Token = string(t.Token)
 	i.log.Println("fetched", pkg, "auth token")
 	return
 }
@@ -19,7 +19,7 @@ func (i *Initializer) resolveAuthToken(pkg string) (err error) {
 	if err != nil {
 		return
 	}
-	i.Apphost.AuthToken = string(t.Token)
+	i.Apphost.Token = string(t.Token)
 	i.log.Println("resolved", pkg, "auth token")
 	return
 }

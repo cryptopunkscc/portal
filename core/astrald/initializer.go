@@ -60,7 +60,7 @@ func (i *Initializer) initialize(ctx context.Context) (err error) {
 	if err = i.resolveNodeAuthToken(); err != nil {
 		return
 	}
-	i.Apphost.AuthToken = i.nodeToken
+	i.Apphost.Token = i.nodeToken
 	if !i.apphostIsRunning() {
 		if err = i.startAstrald(ctx); err != nil {
 			return
@@ -104,7 +104,7 @@ func (i *Initializer) start(ctx context.Context) (err error) {
 
 // verify the agent access token has been set
 func (i *Initializer) verifyAgentToken() {
-	if len(i.Apphost.AuthToken) == 0 || i.Apphost.AuthToken == i.nodeToken {
-		panic(fmt.Errorf("invalid agent token with len %d", len(i.Apphost.AuthToken)))
+	if len(i.Apphost.Token) == 0 || i.Apphost.Token == i.nodeToken {
+		panic(fmt.Errorf("invalid agent token with len %d", len(i.Apphost.Token)))
 	}
 }
