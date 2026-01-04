@@ -13,7 +13,7 @@ import (
 )
 
 func (a *Application) Configure() (err error) {
-	if len(a.Apphost.AuthToken) > 0 {
+	if len(a.Apphost.Token) > 0 {
 		return
 	}
 	if err = a.resolveConfig(); err != nil {
@@ -55,7 +55,7 @@ func (a *Application) setupAuthToken() (err error) {
 	var t *apphost.AccessToken
 	tokens := token.Repository{Dir: a.Config.Tokens}
 	if t, err = tokens.Get("portal"); err == nil {
-		a.Apphost.AuthToken = string(t.Token)
+		a.Apphost.Token = string(t.Token)
 	}
 	return
 }

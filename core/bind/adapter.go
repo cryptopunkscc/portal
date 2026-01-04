@@ -1,7 +1,6 @@
 package bind
 
 import (
-	"context"
 	_ "embed"
 	"encoding/json"
 	"errors"
@@ -11,19 +10,17 @@ import (
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/bind"
-	"github.com/cryptopunkscc/portal/pkg/plog"
+	apphost2 "github.com/cryptopunkscc/portal/core/apphost"
 )
 
-func NewAdapter(ctx context.Context, cached apphost.Cached) *Adapter {
+func NewAdapter(invoker apphost2.Invoker) *Adapter {
 	a := &Adapter{}
-	a.Cached = cached
-	a.log = plog.Get(ctx).Type(a)
+	a.Invoker = invoker
 	return a
 }
 
 type Adapter struct {
-	apphost.Cached
-	log      plog.Logger
+	apphost2.Invoker
 	listener apphost.Listener
 }
 
@@ -65,7 +62,7 @@ func (a *Adapter) ConnAccept() (data *bind.QueryData, err error) {
 		return
 	}
 
-	a.log.Println("accepted connection:", conn.Ref())
+	a.Log.Println("accepted connection:", conn.Ref())
 
 	data = &bind.QueryData{
 		Id:       conn.Ref(),
@@ -76,7 +73,7 @@ func (a *Adapter) ConnAccept() (data *bind.QueryData, err error) {
 }
 
 func (a *Adapter) ConnClose(id string) (err error) {
-	a.log.Printf("close <%s>", id)
+	a.Log.Printf("close <%s>", id)
 	conn, ok := a.Connections().Get(id)
 	if !ok {
 		err = errors.New("[ConnClose] not found connection with id: " + id)
@@ -87,8 +84,8 @@ func (a *Adapter) ConnClose(id string) (err error) {
 }
 
 func (a *Adapter) ConnWrite(id string, data []byte) (n int, err error) {
-	a.log.Printf("> [%v]byte <%s>", len(data), id)
-	//api.log.Printf("> [%v]byte <%s>", data, id)
+	a.Log.Printf("> [%v]byte <%s>", len(data), id)
+	//api.Log.Printf("> [%v]byte <%s>", data, id)
 	conn, ok := a.Connections().Get(id)
 	if !ok {
 		err = errors.New("[ConnWrite] not found connection with id: " + id)
@@ -107,13 +104,13 @@ func (a *Adapter) ConnRead(id string, n int) (data []byte, err error) {
 	buf := make([]byte, n)
 	n, err = conn.Read(buf)
 	data = buf[:n]
-	a.log.Printf("< [%v]byte <%s>", n, id)
-	//api.log.Printf("< [%v]byte <%s> %v", data, id, err)
+	a.Log.Printf("< [%v]byte <%s>", n, id)
+	//api.Log.Printf("< [%v]byte <%s> %v", data, id, err)
 	return
 }
 
 func (a *Adapter) ConnWriteLn(id string, data string) (err error) {
-	a.log.Printf("> %s <%s>", strings.TrimRight(data, "\r\n"), id)
+	a.Log.Printf("> %s <%s>", strings.TrimRight(data, "\r\n"), id)
 	conn, ok := a.Connections().Get(id)
 	if !ok {
 		err = errors.New("[ConnWriteLn] not found connection with id: " + id)
@@ -134,12 +131,12 @@ func (a *Adapter) ConnReadLn(id string) (data string, err error) {
 	}
 	data, err = conn.ReadString('\n')
 	data = strings.TrimSuffix(data, "\n")
-	a.log.Printf("< %s <%s>", data, id)
+	a.Log.Printf("< %s <%s>", data, id)
 	return
 }
 
 func (a *Adapter) Query(target string, query string) (data *bind.QueryData, err error) {
-	a.log.Println("~>", target, query)
+	a.Log.Println("~>", target, query)
 	conn, err := a.Cached.Query(target, query, nil)
 	if err != nil {
 		return

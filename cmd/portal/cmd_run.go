@@ -32,7 +32,7 @@ func (a *Application) Run(ctx context.Context, opt Opt, cmd ...string) (err erro
 		}
 	}
 	if len(opt.Token) > 0 {
-		a.Apphost.AuthToken = opt.Token
+		a.Apphost.Token = opt.Token
 		if err = a.Apphost.Reconnect(); err != nil {
 			return
 		}

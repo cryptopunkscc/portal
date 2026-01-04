@@ -109,6 +109,7 @@ func (s *testService) configure() test.Test {
 			target.Skip("node_modules"),
 			goja.Runner(f.Create2).Try,
 		)
+		//s.Apphost.Log = plog.New().Scope("TEST_APPHOST_" + s.name)
 	})
 }
 

@@ -11,7 +11,7 @@ import (
 
 type NewCore func(ctx context.Context, portal target.Portal_) (Core, context.Context)
 
-func CreateCore(ctx context.Context, portal target.Portal_) (Core, context.Context) {
+func CreateCore(ctx context.Context, portal target.Portal_) (Core2, context.Context) {
 	return DefaultCoreFactory{}.Create(ctx)
 }
 
@@ -21,17 +21,18 @@ type Core interface {
 }
 
 type Core2 struct {
-	*Adapter
+	Adapter
 	*Process
 }
 
 type DefaultCoreFactory struct{}
 
 func (DefaultCoreFactory) Create(ctx context.Context) (Core2, context.Context) {
-	i := &apphost.Invoker{Ctx: ctx}
 	c := Core2{}
 	c.Process, ctx = NewProcess(ctx)
-	c.Adapter = NewAdapter(ctx, apphost.NewCached(i))
+	c.Ctx = ctx
+	c.Cached = *apphost.NewCached(apphost.Default)
+	c.Adapter.Log = c.Process.log
 	return c, ctx
 }
 
@@ -40,17 +41,20 @@ type AutoTokenCoreFactory struct {
 	Tokens  *token.Repository
 }
 
-func (f AutoTokenCoreFactory) Create(ctx context.Context) (Core2, context.Context) {
-	i := &apphost.Invoker{Ctx: ctx}
-	i.Endpoint = f.Tokens.Endpoint
+func (f AutoTokenCoreFactory) Create(ctx context.Context) (*Core2, context.Context) {
+	c := &Core2{}
+
 	t, err := f.Tokens.Get(f.PkgName)
 	if err != nil {
-		return Core2{}, nil
+		panic(err)
 	}
-	i.Token = t.Token.String()
-	c := Core2{}
+
 	c.Process, ctx = NewProcess(ctx)
-	c.Adapter = NewAdapter(ctx, apphost.NewCached(i))
+	c.Cached = *apphost.NewCached(apphost.Default)
+	c.Ctx = ctx
+	c.Token = t.Token.String()
+	c.Endpoint = f.Tokens.Endpoint
+	c.Adapter.Log = c.Process.log
 	return c, ctx
 }
 
