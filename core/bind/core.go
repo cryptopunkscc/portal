@@ -11,7 +11,7 @@ import (
 
 type NewCore func(ctx context.Context, portal target.Portal_) (Core, context.Context)
 
-func CreateCore(ctx context.Context, portal target.Portal_) (Core2, context.Context) {
+func CreateCore(ctx context.Context, portal target.Portal_) (*Core2, context.Context) {
 	return DefaultCoreFactory{}.Create(ctx)
 }
 
@@ -27,8 +27,8 @@ type Core2 struct {
 
 type DefaultCoreFactory struct{}
 
-func (DefaultCoreFactory) Create(ctx context.Context) (Core2, context.Context) {
-	c := Core2{}
+func (DefaultCoreFactory) Create(ctx context.Context) (*Core2, context.Context) {
+	c := &Core2{}
 	c.Process, ctx = NewProcess(ctx)
 	c.Ctx = ctx
 	c.Cached = *apphost.NewCached(apphost.Default)

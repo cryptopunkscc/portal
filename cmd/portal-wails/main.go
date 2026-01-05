@@ -11,6 +11,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/runner/v2/wails"
 	"github.com/cryptopunkscc/portal/source"
+	"github.com/cryptopunkscc/portal/source/app"
 )
 
 func main() { cli.Run(handler) }
@@ -31,7 +32,7 @@ func run(ctx context.Context, src string) (err error) {
 	astrald.DefaultClient()
 	s := source.Providers{
 		source.OsFs,
-		&source.Objects{Client: *astrald.DefaultClient()},
+		&app.Objects{Client: *astrald.DefaultClient()},
 	}.GetSource(src)
 	if s == nil {
 		return fs.ErrNotExist

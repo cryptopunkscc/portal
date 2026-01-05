@@ -73,13 +73,17 @@ func (z *Zip) WriteRef(ref Ref) (err error) {
 }
 
 func (z Zip) Publish(objects *astrald.ObjectsClient) (err error) {
-	writer, err := objects.Create("", len(z.Blob))
+	z.ObjectID, err = ObjectsCommit(objects, bytes.NewReader(z.Blob))
+	return
+}
+
+func ObjectsCommit(objects *astrald.ObjectsClient, to io.WriterTo) (objectID *astral.ObjectID, err error) {
+	writer, err := objects.Create("", 0)
 	if err != nil {
 		return
 	}
-	if _, err = writer.Write(z.Blob); err != nil {
+	if _, err = to.WriteTo(writer); err != nil {
 		return
 	}
-	z.ObjectID, err = writer.Commit()
-	return
+	return writer.Commit()
 }

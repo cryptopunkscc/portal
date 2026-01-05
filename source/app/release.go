@@ -1,4 +1,4 @@
-package source
+package app
 
 import (
 	"encoding/json"
@@ -16,9 +16,7 @@ type ReleaseMetadata struct {
 }
 
 func init() {
-	_ = astral.DefaultBlueprints.Add(
-		&ReleaseMetadata{},
-	)
+	_ = astral.DefaultBlueprints.Add(&ReleaseMetadata{})
 }
 
 func (ReleaseMetadata) ObjectType() string { return "app.release" }

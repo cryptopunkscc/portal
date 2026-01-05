@@ -27,6 +27,8 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/runner/goja"
+	source2 "github.com/cryptopunkscc/portal/source"
+	"github.com/cryptopunkscc/portal/source/app"
 	"github.com/cryptopunkscc/portal/target/bundle"
 	"github.com/cryptopunkscc/portal/target/npm"
 	"github.com/cryptopunkscc/portal/target/source"
@@ -39,8 +41,9 @@ type testService struct {
 	ctx    context.Context
 	config portal.Config
 	*portald.Service
-	apps      []target.Portal_
-	published map[astral.ObjectID]bundle.Info
+	apps       []target.Portal_
+	published  map[astral.ObjectID]bundle.Info
+	published2 map[astral.ObjectID]app.ReleaseInfo
 }
 
 func testServiceContext(t *testing.T) context.Context {
@@ -267,6 +270,33 @@ func (s *testService) awaitPublishedBundles() test.Test {
 			t.Fatalf("no published bundles")
 		}
 		for id := range s.published {
+			s.awaitObject(id).Run(t)
+			break
+		}
+	})
+}
+
+func (s *testService) publishAppBundlesV2() test.Test {
+	return s.test(func(t *testing.T) {
+		s.published2 = map[astral.ObjectID]app.ReleaseInfo{}
+		src := source2.FSRef(apps.Builds)
+		l, err := app.PublishAppBundlesSrc(s.Apphost.Client, src)
+		test.AssertErr(t, err)
+		count := 0
+		for _, app := range l {
+			s.published2[*app.ReleaseID] = app
+			count++
+		}
+		assert.NotZero(t, count)
+	})
+}
+
+func (s *testService) awaitPublishedBundlesV2() test.Test {
+	return s.test(func(t *testing.T) {
+		if len(s.published) == 0 {
+			t.Fatalf("no published bundles")
+		}
+		for id := range s.published2 {
 			s.awaitObject(id).Run(t)
 			break
 		}

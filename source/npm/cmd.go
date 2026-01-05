@@ -1,10 +1,10 @@
-package source
+package npm
 
 import (
 	"io/fs"
 
-	"github.com/cryptopunkscc/astrald/lib/astrald"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/source"
 )
 
 type BuildNpmAppsOpt struct {
@@ -15,8 +15,8 @@ type BuildNpmAppsOpt struct {
 // BuildNpmApps recursively searches the given path and builds any app bundle it finds.
 func BuildNpmApps(opt BuildNpmAppsOpt, path string) (err error) {
 	defer plog.TraceErr(&err)
-	ref := OSRef(path)
-	projects := CollectIt(ref, &NpmProject{})
+	ref := source.OSRef(path)
+	projects := source.CollectIt(ref, &Project{})
 	if len(projects) == 0 {
 		return fs.ErrNotExist
 	}
@@ -33,22 +33,6 @@ func BuildNpmApps(opt BuildNpmAppsOpt, path string) (err error) {
 			if err = p.Project().Pack(); err != nil {
 				return
 			}
-		}
-	}
-	return
-}
-
-// PublishAppBundles recursively searches the given path and publishes any app bundle it finds.
-func PublishAppBundles(path string) (err error) {
-	defer plog.TraceErr(&err)
-	apps := CollectIt(OSRef(path), &AppBundle{})
-	if len(apps) == 0 {
-		return fs.ErrNotExist
-	}
-	objects := astrald.Objects()
-	for _, app := range apps {
-		if err = app.Publish(objects); err != nil {
-			return
 		}
 	}
 	return

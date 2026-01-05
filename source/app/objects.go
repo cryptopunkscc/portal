@@ -1,4 +1,4 @@
-package source
+package app
 
 import (
 	"context"
@@ -17,19 +17,20 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
+	"github.com/cryptopunkscc/portal/source"
 )
 
 type Objects struct {
 	astrald.Client
 }
 
-var _ Provider = &Objects{}
+var _ source.Provider = &Objects{}
 
-func (r *Objects) GetSource(src string) (out Source) {
+func (r *Objects) GetSource(src string) (out source.Source) {
 	return r.GetAppBundle(src)
 }
 
-func (r *Objects) GetAppBundle(src string) (out *AppBundle) {
+func (r *Objects) GetAppBundle(src string) (out *Bundle) {
 	id, err := astral.ParseID(src)
 	if err == nil {
 		out, err = r.GetByObjectID(*id)
@@ -42,7 +43,7 @@ func (r *Objects) GetAppBundle(src string) (out *AppBundle) {
 	return
 }
 
-func (r *Objects) GetByNameOrPkg(name string) (out *AppBundle, err error) {
+func (r *Objects) GetByNameOrPkg(name string) (out *Bundle, err error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	infos, err := r.Scan(ctx, false)
@@ -64,17 +65,17 @@ func (r *Objects) GetByNameOrPkg(name string) (out *AppBundle, err error) {
 	return
 }
 
-func (r *Objects) GetByObjectID(id astral.ObjectID, host ...astral.Identity) (out *AppBundle, err error) {
+func (r *Objects) GetByObjectID(id astral.ObjectID, host ...astral.Identity) (out *Bundle, err error) {
 	defer plog.TraceErr(&err)
 	var c *channel.Channel
 	for _, identity := range host {
-		out, _, err = func() (o *AppBundle, n int64, err error) {
+		out, _, err = func() (o *Bundle, n int64, err error) {
 			c, err = r.QueryChannel(identity.String(), "objects.read", query.Args{"id": id.String()})
 			if err != nil {
 				return
 			}
 			defer c.Close()
-			return astralRead[*AppBundle](c.Transport())
+			return astralRead[*Bundle](c.Transport())
 		}()
 		return
 	}

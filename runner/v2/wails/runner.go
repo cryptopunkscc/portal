@@ -8,6 +8,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/assets"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/source"
+	"github.com/cryptopunkscc/portal/source/html"
 	"github.com/wailsapp/wails/v2/pkg/application"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
@@ -20,7 +21,7 @@ type Runner interface {
 
 type BundleRunner struct {
 	AppRunner
-	Bundle source.HtmlBundle
+	Bundle html.Bundle
 }
 
 func NewBundleRunner(core bind.Core) *BundleRunner {
@@ -29,14 +30,14 @@ func NewBundleRunner(core bind.Core) *BundleRunner {
 
 func (r *BundleRunner) ReadSrc(src source.Source) (err error) {
 	if err = r.Bundle.ReadSrc(src); err != nil {
-		r.HtmlApp = r.Bundle.HtmlApp
+		r.App = r.Bundle.App
 		r.Func = r.Run
 	}
 	return
 }
 
 type AppRunner struct {
-	source.HtmlApp
+	html.App
 	Core     bind.Core
 	frontCtx context.Context
 }

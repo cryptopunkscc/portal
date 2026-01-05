@@ -4,17 +4,6 @@ import (
 	"github.com/spf13/afero"
 )
 
-var OsFs = PathProvider{Ref{Fs: afero.NewOsFs()}}
-
-type PathProvider struct{ Ref }
-
-func (r PathProvider) GetSource(path string) (out Source) {
-	if err := r.Ref.Checkout(path); err == nil {
-		out = r.New()
-	}
-	return
-}
-
 type Provider interface {
 	GetSource(source string) Source
 }
@@ -29,3 +18,14 @@ func (p Providers) GetSource(source string) (out Source) {
 	}
 	return
 }
+
+type PathProvider struct{ Ref }
+
+func (r PathProvider) GetSource(path string) (out Source) {
+	if err := r.Ref.Checkout(path); err == nil {
+		out = r.New()
+	}
+	return
+}
+
+var OsFs = PathProvider{Ref{Fs: afero.NewOsFs()}}
