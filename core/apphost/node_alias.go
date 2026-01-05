@@ -5,10 +5,10 @@ import (
 )
 
 func (a *Adapter) NodeAlias() (alias string, err error) {
-	dir := astrald.NewDirClient(a.Client)
-	identity, err := dir.ResolveIdentity("localnode")
+	dir := astrald.NewDirClient(a.TargetID, a.Client)
+	identity, err := dir.ResolveIdentity(nil, "localnode")
 	if err != nil {
 		return
 	}
-	return dir.GetAlias(identity)
+	return dir.GetAlias(nil, identity)
 }

@@ -18,8 +18,8 @@ type Client interface {
 
 type Conn interface {
 	io.ReadWriteCloser
+	LocalIdentity() *astral.Identity
 	RemoteIdentity() *astral.Identity
-	RemoteAddr() net.Addr
 	Query() string
 	ReadString(delim byte) (string, error)
 
@@ -38,7 +38,7 @@ type Listener interface {
 
 type PendingQuery interface {
 	Query() string
-	RemoteIdentity() *astral.Identity
+	Caller() *astral.Identity
 	Reject() (err error)
 	Accept() (conn Conn, err error)
 	Close() error

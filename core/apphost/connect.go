@@ -1,7 +1,11 @@
 package apphost
 
 import (
+	"reflect"
+
+	"github.com/cryptopunkscc/astrald/lib/apphost"
 	"github.com/cryptopunkscc/astrald/lib/astrald"
+	"github.com/cryptopunkscc/portal/api/env"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
@@ -15,7 +19,7 @@ func (a *Adapter) Connect() (err error) {
 }
 
 func (a *Adapter) IsConnected() bool {
-	return a.HostID != nil
+	return a.TargetID != nil
 }
 
 func (a *Adapter) Reconnect() (err error) {
@@ -26,16 +30,26 @@ func (a *Adapter) Reconnect() (err error) {
 
 func (a *Adapter) connect() (err error) {
 	defer plog.TraceErr(&err)
-	defaultConfig := astrald.DefaultConfig()
-	if len(a.Endpoint) == 0 {
-		a.Endpoint = defaultConfig.Endpoint
+	a.Endpoint = FirstNotZero(a.Endpoint, env.ApphostAddr.Get(), apphost.DefaultEndpoint)
+	a.Token = FirstNotZero(a.Token, env.ApphostToken.Get())
+	host, err := apphost.Connect(a.Endpoint)
+	if err != nil {
+		return
 	}
-	if len(a.Token) == 0 {
-		a.Token = defaultConfig.Token
+	if err = host.AuthToken(a.Token); err != nil {
+		return
 	}
-	a.Client = astrald.NewClient(a.Config)
-	if a.HostID == nil {
-		a.HostID, err = astrald.NewDirClient(a.Client).ResolveIdentity("localnode")
+	defer host.Close()
+	a.TargetID = host.HostID()
+	a.Client = astrald.NewClient(apphost.NewRouter(a.Endpoint, a.Token))
+	return
+}
+
+func FirstNotZero[T any](anyOf ...T) (zero T) {
+	for _, next := range anyOf {
+		if val := reflect.ValueOf(next); !val.IsZero() {
+			return next
+		}
 	}
 	return
 }

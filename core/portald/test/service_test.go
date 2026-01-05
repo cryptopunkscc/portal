@@ -161,7 +161,7 @@ func (s *testService) hasUser() test.Test {
 
 func (s *testService) userClaim(s2 *testService) test.Test {
 	return s.test(func(t *testing.T) {
-		err := s.Claim(s2.Apphost.HostID.String())
+		err := s.Claim(s2.Apphost.TargetID.String())
 		test.AssertErr(t, err)
 	}).Requires(
 		s.createUser(),
@@ -171,7 +171,7 @@ func (s *testService) userClaim(s2 *testService) test.Test {
 
 func (s *testService) addEndpoint(s2 *testService) test.Test {
 	return s.arg(s2.name).test(func(t *testing.T) {
-		id := s2.Apphost.HostID.String()
+		id := s2.Apphost.TargetID.String()
 		port := s2.Config.TCP.ListenPort
 		endpoint := fmt.Sprintf("tcp:127.0.0.1:%d", port)
 		err := nodes.Op(&s.Apphost).AddEndpoint(id, endpoint)
@@ -373,7 +373,7 @@ func (s *testService) scanObjects(typ string, s2 ...*testService) test.Test {
 		o = append(o, s)
 	}
 	return s.arg(typ).test(func(t *testing.T) {
-		c := objects.Op(s.Apphost.Rpc(), o[0].Apphost.HostID.String())
+		c := objects.Op(s.Apphost.Rpc(), o[0].Apphost.TargetID.String())
 		search, err := c.Scan(objects.ScanArgs{
 			Type: typ,
 			Zone: astral.ZoneAll,
@@ -409,7 +409,7 @@ func (s *testService) searchObjects(query string, s2 ...*testService) test.Test 
 		o = append(o, s)
 	}
 	return s.arg(query).test(func(t *testing.T) {
-		c := objects.Op(s.Apphost.Rpc(), o[0].Apphost.HostID.String())
+		c := objects.Op(s.Apphost.Rpc(), o[0].Apphost.TargetID.String())
 		search, err := c.Search(objects.SearchArgs{
 			Query: query,
 			Zone:  astral.ZoneAll,

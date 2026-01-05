@@ -63,7 +63,7 @@ func (r Objects) GetByObjectID(id astral.ObjectID, host ...astral.Identity) (out
 	var c *channel.Channel
 	for _, identity := range host {
 		out, _, err = func() (o *Bundle, n int64, err error) {
-			c, err = r.QueryChannel(identity.String(), "objects.read", query.Args{"id": id.String()})
+			c, err = r.WithTarget(&identity).QueryChannel(nil, "objects.read", query.Args{"id": id.String()})
 			if err != nil {
 				return
 			}
@@ -105,7 +105,7 @@ func (r Objects) Scan(ctx context.Context, follow bool) (out flow.Input[ReleaseI
 
 		// remote apps
 		if conn, err := r.Query(
-			"localnode", "user.list_siblings", map[string]any{
+			nil, "user.list_siblings", map[string]any{
 				"out":  "json",
 				"zone": astral.ZoneAll,
 			}); err != nil {

@@ -78,7 +78,7 @@ func (z Zip) Publish(objects *astrald.ObjectsClient) (err error) {
 }
 
 func ObjectsCommit(objects *astrald.ObjectsClient, to io.WriterTo) (objectID *astral.ObjectID, err error) {
-	writer, err := objects.Create("", 0)
+	writer, err := objects.Create(nil, "", 0)
 	if err != nil {
 		return
 	}

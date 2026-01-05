@@ -13,7 +13,8 @@ type Key string
 const (
 	AstraldHome       Key = "ASTRALD_HOME"
 	AstraldDb         Key = "ASTRALD_DB_DIR"
-	ApphostAddr       Key = "APPHOST_ADDR"
+	ApphostAddr       Key = "ASTRALD_APPHOST_ADDR"
+	ApphostToken      Key = "ASTRALD_APPHOST_TOKEN"
 	PortaldHome       Key = "PORTALD_HOME"
 	PortaldTokens     Key = "PORTALD_TOKENS_DIR"
 	PortaldApps       Key = "PORTALD_APPS_DIR"

@@ -19,7 +19,8 @@ func PublishAppBundlesSrc(client *astrald.Client, src source.Source) (out []Rele
 	if len(apps) == 0 {
 		return nil, fs.ErrNotExist
 	}
-	objects := astrald.NewObjectsClient(client, "")
+
+	objects := astrald.NewObjectsClient(nil, client)
 	for _, app := range apps {
 		var info ReleaseInfo
 		if info, err = app.Publish(objects); err != nil {
