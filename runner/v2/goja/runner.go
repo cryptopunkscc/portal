@@ -7,7 +7,7 @@ import (
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/goja"
-	source2 "github.com/cryptopunkscc/portal/source"
+	"github.com/cryptopunkscc/portal/source"
 	"github.com/cryptopunkscc/portal/source/js"
 )
 
@@ -20,12 +20,16 @@ type BundleRunner struct {
 	Bundle js.JsBundle
 }
 
+func (r BundleRunner) New() source.Source {
+	return &r
+}
+
 func NewBundleRunner(core bind.Core) *BundleRunner {
 	return &BundleRunner{AppRunner: AppRunner{Core: core}}
 }
 
-func (r *BundleRunner) ReadSrc(src source2.Source) (err error) {
-	if err = r.Bundle.ReadSrc(src); err != nil {
+func (r *BundleRunner) ReadSrc(src source.Source) (err error) {
+	if err = r.Bundle.ReadSrc(src); err == nil {
 		r.App = r.Bundle.App
 		r.Func = r.Run
 	}
@@ -39,11 +43,15 @@ type AppRunner struct {
 	args    []string
 }
 
+func (r AppRunner) New() source.Source {
+	return &r
+}
+
 func NewAppRunner(core bind.Core) *AppRunner {
 	return &AppRunner{Core: core}
 }
 
-func (r *AppRunner) ReadSrc(src source2.Source) (err error) {
+func (r *AppRunner) ReadSrc(src source.Source) (err error) {
 	if err = r.App.ReadSrc(src); err != nil {
 		r.Func = r.Run
 	}
@@ -51,7 +59,7 @@ func (r *AppRunner) ReadSrc(src source2.Source) (err error) {
 }
 
 func (r *AppRunner) Reload() (err error) {
-	return r.backend.RunFs(r.FS(), r.args...)
+	return r.backend.RunFs(r.PathFS(), r.args...)
 }
 
 func (r *AppRunner) Run(ctx context.Context, args ...string) (err error) {

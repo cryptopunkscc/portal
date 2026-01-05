@@ -80,6 +80,11 @@ func TestService_Integrations(t *testing.T) {
 			Require: test.Tests{it.s1.publishAppBundles(), it.s1.createUser()},
 		},
 		{
+			Name:    "should fetch releases",
+			Test:    it.s1.fetchReleases(),
+			Require: test.Tests{it.s1.awaitPublishedBundles()},
+		},
+		{
 			Name:    "should publish app bundles v2",
 			Test:    it.s1.publishAppBundlesV2(),
 			Require: test.Tests{it.s1.createUser()},
@@ -90,9 +95,9 @@ func TestService_Integrations(t *testing.T) {
 			Require: test.Tests{it.s1.publishAppBundlesV2(), it.s1.createUser()},
 		},
 		{
-			Name:    "should fetch releases",
-			Test:    it.s1.fetchReleases(),
-			Require: test.Tests{it.s1.awaitPublishedBundles()},
+			Name:    "should fetch releases v2",
+			Test:    it.s1.fetchReleasesV2(),
+			Require: test.Tests{it.s1.awaitPublishedBundlesV2()},
 		},
 		{
 			Name:    "should fetch executable app bundles",

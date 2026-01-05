@@ -4,14 +4,12 @@ import (
 	"context"
 	"io/fs"
 
-	"github.com/cryptopunkscc/astrald/lib/astrald"
 	"github.com/cryptopunkscc/portal/api/version"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/runner/v2/goja"
 	"github.com/cryptopunkscc/portal/source"
-	"github.com/cryptopunkscc/portal/source/app"
 )
 
 func main() { cli.Run(handler) }
@@ -31,7 +29,7 @@ var handler = cmd.Handler{
 func run(ctx context.Context, src string, args ...string) (err error) {
 	s := source.Providers{
 		source.OsFs,
-		&app.Objects{Client: *astrald.DefaultClient()},
+		//app.Objects{Client: *astrald.DefaultClient()},
 	}.GetSource(src)
 	if s == nil {
 		return fs.ErrNotExist
@@ -39,7 +37,6 @@ func run(ctx context.Context, src string, args ...string) (err error) {
 
 	core, ctx := bind.DefaultCoreFactory{}.Create(ctx)
 	for _, ss := range source.Collect(s,
-		source.SkipNodeModules,
 		goja.NewAppRunner(core),
 		goja.NewBundleRunner(core),
 	) {

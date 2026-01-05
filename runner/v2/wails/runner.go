@@ -28,8 +28,12 @@ func NewBundleRunner(core bind.Core) *BundleRunner {
 	return &BundleRunner{AppRunner: AppRunner{Core: core}}
 }
 
+func (r BundleRunner) New() source.Source {
+	return &r
+}
+
 func (r *BundleRunner) ReadSrc(src source.Source) (err error) {
-	if err = r.Bundle.ReadSrc(src); err != nil {
+	if err = r.Bundle.ReadSrc(src); err == nil {
 		r.App = r.Bundle.App
 		r.Func = r.Run
 	}
@@ -46,8 +50,12 @@ func NewAppRunner(core bind.Core) *AppRunner {
 	return &AppRunner{Core: core}
 }
 
+func (r AppRunner) New() source.Source {
+	return &r
+}
+
 func (r *AppRunner) ReadSrc(src source.Source) (err error) {
-	if err = r.Html.ReadSrc(src); err != nil {
+	if err = r.App.ReadSrc(src); err != nil {
 		r.Func = r.Run
 	}
 	return
@@ -101,17 +109,18 @@ func (r *AppRunner) SetupOptions(opt *options.App) {
 	}
 
 	apphostJsFS := wails.JsFs
+	assetsFs := r.PathFS()
 
 	// Setup fs assets
 	opt.AssetServer.Assets = assets.ArrayFs{
-		r.FS(),
+		assetsFs,
 		apphostJsFS,
 	}
 
 	// Setup http assets
 	opt.AssetServer.Handler = assets.StoreHandler{
 		Store: &assets.OverlayStore{Stores: []assets.Store{
-			&assets.FsStore{FS: r.FS()},
+			&assets.FsStore{FS: assetsFs},
 			&assets.FsStore{FS: apphostJsFS}},
 		},
 	}

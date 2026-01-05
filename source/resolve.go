@@ -8,14 +8,14 @@ import (
 )
 
 func Collect(src Source, constructors ...Constructor) (out List[Source]) {
-	return Collect(src, constructors...)
+	return CollectT[Source](src, constructors...)
 }
 
 func CollectIt[T Constructor](src Source, constructor T) (out List[T]) {
 	return CollectT[T](src, constructor)
 }
 
-func CollectT[T Constructor](src Source, constructors ...Constructor) (out List[T]) {
+func CollectT[T Source](src Source, constructors ...Constructor) (out List[T]) {
 	if src == nil {
 		return
 	}
@@ -62,9 +62,6 @@ func Resolve(src Source, constructors ...Constructor) (out Source, err error) {
 }
 
 func ResolveT[T Source](src Source, constructors ...Constructor) (out T, err error) {
-	if out, err = Cast[T](src); err == nil {
-		return
-	}
 	if len(constructors) == 0 {
 		return out, fs.ErrInvalid
 	}

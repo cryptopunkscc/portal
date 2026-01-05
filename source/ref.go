@@ -53,8 +53,21 @@ func (r Ref) String() string {
 	return r.Path
 }
 
-func (r Ref) FS() fs.FS {
-	return afero.IOFS{Fs: r.Fs}
+func (r Ref) PathFS() fs.FS {
+	// Try to unpack io.FS because wails assets server doesn't work with zip.Reader through afero.IOFS.
+	if ioFs, ok := r.Fs.(afero.FromIOFS); ok {
+		if r.Path == "" {
+			return ioFs.FS
+		}
+		if sub, err := fs.Sub(ioFs.FS, r.Path); err != nil {
+			return sub
+		}
+		return ioFs.FS
+	}
+	if r.Path == "" {
+		return afero.IOFS{Fs: r.Fs}
+	}
+	return afero.IOFS{Fs: afero.NewBasePathFs(r.Fs, r.Path)}
 }
 
 func (r *Ref) Ref_() *Ref {

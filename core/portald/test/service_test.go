@@ -293,7 +293,7 @@ func (s *testService) publishAppBundlesV2() test.Test {
 
 func (s *testService) awaitPublishedBundlesV2() test.Test {
 	return s.test(func(t *testing.T) {
-		if len(s.published) == 0 {
+		if len(s.published2) == 0 {
 			t.Fatalf("no published bundles")
 		}
 		for id := range s.published2 {
@@ -436,6 +436,19 @@ func (s *testService) fetchReleases() test.Test {
 			assert.Equal(t, *info.Release.ManifestID, *r.ManifestID)
 			assert.Equal(t, info.Release.Release, r.Release)
 			assert.Equal(t, info.Release.Target, r.Target)
+		}
+	})
+}
+
+func (s *testService) fetchReleasesV2() test.Test {
+	return s.test(func(t *testing.T) {
+		for _, info := range s.published2 {
+			a, err := app.Objects{Client: *s.Apphost.Client}.GetAppBundle("")
+			test.NoError(t, err)
+			test.AssertErr(t, err)
+			assert.Equal(t, info.Manifest, a.Metadata.Manifest)
+			assert.Equal(t, info.Release, a.Metadata.Release)
+			assert.Equal(t, info.Target, a.Metadata.Target)
 		}
 	})
 }

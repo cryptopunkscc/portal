@@ -26,31 +26,24 @@ type Objects struct {
 
 var _ source.Provider = &Objects{}
 
-func (r *Objects) GetSource(src string) (out source.Source) {
-	return r.GetAppBundle(src)
-}
-
-func (r *Objects) GetAppBundle(src string) (out *Bundle) {
-	id, err := astral.ParseID(src)
-	if err == nil {
-		out, err = r.GetByObjectID(*id)
-	} else {
-		out, err = r.GetByNameOrPkg(src)
-	}
-	if err != nil {
-		out = nil
-	}
+func (r Objects) GetSource(src string) (out source.Source) {
+	out, _ = r.GetAppBundle(src)
 	return
 }
 
-func (r *Objects) GetByNameOrPkg(name string) (out *Bundle, err error) {
+func (r Objects) GetAppBundle(src string) (out *Bundle, err error) {
+	id, err := astral.ParseID(src)
+	if err == nil {
+		return r.GetByObjectID(*id)
+	}
+	return r.GetByNameOrPkg(src)
+}
+
+func (r Objects) GetByNameOrPkg(name string) (out *Bundle, err error) {
+	defer plog.TraceErr(&err)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	infos, err := r.Scan(ctx, false)
-	if err != nil {
-		return
-	}
-	for info := range infos {
+	for info := range r.Scan(ctx, false) {
 		if !info.Manifest.Match(name) {
 			continue
 		}
@@ -65,7 +58,7 @@ func (r *Objects) GetByNameOrPkg(name string) (out *Bundle, err error) {
 	return
 }
 
-func (r *Objects) GetByObjectID(id astral.ObjectID, host ...astral.Identity) (out *Bundle, err error) {
+func (r Objects) GetByObjectID(id astral.ObjectID, host ...astral.Identity) (out *Bundle, err error) {
 	defer plog.TraceErr(&err)
 	var c *channel.Channel
 	for _, identity := range host {
@@ -82,7 +75,7 @@ func (r *Objects) GetByObjectID(id astral.ObjectID, host ...astral.Identity) (ou
 	return
 }
 
-func (r *Objects) Scan(ctx context.Context, follow bool) (out flow.Input[ReleaseInfo], err error) {
+func (r Objects) Scan(ctx context.Context, follow bool) (out flow.Input[ReleaseInfo]) {
 	a := availableAppsScanner{
 		log: plog.Get(ctx),
 		out: make(chan ReleaseInfo),
@@ -142,6 +135,7 @@ func astralRead[O astral.Object](r io.Reader) (o O, n int64, err error) {
 }
 
 type availableAppsScanner struct {
+	astrald.Client
 	wg  sync.WaitGroup
 	log plog.Logger
 	rpc rpc.Rpc
