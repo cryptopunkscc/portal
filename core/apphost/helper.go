@@ -2,6 +2,8 @@ package apphost
 
 import (
 	"context"
+	"errors"
+	"io"
 
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/astral/channel"
@@ -20,8 +22,11 @@ func Call(
 	if err != nil {
 		return err
 	}
-	_ = conn.Close()
-	return nil
+	defer conn.Close()
+	if _, err = conn.Read(make([]byte, 0)); !errors.Is(err, io.EOF) {
+		return nil
+	}
+	return
 }
 
 func Receive[T any](

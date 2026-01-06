@@ -5,9 +5,7 @@ import (
 	"os"
 
 	mod "github.com/cryptopunkscc/astrald/mod/apphost"
-	api "github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/env"
-	"github.com/cryptopunkscc/portal/api/keys"
 	"github.com/cryptopunkscc/portal/core/apphost"
 	pkgOs "github.com/cryptopunkscc/portal/pkg/os"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -43,7 +41,7 @@ func (r *Repository) dir() string {
 	return r.Dir
 }
 
-func (r *Repository) apphost() api.Client {
+func (r *Repository) apphost() *apphost.Adapter {
 	if r.Adapter == nil {
 		r.Adapter = apphost.Default
 	}
@@ -72,7 +70,7 @@ type ListTokensArgs struct {
 type AccessTokens []mod.AccessToken
 
 func (r *Repository) List(args ListTokensArgs) (AccessTokens, error) {
-	return r.Adapter.ListTokens(args.Out)
+	return r.apphost().ListTokens(args.Out)
 }
 
 func (r *Repository) Resolve(pkg string) (accessToken *mod.AccessToken, err error) {
@@ -85,7 +83,7 @@ func (r *Repository) Resolve(pkg string) (accessToken *mod.AccessToken, err erro
 
 	if id != nil {
 		var tokens []mod.AccessToken
-		if tokens, err = r.Adapter.ListTokens(""); err != nil {
+		if tokens, err = r.apphost().ListTokens(""); err != nil {
 			return
 		}
 
@@ -96,11 +94,11 @@ func (r *Repository) Resolve(pkg string) (accessToken *mod.AccessToken, err erro
 				return
 			}
 		}
-	} else if id, err = keys.Op(r.apphost()).CreateKey(pkg); err != nil {
+	} else if id, err = r.apphost().Keys().CreateKey(nil, pkg); err != nil {
 		return
 	}
 
-	if accessToken, err = r.Adapter.CreateToken(id); err != nil {
+	if accessToken, err = r.apphost().CreateToken(id); err != nil {
 		return
 	}
 

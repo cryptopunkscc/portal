@@ -5,8 +5,8 @@ import (
 	"errors"
 	"slices"
 
-	"github.com/cryptopunkscc/portal/api/portald"
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target/bundle"
 	"github.com/cryptopunkscc/portal/target/exec"
@@ -34,7 +34,7 @@ func (r *BundleHostRunner) Run(ctx context.Context, src target.Portal_, args ...
 		Resolve: target.Any[target.BundleExec](exec.ResolveBundle.Try),
 	}
 	hostId := src.Manifest().Runtime
-	opt := portald.OpenOpt{}
+	opt := apphost.OpenOptLegacy{}
 	if opt.Load(ctx); len(opt.Schema) > 0 {
 		hostId = opt.Schema + "." + hostId
 	}

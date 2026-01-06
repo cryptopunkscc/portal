@@ -4,20 +4,19 @@ import (
 	"context"
 	"errors"
 
-	"github.com/cryptopunkscc/portal/api/portald"
 	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/getlantern/systray"
 )
 
 type Tray struct {
-	Portald portald.OpClient
+	Portald apphost.PortaldClientLegacy
 	log     plog.Logger
 }
 
 func (t *Tray) Run(ctx context.Context) (err error) {
 	if t.Portald.Conn == nil {
-		t.Portald = portald.Op(apphost.Default)
+		t.Portald = apphost.Default.PortaldLegacy()
 	}
 
 	if err = t.Portald.Ping(); err != nil {

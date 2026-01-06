@@ -20,13 +20,13 @@ type Repository struct {
 
 var _ target.Repository = &Repository{}
 
-func (r *Repository) init() {
+func (r Repository) init() {
 	if r.Apphost == nil {
 		r.Apphost = apphost.Default
 	}
 }
 
-func (r *Repository) Get(src string) (out []target.Source) {
+func (r Repository) Get(src string) (out []target.Source) {
 	r.init()
 	id, err := astral.ParseID(src)
 	var b target.Bundle_
@@ -41,7 +41,7 @@ func (r *Repository) Get(src string) (out []target.Source) {
 	return
 }
 
-func (r *Repository) GetByNameOrPkg(name string) (out target.Bundle_, err error) {
+func (r Repository) GetByNameOrPkg(name string) (out target.Bundle_, err error) {
 	r.init()
 	defer plog.TraceErr(&err)
 	if err = r.Apphost.Connect(); err == nil {
@@ -68,7 +68,7 @@ func (r *Repository) GetByNameOrPkg(name string) (out target.Bundle_, err error)
 	return
 }
 
-func (r *Repository) GetByObjectID(id astral.ObjectID, host ...astral.Identity) (out target.Bundle_, err error) {
+func (r Repository) GetByObjectID(id astral.ObjectID, host ...astral.Identity) (out target.Bundle_, err error) {
 	r.init()
 	defer plog.TraceErr(&err)
 	if err = r.Apphost.Connect(); err == nil {
@@ -85,7 +85,7 @@ func (r *Repository) GetByObjectID(id astral.ObjectID, host ...astral.Identity) 
 	return
 }
 
-func (r *Repository) Scan(ctx context.Context, follow bool) (out flow.Input[Info], err error) {
+func (r Repository) Scan(ctx context.Context, follow bool) (out flow.Input[Info], err error) {
 	r.init()
 	defer plog.TraceErr(&err)
 	if err = r.Apphost.Connect(); err == nil {

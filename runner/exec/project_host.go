@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/cryptopunkscc/portal/api/portald"
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target/dist"
 	exec2 "github.com/cryptopunkscc/portal/target/exec"
@@ -46,7 +46,7 @@ func (r *ProjectHostRunner) Run(ctx context.Context, src target.Portal_, args ..
 	log := plog.Get(ctx).Type(r)
 
 	runtime := src.Manifest().Runtime
-	opt := portald.OpenOpt{}
+	opt := apphost.OpenOptLegacy{}
 	if opt.Load(ctx); len(opt.Schema) > 0 {
 		runtime = opt.Schema + "." + runtime
 	}

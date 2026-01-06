@@ -4,16 +4,16 @@ import (
 	"context"
 	"errors"
 
-	"github.com/cryptopunkscc/portal/api/portald"
 	. "github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target/portal"
 	"github.com/cryptopunkscc/portal/target/source"
 )
 
-func (s *Service) Open() Run[portald.OpenOpt] {
+func (s *Service) Open() Run[apphost.OpenOptLegacy] {
 	dispatcher := s.dispatcher()
-	return func(ctx context.Context, opt portald.OpenOpt, cmd ...string) (err error) {
+	return func(ctx context.Context, opt apphost.OpenOptLegacy, cmd ...string) (err error) {
 		plog.Get(ctx).Type(s).Println("open:", opt, cmd)
 		if len(cmd) == 0 {
 			return errors.New("no command")

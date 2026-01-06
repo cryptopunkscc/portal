@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"slices"
 
-	"github.com/cryptopunkscc/portal/api/portald"
 	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/target/dist"
 	"github.com/cryptopunkscc/portal/target/exec"
@@ -35,7 +35,7 @@ func (r *DistHostRunner) Run(ctx context.Context, src target.Portal_, args ...st
 		Resolve: target.Any[target.DistExec](exec.ResolveDist.Try),
 	}
 	hostId := src.Manifest().Runtime
-	opt := portald.OpenOpt{}
+	opt := apphost.OpenOptLegacy{}
 	if opt.Load(ctx); len(opt.Schema) > 0 {
 		hostId = opt.Schema + "." + hostId
 	}

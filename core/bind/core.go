@@ -11,7 +11,7 @@ import (
 
 type NewCore func(ctx context.Context, portal target.Portal_) (Core, context.Context)
 
-func CreateCore(ctx context.Context, portal target.Portal_) (*Core2, context.Context) {
+func CreateCore(ctx context.Context, portal target.Portal_) (Core, context.Context) {
 	return DefaultCoreFactory{}.Create(ctx)
 }
 

@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cryptopunkscc/portal/api/portald"
+	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
@@ -62,7 +62,7 @@ func (a *Application) Run(ctx context.Context, opt Opt, cmd ...string) (err erro
 		go func() {
 			defer wg.Done()
 			cmd = fixCmd(cmd)
-			o := &portald.OpenOpt{}
+			o := &apphost.OpenOptLegacy{}
 			if opt.Dev {
 				o.Schema = "dev"
 				o.Order = []int{2, 1, 0}

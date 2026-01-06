@@ -13,9 +13,9 @@ import (
 
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/portal/api/portal"
-	portald2 "github.com/cryptopunkscc/portal/api/portald"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/apps"
+	portald2 "github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/core/astrald/debug"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/core/portald"
@@ -461,7 +461,7 @@ func (s *testService) fetchAppBundleExecs() test.Test {
 
 func (s *testService) openApp(pkg string) test.Test {
 	return s.arg(pkg).test(func(t *testing.T) {
-		o := portald2.OpenOpt{}
+		o := portald2.OpenOptLegacy{}
 		err := s.Open().Run(s.ctx, o, pkg)
 		test.AssertErr(t, err)
 	})
