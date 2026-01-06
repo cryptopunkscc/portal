@@ -99,7 +99,7 @@ func (s *Service) Installer() app.Installer {
 	}
 }
 
-func (s *Service) Publisher2() app2.Publisher {
+func (s *Service) Publisher() app2.Publisher {
 	return app2.Publisher{ObjectsClient: &s.Apphost.Objects().ObjectsClient}
 }
 

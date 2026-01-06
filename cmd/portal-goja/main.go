@@ -10,6 +10,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/runner/v2/goja"
 	"github.com/cryptopunkscc/portal/source"
+	"github.com/cryptopunkscc/portal/source/app"
 )
 
 func main() { cli.Run(handler) }
@@ -29,7 +30,7 @@ var handler = cmd.Handler{
 func run(ctx context.Context, src string, args ...string) (err error) {
 	s := source.Providers{
 		source.OsFs,
-		//app.Objects{Client: *astrald.DefaultClient()},
+		app.Objects{}.Default(),
 	}.GetSource(src)
 	if s == nil {
 		return fs.ErrNotExist

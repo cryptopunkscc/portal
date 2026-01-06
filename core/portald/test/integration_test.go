@@ -85,6 +85,16 @@ func TestService_Integrations(t *testing.T) {
 			Require: test.Tests{it.s1.awaitPublishedBundles()},
 		},
 		{
+			Name:    "should get app by package name",
+			Test:    it.s1.getAppByPackageName(),
+			Require: test.Tests{it.s1.awaitPublishedBundles()},
+		},
+		{
+			Name:    "should get app by object ID",
+			Test:    it.s1.getAppById(),
+			Require: test.Tests{it.s1.awaitPublishedBundles()},
+		},
+		{
 			Name:    "should fetch executable app bundles",
 			Test:    it.s1.fetchAppBundleExecs(),
 			Require: test.Tests{it.s1.awaitPublishedBundles()},

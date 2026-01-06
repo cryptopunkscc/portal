@@ -20,6 +20,11 @@ type Objects struct {
 
 var _ source.Provider = &Objects{}
 
+func (r Objects) Default() Objects {
+	r.Adapter = apphost.Default
+	return r
+}
+
 func (r Objects) GetSource(src string) (out source.Source) {
 	out, _ = r.GetAppBundle(src)
 	return
@@ -54,6 +59,9 @@ func (r Objects) GetByNameOrPkg(name string) (out *Bundle, err error) {
 func (r Objects) GetByObjectID(id astral.ObjectID, host ...astral.Identity) (out *Bundle, err error) {
 	defer plog.TraceErr(&err)
 	var obj astral.Object
+	if len(host) == 0 {
+		host = append(host, *r.HostID())
+	}
 	for _, identity := range host {
 		r.Client = r.WithTarget(&identity)
 		if obj, err = r.Objects().Get(&id); err == nil {

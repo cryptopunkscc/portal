@@ -5,5 +5,5 @@ import (
 )
 
 func (s *Service) PublishApps(path string) (out []app.ReleaseInfo, err error) {
-	return s.Publisher2().PublishBundles(path)
+	return s.Publisher().PublishBundles(path)
 }

@@ -248,7 +248,7 @@ func (s *testService) publishAppBundles() test.Test {
 	return s.test(func(t *testing.T) {
 		s.published2 = map[astral.ObjectID]app.ReleaseInfo{}
 		src := source2.FSRef(apps.Builds)
-		l, err := s.Publisher2().PublishBundlesSrc(src)
+		l, err := s.Publisher().PublishBundlesSrc(src)
 		test.AssertErr(t, err)
 		count := 0
 		for _, app := range l {
@@ -385,12 +385,35 @@ func (s *testService) fetchReleases() test.Test {
 		for id, info := range s.published2 {
 			obj, err := s.Apphost.Objects().Get(&id)
 			r := obj.(*app.ReleaseMetadata)
-			//a, err := app.Objects{Adapter: &s.Apphost}.GetAppBundle(info.Manifest.Package)
 			test.NoError(t, err)
 			assert.Equal(t, *info.BundleID, *r.BundleID)
 			assert.Equal(t, *info.ManifestID, *r.ManifestID)
 			assert.Equal(t, info.Release, r.Release)
 			assert.Equal(t, info.Target, r.Target)
+		}
+	})
+}
+
+func (s *testService) getAppByPackageName() test.Test {
+	return s.test(func(t *testing.T) {
+		for _, info := range s.published2 {
+			r, err := s.AppObjects().GetAppBundle(info.Manifest.Package)
+			test.NoError(t, err)
+			assert.Equal(t, info.Release, r.Release)
+			assert.Equal(t, info.Target, r.Target)
+			return
+		}
+	})
+}
+
+func (s *testService) getAppById() test.Test {
+	return s.test(func(t *testing.T) {
+		for _, info := range s.published2 {
+			r, err := s.AppObjects().GetAppBundle(info.BundleID.String())
+			test.NoError(t, err)
+			assert.Equal(t, info.Release, r.Release)
+			assert.Equal(t, info.Target, r.Target)
+			return
 		}
 	})
 }
