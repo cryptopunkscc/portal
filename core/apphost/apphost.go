@@ -9,7 +9,7 @@ import (
 )
 
 func (a *Adapter) CreateToken(id *astral.Identity) (ac *apphost.AccessToken, err error) {
-	return Request[*apphost.AccessToken](nil, *a.Client, "apphost.create_token", query.Args{"id": id.String()})
+	return Receive[*apphost.AccessToken](nil, *a.Client, "apphost.create_token", query.Args{"id": id.String()})
 }
 
 func (a *Adapter) ListTokens(out string) ([]apphost.AccessToken, error) {
@@ -31,5 +31,5 @@ func (t AccessTokens) MarshalCLI() (s string) {
 
 // SignAppContract signs contract with given app and returns contract identity
 func (a *Adapter) SignAppContract(id *astral.Identity) (out *astral.ObjectID, err error) {
-	return Request[*astral.ObjectID](nil, *a.Client, "apphost.sign_app_contract", query.Args{"id": id.String()})
+	return Receive[*astral.ObjectID](nil, *a.Client, "apphost.sign_app_contract", query.Args{"id": id.String()})
 }

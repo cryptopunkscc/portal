@@ -20,13 +20,13 @@ func (c *UserClient) Siblings(ctx *astral.Context) (out <-chan astral.Identity, 
 }
 
 func (c *UserClient) Info(ctx *astral.Context) (out *user.Info, err error) {
-	return Request[*user.Info](ctx, c.Client, "user.info", nil)
+	return Receive[*user.Info](ctx, c.Client, "user.info", nil)
 }
 
 func (c *UserClient) Claim(ctx *astral.Context, alias string) (out *user.SignedNodeContract, err error) {
-	return Request[*user.SignedNodeContract](ctx, c.Client, "user.claim", query.Args{"target": alias})
+	return Receive[*user.SignedNodeContract](ctx, c.Client, "user.claim", query.Args{"target": alias})
 }
 
 func (c *UserClient) Create(ctx *astral.Context, alias string) (out *user.CreatedUserInfo, err error) {
-	return Request[*user.CreatedUserInfo](ctx, c.Client, "user.create", query.Args{"alias": alias})
+	return Receive[*user.CreatedUserInfo](ctx, c.Client, "user.create", query.Args{"alias": alias})
 }

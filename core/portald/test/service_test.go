@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/cryptopunkscc/astrald/astral"
-	"github.com/cryptopunkscc/portal/api/nodes"
 	"github.com/cryptopunkscc/portal/api/portal"
 	portald2 "github.com/cryptopunkscc/portal/api/portald"
 	"github.com/cryptopunkscc/portal/api/target"
@@ -168,10 +167,10 @@ func (s *testService) userClaim(s2 *testService) test.Test {
 
 func (s *testService) addEndpoint(s2 *testService) test.Test {
 	return s.arg(s2.name).test(func(t *testing.T) {
-		id := s2.Apphost.TargetID.String()
+		id := s2.Apphost.TargetID
 		port := s2.Config.TCP.ListenPort
 		endpoint := fmt.Sprintf("tcp:127.0.0.1:%d", port)
-		err := nodes.Op(&s.Apphost).AddEndpoint(id, endpoint)
+		err := s.Apphost.Nodes().AddEndpoint(nil, *id, endpoint)
 		test.AssertErr(t, err)
 	}).Requires(
 		s.start(),
