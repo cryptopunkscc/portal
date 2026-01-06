@@ -1,12 +1,15 @@
 package apphost
 
 import (
+	"bufio"
 	"sync"
 
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/lib/astrald"
+	"github.com/cryptopunkscc/astrald/lib/query"
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/google/uuid"
 )
 
 var Default = &Adapter{}
@@ -57,7 +60,17 @@ func (a *Adapter) Query(target string, method string, args any) (conn apphost.Co
 	if err != nil {
 		return
 	}
-	return outConn(a.Client.WithTarget(id).Query(nil, method, args))
+	q := query.New(a.GuestID(), id, method, args)
+	aConn, err := a.Client.RouteQuery(nil, q)
+	if err != nil {
+		return
+	}
+	return &Conn{
+		Conn:  aConn,
+		buf:   bufio.NewReader(aConn),
+		ref:   uuid.New().String(),
+		query: q.Query,
+	}, nil
 }
 
 func (a *Adapter) Register() (out apphost.Listener, err error) {

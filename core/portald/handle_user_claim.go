@@ -2,10 +2,6 @@ package portald
 
 import (
 	"strings"
-
-	"github.com/cryptopunkscc/portal/api/apphost"
-	"github.com/cryptopunkscc/portal/api/dir"
-	"github.com/cryptopunkscc/portal/api/user"
 )
 
 func (s *Service) Claim(alias string) (err error) {
@@ -31,17 +27,17 @@ func (s *Service) Claim(alias string) (err error) {
 	}
 	sid := id.String()
 
-	err = user.Op(a).Claim(sid)
+	_, err = a.User().Claim(nil, sid)
 	if err != nil {
 		return
 	}
 
-	pid, err := dir.Op(a, sid).Resolve("portald")
+	pid, err := a.Resolve("portald")
 	if err != nil {
 		return
 	}
 
-	_, err = apphost.Op(a, sid).SignAppContract(pid)
+	_, err = a.SignAppContract(pid)
 	if err != nil {
 		return
 	}

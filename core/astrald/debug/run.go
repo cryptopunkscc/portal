@@ -13,7 +13,7 @@ import (
 	_ "github.com/cryptopunkscc/astrald/mod/all"
 	"github.com/cryptopunkscc/astrald/mod/keys"
 	"github.com/cryptopunkscc/astrald/resources"
-	"github.com/cryptopunkscc/portal/api/objects"
+	resources2 "github.com/cryptopunkscc/portal/pkg/resources"
 )
 
 const resNodeIdentity = "node_identity"
@@ -85,7 +85,7 @@ func setupNodeIdentity(resources resources.Resources) (*astral.Identity, error) 
 		}
 
 		var pk keys.PrivateKey
-		err = objects.ReadCanonical(bytes.NewReader(keyBytes), &pk)
+		err = resources2.ReadCanonical(bytes.NewReader(keyBytes), &pk)
 		if err != nil {
 			return nil, err
 		}
@@ -102,7 +102,7 @@ func setupNodeIdentity(resources resources.Resources) (*astral.Identity, error) 
 		Bytes: nodeID.PrivateKey().Serialize(),
 	}
 
-	err = objects.WriteCanonical(buf, pk)
+	err = resources2.WriteCanonical(buf, pk)
 	if err != nil {
 		return nil, err
 	}

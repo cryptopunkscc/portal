@@ -50,10 +50,6 @@ func (r *Repository) apphost() api.Client {
 	return r.Adapter
 }
 
-func (r *Repository) op() api.OpClient {
-	return api.Op(r.apphost())
-}
-
 func (r *Repository) Set(pkg string, token *mod.AccessToken) (err error) {
 	if err = pkgOs.WriteJson[*mod.AccessToken](token, r.dir(), pkg); err != nil {
 		err = plog.Err(err, pkg)
@@ -70,8 +66,13 @@ func (r *Repository) Get(pkg string) (token *mod.AccessToken, err error) {
 
 var ErrNotCached = errors.New("apphost auth token is not cached or cannot be loaded")
 
-func (r *Repository) List(args *api.ListTokensArgs) (api.AccessTokens, error) {
-	return r.op().ListTokens(args)
+type ListTokensArgs struct {
+	Out string `query:"format" cli:"format f"`
+}
+type AccessTokens []mod.AccessToken
+
+func (r *Repository) List(args ListTokensArgs) (AccessTokens, error) {
+	return r.Adapter.ListTokens(args.Out)
 }
 
 func (r *Repository) Resolve(pkg string) (accessToken *mod.AccessToken, err error) {
@@ -84,7 +85,7 @@ func (r *Repository) Resolve(pkg string) (accessToken *mod.AccessToken, err erro
 
 	if id != nil {
 		var tokens []mod.AccessToken
-		if tokens, err = r.op().ListTokens(nil); err != nil {
+		if tokens, err = r.Adapter.ListTokens(""); err != nil {
 			return
 		}
 
@@ -99,8 +100,7 @@ func (r *Repository) Resolve(pkg string) (accessToken *mod.AccessToken, err erro
 		return
 	}
 
-	args := api.CreateTokenArgs{ID: id}
-	if accessToken, err = r.op().CreateToken(args); err != nil {
+	if accessToken, err = r.Adapter.CreateToken(id); err != nil {
 		return
 	}
 

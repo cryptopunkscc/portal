@@ -15,6 +15,8 @@ type ReleaseMetadata struct {
 	Target
 }
 
+var _ astral.Object = &ReleaseMetadata{}
+
 func init() {
 	_ = astral.DefaultBlueprints.Add(&ReleaseMetadata{})
 }

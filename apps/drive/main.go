@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 
 	"github.com/cryptopunkscc/astrald/astral"
-	"github.com/cryptopunkscc/portal/api/objects"
 	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
@@ -30,9 +29,10 @@ func (a Application) handler() cmd.Handler {
 
 func mount(ctx context.Context, dir string) (err error) {
 	log := plog.Get(ctx)
-	fs := objects.NewFS(apphost.Default)
+	fs := NewFS(apphost.Default.Objects())
+	defer fs.Close()
 
-	if err = fs.Search(objects.SearchArgs{
+	if err = fs.Search(SearchArgs{
 		Zone: astral.ZoneAll,
 		Out:  "json",
 	}); err != nil {

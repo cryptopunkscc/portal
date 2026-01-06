@@ -5,8 +5,6 @@ import (
 
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/portal/api/apphost"
-	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/google/uuid"
 )
 
 type Conn struct {
@@ -19,21 +17,6 @@ type Conn struct {
 
 var _ apphost.Conn = &Conn{}
 
-func inConn(c astral.Conn, err error) (*Conn, error)  { return newConn(c, err, true) }
-func outConn(c astral.Conn, err error) (*Conn, error) { return newConn(c, err, false) }
-
-func newConn(c astral.Conn, err error, in bool) (*Conn, error) {
-	defer plog.TraceErr(&err)
-	if err != nil {
-		return nil, err
-	}
-	return &Conn{
-		Conn: c,
-		buf:  bufio.NewReader(c),
-		ref:  uuid.New().String(),
-		in:   in,
-	}, nil
-}
 func (c *Conn) Query() string { return c.query }
 
 func (c *Conn) Write(b []byte) (n int, err error) {

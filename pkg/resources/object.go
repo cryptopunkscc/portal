@@ -1,4 +1,4 @@
-package objects
+package resources
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ func ReadCanonical(reader io.Reader, obj astral.Object) (err error) {
 	case err != nil:
 		return
 	case objType.String() != obj.ObjectType():
-		return fmt.Errorf("invalid object type: %s", objType)
+		return fmt.Errorf("invalid object type: %s, expect: %s", objType, obj.ObjectType())
 	}
 	_, err = obj.ReadFrom(reader)
 	return

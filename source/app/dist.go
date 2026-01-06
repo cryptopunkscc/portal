@@ -40,6 +40,10 @@ func (a *Dist) WriteRef(ref source.Ref) (err error) {
 	return source.Writers{&a.Ref, &a.Metadata}.WriteRef(ref)
 }
 
+func (a *Dist) ReadFs(fS afero.Fs) (err error) {
+	return source.Readers{&a.Ref, &a.Metadata}.ReadSrc(&source.Ref{Fs: fS})
+}
+
 func (a Dist) Bundle() *Bundle {
 	return &Bundle{Dist: a, Zip: source.Zip{
 		Unpacked: afero.NewBasePathFs(a.Fs, a.Path)}}

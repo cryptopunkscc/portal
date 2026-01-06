@@ -8,7 +8,6 @@ import (
 	"path"
 
 	"github.com/cryptopunkscc/astrald/astral"
-	"github.com/cryptopunkscc/astrald/lib/astrald"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/spf13/afero"
 )
@@ -70,20 +69,4 @@ func (z *Zip) WriteRef(ref Ref) (err error) {
 
 	z.File = ref
 	return
-}
-
-func (z Zip) Publish(objects *astrald.ObjectsClient) (err error) {
-	z.ObjectID, err = ObjectsCommit(objects, bytes.NewReader(z.Blob))
-	return
-}
-
-func ObjectsCommit(objects *astrald.ObjectsClient, to io.WriterTo) (objectID *astral.ObjectID, err error) {
-	writer, err := objects.Create(nil, "", 0)
-	if err != nil {
-		return
-	}
-	if _, err = to.WriteTo(writer); err != nil {
-		return
-	}
-	return writer.Commit()
 }

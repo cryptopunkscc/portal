@@ -2,8 +2,6 @@ package portald
 
 import (
 	user2 "github.com/cryptopunkscc/astrald/mod/user"
-	"github.com/cryptopunkscc/portal/api/apphost"
-	"github.com/cryptopunkscc/portal/api/user"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
@@ -11,8 +9,7 @@ func (s *Service) CreateUser(alias string) (err error) {
 	defer plog.TraceErr(&err)
 
 	// create user
-	c := user.Op(&s.Apphost)
-	if s.UserCreated, err = c.Create(alias); err != nil {
+	if s.UserCreated, err = s.Apphost.User().Create(nil, alias); err != nil {
 		return
 	}
 
@@ -50,7 +47,7 @@ func (s *Service) signAppContract(identifier string) (err error) {
 	if err != nil {
 		return
 	}
-	c, err := apphost.Op(&s.Apphost).SignAppContract(id)
+	c, err := s.Apphost.SignAppContract(id)
 	if err != nil {
 		return
 	}

@@ -1,4 +1,4 @@
-package objects
+package main
 
 import (
 	"io/fs"
@@ -7,23 +7,23 @@ import (
 	"time"
 
 	"github.com/cryptopunkscc/astrald/astral"
-	"github.com/cryptopunkscc/portal/api/apphost"
+	apphost2 "github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"gopkg.in/yaml.v3"
 )
 
 type FS struct {
-	op      OpClient
+	*apphost2.ObjectsClient
 	entries map[string]*Object
 }
 
 var _ fs.FS = &FS{}
 var _ fs.ReadDirFS = &FS{}
 
-func NewFS(client apphost.Client) *FS {
+func NewFS(client *apphost2.ObjectsClient) *FS {
 	return &FS{
-		op:      Op(client.Rpc()),
-		entries: map[string]*Object{},
+		ObjectsClient: client,
+		entries:       map[string]*Object{},
 	}
 }
 
@@ -37,19 +37,42 @@ func (f *FS) ModTime() time.Time         { return time.Now() }
 func (f *FS) IsDir() bool                { return true }
 func (f *FS) Sys() any                   { return nil }
 
+type ScanArgs struct {
+	Type   string
+	Repo   string
+	Out    string
+	Follow bool
+	Zone   astral.Zone
+}
+
+type DescribeArgs struct {
+	ID    astral.ObjectID
+	Out   string
+	Zones astral.Zone
+}
+
+type SearchArgs struct {
+	Query string `query:"q" include:"empty"`
+	Zone  astral.Zone
+	Out   string
+	Ext   string // not implemented yet
+}
+
+type ReadArgs struct {
+	ID     astral.ObjectID
+	Offset astral.Uint64
+	Zone   astral.Zone
+}
+
 func (f *FS) Scan(args ScanArgs) (err error) {
-	scan, err := f.op.Scan2(args)
+	scan, err := f.ObjectsClient.Scan(nil, "", false)
 	if err != nil {
 		return
 	}
 	go func() {
 		for r := range scan {
-			o, err := astral.ParseID(r.Object)
-			if err != nil {
-				plog.Println("scan parse id failed:", err)
-				continue
-			}
-			if err := f.append(*o, nil); err != nil {
+			// FIXME payload
+			if err := f.append(*r, nil); err != nil {
 				plog.Println("scan append failed:", err)
 			}
 		}
@@ -58,13 +81,14 @@ func (f *FS) Scan(args ScanArgs) (err error) {
 }
 
 func (f *FS) Search(args SearchArgs) (err error) {
-	search, err := f.op.Search(args)
+	search, err := f.ObjectsClient.Search(nil, args.Query)
 	if err != nil {
 		return
 	}
 	go func() {
 		for r := range search {
-			if err := f.append(*r.Object.ObjectID, r.Payload); err != nil {
+			// FIXME payload
+			if err := f.append(*r.ObjectID, nil); err != nil {
 				plog.Println("search append failed:", err)
 			}
 		}
@@ -73,11 +97,7 @@ func (f *FS) Search(args SearchArgs) (err error) {
 }
 
 func (f *FS) append(objectID astral.ObjectID, payload []byte) (err error) {
-	describe, err := f.op.Describe(DescribeArgs{
-		ID:    objectID,
-		Out:   "json",
-		Zones: astral.ZoneAll,
-	})
+	describe, err := f.ObjectsClient.Describe(nil, &objectID)
 	if err != nil {
 		return
 	}
@@ -89,7 +109,7 @@ func (f *FS) append(objectID astral.ObjectID, payload []byte) (err error) {
 	var d []any
 	for n := range describe {
 		d = append(d, n)
-		file.Describe[n["Type"].(string)] = n["Object"].(map[string]any)
+		//file.Describe[n["Type"].(string)] = n["Object"].(map[string]any)
 	}
 	if len(file.Payload) == 0 {
 		file.Payload, _ = yaml.Marshal(d)

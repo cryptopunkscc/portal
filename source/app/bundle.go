@@ -29,7 +29,7 @@ func (b *Bundle) ReadSrc(src source.Source) (err error) {
 	if err = b.Zip.ReadSrc(src); err != nil {
 		return
 	}
-	if err = b.Dist.ReadSrc(&source.Ref{Fs: b.Unpacked}); err != nil {
+	if err = b.Dist.ReadFs(b.Unpacked); err != nil {
 		return
 	}
 	return
@@ -66,7 +66,13 @@ func (b *Bundle) ReadFrom(r io.Reader) (n int64, err error) {
 	if err != nil {
 		return
 	}
-	return b.Zip.ReadFrom(bytes.NewReader(blob))
+	if n, err = b.Zip.ReadFrom(bytes.NewReader(blob)); err != nil {
+		return
+	}
+	if err = b.Dist.ReadFs(b.Unpacked); err != nil {
+		return
+	}
+	return
 }
 
 func (b Bundle) Publish(objects *astrald.ObjectsClient) (info ReleaseInfo, err error) {
@@ -74,13 +80,13 @@ func (b Bundle) Publish(objects *astrald.ObjectsClient) (info ReleaseInfo, err e
 		Release: b.Metadata.Release,
 		Target:  b.Metadata.Target,
 	}
-	if release.BundleID, err = source.ObjectsCommit(objects, bytes.NewReader(b.Blob)); err != nil {
+	if release.BundleID, err = source.ObjectsCreateCommit(objects, &b); err != nil {
 		return
 	}
-	if release.ManifestID, err = source.ObjectsCommit(objects, &b.Metadata.Manifest); err != nil {
+	if release.ManifestID, err = source.ObjectsCreateCommit(objects, &b.Metadata.Manifest); err != nil {
 		return
 	}
-	if info.ReleaseID, err = source.ObjectsCommit(objects, &release); err != nil {
+	if info.ReleaseID, err = source.ObjectsCreateCommit(objects, &release); err != nil {
 		return
 	}
 

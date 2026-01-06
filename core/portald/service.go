@@ -111,6 +111,6 @@ func (s *Service) apps() Source {
 	return source.Dir(s.Config.Apps)
 }
 
-func (s *Service) Bundles() bundle.Repository {
-	return bundle.Repository{Apphost: &s.Apphost}
+func (s *Service) Bundles() *bundle.Repository {
+	return &bundle.Repository{Apphost: &s.Apphost}
 }

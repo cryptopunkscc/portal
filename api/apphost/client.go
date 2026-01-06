@@ -39,6 +39,7 @@ type Listener interface {
 type PendingQuery interface {
 	Query() string
 	Caller() *astral.Identity
+	Skip() error
 	Reject() (err error)
 	Accept() (conn Conn, err error)
 	Close() error

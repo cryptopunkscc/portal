@@ -2,18 +2,12 @@ package app
 
 import (
 	"context"
-	"fmt"
-	"io"
 	"io/fs"
 	"log"
-	"reflect"
 	"sync"
 
 	"github.com/cryptopunkscc/astrald/astral"
-	"github.com/cryptopunkscc/astrald/astral/channel"
-	"github.com/cryptopunkscc/astrald/lib/astrald"
-	"github.com/cryptopunkscc/astrald/lib/query"
-	"github.com/cryptopunkscc/portal/api/objects"
+	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/flow"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/rpc"
@@ -21,7 +15,7 @@ import (
 )
 
 type Objects struct {
-	astrald.Client
+	*apphost.Adapter
 }
 
 var _ source.Provider = &Objects{}
@@ -47,11 +41,10 @@ func (r Objects) GetByNameOrPkg(name string) (out *Bundle, err error) {
 		if !info.Manifest.Match(name) {
 			continue
 		}
-		var host []astral.Identity
-		if info.Host != nil {
-			host = append(host, *info.Host)
+		if info.Host == nil {
+			info.Host = r.HostID()
 		}
-		out, err = r.GetByObjectID(*info.BundleID, host...)
+		out, err = r.GetByObjectID(*info.BundleID, *info.Host)
 		return
 	}
 	err = fs.ErrNotExist
@@ -60,16 +53,14 @@ func (r Objects) GetByNameOrPkg(name string) (out *Bundle, err error) {
 
 func (r Objects) GetByObjectID(id astral.ObjectID, host ...astral.Identity) (out *Bundle, err error) {
 	defer plog.TraceErr(&err)
-	var c *channel.Channel
+	var obj astral.Object
 	for _, identity := range host {
-		out, _, err = func() (o *Bundle, n int64, err error) {
-			c, err = r.WithTarget(&identity).QueryChannel(nil, "objects.read", query.Args{"id": id.String()})
-			if err != nil {
+		r.Client = r.WithTarget(&identity)
+		if obj, err = r.Objects().Get(&id); err == nil {
+			if out, _ = obj.(*Bundle); out != nil {
 				return
 			}
-			defer c.Close()
-			return astralRead[*Bundle](c.Transport())
-		}()
+		}
 		return
 	}
 	return
@@ -77,13 +68,9 @@ func (r Objects) GetByObjectID(id astral.ObjectID, host ...astral.Identity) (out
 
 func (r Objects) Scan(ctx context.Context, follow bool) (out flow.Input[ReleaseInfo]) {
 	a := availableAppsScanner{
-		log: plog.Get(ctx),
-		out: make(chan ReleaseInfo),
-		arg: objects.ScanArgs{
-			Type:   ReleaseMetadata{}.ObjectType(),
-			Zone:   astral.ZoneAll,
-			Follow: follow,
-		},
+		Adapter: r.Adapter,
+		log:     plog.Get(ctx),
+		out:     make(chan ReleaseInfo),
 	}
 
 	out = a.out
@@ -104,42 +91,21 @@ func (r Objects) Scan(ctx context.Context, follow bool) (out flow.Input[ReleaseI
 		}
 
 		// remote apps
-		if conn, err := r.Query(
-			nil, "user.list_siblings", map[string]any{
-				"out":  "json",
-				"zone": astral.ZoneAll,
-			}); err != nil {
-			for {
-				id, _, err := astralRead[*astral.Identity](conn)
-				if err != nil {
-					return
-				}
-				a.scan(ctx, *id)
+
+		if c, err := r.User().Siblings(astral.NewContext(ctx)); err == nil {
+			for id := range c {
+				a.scan(ctx, id)
 			}
 		}
 	}()
 	return
 }
 
-// Read reads an object from the reader using DefaultBlueprints.
-func astralRead[O astral.Object](r io.Reader) (o O, n int64, err error) {
-	obj, n, err := astral.Read(r)
-	if err != nil {
-		return
-	}
-	o, ok := obj.(O)
-	if !ok {
-		err = fmt.Errorf("invalid object type %s", reflect.TypeOf(obj))
-	}
-	return
-}
-
 type availableAppsScanner struct {
-	astrald.Client
+	*apphost.Adapter
 	wg  sync.WaitGroup
 	log plog.Logger
 	rpc rpc.Rpc
-	arg objects.ScanArgs
 	out chan ReleaseInfo
 }
 
@@ -160,8 +126,7 @@ func (a *availableAppsScanner) scan(ctx context.Context, host ...astral.Identity
 		h = &host[0]
 	}
 
-	oc := objects.Op(a.rpc, identities(host).Strings()...)
-	ids, err := oc.Scan(a.arg)
+	ids, err := a.Objects().Scan(astral.NewContext(ctx), "", false)
 	if err != nil {
 		log.Println(err)
 		return
@@ -173,35 +138,40 @@ func (a *availableAppsScanner) scan(ctx context.Context, host ...astral.Identity
 			if ctx.Err() != nil {
 				continue
 			}
-			a.fetchInfo(oc, id, h)
+			a.fetchInfo(*id, h)
 		}
 	}()
 }
 
 func (a *availableAppsScanner) fetchInfo(
-	oc objects.OpClient,
 	id astral.ObjectID,
 	host *astral.Identity,
 ) {
-	metadata := ReleaseMetadata{}
-	readArgs := objects.ReadArgs{
-		ID:   id,
-		Zone: astral.ZoneAll,
+	metadata := &ReleaseMetadata{}
+	oc := a.Objects()
+
+	o, err := oc.Get(&id)
+	if err != nil {
+		return
 	}
-	if err := oc.Fetch(readArgs, &metadata); err != nil {
-		a.log.Println(err)
+	metadata, ok := o.(*ReleaseMetadata)
+	if !ok {
 		return
 	}
 
-	readArgs.ID = *metadata.ManifestID
-	ma := Manifest{}
-	if err := oc.Fetch(readArgs, &ma); err != nil {
+	//if err := oc.Fetch(&id, &metadata); err != nil {
+	//	a.log.Println(err)
+	//	return
+	//}
+
+	manifest := Manifest{}
+	if err := oc.Fetch(metadata.ManifestID, &manifest); err != nil {
 		a.log.Println(err)
 		return
 	}
 	i := ReleaseInfo{
-		Manifest:        ma,
-		ReleaseMetadata: metadata,
+		Manifest:        manifest,
+		ReleaseMetadata: *metadata,
 		ReleaseID:       &id,
 		Host:            host,
 	}

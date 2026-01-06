@@ -106,14 +106,14 @@ func TestService_Integrations(t *testing.T) {
 		},
 		{
 			Name:    "should scan its own objects",
-			Test:    it.s1.scanObjects("app.manifest"),
+			Test:    it.s1.scanObjects(),
 			Require: test.Tests{it.s1.awaitPublishedBundles()},
 		},
 		{
 			Name: "should scan another node's objects",
-			Test: it.s2.scanObjects("app.manifest", &it.s1),
+			Test: it.s2.scanObjects(&it.s1),
 			Require: test.Tests{
-				it.s1.scanObjects("app.manifest"),
+				it.s1.scanObjects(),
 				it.s1.userClaim(&it.s2),
 				it.s2.addEndpoint(&it.s1),
 			},
