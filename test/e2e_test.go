@@ -40,7 +40,7 @@ var configuration = [][]*Cases{
 }
 
 func TestE2E_2(t *testing.T) {
-	c := configuration[0]
+	c := configuration[1]
 
 	runner := test.Runner{}
 	tests := []test.Task{

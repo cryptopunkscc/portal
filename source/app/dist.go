@@ -9,11 +9,20 @@ import (
 
 type Dist struct {
 	source.Ref
-	Metadata Metadata
+	Metadata
 }
 
 func (a Dist) New() (src source.Source) {
 	return &a
+}
+
+func (a Dist) Dist() Dist {
+	return a
+}
+
+func (a Dist) Bundle() *Bundle {
+	return &Bundle{Dist: a, Zip: source.Zip{
+		Unpacked: afero.NewBasePathFs(a.Fs, a.Path)}}
 }
 
 func (a *Dist) BundleName() string {
@@ -42,9 +51,4 @@ func (a *Dist) WriteRef(ref source.Ref) (err error) {
 
 func (a *Dist) ReadFs(fS afero.Fs) (err error) {
 	return source.Readers{&a.Ref, &a.Metadata}.ReadSrc(&source.Ref{Fs: fS})
-}
-
-func (a Dist) Bundle() *Bundle {
-	return &Bundle{Dist: a, Zip: source.Zip{
-		Unpacked: afero.NewBasePathFs(a.Fs, a.Path)}}
 }

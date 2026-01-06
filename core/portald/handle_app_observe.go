@@ -4,11 +4,10 @@ import (
 	"context"
 
 	"github.com/cryptopunkscc/astrald/sig"
-	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/pkg/fs2"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/target/app"
-	"github.com/cryptopunkscc/portal/target/source"
+	"github.com/cryptopunkscc/portal/source"
+	"github.com/cryptopunkscc/portal/source/app"
 	"github.com/fsnotify/fsnotify"
 )
 
@@ -24,7 +23,6 @@ func (s *Service) ObserveApps(ctx context.Context, opts ListAppsOpts) (out <-cha
 	installed := sig.Map[string, bool]{}
 	results := make(chan ObservedApp)
 	out = results
-	resolve := app.Resolve_
 
 	go func() {
 		<-ctx.Done()
@@ -33,11 +31,12 @@ func (s *Service) ObserveApps(ctx context.Context, opts ListAppsOpts) (out <-cha
 
 	// list installed apps
 	go func() {
-		for _, bundle := range resolve.List(s.apps()) {
-			if opts.includes(bundle) {
-				installed.Set(bundle.Manifest().Package, true)
+		for _, a := range source.CollectT[app.App](s.appsRef(), &app.Dist{}, &app.Bundle{}) {
+			metadata := a.Dist().Metadata
+			if opts.includes(metadata) {
+				installed.Set(metadata.Package, true)
 				results <- ObservedApp{
-					App:       *bundle.Manifest(),
+					Manifest:  metadata.Manifest,
 					Installed: true,
 				}
 			}
@@ -46,23 +45,17 @@ func (s *Service) ObserveApps(ctx context.Context, opts ListAppsOpts) (out <-cha
 		// observe installed apps
 		go func() {
 			for event := range watch {
-				log.Println("Event:", event)
 				if event.Op != fsnotify.Create && event.Op != fsnotify.Write {
 					continue
 				}
-				if file, err := source.File(event.Name); err == nil {
-					log.Println("new installed file:", file.Abs())
-					for _, bundle := range resolve.List(file) {
-						log.Println("new installed app:", *bundle.Manifest())
-						if opts.includes(bundle) {
-							installed.Set(bundle.Manifest().Package, true)
-							log.Println("new installed app sending:", *bundle.Manifest())
-							results <- ObservedApp{
-								App:       *bundle.Manifest(),
-								Installed: true,
-							}
+				for _, a := range source.CollectT[app.App](s.appsRef(), &app.Dist{}, &app.Bundle{}) {
+					metadata := a.Dist().Metadata
+					if opts.includes(metadata) {
+						installed.Set(metadata.Package, true)
+						results <- ObservedApp{
+							Manifest:  metadata.Manifest,
+							Installed: true,
 						}
-						break
 					}
 				}
 			}
@@ -70,17 +63,13 @@ func (s *Service) ObserveApps(ctx context.Context, opts ListAppsOpts) (out <-cha
 
 		// observe available apps
 		go func() {
-			if apps, err := s.AvailableApps(ctx, true); err == nil {
-				for info := range apps {
-					log.Println("new available app:", info.Manifest)
-					_, b := installed.Get(info.Manifest.Package)
-					results <- ObservedApp{
-						App:       info.Manifest,
-						Installed: b,
-					}
+			for info := range s.AvailableApps(ctx, true) {
+				log.Println("new available app:", info.Manifest)
+				_, b := installed.Get(info.Manifest.Package)
+				results <- ObservedApp{
+					Manifest:  info.Manifest,
+					Installed: b,
 				}
-			} else {
-				log.Println("Error observing apps:", err)
 			}
 		}()
 	}()
@@ -88,6 +77,6 @@ func (s *Service) ObserveApps(ctx context.Context, opts ListAppsOpts) (out <-cha
 }
 
 type ObservedApp struct {
-	manifest.App
+	app.Manifest
 	Installed bool `json:"installed"`
 }

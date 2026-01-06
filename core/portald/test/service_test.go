@@ -246,37 +246,9 @@ func (s *testService) uninstallApp() test.Test {
 
 func (s *testService) publishAppBundles() test.Test {
 	return s.test(func(t *testing.T) {
-		b := source.Embed(apps.Builds)
-		s.published = map[astral.ObjectID]bundle.Info{}
-
-		l, err := s.PublishAppsFS(b)
-		test.AssertErr(t, err)
-		count := 0
-		for _, app := range l {
-			s.published[*app.ReleaseID] = app
-			count++
-		}
-		assert.NotZero(t, count)
-	})
-}
-
-func (s *testService) awaitPublishedBundles() test.Test {
-	return s.test(func(t *testing.T) {
-		if len(s.published) == 0 {
-			t.Fatalf("no published bundles")
-		}
-		for id := range s.published {
-			s.awaitObject(id).Run(t)
-			break
-		}
-	})
-}
-
-func (s *testService) publishAppBundlesV2() test.Test {
-	return s.test(func(t *testing.T) {
 		s.published2 = map[astral.ObjectID]app.ReleaseInfo{}
 		src := source2.FSRef(apps.Builds)
-		l, err := app.PublishAppBundlesSrc(s.Apphost.Client, src)
+		l, err := s.Publisher2().PublishBundlesSrc(src)
 		test.AssertErr(t, err)
 		count := 0
 		for _, app := range l {
@@ -287,7 +259,7 @@ func (s *testService) publishAppBundlesV2() test.Test {
 	})
 }
 
-func (s *testService) awaitPublishedBundlesV2() test.Test {
+func (s *testService) awaitPublishedBundles() test.Test {
 	return s.test(func(t *testing.T) {
 		if len(s.published2) == 0 {
 			t.Fatalf("no published bundles")
@@ -382,11 +354,8 @@ func (s *testService) scanObjects(s2 ...*testService) test.Test {
 
 func (s *testService) availableApps() test.Test {
 	return s.test(func(t *testing.T) {
-		aa, err := s.AvailableApps(s.ctx, false)
-		test.AssertErr(t, err)
-
 		count := 0
-		for info := range aa {
+		for info := range s.AvailableApps(s.ctx, false) {
 			count++
 			plog.Println("available app:", info)
 		}
@@ -412,20 +381,6 @@ func (s *testService) searchObjects(query string, s2 ...*testService) test.Test 
 }
 
 func (s *testService) fetchReleases() test.Test {
-	return s.test(func(t *testing.T) {
-		for id, info := range s.published {
-			r := &bundle.Release{}
-			err := s.Apphost.Objects().Fetch(&id, r)
-			test.AssertErr(t, err)
-			assert.Equal(t, *info.Release.BundleID, *r.BundleID)
-			assert.Equal(t, *info.Release.ManifestID, *r.ManifestID)
-			assert.Equal(t, info.Release.Release, r.Release)
-			assert.Equal(t, info.Release.Target, r.Target)
-		}
-	})
-}
-
-func (s *testService) fetchReleasesV2() test.Test {
 	return s.test(func(t *testing.T) {
 		for id, info := range s.published2 {
 			obj, err := s.Apphost.Objects().Get(&id)
@@ -453,7 +408,7 @@ func (s *testService) signAppContract(pkg string) test.Test {
 func (s *testService) fetchAppBundleExecs() test.Test {
 	return s.test(func(t *testing.T) {
 		for _, r := range s.published {
-			_, err := s.Bundles().GetByObjectID(*r.Release.BundleID)
+			_, err := s.AppObjects().GetByObjectID(*r.Release.BundleID)
 			test.AssertErr(t, err)
 		}
 	})

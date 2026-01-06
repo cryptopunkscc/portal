@@ -37,7 +37,7 @@ func (s *Service) CreateUser(alias string) (err error) {
 
 	// sign installed apps
 	for _, app := range s.InstalledApps(ListAppsOpts{Hidden: true}) {
-		_, _ = s.ClaimPackage(app.Manifest().Package)
+		_, _ = s.ClaimPackage(app.Package)
 	}
 	return
 }

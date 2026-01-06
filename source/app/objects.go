@@ -159,18 +159,16 @@ func (a *availableAppsScanner) fetchInfo(
 		return
 	}
 
-	//if err := oc.Fetch(&id, &metadata); err != nil {
-	//	a.log.Println(err)
-	//	return
-	//}
-
-	manifest := Manifest{}
-	if err := oc.Fetch(metadata.ManifestID, &manifest); err != nil {
+	if o, err = oc.Get(metadata.ManifestID); err != nil {
 		a.log.Println(err)
 		return
 	}
+	manifest, ok := o.(*Manifest)
+	if !ok {
+		return
+	}
 	i := ReleaseInfo{
-		Manifest:        manifest,
+		Manifest:        *manifest,
 		ReleaseMetadata: *metadata,
 		ReleaseID:       &id,
 		Host:            host,

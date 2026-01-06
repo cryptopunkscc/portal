@@ -15,6 +15,11 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type App interface {
+	source.Source
+	Dist() Dist
+}
+
 type Metadata struct {
 	Manifest `json:",inline" yaml:",inline"`
 	Api      Api     `json:"api,omitempty" yaml:"api,omitempty"`

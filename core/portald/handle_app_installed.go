@@ -6,7 +6,9 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/cryptopunkscc/portal/api/target"
+	"github.com/cryptopunkscc/astrald/sig"
+	"github.com/cryptopunkscc/portal/source"
+	"github.com/cryptopunkscc/portal/source/app"
 )
 
 type ListAppsOpts struct {
@@ -14,11 +16,11 @@ type ListAppsOpts struct {
 	Scope  string `query:"scope s" cli:"scope s"`
 }
 
-func (opts ListAppsOpts) includes(app target.Portal_) bool {
+func (opts ListAppsOpts) includes(app app.Metadata) bool {
 	if opts.Scope == "" {
-		return opts.Hidden || !app.Config().Hidden
+		return opts.Hidden || !app.Config.Hidden
 	} else {
-		appType := app.Manifest().Type
+		appType := app.Manifest.Type
 		if appType == "" {
 			appType = "api"
 		}
@@ -26,30 +28,24 @@ func (opts ListAppsOpts) includes(app target.Portal_) bool {
 	}
 }
 
-func (s *Service) InstalledApps(opts ListAppsOpts) Apps {
-	a := target.Portals[target.Portal_]{}
-	for _, app := range s.Resolve.List(s.apps()) {
-		if opts.includes(app) {
-			a = append(a, app)
+func (s *Service) InstalledApps(opts ListAppsOpts) (a Apps) {
+	m := sig.Map[string, app.Dist]{}
+	for _, app := range source.CollectIt(s.appsRef(), &app.Bundle{}) {
+		if opts.includes(app.Metadata) {
+			m.Set(app.Metadata.Package, app.Dist)
 		}
 	}
-	a = a.Reduced()
-	return Apps(a)
+	return m.Values()
 }
 
-type Apps target.Portals[target.Portal_]
+type Apps []app.Dist
 
 func (a Apps) MarshalCLI() string {
 	b := &bytes.Buffer{}
 	w := tabwriter.NewWriter(b, 4, 4, 2, ' ', 0)
 	for _, app := range a {
-		m := app.Manifest()
-		v := ""
-		if d, ok := app.(target.Dist_); ok {
-			v = d.Version()
-		} else {
-			v = fmt.Sprintf("%d.%d", m.Version, app.Api().Version)
-		}
+		m := app.Dist().Metadata
+		v := fmt.Sprintf("%d.%d", m.Version, m.Api.Version)
 		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\n", m.Name, v, m.Title, m.Description, m.Package, m.Runtime)
 	}
 	_ = w.Flush()

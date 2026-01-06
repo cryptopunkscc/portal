@@ -25,7 +25,7 @@ var handler = cmd.Handler{
 			Desc: "Build Astral apps",
 		},
 		cmd.Handler{
-			Func: app.PublishAppBundles,
+			Func: app.Publisher{}.PublishBundles,
 			Name: "publish p",
 			Desc: "Publish app bundles to Astral",
 		},
