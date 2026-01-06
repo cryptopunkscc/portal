@@ -386,9 +386,9 @@ func (s *testService) availableApps() test.Test {
 		test.AssertErr(t, err)
 
 		count := 0
-		for app := range aa {
+		for info := range aa {
 			count++
-			plog.Println("available app:", app)
+			plog.Println("available app:", info)
 		}
 		assert.NotZero(t, count)
 	})

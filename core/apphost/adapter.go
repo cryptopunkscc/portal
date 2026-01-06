@@ -15,18 +15,20 @@ import (
 var Default = &Adapter{}
 
 type Adapter struct {
+	adapter
+	mu sync.Mutex
+}
+
+type adapter struct {
 	*astrald.Client
+	TargetID *astral.Identity
 	Endpoint string
 	Token    string
-	TargetID *astral.Identity
-	mu       sync.Mutex
 	Log      plog.Logger
 }
 
 func (a *Adapter) Clone() (c *Adapter) {
-	c = &Adapter{}
-	c.Log = a.Log
-	return
+	return &Adapter{adapter: a.adapter}
 }
 
 func (a *Adapter) Resolve(name string) (i *astral.Identity, err error) {

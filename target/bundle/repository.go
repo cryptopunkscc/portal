@@ -122,7 +122,7 @@ func (r Repository) Scan(ctx context.Context, follow bool) (out flow.Input[Info]
 			return
 		}
 		for id := range ss {
-			a.scan(ctx, id)
+			a.scan(ctx, *id)
 		}
 	}()
 	return

@@ -94,7 +94,7 @@ func (r Objects) Scan(ctx context.Context, follow bool) (out flow.Input[ReleaseI
 
 		if c, err := r.User().Siblings(astral.NewContext(ctx)); err == nil {
 			for id := range c {
-				a.scan(ctx, id)
+				a.scan(ctx, *id)
 			}
 		}
 	}()

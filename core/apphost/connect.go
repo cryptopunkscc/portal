@@ -19,7 +19,7 @@ func (a *Adapter) Connect() (err error) {
 }
 
 func (a *Adapter) IsConnected() bool {
-	return a.TargetID != nil
+	return a.Client != nil
 }
 
 func (a *Adapter) Reconnect() (err error) {

@@ -15,8 +15,8 @@ type UserClient struct {
 	astrald.Client
 }
 
-func (c *UserClient) Siblings(ctx *astral.Context) (out <-chan astral.Identity, err error) {
-	return GoChan[astral.Identity](ctx, c.Client, "user.list_siblings", query.Args{"zone": astral.ZoneAll})
+func (c *UserClient) Siblings(ctx *astral.Context) (out <-chan *astral.Identity, err error) {
+	return GoChan[*astral.Identity](ctx, c.Client, "user.list_siblings", query.Args{"zone": astral.ZoneAll})
 }
 
 func (c *UserClient) Info(ctx *astral.Context) (out *user.Info, err error) {
