@@ -12,12 +12,18 @@ type Dist struct {
 	Metadata
 }
 
+var _ App = &Dist{}
+
 func (a Dist) New() (src source.Source) {
 	return &a
 }
 
 func (a Dist) Dist() Dist {
 	return a
+}
+
+func (a Dist) GetMetadata() Metadata {
+	return a.Metadata
 }
 
 func (a Dist) Bundle() *Bundle {

@@ -21,18 +21,11 @@ import (
 type Runner struct {
 	html.Project
 	frontCtx context.Context
-	Core     bind.Core
 }
 
-func NewRunner(core bind.Core) (r *Runner) {
-	r = &Runner{}
-	r.Core = core
-	return
-}
-
-func (r *Runner) Run(ctx context.Context) (err error) {
+func (r *Runner) Run(ctx bind.Core) (err error) {
 	// TODO pass args to js
-	log := plog.Get(ctx).Type(r).Set(&ctx)
+	log := plog.Get(ctx).Type(r)
 	log.Println("start", r.Package, r.Path)
 	defer log.Println("exit", r.Package, r.Path)
 
@@ -44,7 +37,7 @@ func (r *Runner) Run(ctx context.Context) (err error) {
 		return
 	}
 
-	opt := wails.AppOptions(r.Core)
+	opt := wails.AppOptions(ctx)
 	opt.OnStartup = func(ctx context.Context) { r.frontCtx = ctx }
 	path := r.Path
 
@@ -89,7 +82,7 @@ func (r *Runner) Run(ctx context.Context) (err error) {
 		app.Quit()
 	}()
 
-	_ = reload.Start(ctx, r.Package, r.Reload, r.Core)
+	_ = reload.Start(ctx, r.Package, r.Reload, ctx)
 
 	err = app.Run()
 	if err != nil {

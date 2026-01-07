@@ -15,6 +15,8 @@ import (
 	wails_pro "github.com/cryptopunkscc/portal/runner/v2/wails/pro"
 	"github.com/cryptopunkscc/portal/source"
 	"github.com/cryptopunkscc/portal/source/app"
+	"github.com/cryptopunkscc/portal/source/html"
+	"github.com/cryptopunkscc/portal/source/js"
 	"github.com/cryptopunkscc/portal/source/npm"
 	"github.com/cryptopunkscc/portal/source/tmpl"
 )
@@ -45,6 +47,10 @@ var handler = cmd.Handler{
 			Name: "run r",
 			Desc: "Run HTML/JS app in hot reloading runner.",
 		},
+		cmd.Handler{
+			Func: listTargets,
+			Name: "list l",
+		},
 	},
 }
 
@@ -56,22 +62,49 @@ func runApp(ctx context.Context, src string, args ...string) (err error) {
 		return fs.ErrNotExist
 	}
 
-	core, ctx := bind.DefaultCoreFactory{}.Create(ctx)
 	for _, ss := range source.Collect(s,
-		goja_pro.NewRunner(core),
-		goja_dist.NewRunner(core),
-		goja.NewBundleRunner(core),
-		wails_pro.NewRunner(core),
-		wails_dist.NewRunner(core),
-		wails.NewBundleRunner(core),
+		&goja_pro.Runner{},
+		&goja_dist.Runner{},
+		&goja.BundleRunner{},
+		&wails_pro.Runner{},
+		&wails_dist.Runner{},
+		&wails.BundleRunner{},
 	) {
 		switch r := ss.(type) {
 		case goja.Runner:
-			return r.Run(ctx, args...)
+			ctx := bind.DefaultCoreFactory{}.Create(ctx)
+			return r.Run(*ctx, args...)
 		case wails.Runner:
-			return r.Run(ctx)
+			ctx := bind.DefaultCoreFactory{}.Create(ctx)
+			return r.Run(&Adapter{ctx})
 		}
 	}
 
 	return fs.ErrInvalid
+}
+
+type Adapter struct{ bind.Core }
+
+func listTargets(src string) (out []app.Manifest, err error) {
+	s := source.Providers{
+		source.OsFs,
+	}.GetSource(src)
+	if s == nil {
+		return nil, fs.ErrNotExist
+	}
+
+	for _, ss := range source.CollectT[app.App](s,
+		&html.App{},
+		&html.Bundle{},
+		&html.Project{},
+		&js.App{},
+		&js.Bundle{},
+		&js.Project{},
+	) {
+		out = append(out, ss.GetMetadata().Manifest)
+	}
+	if len(out) == 0 {
+		err = fs.ErrInvalid
+	}
+	return
 }

@@ -18,6 +18,7 @@ import (
 type App interface {
 	source.Source
 	Dist() Dist
+	GetMetadata() Metadata
 }
 
 type Metadata struct {

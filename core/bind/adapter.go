@@ -13,12 +13,6 @@ import (
 	apphost2 "github.com/cryptopunkscc/portal/core/apphost"
 )
 
-func NewAdapter(invoker apphost2.Invoker) *Adapter {
-	a := &Adapter{}
-	a.Invoker = invoker
-	return a
-}
-
 type Adapter struct {
 	apphost2.Invoker
 	listener apphost.Listener

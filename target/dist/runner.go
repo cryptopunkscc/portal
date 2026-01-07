@@ -27,13 +27,13 @@ func (r *reRunner[T]) Run(ctx context.Context, dist T, args ...string) (err erro
 	changes = flow.From(changes).Debounce(200 * time.Millisecond)
 	r.args = args
 	for range changes {
-		if err = r.Reload(); err != nil {
+		if err = r.Reload(ctx); err != nil {
 			return
 		}
 	}
 	return
 }
 
-func (r *reRunner[T]) Reload() error {
+func (r *reRunner[T]) Reload(ctx context.Context) error {
 	return r.reload(r.args...)
 }

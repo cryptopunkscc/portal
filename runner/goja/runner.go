@@ -31,7 +31,7 @@ func NewRunner(newCore bind.NewCore) target.ReRunner[target.AppJs] {
 	return &runner{newCore: newCore}
 }
 
-func (r *runner) Reload() (err error) {
+func (r *runner) Reload(ctx context.Context) (err error) {
 	return r.backend.RunFs(r.app.FS(), r.args...)
 }
 
@@ -43,7 +43,7 @@ func (r *runner) Run(ctx context.Context, app target.AppJs, args ...string) (err
 	r.app = app
 	r.args = args
 	r.backend = NewBackend(core)
-	if err = r.Reload(); err != nil {
+	if err = r.Reload(ctx); err != nil {
 		return
 	}
 	<-ctx.Done()

@@ -19,6 +19,10 @@ func (p Project) New() (src source.Source) {
 	return &p
 }
 
+func (p Project) GetMetadata() (src app.Metadata) {
+	return p.Metadata
+}
+
 func (p Project) Project() app.Project {
 	return app.Project{p.Ref, p.ProjectMetadata}
 }

@@ -12,7 +12,7 @@ import (
 )
 
 type Runner interface {
-	Run(ctx context.Context, args ...string) error
+	Run(ctx bind.Context, args ...string) error
 }
 
 type BundleRunner struct {
@@ -22,10 +22,6 @@ type BundleRunner struct {
 
 func (r BundleRunner) New() source.Source {
 	return &r
-}
-
-func NewBundleRunner(core bind.Core) *BundleRunner {
-	return &BundleRunner{AppRunner: AppRunner{Core: core}}
 }
 
 func (r *BundleRunner) ReadSrc(src source.Source) (err error) {
@@ -45,10 +41,6 @@ type AppRunner struct {
 
 func (r AppRunner) New() source.Source {
 	return &r
-}
-
-func NewAppRunner(core bind.Core) *AppRunner {
-	return &AppRunner{Core: core}
 }
 
 func (r *AppRunner) ReadSrc(src source.Source) (err error) {

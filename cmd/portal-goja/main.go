@@ -36,12 +36,12 @@ func run(ctx context.Context, src string, args ...string) (err error) {
 		return fs.ErrNotExist
 	}
 
-	core, ctx := bind.DefaultCoreFactory{}.Create(ctx)
 	for _, ss := range source.Collect(s,
-		goja.NewAppRunner(core),
-		goja.NewBundleRunner(core),
+		&goja.AppRunner{},
+		&goja.BundleRunner{},
 	) {
-		return ss.(goja.Runner).Run(ctx, args...)
+		ctx := bind.DefaultCoreFactory{}.Create(ctx)
+		return ss.(goja.Runner).Run(*ctx, args...)
 	}
 
 	return fs.ErrInvalid

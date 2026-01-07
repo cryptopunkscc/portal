@@ -1,6 +1,7 @@
 package app
 
 import (
+	"io/fs"
 	"path"
 	"path/filepath"
 
@@ -13,17 +14,23 @@ type Project struct {
 	Metadata ProjectMetadata
 }
 
-func (p Project) Dist() (a Dist, err error) {
-	err = a.ReadSrc(p.Sub("dist"))
+func (p Project) Dist() (a Dist) {
+	if err := a.ReadSrc(p.Sub("dist")); err != nil {
+		a.Fs = nil
+	}
 	return
 }
 
 func (p Project) Pack() (err error) {
-	app, err := p.Dist()
-	if err != nil {
-		return
+	app := p.Dist()
+	if app.Fs == nil {
+		return fs.ErrNotExist
 	}
 	return app.Bundle().WriteRef(*p.Sub("build"))
+}
+
+func (p Project) GetMetadata() Metadata {
+	return p.Metadata.Metadata
 }
 
 func (p *Project) ReadSrc(src source.Source) (err error) {

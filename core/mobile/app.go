@@ -27,11 +27,12 @@ func (m *service) App(path string) mobile.App {
 	return nil
 }
 
-func (m *service) newCore(ctx context.Context, portal target.Portal_) (Core2, context.Context) {
-	return AutoTokenCoreFactory{
+func (m *service) newCore(ctx context.Context, portal target.Portal_) (Core, context.Context) {
+	c := AutoTokenCoreFactory{
 		PkgName: portal.Manifest().Package,
 		Tokens:  m.Tokens(),
 	}.Create(ctx)
+	return &c, c.Context
 }
 
 type app_ struct {

@@ -37,12 +37,12 @@ func run(ctx context.Context, src string) (err error) {
 	}
 
 	adapter := &Adapter{}
-	adapter.Core, ctx = bind.DefaultCoreFactory{}.Create(ctx)
+	adapter.Core = bind.DefaultCoreFactory{}.Create(ctx)
 	for _, ss := range source.Collect(s,
-		wails.NewAppRunner(adapter),
-		wails.NewBundleRunner(adapter),
+		&wails.AppRunner{},
+		&wails.BundleRunner{},
 	) {
-		return ss.(wails.Runner).Run(ctx)
+		return ss.(wails.Runner).Run(adapter)
 	}
 
 	return fs.ErrInvalid

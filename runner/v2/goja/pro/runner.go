@@ -1,7 +1,6 @@
 package goja_pro
 
 import (
-	"context"
 	"os"
 	"os/exec"
 	"time"
@@ -18,17 +17,11 @@ type Runner struct {
 	js.Project
 }
 
-func NewRunner(core bind.Core) (r *Runner) {
-	r = &Runner{}
-	r.Core = core
-	return
-}
-
 func (r Runner) New() source.Source {
 	return &r
 }
 
-func (r *Runner) Run(ctx context.Context, args ...string) (err error) {
+func (r *Runner) Run(ctx bind.Context, args ...string) (err error) {
 	if err = deps.Check("npm", "-v"); err != nil {
 		return
 	}

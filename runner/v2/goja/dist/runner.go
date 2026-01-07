@@ -20,12 +20,6 @@ type Runner struct {
 	send dev.SendMsg
 }
 
-func NewRunner(core bind.Core) (r *Runner) {
-	r = &Runner{}
-	r.Core = core
-	return
-}
-
 func (r Runner) New() source.Source {
 	return &r
 }
@@ -43,7 +37,7 @@ func (r *Runner) Reload(ctx context.Context) (err error) {
 	return
 }
 
-func (r *Runner) Run(ctx context.Context, args ...string) (err error) {
+func (r *Runner) Run(ctx bind.Context, args ...string) (err error) {
 	defer plog.TraceErr(&err)
 	if !filepath.IsAbs(r.Path) {
 		return fmt.Errorf("goja_dist.Runner needs absolute path: %s", r.Path)

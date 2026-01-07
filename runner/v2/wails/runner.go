@@ -16,16 +16,12 @@ import (
 )
 
 type Runner interface {
-	Run(ctx context.Context) error
+	Run(ctx bind.Core) error
 }
 
 type BundleRunner struct {
 	AppRunner
 	Bundle html.Bundle
-}
-
-func NewBundleRunner(core bind.Core) *BundleRunner {
-	return &BundleRunner{AppRunner: AppRunner{Core: core}}
 }
 
 func (r BundleRunner) New() source.Source {
@@ -42,12 +38,7 @@ func (r *BundleRunner) ReadSrc(src source.Source) (err error) {
 
 type AppRunner struct {
 	html.App
-	Core     bind.Core
 	frontCtx context.Context
-}
-
-func NewAppRunner(core bind.Core) *AppRunner {
-	return &AppRunner{Core: core}
 }
 
 func (r AppRunner) New() source.Source {
@@ -69,12 +60,12 @@ func (r *AppRunner) Reload() (err error) {
 	return
 }
 
-func (r *AppRunner) Run(ctx context.Context) (err error) {
-	log := plog.Get(ctx).Type(r).Set(&ctx)
+func (r *AppRunner) Run(ctx bind.Core) (err error) {
+	log := plog.Get(ctx).Type(r)
 	log.Println("start", r.Metadata.Package, r.Metadata)
 	defer log.Println("exit", r.Metadata.Package, r.Metadata)
 
-	opt := AppOptions(r.Core)
+	opt := AppOptions(ctx)
 	opt.OnStartup = func(ctx context.Context) { r.frontCtx = ctx }
 	SetupOptions(opt, r.App)
 	if err = application.NewWithOptions(opt).Run(); err != nil {

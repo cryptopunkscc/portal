@@ -50,8 +50,8 @@ func runner() Dispatcher {
 }
 
 func core(ctx context.Context, portal Portal_) (bind.Core, context.Context) {
-	r, ctx := bind.DefaultCoreFactory{}.Create(ctx)
-	return &Adapter{r}, ctx
+	r := bind.DefaultCoreFactory{}.Create(ctx)
+	return &Adapter{r}, r.Context
 }
 
 type Adapter struct{ bind.Core }

@@ -18,12 +18,6 @@ type Runner struct {
 	newCore bind.NewCore
 }
 
-func NewRunner(core bind.Core) (r *Runner) {
-	r = &Runner{}
-	r.Core = core
-	return
-}
-
 func (r *Runner) Reload(ctx context.Context) (err error) {
 	log := plog.Get(ctx).Type(r)
 	if err := r.send(dev.NewMsg(r.Package, dev.Changed)); err != nil {
@@ -36,12 +30,12 @@ func (r *Runner) Reload(ctx context.Context) (err error) {
 	return err
 }
 
-func (r *Runner) Run(ctx context.Context) (err error) {
+func (r *Runner) Run(ctx bind.Core) (err error) {
 	defer plog.TraceErr(&err)
 	if !filepath.IsAbs(r.Path) {
 		return plog.Errorf("wails_dist.Runner needs absolute path: %s", r.Path)
 	}
 	go runner.ReloadOnChange(ctx, r, r.Dist)
-	r.send = reload.Start(ctx, r.Path, r.Reload, r.Core)
+	r.send = reload.Start(ctx, r.Path, r.Reload, ctx)
 	return r.AppRunner.Run(ctx)
 }
