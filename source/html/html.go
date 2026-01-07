@@ -14,6 +14,8 @@ type App struct {
 	Html
 }
 
+var _ app.App = &App{}
+
 func (a App) New() (src source.Source) {
 	return &a
 }
@@ -32,8 +34,15 @@ type Project struct {
 	App App
 }
 
+var _ app.App = &Project{}
+
 func (p Project) New() (src source.Source) {
 	return &p
+}
+
+func (p Project) GetDist() (d app.Dist) {
+	_ = d.ReadSrc(p.Sub("dist"))
+	return
 }
 
 func (p *Project) ReadSrc(src source.Source) (err error) {

@@ -3,6 +3,7 @@ package source
 import (
 	"errors"
 	"io/fs"
+	"strings"
 
 	"github.com/spf13/afero"
 )
@@ -19,8 +20,6 @@ func CollectT[T Source](src Source, constructors ...Constructor) (out List[T]) {
 	if src == nil {
 		return
 	}
-
-	constructors = append([]Constructor{SkipNodeModules}, constructors...)
 
 	if src != src.Ref_() {
 		if o, err := ResolveT[T](src, constructors...); err == nil {
@@ -39,6 +38,9 @@ func CollectT[T Source](src Source, constructors ...Constructor) (out List[T]) {
 	_ = afero.Walk(ref.Fs, ref.Path, func(p string, _ fs.FileInfo, err error) error {
 		if err != nil {
 			return err
+		}
+		if strings.HasSuffix(p, "node_modules") {
+			return fs.SkipDir
 		}
 		ref.Path = p
 		source, err := ResolveT[T](&ref, constructors...)

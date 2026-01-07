@@ -1,11 +1,5 @@
 package source
 
-import (
-	"errors"
-	"io/fs"
-	"strings"
-)
-
 type Source interface {
 	Reader
 	Ref_() *Ref
@@ -56,30 +50,3 @@ func (l List[T]) Filter(f func(T) bool) (out List[T]) {
 	}
 	return
 }
-
-type Filter struct {
-	Func func(Ref) error
-	ref  *Ref
-}
-
-func (f Filter) New() Source { return &f }
-func (f *Filter) Ref_() *Ref { return f.ref }
-func (f *Filter) ReadSrc(src Source) (err error) {
-	if err = f.Func(*f.ref); err != nil {
-		f.ref = src.Ref_()
-	}
-	return
-}
-
-type SkipDir struct{ Name string }
-
-func (s SkipDir) New() Source { return &s }
-func (s SkipDir) Ref_() *Ref  { return nil }
-func (s SkipDir) ReadSrc(src Source) (err error) {
-	if strings.HasSuffix(src.Ref_().Path, s.Name) {
-		return fs.SkipDir
-	}
-	return errors.New(s.Name)
-}
-
-var SkipNodeModules = &SkipDir{"node_modules"}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io/fs"
 
 	"github.com/cryptopunkscc/portal/core/bind"
@@ -85,15 +86,15 @@ func runApp(ctx context.Context, src string, args ...string) (err error) {
 
 type Adapter struct{ bind.Core }
 
-func listTargets(src string) (out []app.Manifest, err error) {
+func listTargets(src string) (err error) {
 	s := source.Providers{
 		source.OsFs,
 	}.GetSource(src)
 	if s == nil {
-		return nil, fs.ErrNotExist
+		return fs.ErrNotExist
 	}
 
-	for _, ss := range source.CollectT[app.App](s,
+	for i, ss := range source.CollectT[app.App](s,
 		&html.App{},
 		&html.Bundle{},
 		&html.Project{},
@@ -101,10 +102,7 @@ func listTargets(src string) (out []app.Manifest, err error) {
 		&js.Bundle{},
 		&js.Project{},
 	) {
-		out = append(out, ss.GetMetadata().Manifest)
-	}
-	if len(out) == 0 {
-		err = fs.ErrInvalid
+		println(fmt.Sprintf("%d. %T:%s %v", i, ss, ss.GetPath(), ss.GetMetadata().Manifest))
 	}
 	return
 }

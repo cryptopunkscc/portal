@@ -17,7 +17,8 @@ import (
 
 type App interface {
 	source.Source
-	Dist() Dist
+	GetPath() string
+	GetDist() Dist
 	GetMetadata() Metadata
 }
 

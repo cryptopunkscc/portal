@@ -19,6 +19,10 @@ type Zip struct {
 	ObjectID *astral.ObjectID
 }
 
+func (z Zip) GetPath() string {
+	return z.File.Path
+}
+
 func (z *Zip) ReadSrc(src Source) (err error) {
 	defer plog.TraceErr(&err)
 	if err = z.File.ReadSrc(src); err != nil {

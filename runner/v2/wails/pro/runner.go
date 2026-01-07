@@ -12,6 +12,7 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/runner/v2/wails"
+	"github.com/cryptopunkscc/portal/source"
 	"github.com/cryptopunkscc/portal/source/html"
 	"github.com/cryptopunkscc/portal/target/dev/reload"
 	"github.com/wailsapp/wails/v2/pkg/application"
@@ -21,6 +22,12 @@ import (
 type Runner struct {
 	html.Project
 	frontCtx context.Context
+}
+
+var _ wails.Runner = &Runner{}
+
+func (r Runner) New() source.Source {
+	return &r
 }
 
 func (r *Runner) Run(ctx bind.Core) (err error) {

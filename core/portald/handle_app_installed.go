@@ -44,7 +44,7 @@ func (a Apps) MarshalCLI() string {
 	b := &bytes.Buffer{}
 	w := tabwriter.NewWriter(b, 4, 4, 2, ' ', 0)
 	for _, app := range a {
-		m := app.Dist().Metadata
+		m := app.GetDist().Metadata
 		v := fmt.Sprintf("%d.%d", m.Version, m.Api.Version)
 		_, _ = fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\n", m.Name, v, m.Title, m.Description, m.Package, m.Runtime)
 	}

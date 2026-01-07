@@ -14,7 +14,7 @@ type Project struct {
 	Metadata ProjectMetadata
 }
 
-func (p Project) Dist() (a Dist) {
+func (p Project) GetDist() (a Dist) {
 	if err := a.ReadSrc(p.Sub("dist")); err != nil {
 		a.Fs = nil
 	}
@@ -22,7 +22,7 @@ func (p Project) Dist() (a Dist) {
 }
 
 func (p Project) Pack() (err error) {
-	app := p.Dist()
+	app := p.GetDist()
 	if app.Fs == nil {
 		return fs.ErrNotExist
 	}

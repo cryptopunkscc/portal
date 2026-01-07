@@ -32,7 +32,7 @@ func (s *Service) ObserveApps(ctx context.Context, opts ListAppsOpts) (out <-cha
 	// list installed apps
 	go func() {
 		for _, a := range source.CollectT[app.App](s.appsRef(), &app.Dist{}, &app.Bundle{}) {
-			metadata := a.Dist().Metadata
+			metadata := a.GetDist().Metadata
 			if opts.includes(metadata) {
 				installed.Set(metadata.Package, true)
 				results <- ObservedApp{
@@ -49,7 +49,7 @@ func (s *Service) ObserveApps(ctx context.Context, opts ListAppsOpts) (out <-cha
 					continue
 				}
 				for _, a := range source.CollectT[app.App](s.appsRef(), &app.Dist{}, &app.Bundle{}) {
-					metadata := a.Dist().Metadata
+					metadata := a.GetDist().Metadata
 					if opts.includes(metadata) {
 						installed.Set(metadata.Package, true)
 						results <- ObservedApp{

@@ -40,6 +40,10 @@ func OSRef(path ...string) *Ref {
 	return &Ref{Fs: afero.NewOsFs(), Path: Abs(path...)}
 }
 
+func (r Ref) GetPath() string {
+	return r.Path
+}
+
 func (r Ref) Sub(path string) *Ref {
 	r.Path = path2.Join(r.Path, path)
 	return &r

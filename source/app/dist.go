@@ -18,7 +18,7 @@ func (a Dist) New() (src source.Source) {
 	return &a
 }
 
-func (a Dist) Dist() Dist {
+func (a Dist) GetDist() Dist {
 	return a
 }
 
