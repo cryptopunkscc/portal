@@ -28,8 +28,8 @@ type ReRunner struct {
 	distRunner target.ReRunner[target.DistJs]
 }
 
-func (r *ReRunner) Reload() (err error) {
-	return r.distRunner.Reload()
+func (r *ReRunner) Reload(ctx context.Context) (err error) {
+	return r.distRunner.Reload(ctx)
 }
 
 func (r *ReRunner) Run(ctx context.Context, projectJs target.ProjectJs, args ...string) (err error) {

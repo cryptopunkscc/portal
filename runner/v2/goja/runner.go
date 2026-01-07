@@ -17,7 +17,7 @@ type Runner interface {
 
 type BundleRunner struct {
 	AppRunner
-	Bundle js.JsBundle
+	Bundle js.Bundle
 }
 
 func (r BundleRunner) New() source.Source {
@@ -40,7 +40,7 @@ type AppRunner struct {
 	js.App
 	Core    bind.Core
 	backend *goja.Backend
-	args    []string
+	Args    []string
 }
 
 func (r AppRunner) New() source.Source {
@@ -58,16 +58,20 @@ func (r *AppRunner) ReadSrc(src source.Source) (err error) {
 	return
 }
 
-func (r *AppRunner) Reload() (err error) {
-	return r.backend.RunFs(r.PathFS(), r.args...)
+func (r *AppRunner) Reload(ctx context.Context) (err error) {
+	r.Core.Interrupt()
+	return r.backend.RunFs(r.PathFS(), r.Args...)
 }
 
-func (r *AppRunner) Run(ctx context.Context, args ...string) (err error) {
+func (r *AppRunner) Start(ctx context.Context, args ...string) (err error) {
 	log := plog.Get(ctx).Type(r).Set(&ctx)
 	log.Printf("run %T %s", r.App.Metadata.Package, r.Path)
-	r.args = args
+	r.Args = args
 	r.backend = goja.NewBackend(r.Core)
-	if err = r.Reload(); err != nil {
+	return r.Reload(ctx)
+}
+func (r *AppRunner) Run(ctx context.Context, args ...string) (err error) {
+	if err = r.Start(ctx, args...); err != nil {
 		return
 	}
 	<-ctx.Done()

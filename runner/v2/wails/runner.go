@@ -74,42 +74,42 @@ func (r *AppRunner) Run(ctx context.Context) (err error) {
 	log.Println("start", r.Metadata.Package, r.Metadata)
 	defer log.Println("exit", r.Metadata.Package, r.Metadata)
 
-	opt := r.AppOptions()
+	opt := AppOptions(r.Core)
 	opt.OnStartup = func(ctx context.Context) { r.frontCtx = ctx }
-	r.SetupOptions(opt)
+	SetupOptions(opt, r.App)
 	if err = application.NewWithOptions(opt).Run(); err != nil {
 		return plog.Err(err)
 	}
 	return
 }
 
-func (r *AppRunner) AppOptions() *options.App {
+func AppOptions(core bind.Core) *options.App {
 	return &options.App{
 		Width:            1024,
 		Height:           768,
 		BackgroundColour: options.NewRGB(27, 38, 54),
-		Bind:             []interface{}{r.Core},
+		Bind:             []interface{}{core},
 		OnBeforeClose: func(ctx context.Context) (prevent bool) {
-			r.Core.Interrupt()
+			core.Interrupt()
 			return false
 		},
 	}
 }
 
-func (r *AppRunner) SetupOptions(opt *options.App) {
+func SetupOptions(opt *options.App, app html.App) {
 	// Setup defaults
 	if opt.AssetServer == nil {
 		opt.AssetServer = &assetserver.Options{}
 	}
 
 	// Setup manifest
-	opt.Title = r.Metadata.Title
+	opt.Title = app.Title
 	if opt.Title == "" {
-		opt.Title = r.Metadata.Name
+		opt.Title = app.Name
 	}
 
 	apphostJsFS := wails.JsFs
-	assetsFs := r.PathFS()
+	assetsFs := app.PathFS()
 
 	// Setup fs assets
 	opt.AssetServer.Assets = assets.ArrayFs{

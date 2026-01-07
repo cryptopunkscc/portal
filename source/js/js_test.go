@@ -61,8 +61,8 @@ func TestJsProject_WriteFs_ReadFS(t *testing.T) {
 
 func TestJsBundle_WriteFs_ReadFS(t *testing.T) {
 	ref := testJsRef(t, ".js_test_bundle")
-	actual := JsBundle{}
-	expected := JsBundle{}
+	actual := Bundle{}
+	expected := Bundle{}
 	expected.Dist.Metadata = app.Metadata{Manifest: testJsManifest}
 	expected.Js.MainJs = testMainJs
 	test.NoError(t, expected.WriteRef(ref))

@@ -34,7 +34,7 @@ type ReRunner struct {
 	frontCtx context.Context
 }
 
-func (r *ReRunner) Reload() (err error) {
+func (r *ReRunner) Reload(context.Context) (err error) {
 	if r.frontCtx == nil {
 		return plog.Errorf("nil context")
 	}

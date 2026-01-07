@@ -33,8 +33,8 @@ type ReRunner struct {
 	newCore bind.NewCore
 }
 
-func (r *ReRunner) Reload() (err error) {
-	return r.ReRunner.Reload()
+func (r *ReRunner) Reload(ctx context.Context) (err error) {
+	return r.ReRunner.Reload(ctx)
 }
 
 func (r *ReRunner) Run(ctx context.Context, distHtml target.DistHtml, args ...string) (err error) {
@@ -49,7 +49,7 @@ func (r *ReRunner) Run(ctx context.Context, distHtml target.DistHtml, args ...st
 			if err := r.send(dev.NewMsg(pkg, dev.Changed)); err != nil {
 				log.F().Println(err)
 			}
-			err = r.Reload()
+			err = r.Reload(ctx)
 			if err := r.send(dev.NewMsg(pkg, dev.Refreshed)); err != nil {
 				log.F().Println(err)
 			}
@@ -62,7 +62,7 @@ func (r *ReRunner) Run(ctx context.Context, distHtml target.DistHtml, args ...st
 	}()
 
 	r.Core, ctx = r.newCore(ctx, distHtml)
-	r.send = reload.Start(ctx, distHtml, r.Reload, r.Core)
+	r.send = reload.Start(ctx, distHtml.Manifest().Package, r.Reload, r.Core)
 	if err = r.ReRunner.Run(ctx, distHtml, args...); err != nil {
 		return
 	}

@@ -44,16 +44,16 @@ func (p *Project) WriteRef(ref source.Ref) (err error) {
 	return source.Writers{&p.Project, &p.Js}.WriteRef(ref)
 }
 
-type JsBundle struct {
+type Bundle struct {
 	App
 	source.Zip
 }
 
-func (b JsBundle) New() (src source.Source) {
+func (b Bundle) New() (src source.Source) {
 	return &b
 }
 
-func (b *JsBundle) ReadSrc(src source.Source) (err error) {
+func (b *Bundle) ReadSrc(src source.Source) (err error) {
 	if err = b.Zip.ReadSrc(src); err != nil {
 		return
 	}
@@ -63,7 +63,7 @@ func (b *JsBundle) ReadSrc(src source.Source) (err error) {
 	return
 }
 
-func (b *JsBundle) WriteRef(ref source.Ref) (err error) {
+func (b *Bundle) WriteRef(ref source.Ref) (err error) {
 	if b.Fs == nil {
 		b.Fs = afero.NewMemMapFs()
 	}

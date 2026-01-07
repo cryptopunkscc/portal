@@ -32,7 +32,7 @@ type ReRunner struct {
 	backend *goja.Backend
 }
 
-func (r *ReRunner) Reload() (err error) {
+func (r *ReRunner) Reload(ctx context.Context) (err error) {
 	return r.backend.RunFs(r.dist.FS())
 }
 
@@ -48,15 +48,16 @@ func (r *ReRunner) Run(ctx context.Context, distJs target.DistJs, args ...string
 	core, ctx := r.NewCore(ctx, distJs)
 	r.backend = goja.NewBackend(core)
 	r.dist = distJs
-	if err = r.Reload(); err != nil {
+	if err = r.Reload(ctx); err != nil {
 		log.E().Println(err.Error())
 	}
 	pkg := distJs.Manifest().Package
+
 	watch := dist.ReRunner[target.DistJs](func(...string) error {
 		if err := r.send(dev.NewMsg(pkg, dev.Changed)); err != nil {
 			log.E().Println(err)
 		}
-		if err := r.Reload(); err != nil {
+		if err := r.Reload(ctx); err != nil {
 			log.E().Println(err.Error())
 		}
 		// TODO find better solution then sleep
@@ -67,6 +68,6 @@ func (r *ReRunner) Run(ctx context.Context, distJs target.DistJs, args ...string
 		}
 		return nil
 	})
-	r.send = reload.Start(ctx, distJs, r.Reload, core)
+	r.send = reload.Start(ctx, distJs.Manifest().Package, r.Reload, core)
 	return watch.Run(ctx, distJs, args...)
 }
