@@ -3,11 +3,10 @@ package source
 import (
 	"errors"
 	"io/fs"
-	"os"
 	path2 "path"
-	"path/filepath"
 	"strings"
 
+	"github.com/cryptopunkscc/portal/pkg/os"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/spf13/afero"
 	"go.nhat.io/aferocopy/v2"
@@ -19,25 +18,12 @@ type Ref struct {
 	Func any
 }
 
-func Abs(path ...string) string {
-	src := path2.Join(path...)
-	if path2.IsAbs(src) {
-		return src
-	}
-	base, err := os.Getwd()
-	if err != nil {
-		return src
-	}
-	base = filepath.ToSlash(base)
-	return path2.Join(base, src)
-}
-
 func FSRef(fs fs.FS, path ...string) *Ref {
 	return &Ref{Fs: afero.FromIOFS{FS: fs}, Path: path2.Join(path...)}
 }
 
 func OSRef(path ...string) *Ref {
-	return &Ref{Fs: afero.NewOsFs(), Path: Abs(path...)}
+	return &Ref{Fs: afero.NewOsFs(), Path: os.Abs(path...)}
 }
 
 func (r Ref) GetPath() string {
@@ -89,7 +75,7 @@ func (r *Ref) Checkout(path string) (err error) {
 }
 
 func (r *Ref) ReadOS(path string) (err error) {
-	path = Abs(path)
+	path = os.Abs(path)
 	return r.ReadSrc(&Ref{Fs: afero.NewOsFs(), Path: path})
 }
 

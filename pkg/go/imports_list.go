@@ -19,9 +19,9 @@ func (i ImportRefs) String() string {
 	return i.Import
 }
 
-func ListImports(path string) (l []ImportRefs, err error) {
+func ListImports(abs string) (l []ImportRefs, err error) {
 	i := imports{}
-	if err = i.Collect(path); err != nil {
+	if err = i.Collect(abs); err != nil {
 		return
 	}
 	l = i.List()
