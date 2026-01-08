@@ -22,25 +22,22 @@ import (
 //go:embed templates
 var templatesFS embed.FS
 
-type CreateOpts struct {
-	Name         string `cli:"name n"`
-	Template     string `cli:"template t"`
-	TemplateArgs TemplateArgs
-}
-
-type TemplateArgs map[string]string
-
-func Create(opts CreateOpts, path string) (err error) {
-	return Builder{CreateOpts: opts}.WriteRef(*source.OSRef(path))
+func Create(template, path string) (err error) {
+	b := Builder{}
+	b.Template = template
+	return b.WriteRef(*source.OSRef(path))
 }
 
 type Builder struct {
 	source.Ref
-	fs fs.FS
-	CreateOpts
-	Manifest  app.Manifest
-	PortalYml string
+	fs           fs.FS
+	Template     string
+	TemplateArgs TemplateArgs
+	Manifest     app.Manifest
+	PortalYml    string
 }
+
+type TemplateArgs map[string]string
 
 var _ source.Writer = &Builder{}
 
@@ -78,10 +75,7 @@ func (b *Builder) prepare() (err error) {
 	} else {
 		b.PortalYml = "portal.yml"
 	}
-	if b.Name == "" {
-		b.Name = b.Template
-	}
-	b.Manifest.Name = b.Name
+	b.Manifest.Name = path.Base(b.Path)
 	if b.Manifest.Title == "" {
 		b.Manifest.Title = cases.Title(language.English).String(b.Manifest.Name)
 	}

@@ -35,11 +35,11 @@ type ReRunner struct {
 	args    []string
 }
 
-func (r *ReRunner) Reload() (err error) {
+func (r *ReRunner) Reload(ctx context.Context) (err error) {
 	if r.cancel != nil {
 		r.cancel()
 	}
-	ctx := r.ctx
+	ctx = r.ctx
 	ctx, r.cancel = context.WithCancel(r.ctx)
 	go func() {
 		if err := r.run(ctx, r.dist, r.args...); err != nil {
@@ -63,7 +63,7 @@ func (r *ReRunner) Run(ctx context.Context, project target.ProjectGo, args ...st
 	}
 	r.dist = project.Dist()
 
-	if err = r.Reload(); err != nil {
+	if err = r.Reload(ctx); err != nil {
 		return
 	}
 
@@ -73,13 +73,13 @@ func (r *ReRunner) Run(ctx context.Context, project target.ProjectGo, args ...st
 	}
 
 	pkg := project.Manifest().Package
-	r.send = reload.Start(ctx, project, r.Reload, nil)
+	r.send = reload.Start(ctx, project.Manifest().Package, r.Reload, nil)
 	for range flow.From(events).Debounce(200 * time.Millisecond) {
 		if err := r.sendMsg(pkg, dev.Changed); err != nil {
 			log.E().Println(err)
 		}
 		if err = build(ctx, project); err == nil {
-			if err = r.Reload(); err != nil {
+			if err = r.Reload(ctx); err != nil {
 				log.E().Println(err)
 			}
 		}

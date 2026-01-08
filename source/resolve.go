@@ -8,21 +8,21 @@ import (
 	"github.com/spf13/afero"
 )
 
-func Collect(src Source, constructors ...Constructor) (out List[Source]) {
-	return CollectT[Source](src, constructors...)
+func Collect(src Source, types ...Type) (out List[Source]) {
+	return CollectT[Source](src, types...)
 }
 
-func CollectIt[T Constructor](src Source, constructor T) (out List[T]) {
-	return CollectT[T](src, constructor)
+func CollectIt[T Type](src Source, t T) (out List[T]) {
+	return CollectT[T](src, t)
 }
 
-func CollectT[T Source](src Source, constructors ...Constructor) (out List[T]) {
+func CollectT[T Source](src Source, types ...Type) (out List[T]) {
 	if src == nil {
 		return
 	}
 
 	if src != src.Ref_() {
-		if o, err := ResolveT[T](src, constructors...); err == nil {
+		if o, err := ResolveT[T](src, types...); err == nil {
 			out = append(out, o)
 		}
 		return
@@ -43,7 +43,7 @@ func CollectT[T Source](src Source, constructors ...Constructor) (out List[T]) {
 			return fs.SkipDir
 		}
 		ref.Path = p
-		source, err := ResolveT[T](&ref, constructors...)
+		source, err := ResolveT[T](&ref, types...)
 		if isSkip(err) {
 			return err
 		}
@@ -55,19 +55,19 @@ func CollectT[T Source](src Source, constructors ...Constructor) (out List[T]) {
 	return
 }
 
-func ResolveIt[T Constructor](src Source, constructor T) (out T, err error) {
-	return ResolveT[T](src, constructor)
+func ResolveIt[T Type](src Source, t T) (out T, err error) {
+	return ResolveT[T](src, t)
 }
 
-func Resolve(src Source, constructors ...Constructor) (out Source, err error) {
-	return ResolveT[Source](src, constructors...)
+func Resolve(src Source, types ...Type) (out Source, err error) {
+	return ResolveT[Source](src, types...)
 }
 
-func ResolveT[T Source](src Source, constructors ...Constructor) (out T, err error) {
-	if len(constructors) == 0 {
+func ResolveT[T Source](src Source, types ...Type) (out T, err error) {
+	if len(types) == 0 {
 		return out, fs.ErrInvalid
 	}
-	for _, constructor := range constructors {
+	for _, constructor := range types {
 		if out, err = Cast[T](constructor.New()); err == nil {
 			if err = out.ReadSrc(src); err == nil {
 				return

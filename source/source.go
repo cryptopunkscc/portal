@@ -5,10 +5,12 @@ type Source interface {
 	Ref_() *Ref
 }
 
-type Constructor interface {
+type Type interface {
 	Source
 	New() Source
 }
+
+type Types []Type
 
 type Reader interface {
 	ReadSrc(src Source) (err error)

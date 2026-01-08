@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cryptopunkscc/portal/api/bin"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 )
 
@@ -17,7 +16,7 @@ var binFs embed.FS
 
 func installBinaries() (err error) {
 	defer plog.TraceErr(&err)
-	dir := bin.Dir()
+	dir := Dir()
 	if err = os.MkdirAll(dir, 0755); err != nil {
 		return
 	}
@@ -53,7 +52,7 @@ func installBinaries() (err error) {
 func removeBinaries() (err error) {
 	println(fmt.Sprintf("removing binaries..."))
 	defer plog.TraceErr(&err)
-	dir := bin.Dir()
+	dir := Dir()
 	if err = os.MkdirAll(dir, 0755); err != nil {
 		return
 	}

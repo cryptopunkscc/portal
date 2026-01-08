@@ -1,6 +1,6 @@
 //go:build unix
 
-package bin
+package main
 
 import (
 	"os"

@@ -1,23 +1,9 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"io/fs"
-
-	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/runner/v2/goja"
-	goja_dist "github.com/cryptopunkscc/portal/runner/v2/goja/dist"
-	goja_pro "github.com/cryptopunkscc/portal/runner/v2/goja/pro"
-	"github.com/cryptopunkscc/portal/runner/v2/wails"
-	wails_dist "github.com/cryptopunkscc/portal/runner/v2/wails/dist"
-	wails_pro "github.com/cryptopunkscc/portal/runner/v2/wails/pro"
-	"github.com/cryptopunkscc/portal/source"
 	"github.com/cryptopunkscc/portal/source/app"
-	"github.com/cryptopunkscc/portal/source/html"
-	"github.com/cryptopunkscc/portal/source/js"
 	"github.com/cryptopunkscc/portal/source/npm"
 	"github.com/cryptopunkscc/portal/source/tmpl"
 )
@@ -41,68 +27,17 @@ var handler = cmd.Handler{
 		cmd.Handler{
 			Func: app.Publisher{}.PublishBundles,
 			Name: "publish p",
-			Desc: "Publish app bundles to Astral",
+			Desc: "Publish app bundles to Astral.",
 		},
 		cmd.Handler{
-			Func: runApp,
+			Func: runTarget,
 			Name: "run r",
 			Desc: "Run HTML/JS app in hot reloading runner.",
 		},
 		cmd.Handler{
-			Func: listTargets,
 			Name: "list l",
+			Desc: "List apps and projects recursively found in given path.",
+			Func: listTargets,
 		},
 	},
-}
-
-func runApp(ctx context.Context, src string, args ...string) (err error) {
-	s := source.Providers{
-		source.OsFs,
-	}.GetSource(src)
-	if s == nil {
-		return fs.ErrNotExist
-	}
-
-	for _, ss := range source.Collect(s,
-		&goja_pro.Runner{},
-		&goja_dist.Runner{},
-		&goja.BundleRunner{},
-		&wails_pro.Runner{},
-		&wails_dist.Runner{},
-		&wails.BundleRunner{},
-	) {
-		switch r := ss.(type) {
-		case goja.Runner:
-			ctx := bind.DefaultCoreFactory{}.Create(ctx)
-			return r.Run(*ctx, args...)
-		case wails.Runner:
-			ctx := bind.DefaultCoreFactory{}.Create(ctx)
-			return r.Run(&Adapter{ctx})
-		}
-	}
-
-	return fs.ErrInvalid
-}
-
-type Adapter struct{ bind.Core }
-
-func listTargets(src string) (err error) {
-	s := source.Providers{
-		source.OsFs,
-	}.GetSource(src)
-	if s == nil {
-		return fs.ErrNotExist
-	}
-
-	for i, ss := range source.CollectT[app.App](s,
-		&html.App{},
-		&html.Bundle{},
-		&html.Project{},
-		&js.App{},
-		&js.Bundle{},
-		&js.Project{},
-	) {
-		println(fmt.Sprintf("%d. %T:%s %v", i, ss, ss.GetPath(), ss.GetMetadata().Manifest))
-	}
-	return
 }
