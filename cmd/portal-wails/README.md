@@ -1,6 +1,6 @@
 # portal-wails
 
-Runs Astral HTML apps using [wails](https://wails.io/)-based [runner](../../runner/v2/wails).
+Runs Astral HTML apps using [wails](https://wails.io/)-based [runner](../../runner/wails).
 
 ## Dependencies
 

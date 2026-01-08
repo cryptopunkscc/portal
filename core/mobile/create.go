@@ -8,8 +8,8 @@ import (
 	"github.com/cryptopunkscc/portal/api/mobile"
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	exec2 "github.com/cryptopunkscc/portal/runner/exec"
-	"github.com/cryptopunkscc/portal/runner/goja"
+	exec2 "github.com/cryptopunkscc/portal/runner/deprecated/exec"
+	"github.com/cryptopunkscc/portal/runner/deprecated/goja"
 )
 
 func Create(api mobile.Api) mobile.Core {

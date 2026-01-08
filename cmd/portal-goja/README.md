@@ -1,6 +1,6 @@
 # portal-goja
 
-Runs Astral JS services using [goja](https://github.com/dop251/goja)-based [runner](../../runner/v2/goja).
+Runs Astral JS services using [goja](https://github.com/dop251/goja)-based [runner](../../runner/goja).
 
 ## Installation
 

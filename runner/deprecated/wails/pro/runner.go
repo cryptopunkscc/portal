@@ -8,45 +8,52 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/deps"
 	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/runner/v2/wails"
-	"github.com/cryptopunkscc/portal/source"
-	"github.com/cryptopunkscc/portal/source/html"
+	"github.com/cryptopunkscc/portal/runner/deprecated/wails"
 	"github.com/cryptopunkscc/portal/target/dev/reload"
+	"github.com/cryptopunkscc/portal/target/html"
+	"github.com/cryptopunkscc/portal/target/npm"
 	"github.com/wailsapp/wails/v2/pkg/application"
 	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-type Runner struct {
-	html.Project
+func Runner(newCore bind.NewCore) *target.SourceRunner[target.ProjectHtml] {
+	return &target.SourceRunner[target.ProjectHtml]{
+		Resolve: target.Any[target.ProjectHtml](html.ResolveProject.Try),
+		Runner:  ReRunner(newCore),
+	}
+}
+
+func ReRunner(newCore bind.NewCore) target.ReRunner[target.ProjectHtml] {
+	return &reRunner{NewCore: newCore}
+}
+
+type reRunner struct {
 	frontCtx context.Context
+	bind.NewCore
 }
 
-var _ wails.Runner = &Runner{}
-
-func (r Runner) New() source.Source {
-	return &r
-}
-
-func (r *Runner) Run(ctx bind.Core) (err error) {
+func (r *reRunner) Run(ctx context.Context, projectHtml target.ProjectHtml, args ...string) (err error) {
 	// TODO pass args to js
-	log := plog.Get(ctx).Type(r)
-	log.Println("start", r.Package, r.Path)
-	defer log.Println("exit", r.Package, r.Path)
+	log := plog.Get(ctx).Type(r).Set(&ctx)
+	log.Println("start", projectHtml.Manifest().Package, projectHtml.Abs())
+	defer log.Println("exit", projectHtml.Manifest().Package, projectHtml.Abs())
 
 	if err = deps.Check("npm", "-v"); err != nil {
 		return
 	}
 
-	if err = r.Build(); err != nil {
+	if err = npm.BuildProject().Run(ctx, projectHtml); err != nil {
 		return
 	}
 
-	opt := wails.AppOptions(ctx)
+	core, ctx := r.NewCore(ctx, projectHtml)
+	opt := wails.AppOptions(core)
 	opt.OnStartup = func(ctx context.Context) { r.frontCtx = ctx }
-	path := r.Path
+	path := projectHtml.Abs()
 
 	// Start frontend dev watcher
 	viteCommand := "npm run dev"
@@ -65,7 +72,7 @@ func (r *Runner) Run(ctx bind.Core) (err error) {
 	// setup opt
 	front := path
 	path = path + "/dist"
-	wails.SetupOptions(opt, r.App)
+	wails.SetupOptions(projectHtml, opt)
 	if opt.Title == "" {
 		opt.Title = "development"
 	}
@@ -89,7 +96,7 @@ func (r *Runner) Run(ctx bind.Core) (err error) {
 		app.Quit()
 	}()
 
-	_ = reload.Start(ctx, r.Package, r.Reload, ctx)
+	_ = reload.Start(ctx, projectHtml.Manifest().Package, r.Reload, core)
 
 	err = app.Run()
 	if err != nil {
@@ -98,7 +105,7 @@ func (r *Runner) Run(ctx bind.Core) (err error) {
 	return
 }
 
-func (r *Runner) Reload(ctx context.Context) (err error) {
+func (r *reRunner) Reload(ctx context.Context) (err error) {
 	if r.frontCtx == nil {
 		return errors.New("nil context")
 	}

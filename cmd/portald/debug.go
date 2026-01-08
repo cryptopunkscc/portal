@@ -6,7 +6,7 @@ import (
 	"github.com/cryptopunkscc/portal/api/astrald"
 	. "github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/core/astrald/debug"
-	"github.com/cryptopunkscc/portal/runner/exec"
+	"github.com/cryptopunkscc/portal/runner/deprecated/exec"
 )
 
 func (a *Application) init() {

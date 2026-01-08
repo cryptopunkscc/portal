@@ -8,9 +8,9 @@ import (
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/runner/wails"
-	"github.com/cryptopunkscc/portal/runner/wails/dist"
-	"github.com/cryptopunkscc/portal/runner/wails/pro"
+	"github.com/cryptopunkscc/portal/runner/deprecated/wails"
+	"github.com/cryptopunkscc/portal/runner/deprecated/wails/dist"
+	"github.com/cryptopunkscc/portal/runner/deprecated/wails/pro"
 	"github.com/cryptopunkscc/portal/target/html"
 	"github.com/cryptopunkscc/portal/target/source"
 )

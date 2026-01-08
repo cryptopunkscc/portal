@@ -3,9 +3,6 @@ package env
 import (
 	"os"
 	"path/filepath"
-
-	"github.com/cryptopunkscc/portal/api/target"
-	"github.com/cryptopunkscc/portal/target/source"
 )
 
 type Key string
@@ -65,8 +62,4 @@ func (k Key) MkdirAll() (dir string) {
 		panic(err)
 	}
 	return abs
-}
-
-func (k Key) Source() target.Source {
-	return source.Dir(k.MkdirAll())
 }

@@ -5,12 +5,12 @@ import (
 	"io/fs"
 
 	"github.com/cryptopunkscc/portal/core/bind"
-	"github.com/cryptopunkscc/portal/runner/v2/goja"
-	goja_dist "github.com/cryptopunkscc/portal/runner/v2/goja/dist"
-	goja_pro "github.com/cryptopunkscc/portal/runner/v2/goja/pro"
-	"github.com/cryptopunkscc/portal/runner/v2/wails"
-	wails_dist "github.com/cryptopunkscc/portal/runner/v2/wails/dist"
-	wails_pro "github.com/cryptopunkscc/portal/runner/v2/wails/pro"
+	"github.com/cryptopunkscc/portal/runner/goja"
+	"github.com/cryptopunkscc/portal/runner/goja/dist"
+	"github.com/cryptopunkscc/portal/runner/goja/pro"
+	"github.com/cryptopunkscc/portal/runner/wails"
+	"github.com/cryptopunkscc/portal/runner/wails/dist"
+	"github.com/cryptopunkscc/portal/runner/wails/pro"
 	"github.com/cryptopunkscc/portal/source"
 )
 

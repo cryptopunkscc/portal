@@ -22,7 +22,7 @@ import (
 	golang "github.com/cryptopunkscc/portal/pkg/go"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/test"
-	"github.com/cryptopunkscc/portal/runner/goja"
+	"github.com/cryptopunkscc/portal/runner/deprecated/goja"
 	source2 "github.com/cryptopunkscc/portal/source"
 	"github.com/cryptopunkscc/portal/source/app"
 	"github.com/cryptopunkscc/portal/target/bundle"

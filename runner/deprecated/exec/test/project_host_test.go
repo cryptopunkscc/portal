@@ -10,7 +10,7 @@ import (
 	"github.com/cryptopunkscc/portal/api/manifest"
 	"github.com/cryptopunkscc/portal/api/portal"
 	"github.com/cryptopunkscc/portal/pkg/test"
-	"github.com/cryptopunkscc/portal/runner/exec"
+	"github.com/cryptopunkscc/portal/runner/deprecated/exec"
 	"github.com/cryptopunkscc/portal/target/source"
 	"github.com/stretchr/testify/assert"
 )

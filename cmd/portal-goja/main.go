@@ -8,7 +8,7 @@ import (
 	"github.com/cryptopunkscc/portal/core/bind"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/runner/v2/goja"
+	"github.com/cryptopunkscc/portal/runner/goja"
 	"github.com/cryptopunkscc/portal/source"
 	"github.com/cryptopunkscc/portal/source/app"
 )
