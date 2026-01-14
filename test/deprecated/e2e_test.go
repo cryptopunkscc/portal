@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/cryptopunkscc/portal/pkg/test"
-	"github.com/cryptopunkscc/portal/test/docker"
-	"github.com/cryptopunkscc/portal/test/host"
-	"github.com/cryptopunkscc/portal/test/kvm/win10"
+	"github.com/cryptopunkscc/portal/test/deprecated/docker"
+	"github.com/cryptopunkscc/portal/test/deprecated/host"
+	"github.com/cryptopunkscc/portal/test/deprecated/kvm/win10"
 )
 
 var configuration = [][]*Cases{

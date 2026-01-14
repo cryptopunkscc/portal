@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/cryptopunkscc/portal/pkg/test"
-	"github.com/cryptopunkscc/portal/test/util"
+	"github.com/cryptopunkscc/portal/test/deprecated/util"
 	"github.com/stretchr/testify/assert"
 )
 

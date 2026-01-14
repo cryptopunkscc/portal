@@ -1,7 +1,6 @@
 package app
 
 import (
-	"context"
 	"io/fs"
 	"log"
 	"sync"
@@ -26,21 +25,23 @@ func (r Objects) Default() Objects {
 }
 
 func (r Objects) GetSource(src string) (out source.Source) {
-	out, _ = r.GetAppBundle(src)
+	if b, err := r.GetAppBundle(astral.NewContext(nil), src); err == nil {
+		return b
+	}
 	return
 }
 
-func (r Objects) GetAppBundle(src string) (out *Bundle, err error) {
+func (r Objects) GetAppBundle(ctx *astral.Context, src string) (out *Bundle, err error) {
 	id, err := astral.ParseID(src)
 	if err == nil {
-		return r.GetByObjectID(*id)
+		return r.GetByObjectID(ctx, *id)
 	}
-	return r.GetByNameOrPkg(src)
+	return r.GetByNameOrPkg(ctx, src)
 }
 
-func (r Objects) GetByNameOrPkg(name string) (out *Bundle, err error) {
+func (r Objects) GetByNameOrPkg(ctx *astral.Context, name string) (out *Bundle, err error) {
 	defer plog.TraceErr(&err)
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := ctx.WithCancel()
 	defer cancel()
 	for info := range r.Scan(ctx, false) {
 		if !info.Manifest.Match(name) {
@@ -49,14 +50,13 @@ func (r Objects) GetByNameOrPkg(name string) (out *Bundle, err error) {
 		if info.Host == nil {
 			info.Host = r.HostID()
 		}
-		out, err = r.GetByObjectID(*info.BundleID, *info.Host)
+		out, err = r.GetByObjectID(ctx, *info.BundleID, *info.Host)
 		return
 	}
-	err = fs.ErrNotExist
-	return
+	return nil, fs.ErrNotExist
 }
 
-func (r Objects) GetByObjectID(id astral.ObjectID, host ...astral.Identity) (out *Bundle, err error) {
+func (r Objects) GetByObjectID(ctx *astral.Context, id astral.ObjectID, host ...astral.Identity) (out *Bundle, err error) {
 	defer plog.TraceErr(&err)
 	var obj astral.Object
 	if len(host) == 0 {
@@ -64,20 +64,29 @@ func (r Objects) GetByObjectID(id astral.ObjectID, host ...astral.Identity) (out
 	}
 	for _, identity := range host {
 		r.Client = r.WithTarget(&identity)
-		if obj, err = r.Objects().Get(&id); err == nil {
-			if out, _ = obj.(*Bundle); out != nil {
+		if obj, err = r.Objects().Get(ctx, &id); err == nil {
+			switch v := obj.(type) {
+			case *Bundle:
+				out = v
 				return
+			case *ReleaseMetadata:
+				if obj, err = r.Objects().Get(ctx, v.BundleID); err != nil {
+					continue
+				}
+				if out, _ = obj.(*Bundle); out != nil {
+					return
+				}
 			}
 		}
-		return
 	}
-	return
+	return nil, fs.ErrNotExist
 }
 
-func (r Objects) Scan(ctx context.Context, follow bool) (out flow.Input[ReleaseInfo]) {
+func (r Objects) Scan(ctx *astral.Context, follow bool) (out flow.Input[ReleaseInfo]) {
 	a := availableAppsScanner{
 		Adapter: r.Adapter,
 		log:     plog.Get(ctx),
+		follow:  follow,
 		out:     make(chan ReleaseInfo),
 	}
 
@@ -100,7 +109,7 @@ func (r Objects) Scan(ctx context.Context, follow bool) (out flow.Input[ReleaseI
 
 		// remote apps
 
-		if c, err := r.User().Siblings(astral.NewContext(ctx)); err == nil {
+		if c, err := r.User().Siblings(ctx); err == nil {
 			for id := range c {
 				a.scan(ctx, *id)
 			}
@@ -111,10 +120,11 @@ func (r Objects) Scan(ctx context.Context, follow bool) (out flow.Input[ReleaseI
 
 type availableAppsScanner struct {
 	*apphost.Adapter
-	wg  sync.WaitGroup
-	log plog.Logger
-	rpc rpc.Rpc
-	out chan ReleaseInfo
+	wg     sync.WaitGroup
+	log    plog.Logger
+	rpc    rpc.Rpc
+	follow bool
+	out    chan ReleaseInfo
 }
 
 type ReleaseInfo struct {
@@ -124,7 +134,7 @@ type ReleaseInfo struct {
 	Host      *astral.Identity
 }
 
-func (a *availableAppsScanner) scan(ctx context.Context, host ...astral.Identity) {
+func (a *availableAppsScanner) scan(ctx *astral.Context, host ...astral.Identity) {
 	if ctx.Err() != nil {
 		return
 	}
@@ -134,7 +144,7 @@ func (a *availableAppsScanner) scan(ctx context.Context, host ...astral.Identity
 		h = &host[0]
 	}
 
-	ids, err := a.Objects().Scan(astral.NewContext(ctx), "", false)
+	ids, err := a.Objects().Scan(ctx, "main", a.follow)
 	if err != nil {
 		log.Println(err)
 		return
@@ -146,19 +156,20 @@ func (a *availableAppsScanner) scan(ctx context.Context, host ...astral.Identity
 			if ctx.Err() != nil {
 				continue
 			}
-			a.fetchInfo(*id, h)
+			a.fetchInfo(ctx, *id, h)
 		}
 	}()
 }
 
 func (a *availableAppsScanner) fetchInfo(
+	ctx *astral.Context,
 	id astral.ObjectID,
 	host *astral.Identity,
 ) {
 	metadata := &ReleaseMetadata{}
 	oc := a.Objects()
 
-	o, err := oc.Get(&id)
+	o, err := oc.Get(ctx, &id)
 	if err != nil {
 		return
 	}
@@ -167,7 +178,7 @@ func (a *availableAppsScanner) fetchInfo(
 		return
 	}
 
-	if o, err = oc.Get(metadata.ManifestID); err != nil {
+	if o, err = oc.Get(ctx, metadata.ManifestID); err != nil {
 		a.log.Println(err)
 		return
 	}

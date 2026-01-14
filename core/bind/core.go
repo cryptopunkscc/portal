@@ -30,13 +30,18 @@ type Context struct {
 
 func (c *Context) GetCtx() context.Context { return c.Context }
 
-type DefaultCoreFactory struct{}
+type DefaultCoreFactory struct {
+	Adapter *apphost.Adapter
+}
 
-func (DefaultCoreFactory) Create(ctx context.Context) (c *Context) {
+func (f DefaultCoreFactory) Create(ctx context.Context) (c *Context) {
+	if f.Adapter == nil {
+		f.Adapter = apphost.Default
+	}
 	c = &Context{}
 	c.Process, c.Context = NewProcess(ctx)
 	c.Ctx = c.Context
-	c.Cached = *apphost.NewCached(apphost.Default)
+	c.Cached = *apphost.NewCached(f.Adapter)
 	c.Adapter.Log = c.Process.log
 	return
 }

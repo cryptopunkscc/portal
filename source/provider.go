@@ -1,6 +1,7 @@
 package source
 
 import (
+	"github.com/cryptopunkscc/portal/pkg/os"
 	"github.com/spf13/afero"
 )
 
@@ -22,6 +23,7 @@ func (p Providers) GetSource(source string) (out Source) {
 type PathProvider struct{ Ref }
 
 func (r PathProvider) GetSource(path string) (out Source) {
+	path = os.Abs(path)
 	if err := r.Ref.Checkout(path); err == nil {
 		out = r.New()
 	}

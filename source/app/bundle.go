@@ -2,11 +2,13 @@ package app
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"path"
 
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/lib/astrald"
+	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/source"
 	"github.com/spf13/afero"
@@ -22,7 +24,7 @@ func (b Bundle) New() (src source.Source) {
 }
 
 func init() {
-	_ = astral.DefaultBlueprints.Add(&Bundle{})
+	_ = astral.Add(&Bundle{})
 }
 
 func (b *Bundle) ReadSrc(src source.Source) (err error) {
@@ -75,18 +77,58 @@ func (b *Bundle) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
-func (b Bundle) Publish(objects *astrald.ObjectsClient) (info ReleaseInfo, err error) {
+func (b Bundle) Publish(ctx context.Context, objects *apphost.ObjectsClient) (info ReleaseInfo, err error) {
 	release := ReleaseMetadata{
 		Release: b.Metadata.Release,
 		Target:  b.Metadata.Target,
 	}
-	if release.BundleID, err = source.ObjectsCreateCommit(objects, &b); err != nil {
+	repo := "main"
+	actx := astral.NewContext(ctx)
+	if release.BundleID, err = objects.Store(actx, repo, &b); err != nil {
 		return
 	}
-	if release.ManifestID, err = source.ObjectsCreateCommit(objects, &b.Metadata.Manifest); err != nil {
+	if release.ManifestID, err = objects.Store(actx, repo, &b.Metadata.Manifest); err != nil {
 		return
 	}
-	if info.ReleaseID, err = source.ObjectsCreateCommit(objects, &release); err != nil {
+	if info.ReleaseID, err = objects.Store(actx, repo, &release); err != nil {
+		return
+	}
+
+	info.Manifest = b.Metadata.Manifest
+	info.ReleaseMetadata = release
+	return
+}
+
+// Fixme: why objects.Module.OpCreate gets stuck on ch.Send(&astral.Ack{})?
+func (b Bundle) Publish2(ctx context.Context, objects *astrald.ObjectsClient) (info ReleaseInfo, err error) {
+	release := ReleaseMetadata{
+		Release: b.Metadata.Release,
+		Target:  b.Metadata.Target,
+	}
+	actx := astral.NewContext(ctx)
+	writer, err := objects.Create(actx, "main", 0)
+	if err != nil {
+		return
+	}
+
+	if _, err = b.WriteTo(writer); err != nil {
+		return
+	}
+	if release.BundleID, err = writer.Commit(); err != nil {
+		return
+	}
+
+	if _, err = b.Manifest.WriteTo(writer); err != nil {
+		return
+	}
+	if release.ManifestID, err = writer.Commit(); err != nil {
+		return
+	}
+
+	if _, err = release.WriteTo(writer); err != nil {
+		return
+	}
+	if info.ReleaseID, err = writer.Commit(); err != nil {
 		return
 	}
 

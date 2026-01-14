@@ -6,7 +6,6 @@ import (
 
 	"github.com/cryptopunkscc/portal/api/version"
 	"github.com/cryptopunkscc/portal/core/bind"
-	"github.com/cryptopunkscc/portal/pkg/os"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
 	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
 	"github.com/cryptopunkscc/portal/runner/wails"
@@ -29,7 +28,6 @@ var handler = cmd.Handler{
 }
 
 func run(ctx context.Context, src string) (err error) {
-	src = os.Abs(src)
 	s := source.Providers{
 		source.OsFs,
 		app.Objects{}.Default(),

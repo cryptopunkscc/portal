@@ -14,13 +14,13 @@ func Unmarshal(b []byte, v any) (err error) {
 	var reader io.Reader = bytes.NewReader(b)
 	switch obj := v.(type) {
 	case astral.Object:
-		var objType astral.ObjectType
-		objType, _, err = astral.ReadCanonicalType(reader)
+		objType := ""
+		objType, _, err = astral.CanonicalTypeDecoder(reader)
 		switch {
 		case err != nil:
 			return
-		case objType.String() != obj.ObjectType():
-			return fmt.Errorf("object type mismatch: got %q, want %q", objType.String(), obj.ObjectType())
+		case objType != obj.ObjectType():
+			return fmt.Errorf("object type mismatch: got %q, want %q", objType, obj.ObjectType())
 		}
 		_, err = obj.ReadFrom(reader)
 	case io.ReaderFrom:

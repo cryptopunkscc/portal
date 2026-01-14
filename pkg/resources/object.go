@@ -10,11 +10,11 @@ import (
 
 func ReadCanonical(reader io.Reader, obj astral.Object) (err error) {
 	defer plog.TraceErr(&err)
-	objType, _, err := astral.ReadCanonicalType(reader)
+	objType, _, err := astral.CanonicalTypeDecoder(reader)
 	switch {
 	case err != nil:
 		return
-	case objType.String() != obj.ObjectType():
+	case objType != obj.ObjectType():
 		return fmt.Errorf("invalid object type: %s, expect: %s", objType, obj.ObjectType())
 	}
 	_, err = obj.ReadFrom(reader)
@@ -23,6 +23,6 @@ func ReadCanonical(reader io.Reader, obj astral.Object) (err error) {
 
 func WriteCanonical(writer io.Writer, obj astral.Object) (err error) {
 	defer plog.TraceErr(&err)
-	_, err = astral.DefaultBlueprints.Canonical().Write(writer, obj)
+	_, err = astral.Encode(writer, obj, astral.Canonical())
 	return
 }

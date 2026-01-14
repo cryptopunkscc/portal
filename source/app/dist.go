@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"io/fs"
 
 	"github.com/cryptopunkscc/portal/source"
 	"github.com/spf13/afero"
@@ -57,4 +58,11 @@ func (a *Dist) WriteRef(ref source.Ref) (err error) {
 
 func (a *Dist) ReadFs(fS afero.Fs) (err error) {
 	return source.Readers{&a.Ref, &a.Metadata}.ReadSrc(&source.Ref{Fs: fS})
+}
+
+func (a Dist) Pack() error {
+	if a.Fs == nil {
+		return fs.ErrNotExist
+	}
+	return a.Bundle().WriteRef(*a.Sub("../build"))
 }

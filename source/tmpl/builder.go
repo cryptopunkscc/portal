@@ -63,6 +63,7 @@ func (b Builder) WriteRef(ref source.Ref) (err error) {
 }
 
 func (b *Builder) prepare() (err error) {
+	defer plog.TraceErr(&err)
 	if b.Template == "" {
 		return fmt.Errorf("template name required")
 	}
@@ -71,7 +72,7 @@ func (b *Builder) prepare() (err error) {
 	}
 	b.Fs = &afero.FromIOFS{FS: b.fs}
 
-	if _, err = b.Fs.Stat("dev"); err == nil {
+	if _, err := b.Fs.Stat("dev"); err == nil {
 		b.PortalYml = "dev.portal.yml"
 	} else {
 		b.PortalYml = "portal.yml"

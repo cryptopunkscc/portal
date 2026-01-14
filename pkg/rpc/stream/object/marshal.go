@@ -13,7 +13,7 @@ func Marshal(v any) (b []byte, err error) {
 	buf := bytes.NewBuffer(b)
 	switch t := v.(type) {
 	case astral.Object:
-		_, err = astral.DefaultBlueprints.Canonical().Write(buf, t)
+		_, err = astral.Encode(buf, t, astral.Canonical())
 	case io.WriterTo:
 		_, err = t.WriteTo(buf)
 	default:

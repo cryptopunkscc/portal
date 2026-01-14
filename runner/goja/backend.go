@@ -10,9 +10,9 @@ import (
 )
 
 type Backend struct {
-	vm     *goja.Runtime
-	core   bind.Core
-	coreJs string
+	runtime *goja.Runtime
+	core    bind.Core
+	coreJs  string
 }
 
 func NewBackend(core bind.Core) *Backend {
@@ -26,10 +26,10 @@ func NewBackend(core bind.Core) *Backend {
 }
 
 func (b *Backend) Interrupt() {
-	if b.vm != nil {
-		b.vm.ClearInterrupt()
+	if b.runtime != nil {
+		b.runtime.ClearInterrupt()
 		b.core.Interrupt()
-		b.vm = nil
+		b.runtime = nil
 	}
 }
 
@@ -43,24 +43,25 @@ func (b *Backend) RunFs(files fs.FS, args ...string) (err error) {
 
 func (b *Backend) RunSource(app string, args ...string) (err error) {
 	b.Interrupt()
-	b.vm = goja.New()
+	b.runtime = goja.New()
 
-	if err = Bind(b.vm, b.core); err != nil {
+	// bind core to goja runtime
+	if err = Bind(b.runtime, b.core); err != nil {
 		return plog.Err(err)
 	}
 
-	// inject apphost client js lib
-	if _, err = b.vm.RunString(b.coreJs); err != nil {
+	// inject core js adapter
+	if _, err = b.runtime.RunString(b.coreJs); err != nil {
 		return plog.Err(err)
 	}
 
 	// set args
-	if err = b.vm.Set("args", args); err != nil {
+	if err = b.runtime.Set("args", args); err != nil {
 		return plog.Err(err)
 	}
 
-	// start js application backend
-	if _, err = b.vm.RunString(app); err != nil {
+	// start js application
+	if _, err = b.runtime.RunString(app); err != nil {
 		return plog.Err(err)
 	}
 	return

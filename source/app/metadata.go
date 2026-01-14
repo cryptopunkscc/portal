@@ -58,7 +58,7 @@ type Manifest struct {
 }
 
 func init() {
-	_ = astral.DefaultBlueprints.Add(&Manifest{})
+	_ = astral.Add(&Manifest{})
 }
 
 func (m *Manifest) Match(id string) bool {
@@ -131,7 +131,16 @@ func metadataWriteRef(meta any, name string, ref source.Ref) (err error) {
 	if err != nil {
 		return
 	}
-	return afero.WriteFile(ref.Fs, path.Join(ref.Path, name+".json"), b, 0644)
+
+	fileName := ""
+	for _, e := range []string{".yml", ".yaml", ".json"} {
+		fileName = path.Join(ref.Path, name+e)
+		if exists, _ := afero.Exists(ref.Fs, fileName); exists {
+			break
+		}
+	}
+
+	return afero.WriteFile(ref.Fs, fileName, b, 0644)
 }
 
 func metadataReadSrc(meta any, name string, src source.Source) (err error) {
