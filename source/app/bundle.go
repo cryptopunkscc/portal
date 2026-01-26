@@ -7,7 +7,7 @@ import (
 	"path"
 
 	"github.com/cryptopunkscc/astrald/astral"
-	"github.com/cryptopunkscc/astrald/lib/astrald"
+	"github.com/cryptopunkscc/astrald/mod/objects/client"
 	"github.com/cryptopunkscc/portal/core/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/source"
@@ -100,7 +100,7 @@ func (b Bundle) Publish(ctx context.Context, objects *apphost.ObjectsClient) (in
 }
 
 // Fixme: why objects.Module.OpCreate gets stuck on ch.Send(&astral.Ack{})?
-func (b Bundle) Publish2(ctx context.Context, objects *astrald.ObjectsClient) (info ReleaseInfo, err error) {
+func (b Bundle) Publish2(ctx context.Context, objects *objects.Client) (info ReleaseInfo, err error) {
 	release := ReleaseMetadata{
 		Release: b.Metadata.Release,
 		Target:  b.Metadata.Target,

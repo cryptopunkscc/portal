@@ -1,6 +1,7 @@
 package bind
 
 import (
+	"context"
 	_ "embed"
 	"encoding/json"
 	"errors"
@@ -25,7 +26,7 @@ func (a *Adapter) Close() error {
 }
 
 func (a *Adapter) ServiceRegister() (err error) {
-	a.listener, err = a.Cached.Register()
+	a.listener, err = a.Cached.Register(context.Background())
 	return
 }
 

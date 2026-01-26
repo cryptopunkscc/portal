@@ -53,7 +53,7 @@ func (r *Router) Init(ctx context.Context) (err error) {
 	r.ctx = ctx
 	r.Dependencies = append([]any{ctx}, r.Dependencies...)
 
-	r.listener, err = r.Apphost.Register()
+	r.listener, err = r.Apphost.Register(ctx)
 	if err != nil {
 		return
 	}

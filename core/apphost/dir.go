@@ -1,7 +1,7 @@
 package apphost
 
-import "github.com/cryptopunkscc/astrald/lib/astrald"
+import "github.com/cryptopunkscc/astrald/mod/dir/client"
 
-func (a *Adapter) Dir() *astrald.DirClient {
-	return astrald.NewDirClient(a.TargetID, a.Client)
+func (a *Adapter) Dir() *dir.Client {
+	return dir.New(a.TargetID, a.Client)
 }

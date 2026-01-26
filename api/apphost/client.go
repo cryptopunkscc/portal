@@ -1,6 +1,7 @@
 package apphost
 
 import (
+	"context"
 	"io"
 	"net"
 
@@ -11,7 +12,7 @@ import (
 type Client interface {
 	Query(target string, method string, args any) (Conn, error)
 	Resolve(name string) (*astral.Identity, error)
-	Register() (Listener, error)
+	Register(ctx context.Context) (Listener, error)
 	DisplayName(identity *astral.Identity) string
 	Rpc() rpc.Rpc
 }

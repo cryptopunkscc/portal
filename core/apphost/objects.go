@@ -4,21 +4,22 @@ import (
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/lib/astrald"
 	"github.com/cryptopunkscc/astrald/lib/query"
+	objects "github.com/cryptopunkscc/astrald/mod/objects/client"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/resources"
 )
 
 func (a *Adapter) Objects() *ObjectsClient {
-	return &ObjectsClient{*a.Client, *astrald.NewObjectsClient(a.TargetID, a.Client)}
+	return &ObjectsClient{*a.Client, *objects.New(a.TargetID, a.Client)}
 }
 
 type ObjectsClient struct {
 	astrald.Client
-	astrald.ObjectsClient
+	ObjectsClient objects.Client
 }
 
 func (c *ObjectsClient) Fetch(ctx *astral.Context, id *astral.ObjectID, obj astral.Object) (err error) {
-	b, err := c.Read(ctx, id, 0, 0)
+	b, err := c.ObjectsClient.Read(ctx, id, 0, 0)
 	if err != nil {
 		return
 	}
@@ -26,7 +27,7 @@ func (c *ObjectsClient) Fetch(ctx *astral.Context, id *astral.ObjectID, obj astr
 }
 
 func (c *ObjectsClient) Get(ctx *astral.Context, id *astral.ObjectID) (obj astral.Object, err error) {
-	b, err := c.Read(ctx, id, 0, 0)
+	b, err := c.ObjectsClient.Read(ctx, id, 0, 0)
 	if err != nil {
 		return
 	}

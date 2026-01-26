@@ -2,11 +2,13 @@ package apphost
 
 import (
 	"bufio"
+	"context"
 	"sync"
 
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/lib/astrald"
 	"github.com/cryptopunkscc/astrald/lib/query"
+	apphost2 "github.com/cryptopunkscc/astrald/mod/apphost/client"
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/google/uuid"
@@ -75,12 +77,12 @@ func (a *Adapter) Query(target string, method string, args any) (conn apphost.Co
 	}, nil
 }
 
-func (a *Adapter) Register() (out apphost.Listener, err error) {
+func (a *Adapter) Register(ctx context.Context) (out apphost.Listener, err error) {
 	defer plog.TraceErr(&err)
 	if err = a.Connect(); err != nil {
 		return
 	}
-	l, err := astrald.NewAppHostClient(a.TargetID, a.Client).RegisterHandler(nil)
+	l, err := apphost2.New(a.TargetID, a.Client).RegisterHandler(astral.NewContext(ctx))
 	if err != nil {
 		return
 	}

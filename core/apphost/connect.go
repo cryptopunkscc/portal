@@ -41,7 +41,7 @@ func (a *Adapter) connect() (err error) {
 	}
 	defer host.Close()
 	a.TargetID = host.HostID()
-	a.Client = astrald.NewClient(apphost.NewRouter(a.Endpoint, a.Token))
+	a.Client = astrald.New(apphost.NewRouter(a.Endpoint, a.Token))
 	return
 }
 

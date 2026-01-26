@@ -1,6 +1,8 @@
 package apphost
 
 import (
+	"context"
+
 	"github.com/cryptopunkscc/portal/api/apphost"
 )
 
@@ -26,8 +28,8 @@ func (a *Cached) Query(target string, method string, args any) (conn apphost.Con
 	return a.setConn(a.Adapter.Query(target, method, args))
 }
 
-func (a *Cached) Register() (l apphost.Listener, err error) {
-	ll, err := a.Adapter.Register()
+func (a *Cached) Register(ctx context.Context) (l apphost.Listener, err error) {
+	ll, err := a.Adapter.Register(ctx)
 	return a.setListener(ll, err)
 }
 

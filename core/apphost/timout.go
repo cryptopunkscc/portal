@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/cryptopunkscc/astrald/sig"
 	"github.com/cryptopunkscc/portal/api/apphost"
 	"github.com/cryptopunkscc/portal/api/target"
 	"github.com/cryptopunkscc/portal/pkg/plog"
@@ -29,7 +30,7 @@ func Timeout(ctx context.Context, apphost apphost.Cache, portal target.Portal_) 
 		log := plog.Get(ctx).D().Type(t).Set(&ctx)
 		t.log = log
 		t.Enable(true)
-		for e := range apphost.Events().Subscribe(ctx) {
+		for e := range sig.Subscribe(ctx, apphost.Events()) {
 			log.Printf("apphost event %v %s %s", e.Type, e.Query, e.Ref)
 			t.Enable(apphost.Connections().Size() <= ConnectionsThreshold)
 		}
