@@ -65,7 +65,7 @@ func (a *Adapter) Query(target string, method string, args any) (conn apphost.Co
 		return
 	}
 	q := query.New(a.GuestID(), id, method, args)
-	aConn, err := a.Client.RouteQuery(nil, q)
+	aConn, err := a.Client.RouteQuery(astral.NewContext(nil), q)
 	if err != nil {
 		return
 	}
