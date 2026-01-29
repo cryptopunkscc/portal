@@ -6,7 +6,7 @@ toolchain go1.24.7
 
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
-	github.com/cryptopunkscc/astrald v0.0.0-20260126103911-57b288db91b0
+	github.com/cryptopunkscc/astrald v0.0.0-20260128154549-e1bbb8585fa0
 	github.com/dop251/goja v0.0.0-20240220182346-e401ed450204
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/getlantern/systray v1.2.2

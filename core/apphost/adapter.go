@@ -82,12 +82,18 @@ func (a *Adapter) Register(ctx context.Context) (out apphost.Listener, err error
 	if err = a.Connect(); err != nil {
 		return
 	}
-	l, err := apphost2.New(a.TargetID, a.Client).RegisterHandler(astral.NewContext(ctx))
+
+	client := apphost2.New(a.TargetID, a.Client)
+
+	listener, err := astrald.Listen()
 	if err != nil {
-		return
+		return nil, err
 	}
+
+	err = client.RegisterHandler(astral.NewContext(ctx), listener.Endpoint(), listener.AuthToken())
 	if err != nil {
-		return
+		return nil, err
 	}
-	return &Listener{l}, nil
+
+	return &Listener{listener}, nil
 }
