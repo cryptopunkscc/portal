@@ -10,6 +10,7 @@ import (
 	"github.com/cryptopunkscc/astrald/mod/user"
 	"github.com/cryptopunkscc/portal/cmd/portal-goja/src"
 	"github.com/cryptopunkscc/portal/core/apphost"
+	golang "github.com/cryptopunkscc/portal/pkg/go"
 	"github.com/cryptopunkscc/portal/pkg/plog"
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/cryptopunkscc/portal/runner/astrald/debug"
@@ -20,6 +21,7 @@ import (
 )
 
 func TestIntegration(t *testing.T) {
+
 	ctx := TestContext{
 		Context: astral.NewContext(nil),
 		Name:    "1",
@@ -41,6 +43,14 @@ func TestIntegration(t *testing.T) {
 		Template: "svelte",
 		Name:     "svelte-app",
 		Type:     "html",
+	}
+
+	projectRoot, err := golang.FindProjectRoot()
+	test.NoError(t, err)
+	coreJsTest := &TestApp{
+		Name: "core.js.test",
+		Type: "js",
+		Path: path.Join(projectRoot, "core/js/test/common"),
 	}
 
 	runner := test.Runner{}
@@ -97,6 +107,11 @@ func TestIntegration(t *testing.T) {
 			Name: "publish svelte app",
 			Test: ctx.PublishApp(svelte),
 		},
+		{
+			Name:    "test core js",
+			Test:    ctx.RunAppByPath(coreJsTest),
+			Require: test.Tests{ctx.CreateUser()},
+		},
 	}
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("%d  %s", i, tt.Name), runner.Run(tests, tt))
@@ -116,7 +131,18 @@ type TestApp struct {
 	Template    string
 	Name        string
 	Type        string
+	Path        string
 	ReleaseInfo *app.ReleaseInfo
+}
+
+func (a TestApp) GetPath(ctx *TestContext) (projectPath string) {
+	if a.Path == "" {
+		a.Path = path.Join(ctx.Astrald.NodeRoot, a.Name)
+	}
+	if projectPath = a.Path; projectPath == "" {
+		projectPath = path.Join(ctx.Astrald.NodeRoot, a.Name)
+	}
+	return
 }
 
 func (c *TestContext) Test() test.Test {
@@ -164,7 +190,11 @@ func (c *TestContext) GetUserInfo() test.Test {
 
 func (c *TestContext) CreateProject(testApp *TestApp) test.Test {
 	return c.Test().Args(testApp.Name).Func(func(t *testing.T) {
-		err := tmpl.Create(testApp.Template, path.Join(c.Astrald.NodeRoot, testApp.Name))
+		p := testApp.GetPath(c)
+		if tmpl.CheckTargetDirNotExist(p) != nil {
+			return
+		}
+		err := tmpl.Create(testApp.Template, p)
 		test.NoError(t, err)
 	})
 }
@@ -173,7 +203,7 @@ func (c *TestContext) BuildProject(testApp *TestApp) test.Test {
 	return c.Test().Args(testApp.Name).Func(func(t *testing.T) {
 		err := npm.BuildNpmApps(
 			npm.BuildNpmAppsOpt{Pack: true},
-			path.Join(c.Astrald.NodeRoot, testApp.Name),
+			testApp.GetPath(c),
 		)
 		test.NoError(t, err)
 	}).Requires(
@@ -183,7 +213,7 @@ func (c *TestContext) BuildProject(testApp *TestApp) test.Test {
 
 func (c *TestContext) RunAppByPath(testApp *TestApp) test.Test {
 	return c.Test().Args(testApp.Name).Func(func(t *testing.T) {
-		c.runApp(t, testApp, path.Join(c.Astrald.NodeRoot, testApp.Name, "dist"))
+		c.runApp(t, testApp, path.Join(testApp.GetPath(c), "dist"))
 	}).Requires(
 		c.BuildProject(testApp),
 	)
@@ -192,11 +222,11 @@ func (c *TestContext) RunAppByPath(testApp *TestApp) test.Test {
 func (c *TestContext) PublishApp(testApp *TestApp) test.Test {
 	return c.Test().Args(testApp.Name).Func(func(t *testing.T) {
 		publisher := app.Publisher{ObjectsClient: c.Apphost.Objects()}
-		dir := testApp.Name
+		dir := testApp.GetPath(c)
 		if testApp.Template == "js" {
 			dir = path.Dir(dir)
 		}
-		bundles, err := publisher.PublishBundles(c.Context, path.Join(c.Astrald.NodeRoot, dir))
+		bundles, err := publisher.PublishBundles(c.Context, dir)
 		test.NoError(t, err)
 		require.Len(t, bundles, 1)
 		testApp.ReleaseInfo = &bundles[0]

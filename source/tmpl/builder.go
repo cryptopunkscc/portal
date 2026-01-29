@@ -47,7 +47,7 @@ func (b Builder) WriteRef(ref source.Ref) (err error) {
 	if err = b.prepare(); err != nil {
 		return
 	}
-	if err = checkTargetDirNotExist(ref.Path); err != nil {
+	if err = CheckTargetDirNotExist(ref.Path); err != nil {
 		return
 	}
 	if err = makeSourceDir(ref.Path); err != nil {
@@ -106,7 +106,7 @@ func (b Builder) writeManifest(dir string) (err error) {
 	return
 }
 
-func checkTargetDirNotExist(path string) (err error) {
+func CheckTargetDirNotExist(path string) (err error) {
 	defer plog.TraceErr(&err)
 	_, err = os.Stat(path)
 	switch {

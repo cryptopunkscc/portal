@@ -38,10 +38,13 @@ func (a *Adapter) Resolve(name string) (i *astral.Identity, err error) {
 	if err = a.Connect(); err != nil {
 		return
 	}
-	if name == "" {
-		name = "localnode"
+	if name == "" || name == "localnode" {
+		return a.HostID(), nil
 	}
-	return a.Dir().ResolveIdentity(nil, name)
+	if name == "self" {
+		return a.GuestID(), nil
+	}
+	return a.Dir().ResolveIdentity(astral.NewContext(nil), name)
 }
 
 func (a *Adapter) DisplayName(identity *astral.Identity) string {
