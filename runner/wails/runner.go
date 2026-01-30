@@ -112,7 +112,7 @@ func SetupOptions(opt *options.App, app html.App) {
 	opt.AssetServer.Handler = assets.StoreHandler{
 		Store: &assets.OverlayStore{Stores: []assets.Store{
 			&assets.FsStore{FS: assetsFs},
-			&assets.FsStore{FS: apphostJsFS}},
-		},
+			&assets.FsStore{FS: apphostJsFS},
+		}},
 	}
 }

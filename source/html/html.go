@@ -31,7 +31,6 @@ func (a *App) WriteRef(ref source.Ref) (err error) {
 type Project struct {
 	npm.Project
 	Html
-	App App
 }
 
 var _ app.App = &Project{}
@@ -42,6 +41,11 @@ func (p Project) New() (src source.Source) {
 
 func (p Project) GetDist() (d app.Dist) {
 	_ = d.ReadSrc(p.Sub("dist"))
+	return
+}
+
+func (p Project) GetApp() (a App) {
+	_ = a.ReadSrc(p.Sub("dist"))
 	return
 }
 

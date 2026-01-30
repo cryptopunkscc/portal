@@ -44,6 +44,10 @@ func (r Ref) String() string {
 }
 
 func (r Ref) PathFS() fs.FS {
+	if r.Fs == nil {
+		panic("nil fs")
+	}
+
 	// Try to unpack io.FS because wails assets server doesn't work with zip.Reader through afero.IOFS.
 	if ioFs, ok := r.Fs.(afero.FromIOFS); ok {
 		if r.Path == "" {

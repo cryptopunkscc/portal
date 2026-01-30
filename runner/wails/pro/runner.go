@@ -65,7 +65,7 @@ func (r *Runner) Run(ctx bind.Core) (err error) {
 	// setup opt
 	front := path
 	path = path + "/dist"
-	wails.SetupOptions(opt, r.App)
+	wails.SetupOptions(opt, r.GetApp())
 	if opt.Title == "" {
 		opt.Title = "development"
 	}
