@@ -12,3 +12,5 @@ dist
 !api/bin
 
 apps/build/*.portal
+
+astral_user

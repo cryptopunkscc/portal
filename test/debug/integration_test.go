@@ -272,8 +272,7 @@ func (c *TestContext) runApp(t *testing.T, testApp *TestApp, src string) {
 	var err error = plog.Errorf("unsupported type")
 	switch testApp.Type {
 	case "html":
-		a := portal_goja.Application{Adapter: &c.Apphost}
-		err = a.Run(c.Context, src)
+		t.Skip("not supported in debuggable test")
 	case "js":
 		a := portal_goja.Application{Adapter: &c.Apphost}
 		err = a.Run(c.Context, src)

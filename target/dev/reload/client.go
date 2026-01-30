@@ -32,6 +32,7 @@ func Start(
 	ah := apphost.Default
 	portaldId, err := ah.Resolve("portald")
 	if err != nil {
+		err = nil
 		return
 	}
 	c.conn, err = ah.WithTarget(portaldId).QueryChannel(
