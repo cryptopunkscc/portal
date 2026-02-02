@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type Player interface {
+type Audio interface {
 	Play(rc io.ReadCloser, ext string) (err error)
 	CurrentTime() time.Duration
 	TotalTime() time.Duration
@@ -14,4 +14,10 @@ type Player interface {
 	Close() (err error)
 	Suspend() error
 	Resume() error
+}
+
+type Video interface {
+	Audio
+	Fullscreen(bool) (err error)
+	IsFullscreen() (bool, error)
 }

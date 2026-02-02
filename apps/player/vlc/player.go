@@ -20,7 +20,15 @@ type Player struct {
 	readCloser io.ReadCloser
 }
 
-var _ player.Player = &Player{}
+func (p *Player) Fullscreen(b bool) (err error) {
+	return p.player.SetFullScreen(b)
+}
+
+func (p *Player) IsFullscreen() (b bool, err error) {
+	return p.player.IsFullScreen()
+}
+
+var _ player.Video = &Player{}
 
 func NewPlayer() (*Player, error) {
 	if err := vlc.Init("--quiet"); err != nil {

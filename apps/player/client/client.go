@@ -90,3 +90,12 @@ func (c Client) Move(ctx *astral.Context, duration time.Duration) (err error) {
 	_ = conn.Close()
 	return
 }
+
+func (c Client) Fullscreen(ctx *astral.Context, on int) (err error) {
+	conn, err := c.Query(ctx, c.Name+".fullscreen", query.Args{"on": on})
+	if err != nil {
+		return
+	}
+	_ = conn.Close()
+	return
+}

@@ -19,24 +19,18 @@ import (
 
 type Service struct {
 	sync.Mutex
-	player.Player
+	Player        player.Audio
 	ObjectsClient *objects.Client
 	Location      *fs.FileLocation
 	ObjectID      *astral.ObjectID
-	Name          string
 }
 
 func (s *Service) Serve(ctx context.Context) (err error) {
-	if s.Name == "" {
-		s.Name = "audio"
-	}
 	if s.ObjectsClient == nil {
 		s.ObjectsClient = objects.Default()
 	}
-
 	set := ops.NewSet()
-	_ = set.AddSubSet(s.Name, ops.Struct(s, "Op"))
-
+	_ = set.AddSubSet("audio", ops.Struct(s, "Op"))
 	aCtx := astral.NewContext(ctx)
 	return ops.Serve(aCtx, set)
 }
@@ -119,7 +113,7 @@ func (s *Service) OpStop(_ *astral.Context, query *ops.Query) error {
 	defer s.Unlock()
 	conn := query.Accept()
 	defer conn.Close()
-	return s.Close()
+	return s.Player.Close()
 }
 
 type opSeekArgs struct {
@@ -135,7 +129,7 @@ func (s *Service) OpSeek(_ *astral.Context, query *ops.Query, args *opSeekArgs) 
 	if err != nil {
 		return
 	}
-	return s.Seek(duration)
+	return s.Player.Seek(duration)
 }
 
 func (s *Service) OpMove(_ *astral.Context, query *ops.Query, args opSeekArgs) (err error) {
@@ -147,7 +141,7 @@ func (s *Service) OpMove(_ *astral.Context, query *ops.Query, args opSeekArgs) (
 	if err != nil {
 		return
 	}
-	return s.Move(duration)
+	return s.Player.Move(duration)
 }
 
 type opStatusArgs struct {
@@ -160,8 +154,8 @@ func (s *Service) OpStatus(_ *astral.Context, query *ops.Query, args opStatusArg
 
 	status := player.Status{
 		ObjectID: s.ObjectID,
-		Position: astral.Duration(s.CurrentTime()),
-		Length:   astral.Duration(s.TotalTime()),
+		Position: astral.Duration(s.Player.CurrentTime()),
+		Length:   astral.Duration(s.Player.TotalTime()),
 	}
 
 	ch := query.AcceptChannel(channel.WithOutputFormat(args.Out))

@@ -23,7 +23,7 @@ type Player struct {
 	format  beep.Format
 }
 
-var _ player.Player = &Player{}
+var _ player.Audio = &Player{}
 
 func (p *Player) Play(rc io.ReadCloser, ext string) (err error) {
 	var decode func(rc io.ReadCloser) (s beep.StreamSeekCloser, format beep.Format, err error)

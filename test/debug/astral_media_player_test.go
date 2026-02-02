@@ -46,6 +46,19 @@ func (c *TestContext) TestMediaPlayerClient(
 		t.Logf("status: %+v", status)
 	})
 
+	if service == "video" {
+		t.Run("fullscreen toggle", func(t *testing.T) {
+			err := p.Fullscreen(c.Context, 0)
+			test.NoError(t, err)
+		})
+		time.Sleep(debugDelay)
+		time.Sleep(time.Millisecond * 100)
+		t.Run("fullscreen off", func(t *testing.T) {
+			err := p.Fullscreen(c.Context, -1)
+			test.NoError(t, err)
+		})
+	}
+
 	t.Run("resume", func(t *testing.T) {
 		err := p.Resume(c.Context)
 		test.NoError(t, err)
