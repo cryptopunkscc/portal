@@ -1,4 +1,4 @@
-package astral_audio_player
+package player
 
 import (
 	"time"
@@ -7,15 +7,16 @@ import (
 	"github.com/cryptopunkscc/astrald/astral/channel"
 	"github.com/cryptopunkscc/astrald/lib/astrald"
 	"github.com/cryptopunkscc/astrald/lib/query"
-	"github.com/cryptopunkscc/portal/cmd/astral-audio-player/src"
+	"github.com/cryptopunkscc/portal/apps/player"
 )
 
 type Client struct {
+	Name string
 	*astrald.Client
 }
 
 func (c Client) PlayID(ctx *astral.Context, objectID astral.ObjectID) (err error) {
-	conn, err := c.Query(ctx, "audio.play", query.Args{"id": objectID.String()})
+	conn, err := c.Query(ctx, c.Name+".play", query.Args{"id": objectID.String()})
 	if err != nil {
 		return
 	}
@@ -25,7 +26,7 @@ func (c Client) PlayID(ctx *astral.Context, objectID astral.ObjectID) (err error
 }
 
 func (c Client) PlayPath(ctx *astral.Context, path string) (err error) {
-	conn, err := c.Query(ctx, "audio.play", query.Args{"path": path})
+	conn, err := c.Query(ctx, c.Name+".play", query.Args{"path": path})
 	if err != nil {
 		return
 	}
@@ -35,7 +36,7 @@ func (c Client) PlayPath(ctx *astral.Context, path string) (err error) {
 }
 
 func (c Client) Pause(ctx *astral.Context) (err error) {
-	conn, err := c.Query(ctx, "audio.pause", nil)
+	conn, err := c.Query(ctx, c.Name+".pause", nil)
 	if err != nil {
 		return
 	}
@@ -44,7 +45,7 @@ func (c Client) Pause(ctx *astral.Context) (err error) {
 }
 
 func (c Client) Resume(ctx *astral.Context) (err error) {
-	conn, err := c.Query(ctx, "audio.resume", nil)
+	conn, err := c.Query(ctx, c.Name+".resume", nil)
 	if err != nil {
 		return
 	}
@@ -53,7 +54,7 @@ func (c Client) Resume(ctx *astral.Context) (err error) {
 }
 
 func (c Client) Stop(ctx *astral.Context) (err error) {
-	conn, err := c.Query(ctx, "audio.stop", nil)
+	conn, err := c.Query(ctx, c.Name+".stop", nil)
 	if err != nil {
 		return
 	}
@@ -61,8 +62,8 @@ func (c Client) Stop(ctx *astral.Context) (err error) {
 	return
 }
 
-func (c Client) Status(ctx *astral.Context) (status *astral_audio_player.Status, err error) {
-	conn, err := c.QueryChannel(ctx, "audio.status", nil)
+func (c Client) Status(ctx *astral.Context) (status *player.Status, err error) {
+	conn, err := c.QueryChannel(ctx, c.Name+".status", nil)
 	if err != nil {
 		return
 	}
@@ -73,7 +74,7 @@ func (c Client) Status(ctx *astral.Context) (status *astral_audio_player.Status,
 }
 
 func (c Client) Seek(ctx *astral.Context, duration time.Duration) (err error) {
-	conn, err := c.Query(ctx, "audio.seek", query.Args{"duration": astral.Duration(duration)})
+	conn, err := c.Query(ctx, c.Name+".seek", query.Args{"duration": astral.Duration(duration)})
 	if err != nil {
 		return
 	}
@@ -82,7 +83,7 @@ func (c Client) Seek(ctx *astral.Context, duration time.Duration) (err error) {
 }
 
 func (c Client) Move(ctx *astral.Context, duration time.Duration) (err error) {
-	conn, err := c.Query(ctx, "audio.move", query.Args{"duration": astral.Duration(duration)})
+	conn, err := c.Query(ctx, c.Name+".move", query.Args{"duration": astral.Duration(duration)})
 	if err != nil {
 		return
 	}

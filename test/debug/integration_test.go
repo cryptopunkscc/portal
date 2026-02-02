@@ -116,6 +116,10 @@ func TestIntegration(t *testing.T) {
 			Name: "test audio player client",
 			Test: ctx.TestAstralAudioPlayer(),
 		},
+		{
+			Name: "test video player client",
+			Test: ctx.TestAstralVideoPlayer(),
+		},
 	}
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("%d  %s", i, tt.Name), runner.Run(tests, tt))

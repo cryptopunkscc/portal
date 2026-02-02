@@ -3,11 +3,16 @@ package main
 import (
 	"context"
 
-	"github.com/cryptopunkscc/portal/cmd/astral-audio-player/src"
+	"github.com/cryptopunkscc/portal/apps/player/beep"
+	"github.com/cryptopunkscc/portal/apps/player/src"
 )
 
 func main() {
-	if err := astral_audio_player.Serve(context.Background()); err != nil {
+	service := player.Service{
+		Name:   "audio",
+		Player: &beep.Player{},
+	}
+	if err := service.Serve(context.Background()); err != nil {
 		panic(err)
 	}
 }

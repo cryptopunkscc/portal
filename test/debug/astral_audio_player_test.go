@@ -6,8 +6,8 @@ import (
 
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/mod/media"
-	astral_audio_player2 "github.com/cryptopunkscc/portal/cmd/astral-audio-player/client"
-	"github.com/cryptopunkscc/portal/cmd/astral-audio-player/src"
+	"github.com/cryptopunkscc/portal/apps/player/beep"
+	"github.com/cryptopunkscc/portal/apps/player/src"
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/stretchr/testify/require"
 )
@@ -15,7 +15,9 @@ import (
 func (c *TestContext) ServeAstralAudioPlayer() test.Test {
 	return c.Test().Func(func(t *testing.T) {
 		go func() {
-			err := astral_audio_player.Serve(c.Context)
+			s := player.Service{Name: "audio"}
+			s.Player = &beep.Player{}
+			err := s.Serve(c.Context)
 			test.NoError(t, err)
 		}()
 		time.Sleep(time.Second)
@@ -24,43 +26,8 @@ func (c *TestContext) ServeAstralAudioPlayer() test.Test {
 
 func (c *TestContext) TestAstralAudioPlayer() test.Test {
 	return c.Test().Func(func(t *testing.T) {
-		debugDelay := time.Second * 0
-		// find file to play
 		audioFileId := c.findAudioFile(t)
-
-		// play in the background
-		audioClient := astral_audio_player2.Client{Client: c.Apphost.Client.WithTarget(c.Apphost.HostID())}
-		err := audioClient.PlayID(c.Context, *audioFileId)
-		test.NoError(t, err)
-		time.Sleep(debugDelay)
-
-		time.Sleep(time.Millisecond * 100)
-
-		err = audioClient.Pause(c.Context)
-		test.NoError(t, err)
-		time.Sleep(time.Second)
-
-		// move 30s forward
-		err = audioClient.Move(c.Context, 60*time.Second)
-		test.NoError(t, err)
-
-		err = audioClient.Resume(c.Context)
-		test.NoError(t, err)
-
-		status, err := audioClient.Status(c.Context)
-		test.NoError(t, err)
-		t.Logf("status: %+v", status)
-
-		// move back to start
-		time.Sleep(debugDelay)
-		time.Sleep(time.Millisecond)
-		err = audioClient.Seek(c.Context, 0)
-
-		// close
-		time.Sleep(debugDelay)
-		time.Sleep(time.Millisecond)
-		err = audioClient.Stop(c.Context)
-
+		c.TestMediaPlayerClient(t, "audio", audioFileId)
 	}).Requires(
 		c.NewWatch(),
 		c.ServeAstralAudioPlayer(),
