@@ -6,8 +6,8 @@ import (
 
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/mod/media"
+	"github.com/cryptopunkscc/portal/apps/player/audio"
 	"github.com/cryptopunkscc/portal/apps/player/beep"
-	"github.com/cryptopunkscc/portal/apps/player/src"
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/stretchr/testify/require"
 )
@@ -15,7 +15,7 @@ import (
 func (c *TestContext) ServeAstralAudioPlayer() test.Test {
 	return c.Test().Func(func(t *testing.T) {
 		go func() {
-			s := player.Service{Name: "audio"}
+			s := audio.Service{}
 			s.Player = &beep.Player{}
 			err := s.Serve(c.Context)
 			test.NoError(t, err)

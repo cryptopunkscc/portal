@@ -1,4 +1,4 @@
-package player
+package audio
 
 import (
 	"context"
@@ -18,34 +18,37 @@ import (
 )
 
 type Service struct {
-	Name string
 	sync.Mutex
 	player.Player
 	ObjectsClient *objects.Client
 	Location      *fs.FileLocation
 	ObjectID      *astral.ObjectID
+	Name          string
 }
 
-func (p *Service) Serve(ctx context.Context) (err error) {
-	if p.ObjectsClient == nil {
-		p.ObjectsClient = objects.Default()
+func (s *Service) Serve(ctx context.Context) (err error) {
+	if s.Name == "" {
+		s.Name = "audio"
+	}
+	if s.ObjectsClient == nil {
+		s.ObjectsClient = objects.Default()
 	}
 
 	set := ops.NewSet()
-	_ = set.AddSubSet(p.Name, ops.Struct(p, "Op"))
+	_ = set.AddSubSet(s.Name, ops.Struct(s, "Op"))
 
 	aCtx := astral.NewContext(ctx)
 	return ops.Serve(aCtx, set)
 }
 
-func (p *Service) SetID(ctx *astral.Context, id *astral.ObjectID) (err error) {
-	p.Location = nil
-	p.ObjectID = id
-	describeCh, e := p.ObjectsClient.Describe(ctx, id)
+func (s *Service) SetID(ctx *astral.Context, id *astral.ObjectID) (err error) {
+	s.Location = nil
+	s.ObjectID = id
+	describeCh, e := s.ObjectsClient.Describe(ctx, id)
 	for describe := range describeCh {
 		switch d := describe.Descriptor.(type) {
 		case *fs.FileLocation:
-			p.Location = d
+			s.Location = d
 		}
 	}
 	if e != nil && *e != nil {
@@ -54,24 +57,24 @@ func (p *Service) SetID(ctx *astral.Context, id *astral.ObjectID) (err error) {
 	return nil
 }
 
-func (p *Service) SetPath(filePath string) (err error) {
-	p.Location = &fs.FileLocation{Path: astral.String16(filePath)}
+func (s *Service) SetPath(filePath string) (err error) {
+	s.Location = &fs.FileLocation{Path: astral.String16(filePath)}
 	return nil
 }
 
-func (p *Service) Play() (err error) {
+func (s *Service) Play() (err error) {
 	var rc io.ReadCloser
 	var ext string
 
 	switch {
-	case p.Location != nil:
-		ext = filepath.Ext(p.Location.Path.String())
-		rc, err = os.Open(p.Location.Path.String())
+	case s.Location != nil:
+		ext = filepath.Ext(s.Location.Path.String())
+		rc, err = os.Open(s.Location.Path.String())
 	default:
 		return errors.New("no audio file specified")
 	}
 
-	return p.Player.Play(rc, ext)
+	return s.Player.Play(rc, ext)
 }
 
 type OpPlayArgs struct {
@@ -79,86 +82,86 @@ type OpPlayArgs struct {
 	ID   *astral.ObjectID `query:"optional"`
 }
 
-func (p *Service) OpPlay(ctx *astral.Context, query *ops.Query, args *OpPlayArgs) (err error) {
-	p.Lock()
-	defer p.Unlock()
+func (s *Service) OpPlay(ctx *astral.Context, query *ops.Query, args *OpPlayArgs) (err error) {
+	s.Lock()
+	defer s.Unlock()
 	conn := query.Accept()
 	defer conn.Close()
 	if args != nil {
 		switch {
 		case args.Path != "":
-			err = p.SetPath(args.Path)
+			err = s.SetPath(args.Path)
 		case args.ID != nil:
-			err = p.SetID(ctx, args.ID)
+			err = s.SetID(ctx, args.ID)
 		}
 	}
-	return p.Play()
+	return s.Play()
 }
 
-func (p *Service) OpPause(_ *astral.Context, query *ops.Query) error {
-	p.Lock()
-	defer p.Unlock()
+func (s *Service) OpPause(_ *astral.Context, query *ops.Query) error {
+	s.Lock()
+	defer s.Unlock()
 	conn := query.Accept()
 	defer conn.Close()
-	return p.Player.Suspend()
+	return s.Player.Suspend()
 }
 
-func (p *Service) OpResume(_ *astral.Context, query *ops.Query) error {
-	p.Lock()
-	defer p.Unlock()
+func (s *Service) OpResume(_ *astral.Context, query *ops.Query) error {
+	s.Lock()
+	defer s.Unlock()
 	conn := query.Accept()
 	defer conn.Close()
-	return p.Player.Resume()
+	return s.Player.Resume()
 }
 
-func (p *Service) OpStop(_ *astral.Context, query *ops.Query) error {
-	p.Lock()
-	defer p.Unlock()
+func (s *Service) OpStop(_ *astral.Context, query *ops.Query) error {
+	s.Lock()
+	defer s.Unlock()
 	conn := query.Accept()
 	defer conn.Close()
-	return p.Close()
+	return s.Close()
 }
 
 type opSeekArgs struct {
 	Duration string
 }
 
-func (p *Service) OpSeek(_ *astral.Context, query *ops.Query, args *opSeekArgs) (err error) {
-	p.Lock()
-	defer p.Unlock()
+func (s *Service) OpSeek(_ *astral.Context, query *ops.Query, args *opSeekArgs) (err error) {
+	s.Lock()
+	defer s.Unlock()
 	conn := query.Accept()
 	defer conn.Close()
 	duration, err := time.ParseDuration(args.Duration)
 	if err != nil {
 		return
 	}
-	return p.Seek(duration)
+	return s.Seek(duration)
 }
 
-func (p *Service) OpMove(_ *astral.Context, query *ops.Query, args opSeekArgs) (err error) {
-	p.Lock()
-	defer p.Unlock()
+func (s *Service) OpMove(_ *astral.Context, query *ops.Query, args opSeekArgs) (err error) {
+	s.Lock()
+	defer s.Unlock()
 	conn := query.Accept()
 	defer conn.Close()
 	duration, err := time.ParseDuration(args.Duration)
 	if err != nil {
 		return
 	}
-	return p.Move(duration)
+	return s.Move(duration)
 }
 
 type opStatusArgs struct {
 	Out string `query:"optional"`
 }
 
-func (p *Service) OpStatus(_ *astral.Context, query *ops.Query, args opStatusArgs) error {
-	p.Lock()
-	defer p.Unlock()
+func (s *Service) OpStatus(_ *astral.Context, query *ops.Query, args opStatusArgs) error {
+	s.Lock()
+	defer s.Unlock()
 
 	status := player.Status{
-		ObjectID: p.ObjectID,
-		Position: astral.Duration(p.CurrentTime()),
-		Length:   astral.Duration(p.TotalTime()),
+		ObjectID: s.ObjectID,
+		Position: astral.Duration(s.CurrentTime()),
+		Length:   astral.Duration(s.TotalTime()),
 	}
 
 	ch := query.AcceptChannel(channel.WithOutputFormat(args.Out))

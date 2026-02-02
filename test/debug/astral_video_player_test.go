@@ -7,7 +7,7 @@ import (
 
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/mod/fs"
-	player "github.com/cryptopunkscc/portal/apps/player/src"
+	"github.com/cryptopunkscc/portal/apps/player/video"
 	"github.com/cryptopunkscc/portal/apps/player/vlc"
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/stretchr/testify/require"
@@ -17,7 +17,7 @@ func (c *TestContext) ServeAstralVideoPlayer() test.Test {
 	return c.Test().Func(func(t *testing.T) {
 		go func() {
 			var err error
-			s := player.Service{Name: "video"}
+			s := video.Service{}
 			s.Player, err = vlc.NewPlayer()
 			test.NoError(t, err)
 			err = s.Serve(c.Context)
