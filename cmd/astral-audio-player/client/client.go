@@ -81,8 +81,8 @@ func (c Client) Seek(ctx *astral.Context, duration time.Duration) (err error) {
 	return
 }
 
-func (c Client) Add(ctx *astral.Context, duration time.Duration) (err error) {
-	conn, err := c.Query(ctx, "audio.add", query.Args{"duration": astral.Duration(duration)})
+func (c Client) Move(ctx *astral.Context, duration time.Duration) (err error) {
+	conn, err := c.Query(ctx, "audio.move", query.Args{"duration": astral.Duration(duration)})
 	if err != nil {
 		return
 	}

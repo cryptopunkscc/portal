@@ -41,7 +41,7 @@ func (c *TestContext) TestAstralAudioPlayer() test.Test {
 		time.Sleep(time.Second)
 
 		// move 30s forward
-		err = audioClient.Add(c.Context, 60*time.Second)
+		err = audioClient.Move(c.Context, 60*time.Second)
 		test.NoError(t, err)
 
 		err = audioClient.Resume(c.Context)

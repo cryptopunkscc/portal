@@ -82,7 +82,7 @@ func (p *Player) OpSeek(_ *astral.Context, query *ops.Query, args *opSeekArgs) (
 	return p.Seek(duration)
 }
 
-func (p *Player) OpAdd(_ *astral.Context, query *ops.Query, args opSeekArgs) (err error) {
+func (p *Player) OpMove(_ *astral.Context, query *ops.Query, args opSeekArgs) (err error) {
 	p.Lock()
 	defer p.Unlock()
 	conn := query.Accept()
