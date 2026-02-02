@@ -112,6 +112,10 @@ func TestIntegration(t *testing.T) {
 			Test:    ctx.RunAppByPath(coreJsTest),
 			Require: test.Tests{ctx.CreateUser()},
 		},
+		{
+			Name: "test audio player client",
+			Test: ctx.TestAstralAudioPlayer(),
+		},
 	}
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("%d  %s", i, tt.Name), runner.Run(tests, tt))
@@ -266,6 +270,14 @@ func (c *TestContext) RunAppByReleaseID(testApp *TestApp) test.Test {
 	}).Requires(
 		c.PublishApp(testApp),
 	)
+}
+
+func (c *TestContext) NewWatch() test.Test {
+	return c.Test().Func(func(t *testing.T) {
+		err := c.Apphost.Fs().NewWatch(c.Context, path.Join(path.Dir(c.Astrald.NodeRoot), "local"), "test")
+		test.NoError(t, err)
+		time.Sleep(time.Second)
+	}).Requires(c.CreateUser())
 }
 
 func (c *TestContext) runApp(t *testing.T, testApp *TestApp, src string) {
