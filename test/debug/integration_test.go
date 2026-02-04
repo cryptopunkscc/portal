@@ -8,6 +8,7 @@ import (
 
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/mod/user"
+	youtubedl "github.com/cryptopunkscc/portal/cmd/astral-yt-dlp/api"
 	"github.com/cryptopunkscc/portal/cmd/portal-goja/src"
 	"github.com/cryptopunkscc/portal/core/apphost"
 	golang "github.com/cryptopunkscc/portal/pkg/go"
@@ -119,6 +120,24 @@ func TestIntegration(t *testing.T) {
 		{
 			Name: "test video player client",
 			Test: ctx.TestAstralVideoPlayer(),
+		},
+		{
+			Name: "test yt-dlp",
+			Test: ctx.TestServeAstralYouTubeDl(
+				youtubedl.Request{Url: "https://www.youtube.com/watch?v=Kt7ZDFKFNxc", Audio: false},
+				youtubedl.Request{Url: "https://www.youtube.com/watch?v=YAszKsWBpKs", Audio: true},
+			),
+		},
+		{
+			Name: "test yt-dlp + audio & video players",
+			Require: test.Tests{
+				ctx.TestServeAstralYouTubeDl(
+					youtubedl.Request{Url: "https://www.youtube.com/watch?v=Kt7ZDFKFNxc", Audio: false},
+					youtubedl.Request{Url: "https://www.youtube.com/watch?v=YAszKsWBpKs", Audio: true},
+				),
+				ctx.TestAstralAudioPlayer(),
+				ctx.TestAstralVideoPlayer(),
+			},
 		},
 	}
 	for i, tt := range tests {

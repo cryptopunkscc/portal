@@ -52,8 +52,16 @@ func Clean(path ...string) {
 	_ = os.RemoveAll(dir)
 }
 
-func NoError(t *testing.T, err error) {
-	AssertErr(t, err)
+func NoError(t *testing.T, err any) {
+	if err == nil {
+		return
+	}
+	switch v := err.(type) {
+	case error:
+		AssertErr(t, v)
+	case *error:
+		AssertErr(t, *v)
+	}
 }
 
 func AssertErr(t *testing.T, err error) {

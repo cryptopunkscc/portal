@@ -14,7 +14,7 @@ func (c *TestContext) TestMediaPlayerClient(
 	service string,
 	fileId *astral.ObjectID,
 ) {
-	debugDelay := time.Second * 2
+	debugDelay := time.Second * 1
 	p := client.Client{
 		Name:   service,
 		Client: c.Apphost.Client.WithTarget(c.Apphost.HostID()),

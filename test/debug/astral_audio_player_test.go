@@ -8,6 +8,7 @@ import (
 	"github.com/cryptopunkscc/astrald/mod/media"
 	"github.com/cryptopunkscc/portal/apps/player/audio"
 	"github.com/cryptopunkscc/portal/apps/player/beep"
+	"github.com/cryptopunkscc/portal/cmd/astral-yt-dlp/api"
 	"github.com/cryptopunkscc/portal/pkg/test"
 	"github.com/stretchr/testify/require"
 )
@@ -31,6 +32,9 @@ func (c *TestContext) TestAstralAudioPlayer() test.Test {
 	}).Requires(
 		c.NewWatch(),
 		c.ServeAstralAudioPlayer(),
+		c.TestServeAstralYouTubeDl(
+			astral_yt_dlp.Request{Url: "https://www.youtube.com/watch?v=YAszKsWBpKs", Audio: true},
+		),
 	)
 }
 
@@ -43,13 +47,9 @@ func (c *TestContext) findAudioFile(t *testing.T) (audioFileId *astral.ObjectID)
 				audioFileId = id
 			}
 		}
-		if errPtr != nil {
-			test.NoError(t, *errPtr)
-		}
+		test.NoError(t, errPtr)
 	}
-	if errPtr != nil {
-		test.NoError(t, *errPtr)
-	}
+	test.NoError(t, errPtr)
 	require.NotNil(t, audioFileId)
 	return
 }
