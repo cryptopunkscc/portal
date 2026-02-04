@@ -12,12 +12,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cryptopunkscc/portal/api/version"
-	"github.com/cryptopunkscc/portal/apps"
-	"github.com/cryptopunkscc/portal/core/js"
-	golang "github.com/cryptopunkscc/portal/pkg/go"
-	"github.com/cryptopunkscc/portal/pkg/gpg"
-	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/bind/js"
+	"github.com/cryptopunkscc/portal/pkg/util/go"
+	"github.com/cryptopunkscc/portal/pkg/util/gpg"
+	"github.com/cryptopunkscc/portal/pkg/util/plog"
+	"github.com/cryptopunkscc/portal/pkg/version"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/magefile/mage/target"
@@ -120,7 +119,6 @@ func (Build) Installer() error {
 		Build.Astrald,
 		Build.Portald,
 		Build.Cli,
-		Build.Apps,
 	)
 	o := "./bin/"
 	if len(out) > 0 {
@@ -131,19 +129,6 @@ func (Build) Installer() error {
 	c.Stderr = os.Stderr
 	c.Env = append(os.Environ(), "GOOS="+goos[0], "GOARCH="+goarch[0])
 	return c.Run()
-}
-
-func (Build) Apps() (err error) {
-	mg.Deps(
-		Build.JsLib,
-	)
-	var args []string
-	args = append(args, "pack")
-	if clean {
-		args = append(args, "clean")
-	}
-	args = append(args, "goos="+goos[0], "goarch="+goarch[0])
-	return apps.Build(args...)
 }
 
 func (Build) Cli() error {
@@ -184,11 +169,11 @@ func (Build) Portald() error {
 func (Build) JsLib() error {
 	if !clean {
 		if changed, err := target.Dir(
-			"./core/js/embed/",
-			"./core/js/src/",
-			"./core/js/all.js",
-			"./core/js/common.js",
-			"./core/js/package.json",
+			"./pkg/bind/js/embed/",
+			"./pkg/bind/js/src/",
+			"./pkg/bind/js/all.js",
+			"./pkg/bind/js/common.js",
+			"./pkg/bind/js/package.json",
 		); err != nil {
 			return err
 		} else if !changed {
@@ -199,7 +184,7 @@ func (Build) JsLib() error {
 }
 
 func resolveVersion() {
-	file, err := os.Create("./api/version/name")
+	file, err := os.Create("./pkg/version/name")
 	if err != nil {
 		return
 	}
@@ -211,7 +196,7 @@ func resolveVersion() {
 }
 
 func clearVersion() {
-	file, err := os.Create("./api/version/name")
+	file, err := os.Create("./pkg/version/name")
 	if err != nil {
 		panic(err)
 	}

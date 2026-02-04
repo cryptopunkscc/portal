@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	golang "github.com/cryptopunkscc/portal/pkg/go"
-	"github.com/cryptopunkscc/portal/pkg/os"
-	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
+	golang "github.com/cryptopunkscc/portal/pkg/util/go"
+	"github.com/cryptopunkscc/portal/pkg/util/os"
+	"github.com/cryptopunkscc/portal/pkg/util/rpc/cmd"
 )
 
 func init() { cmd.DefaultHandlers.Add(ListGoImportsHandler) }

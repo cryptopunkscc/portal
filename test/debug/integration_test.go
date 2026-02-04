@@ -10,14 +10,14 @@ import (
 	"github.com/cryptopunkscc/astrald/mod/user"
 	youtubedl "github.com/cryptopunkscc/portal/cmd/astral-yt-dlp/api"
 	"github.com/cryptopunkscc/portal/cmd/portal-goja/src"
-	"github.com/cryptopunkscc/portal/core/apphost"
-	golang "github.com/cryptopunkscc/portal/pkg/go"
-	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/pkg/test"
-	"github.com/cryptopunkscc/portal/runner/astrald/debug"
-	"github.com/cryptopunkscc/portal/source/app"
-	"github.com/cryptopunkscc/portal/source/npm"
-	"github.com/cryptopunkscc/portal/source/tmpl"
+	"github.com/cryptopunkscc/portal/pkg/apphost"
+	"github.com/cryptopunkscc/portal/pkg/runner/astrald/debug"
+	"github.com/cryptopunkscc/portal/pkg/source/app"
+	"github.com/cryptopunkscc/portal/pkg/source/npm"
+	"github.com/cryptopunkscc/portal/pkg/source/tmpl"
+	"github.com/cryptopunkscc/portal/pkg/util/go"
+	"github.com/cryptopunkscc/portal/pkg/util/plog"
+	"github.com/cryptopunkscc/portal/pkg/util/test"
 	"github.com/stretchr/testify/require"
 )
 
@@ -51,7 +51,7 @@ func TestIntegration(t *testing.T) {
 	coreJsTest := &TestApp{
 		Name: "core.js.test",
 		Type: "js",
-		Path: path.Join(projectRoot, "core/js/test/common"),
+		Path: path.Join(projectRoot, "pkg/bind/js/test/common"),
 	}
 
 	runner := test.Runner{}
@@ -101,7 +101,7 @@ func TestIntegration(t *testing.T) {
 			Test: ctx.RunAppByBundleID(jsRollup),
 		},
 		{
-			Name: "publish js app",
+			Name: "run raw js app by release ID",
 			Test: ctx.RunAppByReleaseID(js),
 		},
 		{
@@ -184,8 +184,8 @@ func (c *TestContext) StartAstrald() test.Test {
 
 		time.Sleep(time.Second * 1)
 
-		err = c.Apphost.Connect()
-		test.NoError(t, err)
+		c.Apphost.Init()
+		require.NotEmpty(t, c.Apphost.HostID())
 	})
 }
 
@@ -197,8 +197,8 @@ func (c *TestContext) CreateUser() test.Test {
 		t.Log(c.UserCreateInfo)
 
 		c.Apphost.Token = c.UserCreateInfo.AccessToken.String()
-		err = c.Apphost.Reconnect()
-		test.NoError(t, err)
+		c.Apphost.Init()
+		require.NotEmpty(t, c.Apphost.HostID())
 	}).Requires(
 		c.StartAstrald(),
 	)

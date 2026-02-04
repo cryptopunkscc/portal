@@ -7,10 +7,10 @@ import (
 
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/mod/fs"
-	"github.com/cryptopunkscc/portal/apps/player/video"
-	"github.com/cryptopunkscc/portal/apps/player/vlc"
 	"github.com/cryptopunkscc/portal/cmd/astral-yt-dlp/api"
-	"github.com/cryptopunkscc/portal/pkg/test"
+	"github.com/cryptopunkscc/portal/pkg/util/player/video"
+	"github.com/cryptopunkscc/portal/pkg/util/player/vlc"
+	"github.com/cryptopunkscc/portal/pkg/util/test"
 	"github.com/stretchr/testify/require"
 )
 
@@ -43,9 +43,9 @@ func (c *TestContext) TestAstralVideoPlayer() test.Test {
 }
 
 func (c *TestContext) findVideoFile(t *testing.T) (audioFileId *astral.ObjectID) {
-	scan, errPtr := c.Apphost.Objects().ObjectsClient.Scan(c.Context, "test", false)
+	scan, errPtr := c.Apphost.Objects().Client.Scan(c.Context, "test", false)
 	for id := range scan {
-		descCh, errPtr := c.Apphost.Objects().ObjectsClient.Describe(c.Context, id)
+		descCh, errPtr := c.Apphost.Objects().Client.Describe(c.Context, id)
 		for desc := range descCh {
 			if fl, ok := desc.Descriptor.(*fs.FileLocation); ok {
 				if path.Ext(fl.Path.String()) == ".mkv" {

@@ -4,11 +4,11 @@ import (
 	"context"
 	"io/fs"
 
-	"github.com/cryptopunkscc/portal/core/apphost"
-	"github.com/cryptopunkscc/portal/core/bind"
-	"github.com/cryptopunkscc/portal/runner/goja"
-	"github.com/cryptopunkscc/portal/source"
-	"github.com/cryptopunkscc/portal/source/app"
+	"github.com/cryptopunkscc/portal/pkg/apphost"
+	"github.com/cryptopunkscc/portal/pkg/bind/src"
+	"github.com/cryptopunkscc/portal/pkg/runner/goja"
+	"github.com/cryptopunkscc/portal/pkg/source"
+	"github.com/cryptopunkscc/portal/pkg/source/app"
 )
 
 type Application struct {
@@ -30,7 +30,7 @@ func (a Application) Run(ctx context.Context, src string, args ...string) (err e
 		&goja.BundleRunner{},
 	) {
 		ctx := f.Create(ctx)
-		return ss.(goja.Runner).Run(*ctx, args...)
+		return ss.(goja.Runner).Run(ctx, args...)
 	}
 
 	return fs.ErrInvalid

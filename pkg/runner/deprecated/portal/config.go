@@ -1,0 +1,167 @@
+package portal
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"slices"
+
+	"github.com/cryptopunkscc/portal/pkg/env"
+	"github.com/cryptopunkscc/portal/pkg/runner/astrald"
+	"github.com/cryptopunkscc/portal/pkg/util/config"
+	env2 "github.com/cryptopunkscc/portal/pkg/util/env"
+	"github.com/cryptopunkscc/portal/pkg/util/plog"
+	"gopkg.in/yaml.v3"
+)
+
+type Config struct {
+	File           string `yaml:"file,omitempty"`
+	Dir            string `yaml:",omitempty"`
+	Dirs           `yaml:",omitempty"`
+	astrald.Config `yaml:",inline"`
+	ApphostAddr    string `yaml:"-"`
+}
+
+type Dirs struct {
+	Portald  string `yaml:",omitempty"`
+	Astrald  string `yaml:",omitempty"`
+	AstralDB string `yaml:",omitempty"`
+	Tokens   string `yaml:",omitempty"`
+	Apps     string `yaml:",omitempty"`
+	Bin      string `yaml:",omitempty"`
+}
+
+var baseConfig = Config{
+	Dir: "./portal",
+	Dirs: Dirs{
+		Portald:  "",
+		Astrald:  "astrald",
+		AstralDB: "astrald",
+		Tokens:   "tokens",
+		Apps:     "apps",
+		Bin:      "bin",
+	},
+	Config: astrald.DefaultConfig,
+}
+
+func (c *Config) GetDirs() (out []string) {
+	for _, s := range c.dirs() {
+		out = append(out, *s)
+	}
+	return
+}
+
+func (c *Config) dirs() []*string {
+	return []*string{
+		&c.Portald,
+		&c.Astrald,
+		&c.AstralDB,
+		&c.Dir,
+		&c.Tokens,
+		&c.Apps,
+		&c.Bin,
+	}
+}
+
+func (c *Config) Yaml() (s string) {
+	bytes, err := yaml.Marshal(c)
+	if err != nil {
+		panic(err)
+	}
+	return string(bytes)
+}
+
+func (c *Config) Build() (err error) {
+	envConfig := Config{}
+	envConfig.readEnvVars()
+	config.Merge(c, &envConfig, &baseConfig)
+	c.fixPath()
+	if err = c.mkdirAll(); err != nil {
+		return
+	}
+	c.fixApphostAddress()
+	//c.writeEnvVars()
+	return
+}
+
+func (c *Config) readEnvVars() {
+	for e, s := range c.env() {
+		*s = e.Get()
+	}
+}
+
+func (c *Config) writeEnvVars() {
+	for e, s := range c.env() {
+		e.Set(*s)
+	}
+}
+
+func (c *Config) env() map[env2.Key]*string {
+	return map[env2.Key]*string{
+		env.AstraldHome:   &c.Astrald,
+		env.AstraldDb:     &c.AstralDB,
+		env.ApphostAddr:   &c.ApphostAddr,
+		env.PortaldHome:   &c.Dir,
+		env.PortaldTokens: &c.Tokens,
+		env.PortaldApps:   &c.Apps,
+		env.PortaldBin:    &c.Bin,
+	}
+}
+
+func (c *Config) Env() (e []string) {
+	for key, s := range c.env() {
+		e = append(e, fmt.Sprintf("%s=%s", key, *s))
+	}
+	return
+}
+
+func (c *Config) fixPath() {
+	for _, path := range c.dirs() {
+		if filepath.IsLocal(*path) || *path == "" {
+			*path = filepath.Join(c.Dir, *path)
+		}
+	}
+}
+
+func (c *Config) mkdirAll() (err error) {
+	plog.TraceErr(&err)
+	for _, s := range c.dirs() {
+		if err = os.MkdirAll(*s, 0755); err != nil {
+			return
+		}
+	}
+	return
+}
+
+func (c *Config) Load(path ...string) (err error) {
+	l := config.Loader[*Config]{
+		Unmarshal: yaml.Unmarshal,
+		Config:    c,
+		File:      DefaultConfigFile,
+	}
+	if len(path) == 0 {
+		if p := env.PortaldConfigPath.Get(); len(p) > 0 {
+			path = append(path, p)
+		}
+	}
+	if err = l.Load(path...); err != nil {
+		return
+	}
+	if filepath.IsLocal(c.Dir) {
+		c.Dir = filepath.Join(l.Dir, c.Dir)
+	}
+	c.File = l.File
+	return
+}
+func (c *Config) fixApphostAddress() {
+	if len(c.ApphostAddr) > 0 {
+		c.Apphost.Listen = slices.DeleteFunc(c.Apphost.Listen, func(s string) bool { return s == c.ApphostAddr })
+		c.Apphost.Listen = slices.Insert(c.Apphost.Listen, 0, c.ApphostAddr)
+	}
+
+	if len(c.Apphost.Listen) > 0 {
+		c.ApphostAddr = c.Apphost.Listen[0]
+	}
+}
+
+const DefaultConfigFile = ".portal.env.yml"

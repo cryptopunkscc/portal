@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	golang "github.com/cryptopunkscc/portal/pkg/go"
-	"github.com/cryptopunkscc/portal/pkg/test"
+	"github.com/cryptopunkscc/portal/pkg/util/go"
+	"github.com/cryptopunkscc/portal/pkg/util/test"
 	"github.com/cryptopunkscc/portal/test/deprecated/util"
 	"github.com/stretchr/testify/assert"
 )

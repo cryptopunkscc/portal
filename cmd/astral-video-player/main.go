@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 
-	"github.com/cryptopunkscc/portal/apps/player/video"
-	"github.com/cryptopunkscc/portal/apps/player/vlc"
+	"github.com/cryptopunkscc/portal/pkg/util/player/video"
+	"github.com/cryptopunkscc/portal/pkg/util/player/vlc"
 )
 
 func main() {

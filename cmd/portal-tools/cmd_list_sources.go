@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"io/fs"
 
-	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/source"
-	"github.com/cryptopunkscc/portal/source/app"
-	"github.com/cryptopunkscc/portal/source/html"
-	"github.com/cryptopunkscc/portal/source/js"
+	"github.com/cryptopunkscc/portal/pkg/source"
+	"github.com/cryptopunkscc/portal/pkg/source/app"
+	"github.com/cryptopunkscc/portal/pkg/source/html"
+	"github.com/cryptopunkscc/portal/pkg/source/js"
+	"github.com/cryptopunkscc/portal/pkg/util/rpc/cmd"
 )
 
 func init() { cmd.DefaultHandlers.Add(ListTargetsHandler) }

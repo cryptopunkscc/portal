@@ -4,13 +4,13 @@ import (
 	"context"
 	"io/fs"
 
-	"github.com/cryptopunkscc/portal/api/version"
-	"github.com/cryptopunkscc/portal/core/bind"
-	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
-	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/runner/wails"
-	"github.com/cryptopunkscc/portal/source"
-	"github.com/cryptopunkscc/portal/source/app"
+	"github.com/cryptopunkscc/portal/pkg/bind/src"
+	"github.com/cryptopunkscc/portal/pkg/runner/wails"
+	"github.com/cryptopunkscc/portal/pkg/source"
+	"github.com/cryptopunkscc/portal/pkg/source/app"
+	"github.com/cryptopunkscc/portal/pkg/util/rpc/cli"
+	"github.com/cryptopunkscc/portal/pkg/util/rpc/cmd"
+	"github.com/cryptopunkscc/portal/pkg/version"
 )
 
 func main() { cli.Run(handler) }
@@ -48,4 +48,4 @@ func run(ctx context.Context, src string) (err error) {
 	return fs.ErrInvalid
 }
 
-type Adapter struct{ bind.Core }
+type Adapter struct{ *bind.Core }

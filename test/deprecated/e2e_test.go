@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cryptopunkscc/portal/pkg/test"
+	"github.com/cryptopunkscc/portal/pkg/util/test"
 	"github.com/cryptopunkscc/portal/test/deprecated/docker"
 	"github.com/cryptopunkscc/portal/test/deprecated/host"
 	"github.com/cryptopunkscc/portal/test/deprecated/kvm/win10"

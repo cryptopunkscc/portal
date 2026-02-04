@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/cryptopunkscc/portal/pkg/test"
+	"github.com/cryptopunkscc/portal/pkg/util/test"
 	"github.com/stretchr/testify/assert"
 )
 

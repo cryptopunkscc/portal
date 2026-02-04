@@ -6,10 +6,10 @@ import (
 
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/mod/media"
-	"github.com/cryptopunkscc/portal/apps/player/audio"
-	"github.com/cryptopunkscc/portal/apps/player/beep"
 	"github.com/cryptopunkscc/portal/cmd/astral-yt-dlp/api"
-	"github.com/cryptopunkscc/portal/pkg/test"
+	"github.com/cryptopunkscc/portal/pkg/util/player/audio"
+	"github.com/cryptopunkscc/portal/pkg/util/player/beep"
+	"github.com/cryptopunkscc/portal/pkg/util/test"
 	"github.com/stretchr/testify/require"
 )
 
@@ -39,9 +39,9 @@ func (c *TestContext) TestAstralAudioPlayer() test.Test {
 }
 
 func (c *TestContext) findAudioFile(t *testing.T) (audioFileId *astral.ObjectID) {
-	scan, errPtr := c.Apphost.Objects().ObjectsClient.Scan(c.Context, "test", false)
+	scan, errPtr := c.Apphost.Objects().Client.Scan(c.Context, "test", false)
 	for id := range scan {
-		descCh, errPtr := c.Apphost.Objects().ObjectsClient.Describe(c.Context, id)
+		descCh, errPtr := c.Apphost.Objects().Describe(c.Context, id)
 		for desc := range descCh {
 			if _, ok := desc.Descriptor.(*media.AudioFile); ok {
 				audioFileId = id

@@ -1,0 +1,39 @@
+package version
+
+import (
+	_ "embed"
+	"strings"
+
+	"github.com/cryptopunkscc/portal/pkg/util/git"
+	"github.com/cryptopunkscc/portal/pkg/util/vcs"
+)
+
+const (
+	Version = "v0.2.0"
+)
+
+//go:embed name
+var version string
+
+func Name() string {
+	if version = strings.TrimSpace(version); version == "" {
+		version = Resolve()
+	}
+	return version
+}
+
+func Resolve() (version string) {
+	version = goModuleVersion()
+	if vcs.ReadBuildInfo().Modified != "" {
+		version += " [MODIFIED]"
+	}
+	return
+}
+
+func goModuleVersion() (version string) {
+	version = Version
+	if hash, err := git.TimestampHash(); err == nil {
+		version += "-" + hash
+	}
+	return
+}

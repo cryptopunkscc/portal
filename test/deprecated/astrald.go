@@ -3,7 +3,7 @@ package test
 import (
 	"strings"
 
-	"github.com/cryptopunkscc/portal/pkg/plog"
+	"github.com/cryptopunkscc/portal/pkg/util/plog"
 )
 
 type Astrald struct {

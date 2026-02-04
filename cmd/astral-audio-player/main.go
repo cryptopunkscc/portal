@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 
-	"github.com/cryptopunkscc/portal/apps/player/audio"
-	"github.com/cryptopunkscc/portal/apps/player/beep"
+	"github.com/cryptopunkscc/portal/pkg/util/player/audio"
+	"github.com/cryptopunkscc/portal/pkg/util/player/beep"
 )
 
 func main() {

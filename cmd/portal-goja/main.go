@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/cryptopunkscc/portal/api/version"
 	"github.com/cryptopunkscc/portal/cmd/portal-goja/src"
-	"github.com/cryptopunkscc/portal/core/apphost"
-	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
-	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
+	"github.com/cryptopunkscc/portal/pkg/apphost"
+	"github.com/cryptopunkscc/portal/pkg/util/rpc/cli"
+	"github.com/cryptopunkscc/portal/pkg/util/rpc/cmd"
+	"github.com/cryptopunkscc/portal/pkg/version"
 )
 
 func main() { cli.Run(handler) }

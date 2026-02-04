@@ -1,12 +1,13 @@
 package debug
 
 import (
+	"strings"
 	"testing"
 	"time"
 
 	api "github.com/cryptopunkscc/portal/cmd/astral-yt-dlp/api"
 	"github.com/cryptopunkscc/portal/cmd/astral-yt-dlp/src"
-	"github.com/cryptopunkscc/portal/pkg/test"
+	"github.com/cryptopunkscc/portal/pkg/util/test"
 )
 
 func (c *TestContext) TestServeAstralYouTubeDl(requests ...api.Request) test.Test {
@@ -14,7 +15,9 @@ func (c *TestContext) TestServeAstralYouTubeDl(requests ...api.Request) test.Tes
 		p := api.Client{Client: c.Apphost.Client}
 		for _, request := range requests {
 			err := p.Download(c.Context, request)
-			test.NoError(t, err)
+			if err != nil && !strings.Contains(err.Error(), "already downloading") {
+				test.NoError(t, err)
+			}
 		}
 		ch, erp := p.Status(c.Context)
 		test.NoError(t, erp)

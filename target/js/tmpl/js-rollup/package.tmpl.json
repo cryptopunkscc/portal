@@ -1,9 +1,0 @@
-{
-  "scripts": {
-    "build": "rollup main.js -o dist/main.js -f iife" ,
-    "watch": "rollup main.js -o dist/main.js -f iife --watch"
-  },
-  "devDependencies": {
-    "rollup": "^4.12.0"
-  }
-}

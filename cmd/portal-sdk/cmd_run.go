@@ -4,15 +4,15 @@ import (
 	"context"
 	"io/fs"
 
-	"github.com/cryptopunkscc/portal/core/bind"
-	"github.com/cryptopunkscc/portal/pkg/os"
-	"github.com/cryptopunkscc/portal/runner/goja"
-	"github.com/cryptopunkscc/portal/runner/goja/dist"
-	"github.com/cryptopunkscc/portal/runner/goja/pro"
-	"github.com/cryptopunkscc/portal/runner/wails"
-	"github.com/cryptopunkscc/portal/runner/wails/dist"
-	"github.com/cryptopunkscc/portal/runner/wails/pro"
-	"github.com/cryptopunkscc/portal/source"
+	"github.com/cryptopunkscc/portal/pkg/bind/src"
+	"github.com/cryptopunkscc/portal/pkg/runner/goja"
+	"github.com/cryptopunkscc/portal/pkg/runner/goja/dist"
+	"github.com/cryptopunkscc/portal/pkg/runner/goja/pro"
+	"github.com/cryptopunkscc/portal/pkg/runner/wails"
+	"github.com/cryptopunkscc/portal/pkg/runner/wails/dist"
+	"github.com/cryptopunkscc/portal/pkg/runner/wails/pro"
+	"github.com/cryptopunkscc/portal/pkg/source"
+	"github.com/cryptopunkscc/portal/pkg/util/os"
 )
 
 func runTarget(ctx context.Context, src string, args ...string) (err error) {
@@ -35,7 +35,7 @@ func runTarget(ctx context.Context, src string, args ...string) (err error) {
 		switch r := ss.(type) {
 		case goja.Runner:
 			ctx := bind.DefaultCoreFactory{}.Create(ctx)
-			return r.Run(*ctx, args...)
+			return r.Run(ctx, args...)
 		case wails.Runner:
 			ctx := bind.DefaultCoreFactory{}.Create(ctx)
 			return r.Run(&Adapter{ctx})
@@ -45,4 +45,4 @@ func runTarget(ctx context.Context, src string, args ...string) (err error) {
 	return fs.ErrInvalid
 }
 
-type Adapter struct{ bind.Core }
+type Adapter struct{ *bind.Core }

@@ -5,8 +5,8 @@ import (
 
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/portal/cmd/astral-yt-dlp/src"
-	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
-	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
+	"github.com/cryptopunkscc/portal/pkg/util/rpc/cli"
+	"github.com/cryptopunkscc/portal/pkg/util/rpc/cmd"
 )
 
 func main() {

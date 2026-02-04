@@ -1,7 +1,0 @@
-{
-  "scripts": {
-    "build": "test_build"
-  },
-  "devDependencies": {
-  }
-}

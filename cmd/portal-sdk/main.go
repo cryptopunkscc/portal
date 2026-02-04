@@ -2,11 +2,11 @@ package main
 
 import (
 	"github.com/cryptopunkscc/portal/cmd/portal-sdk/src"
-	"github.com/cryptopunkscc/portal/pkg/rpc/cli"
-	"github.com/cryptopunkscc/portal/pkg/rpc/cmd"
-	"github.com/cryptopunkscc/portal/source/app"
-	"github.com/cryptopunkscc/portal/source/npm"
-	"github.com/cryptopunkscc/portal/source/tmpl"
+	"github.com/cryptopunkscc/portal/pkg/source/app"
+	"github.com/cryptopunkscc/portal/pkg/source/npm"
+	"github.com/cryptopunkscc/portal/pkg/source/tmpl"
+	"github.com/cryptopunkscc/portal/pkg/util/rpc/cli"
+	"github.com/cryptopunkscc/portal/pkg/util/rpc/cmd"
 )
 
 func main() { cli.Run(handler) }

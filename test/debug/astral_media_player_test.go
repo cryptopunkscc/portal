@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/cryptopunkscc/astrald/astral"
-	client "github.com/cryptopunkscc/portal/apps/player/client"
-	"github.com/cryptopunkscc/portal/pkg/test"
+	client "github.com/cryptopunkscc/portal/pkg/util/player/client"
+	"github.com/cryptopunkscc/portal/pkg/util/test"
 )
 
 func (c *TestContext) TestMediaPlayerClient(
