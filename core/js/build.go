@@ -1,44 +1,25 @@
 package js
 
 import (
-	"context"
-	"log"
-
-	"github.com/cryptopunkscc/portal/api/target"
 	golang "github.com/cryptopunkscc/portal/pkg/go"
-	"github.com/cryptopunkscc/portal/pkg/plog"
-	"github.com/cryptopunkscc/portal/target/npm"
-	"github.com/cryptopunkscc/portal/target/source"
+	"github.com/cryptopunkscc/portal/source"
+	"github.com/cryptopunkscc/portal/source/npm"
 )
 
 func BuildPortalLib() (err error) {
-	defer plog.TraceErr(&err)
-
-	wd, err := golang.FindProjectRoot()
+	dir, err := golang.FindProjectRoot()
 	if err != nil {
 		return
 	}
-
-	libs, err := source.File(wd, "core", "js")
-	if err != nil {
-		log.Fatal(err)
+	nm := npm.NodeModule{}
+	if err = nm.ReadSrc(source.OSRef(dir, "core", "js")); err != nil {
+		return
 	}
-
-	ctx := context.Background()
-	for _, p := range target.Any[target.NodeModule](
-		target.Skip("node_modules"),
-		target.Try(npm.ResolveNodeModule),
-	).List(libs) {
-		if !p.PkgJson().CanBuild() {
-			continue
-		}
-		log.Printf("building js libs for %s", p.Abs())
-		if err = npm.Install(ctx, p); err != nil {
-			return
-		}
-		if err = npm.BuildModule(ctx, p); err != nil {
-			return
-		}
+	if err = nm.NpmInstall(); err != nil {
+		return
+	}
+	if err = nm.Build(); err != nil {
+		return
 	}
 	return
 }
