@@ -11,9 +11,9 @@ import (
 	"github.com/cryptopunkscc/astrald/core"
 	"github.com/cryptopunkscc/astrald/debug"
 	_ "github.com/cryptopunkscc/astrald/mod/all"
-	"github.com/cryptopunkscc/astrald/mod/keys"
+	"github.com/cryptopunkscc/astrald/mod/crypto"
+	"github.com/cryptopunkscc/astrald/mod/secp256k1"
 	"github.com/cryptopunkscc/astrald/resources"
-	resources2 "github.com/cryptopunkscc/portal/pkg/util/resources"
 )
 
 type Astrald struct {
@@ -29,7 +29,7 @@ func (n *Astrald) Start(ctx context.Context) (err error) {
 		return err
 	}
 
-	nodeID, err := setupNodeIdentity(nodeRes)
+	nodeID, err := loadNodeIdentity(nodeRes)
 	if err != nil {
 		return err
 	}
@@ -81,43 +81,38 @@ func setupResources(args *Astrald) (resources.Resources, error) {
 	return nodeRes, err
 }
 
-const resNodeIdentity = "node_identity"
+const resNodeKey = "node_key"
 
-// setupNodeIdentity reads node's identity from resources or generates one if needed
-func setupNodeIdentity(resources resources.Resources) (*astral.Identity, error) {
-	keyBytes, err := resources.Read(resNodeIdentity)
+// loadNodeIdentity loads node's identity from resources. Generates a new identity if we don't have one yet.
+func loadNodeIdentity(resources resources.Resources) (identity *astral.Identity, err error) {
+	var nodeKey *crypto.PrivateKey
+
+	data, err := resources.Read(resNodeKey)
 	if err == nil {
-		if len(keyBytes) == 32 {
-			return astral.IdentityFromPrivKeyBytes(keyBytes)
-		}
+		object, _, _ := astral.Decode(bytes.NewReader(data), astral.Canonical())
 
-		var pk keys.PrivateKey
-		err = resources2.ReadCanonical(bytes.NewReader(keyBytes), &pk)
+		var ok bool
+		nodeKey, ok = object.(*crypto.PrivateKey)
+		if !ok {
+			return nil, astral.NewErrUnexpectedObject(object)
+		}
+	} else {
+		nodeKey = secp256k1.New()
+
+		// store node key
+		var keyBytes = &bytes.Buffer{}
+		_, err = astral.Encode(keyBytes, nodeKey, astral.Canonical())
 		if err != nil {
 			return nil, err
 		}
 
-		return astral.IdentityFromPrivKeyBytes(pk.Bytes)
+		err = resources.Write("node_key", keyBytes.Bytes())
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	nodeID := astral.GenerateIdentity()
+	identity = secp256k1.Identity(secp256k1.PublicKey(nodeKey))
 
-	var buf = &bytes.Buffer{}
-
-	pk := &keys.PrivateKey{
-		Type:  keys.KeyTypeIdentity,
-		Bytes: nodeID.PrivateKey().Serialize(),
-	}
-
-	err = resources2.WriteCanonical(buf, pk)
-	if err != nil {
-		return nil, err
-	}
-
-	err = resources.Write(resNodeIdentity, buf.Bytes())
-	if err != nil {
-		return nil, err
-	}
-
-	return nodeID, nil
+	return
 }

@@ -9,7 +9,7 @@ func (s *Service) CreateUser(alias string) (err error) {
 	defer plog.TraceErr(&err)
 
 	// create user
-	if s.UserCreated, err = s.Apphost.User().Create(nil, alias); err != nil {
+	if s.UserCreated, err = s.Apphost.CreateUser(nil, alias); err != nil {
 		return
 	}
 

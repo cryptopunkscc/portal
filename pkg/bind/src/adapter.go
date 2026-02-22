@@ -175,7 +175,7 @@ func (a *Adapter) Resolve(name string) (id string, err error) {
 }
 
 func (a *Adapter) NodeInfo(identity string) (info *bind.NodeInfo, err error) {
-	nid, err := astral.IdentityFromString(identity)
+	nid, err := astral.ParseIdentity(identity)
 	if err != nil {
 		return
 	}

@@ -7,6 +7,7 @@ import (
 	"github.com/cryptopunkscc/astrald/lib/ops"
 	"github.com/cryptopunkscc/astrald/sig"
 	"github.com/cryptopunkscc/portal/cmd/astral-yt-dlp/api"
+	"github.com/cryptopunkscc/portal/pkg/util/plog"
 	"github.com/kkdai/youtube/v2"
 )
 
@@ -18,8 +19,11 @@ type Service struct {
 }
 
 func (s *Service) Serve(ctx *astral.Context) (err error) {
+	defer plog.TraceErr(&err)
 	set := ops.NewSet()
-	_ = set.AddSubSet("yt-dlp", ops.Struct(s, "Op"))
+	if err = set.AddSubSet("yt-dlp", ops.Struct(s, "Op")); err != nil {
+		return
+	}
 	go func() {
 		for request := range sig.Subscribe(ctx, &s.queue.Queue) {
 			if err = s.download.Run(ctx, request); err != nil {

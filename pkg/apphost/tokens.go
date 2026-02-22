@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 
+	"github.com/cryptopunkscc/astrald/astral"
 	mod "github.com/cryptopunkscc/astrald/mod/apphost"
 	"github.com/cryptopunkscc/portal/pkg/env"
 	pkgOs "github.com/cryptopunkscc/portal/pkg/util/os"
@@ -54,6 +55,7 @@ func (r *Tokens) Get(pkg string) (token *mod.AccessToken, err error) {
 var ErrNotCached = errors.New("apphost auth token is not cached or cannot be loaded")
 
 func (r *Tokens) Resolve(pkg string) (accessToken *mod.AccessToken, err error) {
+	ctx := astral.NewContext(nil)
 	defer plog.TraceErr(&err)
 	if accessToken, err = r.Get(pkg); err == nil {
 		return
@@ -63,7 +65,7 @@ func (r *Tokens) Resolve(pkg string) (accessToken *mod.AccessToken, err error) {
 
 	if id != nil {
 		var tokens []mod.AccessToken
-		if tokens, err = r.Adapter.ListTokens(""); err != nil {
+		if tokens, err = r.Adapter.ListTokens(ctx, ""); err != nil {
 			return
 		}
 
@@ -78,7 +80,7 @@ func (r *Tokens) Resolve(pkg string) (accessToken *mod.AccessToken, err error) {
 		return
 	}
 
-	if accessToken, err = r.Adapter.CreateToken(id); err != nil {
+	if accessToken, err = r.Adapter.CreateToken(ctx, id); err != nil {
 		return
 	}
 

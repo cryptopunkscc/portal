@@ -150,7 +150,7 @@ type TestContext struct {
 	Name           string
 	Astrald        debug.Astrald
 	Apphost        apphost.Adapter
-	UserCreateInfo *user.CreatedUserInfo
+	UserCreateInfo *apphost.CreatedUserInfo
 	UserInfo       *user.Info
 }
 
@@ -192,11 +192,11 @@ func (c *TestContext) StartAstrald() test.Test {
 func (c *TestContext) CreateUser() test.Test {
 	return c.Test().Func(func(t *testing.T) {
 		var err error
-		c.UserCreateInfo, err = c.Apphost.User().Create(c.Context, "test_user")
+		c.UserCreateInfo, err = c.Apphost.CreateUser(c.Context, "test_user", "123")
 		test.NoError(t, err)
 		t.Log(c.UserCreateInfo)
 
-		c.Apphost.Token = c.UserCreateInfo.AccessToken.String()
+		c.Apphost.Token = c.UserCreateInfo.AccessToken.Token.String()
 		c.Apphost.Init()
 		require.NotEmpty(t, c.Apphost.HostID())
 	}).Requires(

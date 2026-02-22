@@ -8,16 +8,16 @@ import (
 	"github.com/cryptopunkscc/astrald/mod/apphost"
 )
 
-func (a *Adapter) CreateToken(id *astral.Identity) (ac *apphost.AccessToken, err error) {
-	return Receive[*apphost.AccessToken](nil, *a.Client, "apphost.create_token", query.Args{"id": id.String()})
+func (a *Adapter) CreateToken(ctx *astral.Context, id *astral.Identity) (ac *apphost.AccessToken, err error) {
+	return Receive[*apphost.AccessToken](ctx, *a.Client, "apphost.create_token", query.Args{"id": id.String()})
 }
 
-func (a *Adapter) ListTokens(out string) ([]apphost.AccessToken, error) {
+func (a *Adapter) ListTokens(ctx *astral.Context, out string) ([]apphost.AccessToken, error) {
 	args := query.Args{}
 	if out != "" {
 		args = query.Args{"out": out}
 	}
-	return List[apphost.AccessToken](nil, *a.Client, "apphost.list_tokens", args)
+	return List[apphost.AccessToken](ctx, *a.Client, "apphost.list_tokens", args)
 }
 
 type AccessTokens []apphost.AccessToken
@@ -30,6 +30,6 @@ func (t AccessTokens) MarshalCLI() (s string) {
 }
 
 // SignAppContract signs contract with given app and returns contract identity
-func (a *Adapter) SignAppContract(id *astral.Identity) (out *astral.ObjectID, err error) {
-	return Receive[*astral.ObjectID](nil, *a.Client, "apphost.sign_app_contract", query.Args{"id": id.String()})
+func (a *Adapter) SignAppContract(ctx *astral.Context, id *astral.Identity) (out *astral.ObjectID, err error) {
+	return Receive[*astral.ObjectID](ctx, *a.Client, "apphost.sign_app_contract", query.Args{"id": id.String()})
 }

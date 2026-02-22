@@ -11,8 +11,8 @@ import (
 	os2 "github.com/cryptopunkscc/portal/pkg/util/os"
 )
 
-func CreateUser(ctx context.Context, name string, dst string) (err error) {
-	info, err := apphost.Default.User().Create(astral.NewContext(ctx), name)
+func CreateUser(ctx context.Context, name, passphrase, dst string) (err error) {
+	info, err := apphost.Default.CreateUser(astral.NewContext(ctx), name, passphrase)
 	if err != nil {
 		return
 	}
@@ -26,7 +26,7 @@ func CreateUser(ctx context.Context, name string, dst string) (err error) {
 	_, err = astral.Encode(file, info, astral.Canonical())
 
 	// write access token to file env
-	envFileText := fmt.Sprintf("#!/bin/sh\nexport %s=%s\n", apphost2.AuthTokenEnv, info.AccessToken.String())
+	envFileText := fmt.Sprintf("#!/bin/sh\nexport %s=%s\n", apphost2.AuthTokenEnv, info.AccessToken.Token.String())
 	_ = os.WriteFile("astral_user_env", []byte(envFileText), 0600)
 	return
 }

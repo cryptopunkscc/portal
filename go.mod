@@ -7,7 +7,7 @@ toolchain go1.24.7
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/adrg/libvlc-go/v3 v3.1.6
-	github.com/cryptopunkscc/astrald v0.0.0-20260130165721-729d72b05ec7
+	github.com/cryptopunkscc/astrald v0.0.0-20260224180046-d2f074e6eca4
 	github.com/dop251/goja v0.0.0-20250125213203-5ef83b82af17
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/getlantern/systray v1.2.2
@@ -134,4 +134,4 @@ require (
 	modernc.org/sqlite v1.25.0 // indirect
 )
 
-replace github.com/cryptopunkscc/astrald => ../astrald
+//replace github.com/cryptopunkscc/astrald => ../astrald

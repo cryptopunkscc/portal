@@ -34,11 +34,17 @@ func Receive[T any](
 	client astrald.Client,
 	method string,
 	args any,
+	send ...astral.Object,
 ) (out T, err error) {
 	defer plog.TraceErr(&err)
 	conn, err := client.QueryChannel(ctx, method, args)
 	if err != nil {
 		return
+	}
+	for _, o := range send {
+		if err = conn.Send(o); err != nil {
+			return
+		}
 	}
 	receive, err := conn.Receive()
 	if err != nil {
