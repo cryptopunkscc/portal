@@ -21,7 +21,7 @@ type Runner interface {
 
 type Context interface {
 	context.Context
-	bind2.Apphost
+	bind2.Astrald
 	bind2.Process
 }
 

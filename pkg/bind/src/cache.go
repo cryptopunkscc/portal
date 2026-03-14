@@ -9,12 +9,12 @@ import (
 
 type cache struct {
 	sync.RWMutex
-	values map[string]cachedConn
+	values map[string]conn
 }
 
 func (c *cache) init() {
 	if c.values == nil {
-		c.values = make(map[string]cachedConn)
+		c.values = make(map[string]conn)
 	}
 }
 
@@ -31,8 +31,8 @@ func (c *cache) set(ac apphost.Conn) conn {
 	c.Lock()
 	defer c.Unlock()
 	c.init()
-	cc := conn{ac, *bufio.NewReader(ac)}
-	c.values[ac.Query().Nonce.String()] = cachedConn{cc, c}
+	cc := conn{ac, *bufio.NewReader(ac), c}
+	c.values[ac.Query().Nonce.String()] = cc
 	return cc
 }
 
@@ -46,36 +46,37 @@ func (c *cache) get(id string) (conn, bool) {
 	c.RLock()
 	defer c.RUnlock()
 	cc, ok := c.values[id]
-	return cc.conn, ok
+	return cc, ok
 }
 
-type cachedConn struct {
-	conn
+type conn struct {
+	apphost.Conn
+	bufio.Reader
 	*cache
 }
 
-func (c *cachedConn) Read(p []byte) (n int, err error) {
+func (c *conn) Read(p []byte) (n int, err error) {
 	if n, err = c.Reader.Read(p); err != nil {
 		_ = c.Close()
 	}
 	return
 }
 
-func (c *cachedConn) Write(p []byte) (n int, err error) {
+func (c *conn) Write(p []byte) (n int, err error) {
 	if n, err = c.Conn.Write(p); err != nil {
 		_ = c.Close()
 	}
 	return
 }
 
-func (c *cachedConn) ReadString(delim byte) (s string, err error) {
+func (c *conn) ReadString(delim byte) (s string, err error) {
 	if s, err = c.Reader.ReadString(delim); err != nil {
 		_ = c.Close()
 	}
 	return
 }
 
-func (c *cachedConn) Close() error {
+func (c *conn) Close() error {
 	c.cache.delete(c.Conn.Query().Nonce.String())
 	return c.Conn.Close()
 }

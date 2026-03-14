@@ -29,7 +29,7 @@ type Service struct {
 	ExtraTokens []string
 	AppSources  []Source
 
-	Apphost   apphost.Adapter
+	Apphost   client.Adapter
 	Astrald   astrald.Runner
 	Resources resources.Dir
 
@@ -98,10 +98,10 @@ func (s *Service) Installer() app.Installer {
 }
 
 func (s *Service) Publisher() app2.Publisher {
-	return app2.Publisher{ObjectsClient: &s.Apphost.Objects().ObjectsClient}
+	return app2.Publisher{ClientObjects: &s.Apphost.Objects().ObjectsClient}
 }
 
-func (s *Service) Tokens() *apphost.Tokens {
+func (s *Service) Tokens() *client.Tokens {
 	return s.Apphost.Tokens(s.Config.Tokens)
 }
 

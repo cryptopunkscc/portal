@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/cryptopunkscc/portal/cmd/portal-goja/src"
-	"github.com/cryptopunkscc/portal/pkg/apphost"
+	"github.com/cryptopunkscc/portal/pkg/client"
 	"github.com/cryptopunkscc/portal/pkg/util/rpc/cli"
 	"github.com/cryptopunkscc/portal/pkg/util/rpc/cmd"
 	"github.com/cryptopunkscc/portal/pkg/version"
@@ -11,7 +11,7 @@ import (
 func main() { cli.Run(handler) }
 
 var handler = cmd.Handler{
-	Func: portal_goja.Application{Adapter: apphost.Default}.Run,
+	Func: portal_goja.Application{Astrald: client.Default}.Run,
 	Name: "portal-goja",
 	Desc: "Start portal JS app in goja runner.",
 	Params: cmd.Params{

@@ -1,14 +1,12 @@
 module github.com/cryptopunkscc/portal
 
-go 1.24.1
-
-toolchain go1.24.7
+go 1.25.0
 
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/adrg/libvlc-go/v3 v3.1.6
 	github.com/cryptopunkscc/astrald v0.0.0-20260224180046-d2f074e6eca4
-	github.com/dop251/goja v0.0.0-20250125213203-5ef83b82af17
+	github.com/dop251/goja v0.0.0-20260311135729-065cd970411c
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/getlantern/systray v1.2.2
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
@@ -30,9 +28,9 @@ require (
 	github.com/webview/webview v0.0.0-20230415172654-8387ff8945fc
 	go.nhat.io/aferocopy/v2 v2.0.3
 	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa
-	golang.org/x/mod v0.29.0
-	golang.org/x/sys v0.37.0
-	golang.org/x/text v0.30.0
+	golang.org/x/mod v0.33.0
+	golang.org/x/sys v0.41.0
+	golang.org/x/text v0.34.0
 	gopkg.in/yaml.v3 v3.0.1
 	rogchap.com/v8go v0.9.0
 )
@@ -48,8 +46,8 @@ require (
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/bitly/go-simplejson v0.5.1 // indirect
 	github.com/bitonicnl/verify-signed-message v0.7.4 // indirect
-	github.com/btcsuite/btcd v0.24.2 // indirect
-	github.com/btcsuite/btcd/btcec/v2 v2.3.4 // indirect
+	github.com/btcsuite/btcd v0.25.0 // indirect
+	github.com/btcsuite/btcd/btcec/v2 v2.3.5 // indirect
 	github.com/btcsuite/btcd/btcutil v1.1.6 // indirect
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.1.0 // indirect
 	github.com/btcsuite/btclog v0.0.0-20241017175713-3428138b75c7 // indirect
@@ -120,11 +118,14 @@ require (
 	github.com/wailsapp/go-webview2 v1.0.10 // indirect
 	github.com/wailsapp/mimetype v1.4.1 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
-	github.com/xtaci/kcp-go/v5 v5.6.24 // indirect
-	golang.org/x/crypto v0.43.0 // indirect
-	golang.org/x/net v0.46.0 // indirect
-	golang.org/x/term v0.36.0 // indirect
+	github.com/xtaci/kcp-go/v5 v5.6.70 // indirect
+	golang.org/x/crypto v0.48.0 // indirect
+	golang.org/x/mobile v0.0.0-20260217195705-b56b3793a9c4 // indirect
+	golang.org/x/net v0.50.0 // indirect
+	golang.org/x/sync v0.19.0 // indirect
+	golang.org/x/term v0.40.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
+	golang.org/x/tools v0.42.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/driver/sqlite v1.5.4 // indirect
 	gorm.io/gorm v1.25.4 // indirect
@@ -134,4 +135,4 @@ require (
 	modernc.org/sqlite v1.25.0 // indirect
 )
 
-//replace github.com/cryptopunkscc/astrald => ../astrald
+replace github.com/cryptopunkscc/astrald => ../astrald

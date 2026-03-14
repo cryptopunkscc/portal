@@ -1,4 +1,4 @@
-package apphost
+package client
 
 import (
 	"context"
@@ -7,38 +7,34 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/util/rpc/cmd"
 )
 
-func (a *Adapter) Portald() PortaldClient {
-	return PortaldClient{a}
-}
+type Portald struct{ *Astrald }
 
-type PortaldClient struct{ *Adapter }
-
-func (c PortaldClient) Join() {
+func (c Portald) Join() {
 	//_ = Call(nil, *c.Client, "portald.join", nil)
 }
 
-func (c PortaldClient) Ping() error {
+func (c Portald) Ping() error {
 	//return Call(nil, *c.Client, "portald.join", nil)
 	panic("not implemented")
 }
 
-func (c PortaldClient) Close() error {
+func (c Portald) Close() error {
 	//return Call(nil, *c.Client, "portald.close", nil)
 	panic("not implemented")
 }
 
-func (c PortaldClient) Api() (rwc cmd.Handlers, err error) {
+func (c Portald) Api() (rwc cmd.Handlers, err error) {
 	//return Receive[cmd.Handlers](nil, *c.Client, "portald.api", nil)
 	panic("not implemented")
 
 }
 
-func (c PortaldClient) Connect(opt OpenOpt) (rwc io.ReadWriteCloser, err error) {
+func (c Portald) Connect(opt OpenOpt) (rwc io.ReadWriteCloser, err error) {
 	//return c.Client.Query(nil, "portald.connect", opt)
 	panic("not implemented")
 }
 
-func (c PortaldClient) Open(opt OpenOpt) (err error) {
+func (c Portald) Open(opt OpenOpt) (err error) {
 	//return Call(nil, *c.Client, "portald.connect", opt)
 	panic("not implemented")
 }

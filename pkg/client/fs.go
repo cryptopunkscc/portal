@@ -1,4 +1,4 @@
-package apphost
+package client
 
 import (
 	"github.com/cryptopunkscc/astrald/astral"
@@ -7,15 +7,11 @@ import (
 	"github.com/cryptopunkscc/astrald/lib/query"
 )
 
-func (a *Adapter) Fs() *FsClient {
-	return &FsClient{a.Client}
-}
-
-type FsClient struct {
+type Fs struct {
 	*astrald.Client
 }
 
-func (client *FsClient) NewWatch(ctx *astral.Context, path, name string) (err error) {
+func (client *Fs) NewWatch(ctx *astral.Context, path, name string) (err error) {
 	ch, err := client.QueryChannel(ctx, "fs.new_watch", query.Args{"path": path, "name": name})
 	if err != nil {
 		return

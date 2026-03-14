@@ -1,4 +1,4 @@
-package apphost
+package client
 
 import (
 	"context"
@@ -9,28 +9,21 @@ import (
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/lib/apphost"
 	"github.com/cryptopunkscc/astrald/lib/astrald"
-	apphost2 "github.com/cryptopunkscc/astrald/mod/apphost/client"
 	"github.com/cryptopunkscc/astrald/mod/user"
 	"github.com/cryptopunkscc/portal/pkg/env"
 	os2 "github.com/cryptopunkscc/portal/pkg/util/os"
 	"github.com/cryptopunkscc/portal/pkg/util/plog"
 )
 
-var Default = &Adapter{}
-
-func init() {
-	Default.Init()
-}
-
-type Adapter struct {
+type Astrald struct {
 	*astrald.Client
 	Endpoint string
 	Token    string
 	Log      plog.Logger
-	TargetID *astral.Identity // Optional. HostID by default
+	targetID *astral.Identity // Optional. HostID by default
 }
 
-func (a *Adapter) Init() *Adapter {
+func (a *Astrald) Init() *Astrald {
 	a.Endpoint = firstNonZero[string](a.Endpoint, env.ApphostAddr.Get(), apphost.DefaultEndpoint)
 	a.Token = firstNonZero[string](a.Token, env.ApphostToken.Get(), resolveTokenFromFile)
 	a.Client = astrald.New(apphost.NewRouter(a.Endpoint, a.Token))
@@ -68,16 +61,16 @@ func resolveTokenFromFile() string {
 	return o.(*user.CreatedUserInfo).AccessToken.String()
 }
 
-func (a Adapter) WithTarget(identity *astral.Identity) *Adapter {
+func (a Astrald) WithTarget(identity *astral.Identity) *Astrald {
 	if a.Client == nil {
 		a.Init()
 	}
-	a.Client = a.Client.WithTarget(a.TargetID)
-	a.TargetID = identity
+	a.targetID = identity
+	a.Client = a.Client.WithTarget(a.targetID)
 	return &a
 }
 
-func (a Adapter) Resolve(name string) (i *astral.Identity, err error) {
+func (a Astrald) Resolve(name string) (i *astral.Identity, err error) {
 	defer plog.TraceErr(&err)
 	if name == "" || name == "localnode" {
 		return a.HostID(), nil
@@ -88,17 +81,25 @@ func (a Adapter) Resolve(name string) (i *astral.Identity, err error) {
 	return a.Dir().ResolveIdentity(astral.NewContext(nil), name)
 }
 
-func (a *Adapter) Register(ctx context.Context) (out *astrald.Listener, err error) {
+func (a *Astrald) Register(ctx context.Context) (out *astrald.Listener, err error) {
 	defer plog.TraceErr(&err)
 	listener, err := astrald.Listen()
 	if err != nil {
 		return nil, err
 	}
 
-	err = apphost2.New(a.TargetID, a.Client).RegisterHandler(astral.NewContext(ctx), listener.Endpoint(), listener.AuthToken())
+	err = a.Apphost().RegisterHandler(astral.NewContext(ctx), listener.Endpoint(), listener.AuthToken())
 	if err != nil {
 		return nil, err
 	}
 
 	return listener, nil
+}
+
+func (a *Astrald) NodeAlias() (alias string, err error) {
+	return a.Dir().GetAlias(nil, a.HostID())
+}
+
+func (a *Astrald) TargetID() *astral.Identity {
+	return a.targetID
 }

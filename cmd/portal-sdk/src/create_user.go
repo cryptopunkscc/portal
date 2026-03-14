@@ -7,12 +7,12 @@ import (
 
 	"github.com/cryptopunkscc/astrald/astral"
 	apphost2 "github.com/cryptopunkscc/astrald/lib/apphost"
-	"github.com/cryptopunkscc/portal/pkg/apphost"
+	"github.com/cryptopunkscc/portal/pkg/client"
 	os2 "github.com/cryptopunkscc/portal/pkg/util/os"
 )
 
 func CreateUser(ctx context.Context, name, passphrase, dst string) (err error) {
-	info, err := apphost.Default.CreateUser(astral.NewContext(ctx), name, passphrase)
+	info, err := client.Default.CreateUser(astral.NewContext(ctx), name, passphrase)
 	if err != nil {
 		return
 	}

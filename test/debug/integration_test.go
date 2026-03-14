@@ -8,9 +8,9 @@ import (
 
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/mod/user"
-	youtubedl "github.com/cryptopunkscc/portal/cmd/astral-yt-dlp/api"
+	youtubedl "github.com/cryptopunkscc/portal/cmd/astral-yt-dlp/client"
 	"github.com/cryptopunkscc/portal/cmd/portal-goja/src"
-	"github.com/cryptopunkscc/portal/pkg/apphost"
+	"github.com/cryptopunkscc/portal/pkg/client"
 	"github.com/cryptopunkscc/portal/pkg/runner/astrald/debug"
 	"github.com/cryptopunkscc/portal/pkg/source/app"
 	"github.com/cryptopunkscc/portal/pkg/source/npm"
@@ -149,8 +149,8 @@ type TestContext struct {
 	*astral.Context
 	Name           string
 	Astrald        debug.Astrald
-	Apphost        apphost.Adapter
-	UserCreateInfo *apphost.CreatedUserInfo
+	Client         client.Astrald
+	UserCreateInfo *client.CreatedUserInfo
 	UserInfo       *user.Info
 }
 
@@ -184,21 +184,21 @@ func (c *TestContext) StartAstrald() test.Test {
 
 		time.Sleep(time.Second * 1)
 
-		c.Apphost.Init()
-		require.NotEmpty(t, c.Apphost.HostID())
+		c.Client.Init()
+		require.NotEmpty(t, c.Client.HostID())
 	})
 }
 
 func (c *TestContext) CreateUser() test.Test {
 	return c.Test().Func(func(t *testing.T) {
 		var err error
-		c.UserCreateInfo, err = c.Apphost.CreateUser(c.Context, "test_user", "123")
+		c.UserCreateInfo, err = c.Client.CreateUser(c.Context, "test_user", "123")
 		test.NoError(t, err)
 		t.Log(c.UserCreateInfo)
 
-		c.Apphost.Token = c.UserCreateInfo.AccessToken.Token.String()
-		c.Apphost.Init()
-		require.NotEmpty(t, c.Apphost.HostID())
+		c.Client.Token = c.UserCreateInfo.AccessToken.Token.String()
+		c.Client.Init()
+		require.NotEmpty(t, c.Client.HostID())
 	}).Requires(
 		c.StartAstrald(),
 	)
@@ -207,7 +207,7 @@ func (c *TestContext) CreateUser() test.Test {
 func (c *TestContext) GetUserInfo() test.Test {
 	return c.Test().Func(func(t *testing.T) {
 		var err error
-		c.UserInfo, err = c.Apphost.User().Info(c.Context)
+		c.UserInfo, err = c.Client.User().Info(c.Context)
 		test.NoError(t, err)
 		t.Log(c.UserInfo)
 	}).Requires(
@@ -248,7 +248,7 @@ func (c *TestContext) RunAppByPath(testApp *TestApp) test.Test {
 
 func (c *TestContext) PublishApp(testApp *TestApp) test.Test {
 	return c.Test().Args(testApp.Name).Func(func(t *testing.T) {
-		publisher := app.Publisher{ObjectsClient: c.Apphost.Objects()}
+		publisher := app.Publisher{Objects: c.Client.Objects()}
 		dir := testApp.GetPath(c)
 		if testApp.Template == "js" {
 			dir = path.Dir(dir)
@@ -297,7 +297,7 @@ func (c *TestContext) RunAppByReleaseID(testApp *TestApp) test.Test {
 
 func (c *TestContext) NewWatch() test.Test {
 	return c.Test().Func(func(t *testing.T) {
-		err := c.Apphost.Fs().NewWatch(c.Context, path.Join(path.Dir(c.Astrald.NodeRoot), "local"), "test")
+		err := c.Client.Fs().NewWatch(c.Context, path.Join(path.Dir(c.Astrald.NodeRoot), "local"), "test")
 		test.NoError(t, err)
 		time.Sleep(time.Second)
 	}).Requires(c.CreateUser())
@@ -309,7 +309,7 @@ func (c *TestContext) runApp(t *testing.T, testApp *TestApp, src string) {
 	case "html":
 		t.Skip("not supported in debuggable test")
 	case "js":
-		a := portal_goja.Application{Adapter: &c.Apphost}
+		a := portal_goja.Application{Astrald: &c.Client}
 		err = a.Run(c.Context, src)
 	}
 	test.NoError(t, err)

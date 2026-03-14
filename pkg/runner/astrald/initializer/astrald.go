@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/cryptopunkscc/astrald/astral"
-	"github.com/cryptopunkscc/portal/pkg/apphost"
+	"github.com/cryptopunkscc/portal/pkg/client"
 	"github.com/cryptopunkscc/portal/pkg/runner/astrald"
 	"github.com/cryptopunkscc/portal/pkg/util/plog"
 	"github.com/cryptopunkscc/portal/pkg/util/resources"
@@ -17,7 +17,7 @@ type Astrald struct {
 	TokensDir  string
 	Config     astrald.Config
 	Runner     astrald.Runner
-	Apphost    *apphost.Adapter
+	Client     *client.Astrald
 
 	log            plog.Logger
 	resources      resources.Dir
@@ -60,7 +60,7 @@ func (i *Astrald) initialize(ctx context.Context) (err error) {
 	if err = i.resolveNodeAuthToken(); err != nil {
 		return
 	}
-	i.Apphost.Token = i.nodeToken
+	i.Client.Token = i.nodeToken
 	if !i.apphostIsRunning() {
 		if err = i.startAstrald(ctx); err != nil {
 			return
@@ -104,7 +104,7 @@ func (i *Astrald) start(ctx context.Context) (err error) {
 
 // verify the agent access token has been set
 func (i *Astrald) verifyAgentToken() {
-	if len(i.Apphost.Token) == 0 || i.Apphost.Token == i.nodeToken {
-		panic(fmt.Errorf("invalid agent token with len %d", len(i.Apphost.Token)))
+	if len(i.Client.Token) == 0 || i.Client.Token == i.nodeToken {
+		panic(fmt.Errorf("invalid agent token with len %d", len(i.Client.Token)))
 	}
 }

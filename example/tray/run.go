@@ -4,19 +4,19 @@ import (
 	"context"
 	"errors"
 
-	"github.com/cryptopunkscc/portal/pkg/apphost"
+	"github.com/cryptopunkscc/portal/pkg/client"
 	"github.com/cryptopunkscc/portal/pkg/util/plog"
 	"github.com/getlantern/systray"
 )
 
 type Tray struct {
-	Portald apphost.PortaldClient
+	Portald client.Portald
 	log     plog.Logger
 }
 
 func (t *Tray) Run(ctx context.Context) (err error) {
-	if t.Portald.Adapter == nil {
-		t.Portald = apphost.Default.Portald()
+	if t.Portald.Astrald == nil {
+		t.Portald = client.Default.Portald()
 	}
 
 	if err = t.Portald.Ping(); err != nil {
@@ -49,7 +49,7 @@ func (t *Tray) onReady() {
 			select {
 			case <-launcher.ClickedCh:
 				go func() {
-					if err := t.Portald.Open(apphost.OpenOpt{App: "launcher"}); err != nil {
+					if err := t.Portald.Open(client.OpenOpt{App: "launcher"}); err != nil {
 						t.log.Println("launcher:", err)
 					}
 				}()

@@ -15,7 +15,7 @@ const (
 	Interrupt       = "_astral_interrupt"
 )
 
-type Apphost interface {
+type Astrald interface {
 	ServiceRegister() (err error)
 	ServiceClose() (err error)
 	ConnAccept() (data *QueryData, err error)

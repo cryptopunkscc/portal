@@ -33,7 +33,7 @@ func NewTestGoService(p string) *TestGoService {
 		},
 	}
 	return &TestGoService{
-		Router: apphost.Default.Rpc().Router(root),
+		Router: client.Default.Rpc().Router(root),
 	}
 }
 

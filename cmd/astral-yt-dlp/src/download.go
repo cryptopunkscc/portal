@@ -9,7 +9,7 @@ import (
 
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/sig"
-	"github.com/cryptopunkscc/portal/cmd/astral-yt-dlp/api"
+	"github.com/cryptopunkscc/portal/cmd/astral-yt-dlp/client"
 	"github.com/cryptopunkscc/portal/pkg/util/os"
 )
 

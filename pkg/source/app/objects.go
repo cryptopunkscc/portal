@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/cryptopunkscc/astrald/astral"
-	"github.com/cryptopunkscc/portal/pkg/apphost"
+	"github.com/cryptopunkscc/portal/pkg/client"
 	"github.com/cryptopunkscc/portal/pkg/source"
 	"github.com/cryptopunkscc/portal/pkg/util/flow"
 	"github.com/cryptopunkscc/portal/pkg/util/plog"
@@ -14,13 +14,13 @@ import (
 )
 
 type Objects struct {
-	*apphost.Adapter
+	*client.Astrald
 }
 
 var _ source.Provider = &Objects{}
 
 func (r Objects) Default() Objects {
-	r.Adapter = apphost.Default
+	r.Astrald = client.Default
 	return r
 }
 
@@ -63,7 +63,7 @@ func (r Objects) GetByObjectID(ctx *astral.Context, id astral.ObjectID, host ...
 		host = append(host, *r.HostID())
 	}
 	for _, identity := range host {
-		r.Adapter = r.WithTarget(&identity)
+		r.Astrald = r.WithTarget(&identity)
 		if obj, err = r.Objects().Get(ctx, &id); err == nil {
 			switch v := obj.(type) {
 			case *Bundle:
@@ -84,7 +84,7 @@ func (r Objects) GetByObjectID(ctx *astral.Context, id astral.ObjectID, host ...
 
 func (r Objects) Scan(ctx *astral.Context, follow bool) (out flow.Input[ReleaseInfo]) {
 	a := availableAppsScanner{
-		Adapter: r.Adapter,
+		Astrald: r.Astrald,
 		log:     plog.Get(ctx),
 		follow:  follow,
 		out:     make(chan ReleaseInfo),
@@ -108,7 +108,6 @@ func (r Objects) Scan(ctx *astral.Context, follow bool) (out flow.Input[ReleaseI
 		}
 
 		// remote apps
-
 		if c, err := r.User().Siblings(ctx); err == nil {
 			for id := range c {
 				a.scan(ctx, *id)
@@ -119,7 +118,7 @@ func (r Objects) Scan(ctx *astral.Context, follow bool) (out flow.Input[ReleaseI
 }
 
 type availableAppsScanner struct {
-	*apphost.Adapter
+	*client.Astrald
 	wg     sync.WaitGroup
 	log    plog.Logger
 	rpc    rpc.Rpc
@@ -145,18 +144,21 @@ func (a *availableAppsScanner) scan(ctx *astral.Context, host ...astral.Identity
 	}
 
 	ids, err := a.Objects().Scan(ctx, "main", a.follow)
-	if err != nil {
-		log.Println(err)
+	if *err != nil {
+		log.Println(*err)
 		return
 	}
 	a.wg.Add(1)
 	go func() {
 		defer a.wg.Done()
 		for id := range ids {
-			if ctx.Err() != nil {
-				continue
+			if id != nil {
+				a.fetchInfo(ctx, *id, h)
 			}
-			a.fetchInfo(ctx, *id, h)
+		}
+		if *err != nil {
+			log.Println(*err)
+			return
 		}
 	}()
 }

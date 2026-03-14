@@ -5,14 +5,14 @@ import (
 	"testing"
 	"time"
 
-	api "github.com/cryptopunkscc/portal/cmd/astral-yt-dlp/api"
+	client "github.com/cryptopunkscc/portal/cmd/astral-yt-dlp/client"
 	"github.com/cryptopunkscc/portal/cmd/astral-yt-dlp/src"
 	"github.com/cryptopunkscc/portal/pkg/util/test"
 )
 
-func (c *TestContext) TestServeAstralYouTubeDl(requests ...api.Request) test.Test {
+func (c *TestContext) TestServeAstralYouTubeDl(requests ...client.Request) test.Test {
 	return c.Test().Args(requests).Func(func(t *testing.T) {
-		p := api.Client{Client: c.Apphost.Client}
+		p := client.Client{Client: c.Client.Client}
 		for _, request := range requests {
 			err := p.Download(c.Context, request)
 			if err != nil && !strings.Contains(err.Error(), "already downloading") {

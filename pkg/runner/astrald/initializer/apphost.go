@@ -26,14 +26,14 @@ func (i *Astrald) writeApphostConfig() (err error) {
 
 func (i *Astrald) apphostResolveEndpoint() {
 	for _, endpoint := range i.Config.Apphost.Listen {
-		i.Apphost.Endpoint = endpoint
+		i.Client.Endpoint = endpoint
 		return
 	}
-	i.Apphost.Endpoint = libApphost.DefaultEndpoint
+	i.Client.Endpoint = libApphost.DefaultEndpoint
 }
 
 func (i *Astrald) apphostIsRunning() bool {
-	return i.Apphost.Reconnect() == nil
+	return i.Client.Reconnect() == nil
 }
 
 func (i *Astrald) apphostAwait(ctx context.Context) (err error) {
@@ -46,7 +46,7 @@ func (i *Astrald) apphostAwait(ctx context.Context) (err error) {
 	}.Chan()
 	for n := range retry {
 		log.Println("awaiting apphost:", n)
-		err = i.Apphost.Connect()
+		err = i.Client.Connect()
 		if err == nil || err.Error() == "token authentication failed" {
 			err = nil
 			log.Println("apphost started")

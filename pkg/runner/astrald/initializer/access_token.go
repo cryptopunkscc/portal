@@ -1,7 +1,7 @@
 package initializer
 
 import (
-	"github.com/cryptopunkscc/portal/pkg/apphost"
+	"github.com/cryptopunkscc/portal/pkg/client"
 )
 
 func (i *Astrald) fetchAuthToken(pkg string) (err error) {
@@ -9,7 +9,7 @@ func (i *Astrald) fetchAuthToken(pkg string) (err error) {
 	if err != nil {
 		return
 	}
-	i.Apphost.Token = string(t.Token)
+	i.Client.Token = string(t.Token)
 	i.log.Println("fetched", pkg, "auth token")
 	return
 }
@@ -19,11 +19,11 @@ func (i *Astrald) resolveAuthToken(pkg string) (err error) {
 	if err != nil {
 		return
 	}
-	i.Apphost.Token = string(t.Token)
+	i.Client.Token = string(t.Token)
 	i.log.Println("resolved", pkg, "auth token")
 	return
 }
 
-func (i *Astrald) tokens() *apphost.Tokens {
-	return i.Apphost.Tokens(i.TokensDir)
+func (i *Astrald) tokens() *client.Tokens {
+	return i.Client.Tokens(i.TokensDir)
 }

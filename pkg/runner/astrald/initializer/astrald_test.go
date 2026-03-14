@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cryptopunkscc/portal/pkg/apphost"
+	"github.com/cryptopunkscc/portal/pkg/client"
 	"github.com/cryptopunkscc/portal/pkg/runner/astrald/debug"
 	"github.com/cryptopunkscc/portal/pkg/util/plog"
 	"github.com/cryptopunkscc/portal/pkg/util/test"
@@ -22,7 +22,7 @@ func TestInitializer_Start(t *testing.T) {
 			r.AgentAlias = "portald"
 			r.NodeRoot = dir
 			r.TokensDir = dir
-			r.Apphost = &apphost.Adapter{}
+			r.Client = &client.Astrald{}
 			//r.Runner = &exec.Astrald{NodeRoot: dir}
 			r.Runner = &debug.Astrald{NodeRoot: dir}
 			r.Config.Node.Log.Level = 100

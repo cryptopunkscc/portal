@@ -4,13 +4,13 @@ import (
 	"context"
 	"io/fs"
 
-	"github.com/cryptopunkscc/portal/pkg/apphost"
+	"github.com/cryptopunkscc/portal/pkg/client"
 	"github.com/cryptopunkscc/portal/pkg/source"
 	"github.com/cryptopunkscc/portal/pkg/util/plog"
 )
 
 type Publisher struct {
-	*apphost.ObjectsClient
+	*client.Objects
 }
 
 // PublishBundles recursively searches the given path and publishes any app bundle it finds.
@@ -19,8 +19,8 @@ func (p Publisher) PublishBundles(ctx context.Context, path string) (out []Relea
 }
 
 func (p Publisher) PublishBundlesSrc(ctx context.Context, src source.Source) (out []ReleaseInfo, err error) {
-	if p.ObjectsClient == nil {
-		p.ObjectsClient = apphost.Default.Objects()
+	if p.Objects == nil {
+		p.Objects = client.Default.Objects()
 	}
 	defer plog.TraceErr(&err)
 	apps := source.CollectIt(src, &Bundle{})
@@ -31,7 +31,7 @@ func (p Publisher) PublishBundlesSrc(ctx context.Context, src source.Source) (ou
 
 	for _, app := range apps {
 		var info ReleaseInfo
-		if info, err = app.Publish(ctx, p.ObjectsClient); err != nil {
+		if info, err = app.Publish(ctx, p.Objects); err != nil {
 			return
 		}
 		out = append(out, info)

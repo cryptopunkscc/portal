@@ -8,7 +8,7 @@ import (
 
 	"github.com/cryptopunkscc/astrald/astral"
 	"github.com/cryptopunkscc/astrald/mod/objects/client"
-	"github.com/cryptopunkscc/portal/pkg/apphost"
+	"github.com/cryptopunkscc/portal/pkg/client"
 	"github.com/cryptopunkscc/portal/pkg/source"
 	"github.com/cryptopunkscc/portal/pkg/util/plog"
 	"github.com/spf13/afero"
@@ -77,7 +77,7 @@ func (b *Bundle) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
-func (b Bundle) Publish(ctx context.Context, objects *apphost.ObjectsClient) (info ReleaseInfo, err error) {
+func (b Bundle) Publish(ctx context.Context, objects *client.Objects) (info ReleaseInfo, err error) {
 	release := ReleaseMetadata{
 		Release: b.Metadata.Release,
 		Target:  b.Metadata.Target,

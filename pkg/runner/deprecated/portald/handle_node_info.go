@@ -15,7 +15,7 @@ func (s *Service) nodeInfo() (ni *NodeInfo, err error) {
 		return s.NodeInfo, nil
 	}
 	ni = new(NodeInfo)
-	ni.Alias, err = s.Apphost.NodeAlias()
+	//ni.Alias, err = s.Apphost.NodeAlias()
 	if err != nil {
 		return
 	}

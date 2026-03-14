@@ -21,6 +21,8 @@ Or
 import "C"
 ```
 
-
-
-
+Zagadnienia:
+USB
+IPC
+bindowanie funkcji
+kontrola audio

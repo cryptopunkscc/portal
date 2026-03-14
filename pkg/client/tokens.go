@@ -1,4 +1,4 @@
-package apphost
+package client
 
 import (
 	"errors"
@@ -11,16 +11,16 @@ import (
 	"github.com/cryptopunkscc/portal/pkg/util/plog"
 )
 
-func (a *Adapter) Tokens(dir string) *Tokens {
+func (a *Astrald) Tokens(dir string) *Tokens {
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		panic(err)
 	}
-	return &Tokens{Dir: dir, Adapter: a}
+	return &Tokens{Dir: dir, Astrald: a}
 }
 
 type Tokens struct {
 	Dir string
-	*Adapter
+	*Astrald
 }
 
 func (r *Tokens) Load() bool {
@@ -61,11 +61,11 @@ func (r *Tokens) Resolve(pkg string) (accessToken *mod.AccessToken, err error) {
 		return
 	}
 
-	id, _ := r.Adapter.Resolve(pkg)
+	id, _ := r.Astrald.Resolve(pkg)
 
 	if id != nil {
 		var tokens []mod.AccessToken
-		if tokens, err = r.Adapter.ListTokens(ctx, ""); err != nil {
+		if tokens, err = r.Astrald.Apphost().ListTokens(ctx, ""); err != nil {
 			return
 		}
 
@@ -76,11 +76,12 @@ func (r *Tokens) Resolve(pkg string) (accessToken *mod.AccessToken, err error) {
 				return
 			}
 		}
-	} else if id, err = r.Adapter.Keys().CreateKey(nil, pkg); err != nil {
-		return
 	}
+	//else if id, err = r.Adapter.Keys().CreateKey(nil, pkg); err != nil { FIXME
+	//	return
+	//}
 
-	if accessToken, err = r.Adapter.CreateToken(ctx, id); err != nil {
+	if accessToken, err = r.Astrald.Apphost().CreateToken(ctx, id); err != nil {
 		return
 	}
 

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/cryptopunkscc/astrald/astral"
-	client "github.com/cryptopunkscc/portal/pkg/util/player/client"
+	"github.com/cryptopunkscc/portal/pkg/util/player/client"
 	"github.com/cryptopunkscc/portal/pkg/util/test"
 )
 
@@ -15,9 +15,9 @@ func (c *TestContext) TestMediaPlayerClient(
 	fileId *astral.ObjectID,
 ) {
 	debugDelay := time.Second * 1
-	p := client.Client{
+	p := player.Client{
 		Name:   service,
-		Client: c.Apphost.Client.WithTarget(c.Apphost.HostID()),
+		Client: c.Client.Client,
 	}
 
 	t.Run("play", func(t *testing.T) {

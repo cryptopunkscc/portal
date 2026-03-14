@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/cryptopunkscc/astrald/sig"
-	"github.com/cryptopunkscc/portal/cmd/astral-yt-dlp/api"
+	"github.com/cryptopunkscc/portal/cmd/astral-yt-dlp/client"
 )
 
 type Queue struct {

@@ -42,7 +42,7 @@ func (s *Service) astrald() astrald.Runner {
 		TokensDir:  s.Config.Tokens,
 		Config:     s.Config.Config,
 		Runner:     s.Astrald,
-		Apphost:    &s.Apphost,
+		Client:     &s.Apphost,
 	}
 }
 
