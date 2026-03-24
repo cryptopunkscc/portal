@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"sync"
 
-	"github.com/cryptopunkscc/astrald/lib/apphost"
+	"github.com/cryptopunkscc/astrald/astral"
 )
 
 type cache struct {
@@ -27,12 +27,12 @@ func (c *cache) interrupt() {
 	c.values = nil
 }
 
-func (c *cache) set(ac apphost.Conn) conn {
+func (c *cache) set(q *astral.Query, ac astral.Conn) conn {
 	c.Lock()
 	defer c.Unlock()
 	c.init()
-	cc := conn{ac, *bufio.NewReader(ac), c}
-	c.values[ac.Query().Nonce.String()] = cc
+	cc := conn{q, ac, *bufio.NewReader(ac), c}
+	c.values[q.Nonce.String()] = cc
 	return cc
 }
 
@@ -50,7 +50,8 @@ func (c *cache) get(id string) (conn, bool) {
 }
 
 type conn struct {
-	apphost.Conn
+	*astral.Query
+	astral.Conn
 	bufio.Reader
 	*cache
 }
@@ -77,6 +78,6 @@ func (c *conn) ReadString(delim byte) (s string, err error) {
 }
 
 func (c *conn) Close() error {
-	c.cache.delete(c.Conn.Query().Nonce.String())
+	c.cache.delete(c.Query.Nonce.String())
 	return c.Conn.Close()
 }

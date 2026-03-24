@@ -61,6 +61,8 @@ func (a *Astrald) ConnAccept() (data *bind.QueryData, err error) {
 	}
 
 	conn := next.Accept()
+	a.set(conn.Query(), conn)
+
 	data = &bind.QueryData{
 		Id:       conn.Query().Nonce.String(),
 		Query:    conn.Query().Query,
@@ -144,6 +146,7 @@ func (a *Astrald) Query(target string, query string) (data *bind.QueryData, err 
 	if err != nil {
 		return
 	}
+	a.set(q, conn)
 	data = &bind.QueryData{
 		Id:       q.Nonce.String(),
 		Query:    query,
