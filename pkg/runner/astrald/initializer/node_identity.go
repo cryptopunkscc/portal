@@ -2,7 +2,6 @@ package initializer
 
 import (
 	"github.com/cryptopunkscc/astrald/astral"
-	"github.com/cryptopunkscc/astrald/mod/keys"
 	"github.com/cryptopunkscc/portal/pkg/util/plog"
 )
 

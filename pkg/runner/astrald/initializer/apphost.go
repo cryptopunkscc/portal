@@ -33,7 +33,7 @@ func (i *Astrald) apphostResolveEndpoint() {
 }
 
 func (i *Astrald) apphostIsRunning() bool {
-	return i.Client.Reconnect() == nil
+	//return i.Client.Reconnect() == nil
 }
 
 func (i *Astrald) apphostAwait(ctx context.Context) (err error) {
@@ -46,7 +46,7 @@ func (i *Astrald) apphostAwait(ctx context.Context) (err error) {
 	}.Chan()
 	for n := range retry {
 		log.Println("awaiting apphost:", n)
-		err = i.Client.Connect()
+		//err = i.Client.Connect()
 		if err == nil || err.Error() == "token authentication failed" {
 			err = nil
 			log.Println("apphost started")
