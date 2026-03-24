@@ -17,6 +17,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.timeout
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -40,7 +41,7 @@ class MainService : Service() {
             status.collect { Log.d(tag, "status: $it") }
         }
         scope.launch {
-            errors.map(::Exception).collect(exceptions)
+            errors.map(::Exception).onEach { Log.e(tag, "core error", it) }.collect(exceptions)
         }
         scope.launch {
             runCatching {

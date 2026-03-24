@@ -31,7 +31,7 @@ Or install & start using adb commands:
 
 ```shell
 adb install ./app/build/outputs/apk/debug/app-debug.apk
-adb shell am start -n cc.cryptopunks.portal/cc.cryptopunks.portal.MainActivity
+adb shell am start -n cc.cryptopunks.portal/cc.cryptopunks.portal.main.MainActivity
 ```
 
 ## Android Studio

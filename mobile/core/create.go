@@ -1,45 +1,32 @@
 package core
 
 import (
-	"context"
+	"os"
+	"path"
 
+	"github.com/cryptopunkscc/astrald/astral"
 	ether "github.com/cryptopunkscc/astrald/mod/ether/src"
-	tcp "github.com/cryptopunkscc/astrald/mod/tcp/src"
+	ip "github.com/cryptopunkscc/astrald/mod/ip/src"
 	"github.com/cryptopunkscc/portal/mobile"
-	exec2 "github.com/cryptopunkscc/portal/pkg/runner/deprecated/exec"
-	"github.com/cryptopunkscc/portal/pkg/runner/deprecated/goja"
 	"github.com/cryptopunkscc/portal/pkg/util/plog"
 )
 
 func Create(api mobile.Api) mobile.Core {
-	tcp.InterfaceAddrs = interfaceAddrsFunc(api)
-	ether.NetInterfaces = netInterfacesFunc(api)
 	plog.Verbosity = 100
+	ip.InterfaceAddrs = interfaceAddrsFunc(api)
+	ether.NetInterfaces = netInterfacesFunc(api)
 
-	m := &service{}
-	m.mobile = api
-	m.ctx = context.Background()
-	m.Config.Dir = api.DataDir()
-	m.Config.Astrald = "astrald"
-	m.Config.Tokens = "portald/tokens"
-	m.Config.Apps = "portald/apps"
-	m.Config.Bin = "portald/bin"
-	m.Config.Config.Node.Log.DisableColors = true
-	m.Config.AstralDB = api.DbDir()
-	_ = m.Configure()
-	m.Astrald = &astrald{
-		NodeRoot: m.Config.Astrald,
-		DbRoot:   api.DbDir(),
+	err := os.Chdir(api.DataDir())
+	if err != nil {
+		panic(err)
 	}
-	m.ExtraTokens = []string{
-		"portal.launcher",
-	}
-	m.Resolve = Any[Runnable](
-		Skip("node_modules"),
-		goja.Runner(m.newCore).Try,
-		m.htmlRunner().Try,
-		exec2.Runner{Config: m.Config}.Dist().Try,
-		exec2.Runner{Config: m.Config}.Bundle().Try,
-	)
+
+	m := &Service{}
+	m.api = api
+	m.ctx, m.cancel = astral.NewContext(nil).WithCancel()
+	//m.astrald.Ghost = true
+	m.astrald.DBRoot = api.DataDir()
+	m.astrald.NodeRoot = path.Join(api.DataDir(), "astrald")
+
 	return m
 }

@@ -35,5 +35,4 @@ const (
 	STOPPED = int32(iota)
 	STARTING
 	STARTED
-	FRESH
 )

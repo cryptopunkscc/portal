@@ -1,26 +1,31 @@
 package core
 
 import (
-	"context"
-	"encoding/json"
+	"strings"
 
-	"github.com/cryptopunkscc/portal/target/html"
+	"github.com/cryptopunkscc/portal/mobile"
+	"github.com/cryptopunkscc/portal/pkg/source"
+	"github.com/cryptopunkscc/portal/pkg/source/html"
 )
 
-func (m *service) htmlRunner() *SourceRunner[AppHtml] {
-	return &SourceRunner[AppHtml]{
-		Resolve: Any[AppHtml](
-			html.ResolveBundle.Try,
-			html.ResolveDist.Try,
-		),
-		Runner: Run[AppHtml](m.runHtml),
-	}
+type htmlBundleRunner struct {
+	html.App
+	api    mobile.Api
+	Bundle html.Bundle
 }
 
-func (m *service) runHtml(_ context.Context, src AppHtml, args ...string) (err error) {
-	argsJson, err := json.Marshal(args)
-	if err != nil {
-		return
+func (r htmlBundleRunner) New() source.Source {
+	return &r
+}
+
+func (r *htmlBundleRunner) ReadSrc(src source.Source) (err error) {
+	if err = r.Bundle.ReadSrc(src); err == nil {
+		r.App = r.Bundle.App
+		r.Func = r.Start
 	}
-	return m.mobile.StartHtml(src.Manifest().Package, string(argsJson))
+	return
+}
+
+func (r *htmlBundleRunner) Start(args ...string) (err error) {
+	return r.api.StartHtml(r.Bundle.Package, strings.Join(args, " "))
 }

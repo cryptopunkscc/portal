@@ -11,7 +11,8 @@ import (
 	"github.com/cryptopunkscc/astrald/core"
 	"github.com/cryptopunkscc/astrald/debug"
 	apphost "github.com/cryptopunkscc/astrald/mod/apphost/src"
-	"github.com/cryptopunkscc/astrald/mod/keys"
+	"github.com/cryptopunkscc/astrald/mod/crypto"
+	"github.com/cryptopunkscc/astrald/mod/secp256k1"
 	"github.com/cryptopunkscc/astrald/resources"
 	api "github.com/cryptopunkscc/portal/pkg/runner/astrald"
 	"github.com/cryptopunkscc/portal/pkg/util/plog"
@@ -20,15 +21,13 @@ import (
 
 type astrald struct {
 	NodeRoot string
-	DbRoot   string
+	DBRoot   string
 	Ghost    bool
 }
 
 func (a *astrald) Start(ctx context.Context) (err error) { return start(ctx, a) }
 
 var _ api.Runner = &astrald{}
-
-const resNodeIdentity = "node_identity"
 
 func start(ctx context.Context, a *astrald) (err error) {
 	log := plog.Get(ctx).Type(a).D()
@@ -45,7 +44,7 @@ func start(ctx context.Context, a *astrald) (err error) {
 	}
 	log.Println("setupNodeConfig done")
 
-	nodeID, err := setupNodeIdentity(nodeRes)
+	nodeID, err := loadNodeIdentity(nodeRes)
 	if err != nil {
 		return
 	}
@@ -61,7 +60,7 @@ func start(ctx context.Context, a *astrald) (err error) {
 	if err != nil {
 		return
 	}
-	log.Println("service.NewNode done")
+	log.Println("Service.NewNode done")
 
 	go func() {
 		err = coreNode.Run(ctx)
@@ -83,8 +82,8 @@ func setupResources(args *astrald) (r resources.Resources, err error) {
 		return nil, err
 	}
 
-	if len(args.DbRoot) > 0 {
-		nodeRes.SetDatabaseRoot(args.DbRoot)
+	if len(args.DBRoot) > 0 {
+		nodeRes.SetDatabaseRoot(args.DBRoot)
 	}
 
 	// make sure root directory exists
@@ -123,55 +122,40 @@ func setupNodeConfig(res resources.Resources) (err error) {
 	return res.Write(configName, configYaml)
 }
 
-// setupNodeIdentity reads node's identity from resources or generates one if needed
-func setupNodeIdentity(resources resources.Resources) (*astral.Identity, error) {
-	keyBytes, err := resources.Read(resNodeIdentity)
+const resNodeKey = "node_key"
+
+// loadNodeIdentity loads node's identity from resources. Generates a new identity if we don't have one yet.
+func loadNodeIdentity(resources resources.Resources) (identity *astral.Identity, err error) {
+	var nodeKey *crypto.PrivateKey
+
+	data, err := resources.Read(resNodeKey)
 	if err == nil {
-		if len(keyBytes) == 32 {
-			return astral.IdentityFromPrivKeyBytes(keyBytes)
+		object, _, _ := astral.Decode(bytes.NewReader(data), astral.Canonical())
+
+		var ok bool
+		nodeKey, ok = object.(*crypto.PrivateKey)
+		if !ok {
+			return nil, astral.NewErrUnexpectedObject(object)
 		}
+	} else {
+		nodeKey = secp256k1.New()
 
-		var pk keys.PrivateKey
-
-		objType, payload, err := astral.OpenCanonical(bytes.NewReader(keyBytes))
-		switch {
-		case err != nil:
-			return nil, err
-		case objType != pk.ObjectType():
-			return nil, fmt.Errorf("invalid object type: %s", objType)
-		}
-
-		_, err = pk.ReadFrom(payload)
+		// store node key
+		var keyBytes = &bytes.Buffer{}
+		_, err = astral.Encode(keyBytes, nodeKey, astral.Canonical())
 		if err != nil {
 			return nil, err
 		}
 
-		return astral.IdentityFromPrivKeyBytes(pk.Bytes)
+		err = resources.Write("node_key", keyBytes.Bytes())
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	nodeID, err := astral.GenerateIdentity()
-	if err != nil {
-		return nil, err
-	}
+	identity = secp256k1.Identity(secp256k1.PublicKey(nodeKey))
 
-	var buf = &bytes.Buffer{}
-
-	pk := &keys.PrivateKey{
-		Type:  keys.KeyTypeIdentity,
-		Bytes: nodeID.PrivateKey().Serialize(),
-	}
-
-	_, err = astral.WriteCanonical(buf, pk)
-	if err != nil {
-		return nil, err
-	}
-
-	err = resources.Write(resNodeIdentity, buf.Bytes())
-	if err != nil {
-		return nil, err
-	}
-
-	return nodeID, nil
+	return
 }
 
 func setupApphostConfig(res resources.Resources, nodeID *astral.Identity) (err error) {

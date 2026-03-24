@@ -30,7 +30,7 @@ task buildGoMobile(type: Exec) {
     doFirst {
         mkdir "$buildDir/outputs/aar/"
     }
-    environment("GOTOOLCHAIN", "go1.24.7")
+    environment("GOTOOLCHAIN", "go1.25.8")
 //    environment("GOARCH", "x86_64")
 //    environment("GOOS", "android")
 

@@ -6,6 +6,7 @@ import android.content.Intent.ACTION_VIEW
 import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 
 object Permissions {
 
@@ -18,7 +19,7 @@ object Permissions {
     fun request(
         message: String,
         vararg required: String,
-    ) = Intent(ACTION_VIEW, Uri.parse("astral://permissions")).apply {
+    ) = Intent(ACTION_VIEW, "astral://permissions".toUri()).apply {
         putExtra(Key.Message, message)
         putExtra(Key.Required, required)
     }

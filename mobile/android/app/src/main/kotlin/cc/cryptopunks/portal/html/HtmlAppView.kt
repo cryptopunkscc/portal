@@ -35,9 +35,8 @@ class HtmlAppView(context: Context) : WebView(context), KoinComponent {
         }
     }
 
-    fun loadApp(src: String): App {
+    fun loadApp(src: String) = try {
         app?.core()?.close()
-
         val app = core.app(src)
         val assets = app.assets()
         val adapter = HtmlRuntimeAdapter(this, app.core())
@@ -46,8 +45,11 @@ class HtmlAppView(context: Context) : WebView(context), KoinComponent {
         portalWebViewClient.assets = assets
         removeJavascriptInterface("_app_host")
         addJavascriptInterface(adapter, "_app_host")
+
+    } catch (e: Exception) {
+        e.printStackTrace()
+    } finally {
         loadUrl("file://index.html")
-        return app
     }
 
     override fun destroy() {
