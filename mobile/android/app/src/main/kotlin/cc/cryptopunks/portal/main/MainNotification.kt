@@ -19,13 +19,6 @@ import androidx.core.content.getSystemService
 import cc.cryptopunks.portal.R
 
 internal fun Service.startForegroundNotification() {
-    val channelId = createNotificationChannel(
-        id = "astral",
-        channelName = "Astral Service",
-        importance = NotificationManagerCompat.IMPORTANCE_LOW,
-        color = Color.BLUE,
-        visibility = Notification.VISIBILITY_PRIVATE,
-    )
 
     val activityIntent = Intent(this, MainActivity::class.java)
 
@@ -33,7 +26,7 @@ internal fun Service.startForegroundNotification() {
         .getActivity(this, 0, activityIntent, PendingIntent.FLAG_IMMUTABLE)
 
     val builder = NotificationCompat
-        .Builder(this, channelId)
+        .Builder(this, "astral")
         .setSmallIcon(R.mipmap.ic_launcher)
         .setContentIntent(pendingIntent)
         .setOngoing(true)
@@ -45,29 +38,38 @@ internal fun Service.startForegroundNotification() {
 
 val astralActivityIntent = Intent(Intent.ACTION_VIEW, Uri.parse("astral://main"))
 
+fun Context.createServiceNotificationChannel() = createNotificationChannel(
+    id = "astral",
+    channelName = "Astral Service",
+    importance = NotificationManagerCompat.IMPORTANCE_LOW,
+    color = Color.BLUE,
+    visibility = Notification.VISIBILITY_PRIVATE,
+)
+
 private fun Context.createNotificationChannel(
     id: String,
     channelName: String,
     importance: Int,
     color: Int,
     visibility: Int,
-): String {
-    return when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
-        -> NotificationChannel(id, channelName, importance).apply {
-            lightColor = color
-            lockscreenVisibility = visibility
-        }.also { channel ->
-            getSystemService<NotificationManager>()
-                ?.createNotificationChannel(channel)
-                ?: throw Exception("Cannot obtain NotificationManager")
-        }.id
-        else
-        -> NotificationChannelCompat.Builder(id, importance).apply {
-            setLightColor(color)
-        }.build().also { channel ->
-            NotificationManagerCompat.from(this)
-                .createNotificationChannel(channel)
-        }.id
+) {
+    when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
+            NotificationChannel(id, channelName, importance).apply {
+                lightColor = color
+                lockscreenVisibility = visibility
+            }.also { channel ->
+                getSystemService<NotificationManager>()
+                    ?.createNotificationChannel(channel)
+                    ?: throw Exception("Cannot obtain NotificationManager")
+            }
+
+        else ->
+            NotificationChannelCompat.Builder(id, importance).apply {
+                setLightColor(color)
+            }.build().also { channel ->
+                NotificationManagerCompat.from(this)
+                    .createNotificationChannel(channel)
+            }
     }
 }

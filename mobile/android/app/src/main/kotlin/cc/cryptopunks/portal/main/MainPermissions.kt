@@ -13,7 +13,7 @@ import cc.cryptopunks.portal.hasPermissions
 internal class MainPermissions : ViewModel() {
 
     @SuppressLint("BatteryLife")
-    private val remaining = buildList {
+    private val permissions = buildList {
         add(
             Data(
                 Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
@@ -28,22 +28,15 @@ internal class MainPermissions : ViewModel() {
                 "Allow service notification, to keep connections alive in background",
             )
         )
-    }.iterator()
-
-    fun ask(context: Context) : Boolean {
-        while (remaining.hasNext()) {
-            val (permission, message, granted) = remaining.next()
-            if (!granted(context)) {
-                context.startActivity(Permissions.request(message, permission))
-                return true
-            }
-        }
-        return false
     }
+
+    fun ask(context: Context) : Boolean = null != permissions
+        .find { !it.granted(context) }
+        ?.apply { context.startActivity(Permissions.request(message, permission)) }
 
     private data class Data(
         val permission: String,
         val message: String,
-        val check: Context.() -> Boolean = { hasPermissions(permission) },
+        val granted: Context.() -> Boolean = { hasPermissions(permission) },
     )
 }

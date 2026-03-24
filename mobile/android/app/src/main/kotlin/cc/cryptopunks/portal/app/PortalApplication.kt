@@ -1,12 +1,14 @@
 package cc.cryptopunks.portal.app
 
 import android.app.Application
+import cc.cryptopunks.portal.activity.ActivityLifecycleLog
 import cc.cryptopunks.portal.activity.ActivityStack
 import cc.cryptopunks.portal.activity.activityModule
 import cc.cryptopunks.portal.compose.composeModule
 import cc.cryptopunks.portal.core.coreModule
 import cc.cryptopunks.portal.exception.exceptionModule
 import cc.cryptopunks.portal.html.htmlAppModule
+import cc.cryptopunks.portal.main.createServiceNotificationChannel
 import cc.cryptopunks.portal.main.mainModule
 import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
@@ -40,5 +42,7 @@ class PortalApplication : Application() {
 //        get<Core>().install()
 //        get<LogcatBackup>().start()
         registerActivityLifecycleCallbacks(get<ActivityStack>())
+//        registerActivityLifecycleCallbacks(ActivityLifecycleLog)
+        createServiceNotificationChannel()
     }
 }

@@ -24,11 +24,8 @@ object Permissions {
         putExtra(Key.Required, required)
     }
 
-    fun result(
-        rejected: Array<String>,
-    ) = Intent().apply {
-        putExtra(Key.Rejected, rejected)
-    }
+    fun result(rejected: Array<String>) = Intent().apply { putExtra(Key.Rejected, rejected) }
+    fun result(rejected: Collection<String>) = result(rejected.toTypedArray())
 
     fun getMessage(intent: Intent): String =
         intent.getStringExtra(Key.Message) ?: ""

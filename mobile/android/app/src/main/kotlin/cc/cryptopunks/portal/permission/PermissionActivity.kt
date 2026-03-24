@@ -1,7 +1,6 @@
 package cc.cryptopunks.portal.permission
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
-import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -24,20 +22,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import cc.cryptopunks.portal.Permissions
 import cc.cryptopunks.portal.compose.AstralTheme
 
 class PermissionActivity : ComponentActivity() {
 
-    private val requestPermission = registerForActivityResult(
+    private val requestPermissions = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { result ->
-        val rejected = result.filterValues { !it }.keys.toTypedArray()
+        val rejected = result.filterValues { !it }.keys
         val intent = Permissions.result(rejected)
         setResult(RESULT_OK, intent)
         finish()
     }
-
     private val requestStorage = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
@@ -58,11 +56,11 @@ class PermissionActivity : ComponentActivity() {
                         perm.startsWith("android.settings")
                     }
                     if (perm != null) {
-                        val uri = Uri.parse("package:$packageName")
+                        val uri = "package:$packageName".toUri()
                         val intent = Intent(perm, uri)
                         requestStorage.launch(intent)
                     } else if (required.isNotEmpty()) {
-                        requestPermission.launch(required.toTypedArray())
+                        requestPermissions.launch(required.toTypedArray())
                     }
                 }
             }
