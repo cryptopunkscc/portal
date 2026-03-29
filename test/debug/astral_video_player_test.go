@@ -47,7 +47,7 @@ func (c *TestContext) findVideoFile(t *testing.T) (audioFileId *astral.ObjectID)
 	for id := range scan {
 		descCh, errPtr := c.Client.Objects().Describe(c.Context, id)
 		for desc := range descCh {
-			if fl, ok := desc.Descriptor.(*fs.FileLocation); ok {
+			if fl, ok := desc.Data.(*fs.FileLocation); ok {
 				if path.Ext(fl.Path.String()) == ".mkv" {
 					audioFileId = id
 				}

@@ -43,7 +43,7 @@ func (c *TestContext) findAudioFile(t *testing.T) (audioFileId *astral.ObjectID)
 	for id := range scan {
 		descCh, errPtr := c.Client.Objects().Describe(c.Context, id)
 		for desc := range descCh {
-			if _, ok := desc.Descriptor.(*media.AudioFile); ok {
+			if _, ok := desc.Data.(*media.AudioFile); ok {
 				audioFileId = id
 			}
 		}

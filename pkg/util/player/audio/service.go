@@ -40,7 +40,7 @@ func (s *Service) SetID(ctx *astral.Context, id *astral.ObjectID) (err error) {
 	s.ObjectID = id
 	describeCh, e := s.ObjectsClient.Describe(ctx, id)
 	for describe := range describeCh {
-		switch d := describe.Descriptor.(type) {
+		switch d := describe.Data.(type) {
 		case *fs.FileLocation:
 			s.Location = d
 		}

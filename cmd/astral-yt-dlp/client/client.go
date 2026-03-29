@@ -33,7 +33,7 @@ func (c Client) Status(ctx *astral.Context) (out <-chan *Progress, e *error) {
 		defer close(pch)
 		err = qch.Switch(
 			channel.Chan[*Progress](pch),
-			channel.StopOnEOS,
+			channel.BreakOnEOS,
 			channel.PassErrors,
 			channel.WithContext(ctx),
 		)
